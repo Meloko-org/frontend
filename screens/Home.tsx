@@ -56,6 +56,7 @@ export default function HomeScreen({ navigation }: Props) {
       {
         isSignedIn ? (
           <>
+            <Button title="Menu Producer" onPress={() => navigation.navigate('TabNavigatorProducer')} />
             <Button title="Test" onPress={onTestPress} /> 
             <Button title="Signout" onPress={onSignoutPress} /> 
           </>
@@ -65,7 +66,7 @@ export default function HomeScreen({ navigation }: Props) {
             <Button title="Signup" onPress={() => navigation.navigate('SignUp')} />
             <Button title="Signin" onPress={() => navigation.navigate('SignIn')} />
             <Button title="Menu User" onPress={() => navigation.navigate('TabNavigatorUser')} />
-            <Button title="Menu Producer" onPress={() => navigation.navigate('TabNavigatorProducer')} />
+            
           </>
         )
       }

@@ -14,8 +14,9 @@ import SignInScreen from './screens/Signin';
 import CartScreen from './screens/Cart';
 import FavoritesScreen from './screens/Favorites';
 import ProfilScreen from './screens/Profil';
-import ShopScreen from './screens/Shop';
+import ShopScreen from './screens/producer/Shop';
 import BusinessScreen from './screens/Business';
+import ProducerProfileScreen from './screens/producer/Profil'
 
 const FontAwesome = _FontAwesome as React.ElementType;
 
@@ -118,7 +119,7 @@ const TabNavigatorProducer: React.FC = () => {
       <Tab.Screen name="Accueil" component={HomeScreen} />
       <Tab.Screen name="Boutique" component={ShopScreen} />
       <Tab.Screen name="Business Center" component={BusinessScreen} />
-      <Tab.Screen name="Profil" component={ProfilScreen} />
+      <Tab.Screen name="ProducerProfile" component={ProducerProfileScreen} />
     </Tab.Navigator>
   );
 };
