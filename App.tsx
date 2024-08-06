@@ -6,7 +6,7 @@ import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { RootStackParamList } from './types/Navigation'
 
-import _FontAwesome from 'react-native-vector-icons/FontAwesome';
+import _FontAwesome from 'react-native-vector-icons/FontAwesome6';
 
 import HomeScreen from './screens/Home';
 import SignUpScreen from './screens/Signup';
