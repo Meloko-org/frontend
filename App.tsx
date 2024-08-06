@@ -106,7 +106,7 @@ const TabNavigatorProducer: React.FC = () => {
           iconName = 'shop';
         } else if (route.name === 'Business Center') {
           iconName = 'file-invoice-dollar';
-        } else if (route.name === 'Profil') {
+        } else if (route.name === 'ProducerProfile') {
           iconName = 'user-circle';
         }
 
