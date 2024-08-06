@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Button, View, Text } from 'react-native'
+import { StyleSheet, Button, View, Text, TouchableOpacity } from 'react-native'
 import { useAuth } from '@clerk/clerk-expo'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/Navigation'
@@ -64,6 +64,8 @@ export default function HomeScreen({ navigation }: Props) {
           <>
             <Button title="Signup" onPress={() => navigation.navigate('SignUp')} />
             <Button title="Signin" onPress={() => navigation.navigate('SignIn')} />
+            <Button title="Menu User" onPress={() => navigation.navigate('TabNavigatorUser')} />
+            <Button title="Menu Producer" onPress={() => navigation.navigate('TabNavigatorProducer')} />
           </>
         )
       }
