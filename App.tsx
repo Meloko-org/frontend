@@ -126,7 +126,7 @@ const TabNavigatorProducer: React.FC = () => {
   );
 };
 
-export default function App() {
+export default function App(): JSX.Element {
   return (
     <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
       <ClerkLoaded>
