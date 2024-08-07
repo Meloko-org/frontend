@@ -5,8 +5,8 @@ import { Text, View } from 'react-native'
 
 export default function Delivered(): JSX.Element {
 	return (
-		<View className="rounded-full px-2 w-1/3 bg-primary">
-			<Text className="text-lightbg font-bold">RETIRÉE</Text>
+		<View className="rounded-lg w-32 bg-primary">
+			<Text className="text-lightbg text-center text-xs">RETIRÉE</Text>
 		</View>
 	)
 }
