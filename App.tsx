@@ -135,7 +135,7 @@ export default function App() {
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="SignUp" component={SignUpScreen} />
             <Stack.Screen name="SignIn" component={SignInScreen} />
-            <Stack.Screen name="Search" component={SearchCustomerScreen} />
+            <Stack.Screen name="SearchCustomer" component={SearchCustomerScreen} />
             <Stack.Screen name="TabNavigatorUser" component={TabNavigatorUser} />
             <Stack.Screen name="TabNavigatorProducer" component={TabNavigatorProducer} />
           </Stack.Navigator>
