@@ -13,7 +13,7 @@ interface ShopData {
 
 export default function ShopUserScreen() {
   const [shopData, setShopData] = useState<ShopData[]>([]);
-  const [count, setCount] = useState<number>(3.5);
+  const [count, setCount] = useState<number>(0);
 
   useEffect(() => {
     fetch(`http://localhost:3000/shops/66b339729a76167d3a93df3b`) // A MODIFIER ${AMODIFIER}

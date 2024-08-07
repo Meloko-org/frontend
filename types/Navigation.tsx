@@ -6,6 +6,10 @@ type RootStackParamList = {
   SignUp: undefined;
   TabNavigatorUser: undefined;
   TabNavigatorProducer: undefined;
+  ShopProducer: undefined;
+  ProfilProducer: undefined;
+  SearchCustomer: undefined;
+  HomeCustomer: undefined; 
 };
 
 export type {
