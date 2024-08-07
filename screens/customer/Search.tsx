@@ -61,7 +61,19 @@ export default function SearchCustomerScreen({ navigation }: Props) {
       })
       const data = await response.json()
       // console.log(data)
-      console.log(data)
+      // navigation.navigate('TabNavigatorUser')
+
+      navigation.navigate('TabNavigatorUser', {
+        screen: 'Accueil',
+        params: { 
+          search: {
+            query,
+            radius,
+            userPosition
+          },
+          searchResults: data.searchResults 
+        },
+      });
     } catch (err) {
       console.error(err)   
     }

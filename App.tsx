@@ -9,7 +9,7 @@ import { RootStackParamList } from './types/Navigation'
 import _FontAwesome from 'react-native-vector-icons/FontAwesome6';
 
 import HomeScreen from './screens/Home';
-import HomeCustomerScreen from './screens/customer/Home'
+import MapCustomerScreen from './screens/customer/Map'
 import SignUpScreen from './screens/Signup';
 import SignInScreen from './screens/Signin';
 import CartScreen from './screens/Cart';
@@ -88,7 +88,7 @@ const TabNavigatorUser: React.FC = () => {
       tabBarInactiveTintColor: '#262E20',
       headerShown: false,
     })}>
-      <Tab.Screen name="Accueil" component={HomeCustomerScreen} />
+      <Tab.Screen name="Accueil" component={MapCustomerScreen} />
       <Tab.Screen name="Panier" component={CartScreen} />
       <Tab.Screen name="Favoris" component={FavoritesScreen} />
       <Tab.Screen name="Profil" component={ProfilScreen} />
@@ -126,7 +126,7 @@ const TabNavigatorProducer: React.FC = () => {
   );
 };
 
-export default function App() {
+export default function App(): JSX.Element {
   return (
     <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
       <ClerkLoaded>

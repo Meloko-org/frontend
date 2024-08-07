@@ -9,7 +9,7 @@ type RootStackParamList = {
   ShopProducer: undefined;
   ProfilProducer: undefined;
   SearchCustomer: undefined;
-  HomeCustomer: undefined; 
+  MapCustomer: undefined; 
 };
 
 export type {
