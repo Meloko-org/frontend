@@ -1,5 +1,6 @@
 import React from 'react'
-import { StyleSheet, Button, View, Text, TouchableOpacity } from 'react-native'
+import { StatusBar } from 'expo-status-bar';
+// import { StyleSheet, Button, View, Text, TouchableOpacity } from 'react-native'
 import { useAuth } from '@clerk/clerk-expo'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/Navigation'
