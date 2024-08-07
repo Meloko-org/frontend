@@ -2,18 +2,18 @@ import React from 'react'
 import { StyleSheet, Button, View, Text, TouchableOpacity } from 'react-native'
 import { useAuth } from '@clerk/clerk-expo'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types/Navigation'
+import { RootStackParamList } from '../../types/Navigation'
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  'Home'
+  'HomeCustomer'
 >;
 
 type Props = {
   navigation: ProfileScreenNavigationProp;
 };
 
-export default function HomeScreen({ navigation }: Props) {
+export default function HomeCustomerScreen({ navigation }: Props) {
   // Import the Clerk Auth functions
   const { signOut, isSignedIn, getToken } = useAuth()
 
@@ -40,39 +40,11 @@ export default function HomeScreen({ navigation }: Props) {
     }
   }
 
-  // Signout the user from Clerk
-  const onSignoutPress = async () => {
-    try {
-      await signOut()
-    } catch (err) {
-      console.error(JSON.stringify(err, null, 2))   
-    }
-  }
-
 
   return (
     <View style={styles.container}>
-      <Text>Bienvenue</Text>
+      <Text>Map</Text>
       <Button title="Test" onPress={onTestPress} /> 
-      <Text>Je veux</Text>
-      <Button title="Voir tous les producteurs aux alentours" onPress={() => navigation.navigate('TabNavigatorUser')} />
-      <Button title="Fair une recherche" onPress={() => navigation.navigate('SearchCustomer')} />
-      <Button title="Gérer mes ventes" onPress={() => navigation.navigate('TabNavigatorProducer')} />
-      {
-        isSignedIn ? (
-          <>
-            <Button title="Signout" onPress={onSignoutPress} /> 
-          </>
-        )
-        : (
-          <>
-            <Button title="Signup" onPress={() => navigation.navigate('SignUp')} />
-            <Button title="Signin" onPress={() => navigation.navigate('SignIn')} />
-          </>
-        )
-      }
-      
-
     </View>
   )
 }

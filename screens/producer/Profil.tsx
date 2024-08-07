@@ -6,14 +6,14 @@ import { RootStackParamList } from '../../types/Navigation'
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  'SignIn'
+  'ProfilProducer'
 >;
 
 type Props = {
   navigation: ProfileScreenNavigationProp;
 };
 
-export default function ProducerProfilScreen({ navigation }: Props) {
+export default function ProfilProducerScreen({ navigation }: Props) {
   // Import the Clerk Auth functions
   const { getToken } = useAuth()
 
