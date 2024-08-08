@@ -9,15 +9,18 @@ import { RootStackParamList } from './types/Navigation'
 import _FontAwesome from 'react-native-vector-icons/FontAwesome6';
 
 import HomeScreen from './screens/Home';
+import MapCustomerScreen from './screens/customer/Map'
 import SignUpScreen from './screens/Signup';
 import SignInScreen from './screens/Signin';
 import CartScreen from './screens/Cart';
 import FavoritesScreen from './screens/Favorites';
 import ProfilScreen from './screens/Profil';
-import ShopScreen from './screens/producer/Shop';
+import ShopProducerScreen from './screens/producer/Shop';
 import BusinessScreen from './screens/Business';
-import ProducerProfileScreen from './screens/producer/Profil';
+import ProfilProducerScreen from './screens/producer/Profil';
 import StocksScreen from './screens/Stocks';
+import SearchCustomerScreen from './screens/customer/Search'
+import ComponentsScreen from './screens/Components'
 
 const FontAwesome = _FontAwesome as React.ElementType;
 
@@ -87,7 +90,7 @@ const TabNavigatorUser: React.FC = () => {
       tabBarInactiveTintColor: '#262E20',
       headerShown: false,
     })}>
-      <Tab.Screen name="Accueil" component={HomeScreen} />
+      <Tab.Screen name="Accueil" component={MapCustomerScreen} />
       <Tab.Screen name="Panier" component={CartScreen} />
       <Tab.Screen name="Favoris" component={FavoritesScreen} />
       <Tab.Screen name="Profil" component={ProfilScreen} />
@@ -107,7 +110,7 @@ const TabNavigatorProducer: React.FC = () => {
           iconName = 'shop';
         } else if (route.name === 'Business Center') {
           iconName = 'file-invoice-dollar';
-        } else if (route.name === 'Profil') {
+        } else if (route.name === 'ProducerProfile') {
           iconName = 'user-circle';
         } else if (route.name === 'GestionDesStocks') {
           iconName = 'boxes';
@@ -120,14 +123,14 @@ const TabNavigatorProducer: React.FC = () => {
       headerShown: false,
     })}>
       <Tab.Screen name="Accueil" component={HomeScreen} />
-      <Tab.Screen name="Boutique" component={ShopScreen} />
+      <Tab.Screen name="Boutique" component={ShopProducerScreen} />
       <Tab.Screen name="Business Center" component={BusinessScreen} />
-      <Tab.Screen name="ProducerProfile" component={ProducerProfileScreen} />
+      <Tab.Screen name="ProducerProfile" component={ProfilProducerScreen} />
     </Tab.Navigator>
   );
 };
 
-export default function App() {
+export default function App(): JSX.Element {
   return (
     <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
       <ClerkLoaded>
@@ -137,6 +140,8 @@ export default function App() {
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="SignUp" component={SignUpScreen} />
             <Stack.Screen name="SignIn" component={SignInScreen} />
+            <Stack.Screen name="SearchCustomer" component={SearchCustomerScreen} />
+            <Stack.Screen name="Components" component={ComponentsScreen} />
             <Stack.Screen name="TabNavigatorUser" component={TabNavigatorUser} />
             <Stack.Screen name="TabNavigatorProducer" component={TabNavigatorProducer} />
           </Stack.Navigator>

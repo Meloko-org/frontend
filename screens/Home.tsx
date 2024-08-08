@@ -6,7 +6,7 @@ import { RootStackParamList } from '../types/Navigation'
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  'SignIn'
+  'Home'
 >;
 
 type Props = {
@@ -52,12 +52,16 @@ export default function HomeScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text>Home</Text>
+      <Text>Bienvenue</Text>
+      <Button title="Components" onPress={() => navigation.navigate('Components')} /> 
+      <Button title="Test" onPress={onTestPress} /> 
+      <Text>Je veux</Text>
+      <Button title="Voir tous les producteurs aux alentours" onPress={() => navigation.navigate('TabNavigatorUser')} />
+      <Button title="Fair une recherche" onPress={() => navigation.navigate('SearchCustomer')} />
+      <Button title="Gérer mes ventes" onPress={() => navigation.navigate('TabNavigatorProducer')} />
       {
         isSignedIn ? (
           <>
-            <Button title="Menu Producer" onPress={() => navigation.navigate('TabNavigatorProducer')} />
-            <Button title="Test" onPress={onTestPress} /> 
             <Button title="Signout" onPress={onSignoutPress} /> 
           </>
         )
@@ -65,8 +69,6 @@ export default function HomeScreen({ navigation }: Props) {
           <>
             <Button title="Signup" onPress={() => navigation.navigate('SignUp')} />
             <Button title="Signin" onPress={() => navigation.navigate('SignIn')} />
-            <Button title="Menu User" onPress={() => navigation.navigate('TabNavigatorUser')} />
-            
           </>
         )
       }

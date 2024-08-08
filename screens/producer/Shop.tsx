@@ -5,18 +5,18 @@ import { RootStackParamList } from '../../types/Navigation'
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  'SignIn'
+  'ShopProducer'
 >;
 
 type Props = {
   navigation: ProfileScreenNavigationProp;
 };
 
-export default function ShopScreen({ navigation }: Props) {
+export default function ShopProducteurScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
     <Text style={styles.texte}>Shop</Text>
-    <Button title="Create my producer profile" onPress={() => navigation.navigate('ProducerProfile')}/>
+    <Button title="Create my producer profile" onPress={() => navigation.navigate('ProfilProducer')}/>
     </View>
   );
 }
