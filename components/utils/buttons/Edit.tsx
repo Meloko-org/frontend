@@ -8,7 +8,7 @@ export default function Edit(): JSX.Element {
 
 	return (
 		<TouchableOpacity className="flex flex-row rounded-lg bg-primary py-1 justify-end items-center px-4">
-			<FontAwesome name="pen" size={30} color="#FFFFFF"/>
+			{/* <FontAwesome name="pen" size={30} color="#FFFFFF"/> */}
 			<Text className="text-lightbg">Edit</Text>
 		</TouchableOpacity>
 	)
