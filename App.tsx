@@ -16,7 +16,8 @@ import FavoritesScreen from './screens/Favorites';
 import ProfilScreen from './screens/Profil';
 import ShopScreen from './screens/producer/Shop';
 import BusinessScreen from './screens/Business';
-import ProducerProfileScreen from './screens/producer/Profil'
+import ProducerProfileScreen from './screens/producer/Profil';
+import StocksScreen from './screens/Stocks';
 
 const FontAwesome = _FontAwesome as React.ElementType;
 
@@ -108,7 +109,9 @@ const TabNavigatorProducer: React.FC = () => {
           iconName = 'file-invoice-dollar';
         } else if (route.name === 'Profil') {
           iconName = 'user-circle';
-        }
+        } else if (route.name === 'GestionDesStocks') {
+          iconName = 'boxes';
+        } 
 
         return <FontAwesome name={iconName} size={size} color={color} />;
       },
@@ -130,6 +133,7 @@ export default function App() {
       <ClerkLoaded>
         <NavigationContainer>
           <Stack.Navigator screenOptions={options}>
+            <Stack.Screen name="GestionDesStocks" component={StocksScreen} />
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="SignUp" component={SignUpScreen} />
             <Stack.Screen name="SignIn" component={SignInScreen} />

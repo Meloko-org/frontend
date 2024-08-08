@@ -6,6 +6,7 @@ type RootStackParamList = {
   SignUp: undefined;
   TabNavigatorUser: undefined;
   TabNavigatorProducer: undefined;
+  GestionDesStocks: undefined;
 };
 
 export type {
