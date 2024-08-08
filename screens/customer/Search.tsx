@@ -29,15 +29,14 @@ export default function SearchCustomerScreen({ navigation }: Props) {
   const [radius, setRadius] = useState({ value: [20] })
   const [query, setQuery] = useState<string>('')
   const [address, setAddress] = useState<string>('')
-  const [searchResults, setSearchResults] = useState([])
-  const [myPosition, setMyPosition] = useState(false)
+  const [search, setSearch] = useState(false)
 
   // Import the public api root address
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
 
   useEffect(() => {
     (async () => {
-      if(userPosition.latitude !== 0 || myPosition) {
+      if((userPosition.latitude !== 0 && search)) {
         const response = await fetch(`${API_ROOT}/shops/search`, {
           method: 'POST',
           headers: {
@@ -64,12 +63,10 @@ export default function SearchCustomerScreen({ navigation }: Props) {
           },
         });
       }
-      // console.log(userPosition)
-  
 
     })()
 
-  }, [userPosition, myPosition])
+  }, [userPosition, search])
 
   const useMyPosition = async () => {
     setAddress('Ma Position')
@@ -90,13 +87,12 @@ export default function SearchCustomerScreen({ navigation }: Props) {
 
   const searchAddress = async () => {
     try {
-      setMyPosition(false)
       console.log('fetching the address')
       const response = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${address}`)
       const data = await response.json()
       const latitude = data.features[0].geometry.coordinates[1]
       const longitude = data.features[0].geometry.coordinates[0]
-      console.log(`lat: ${latitude} lon: ${longitude}`)
+
       setUserPosition({
         latitude: latitude,
         longitude: longitude
@@ -112,14 +108,8 @@ export default function SearchCustomerScreen({ navigation }: Props) {
     try {
       if(address !== 'Ma Position' && address !== '') {
         await searchAddress()
-      } else {
-        setMyPosition(true)
       }
-
-      console.log("user", userPosition)
-
-
-      setSearchResults(data.searchResults)
+      setSearch(true)
     } catch (err) {
       console.error(err)   
     }

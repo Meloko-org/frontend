@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { StyleSheet, Button, View, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, Button, View, ScrollView, Text, TouchableOpacity } from 'react-native'
 import { useAuth } from '@clerk/clerk-expo'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/Navigation'
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
@@ -47,16 +47,45 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
       }
     })();
 
-    console.log(route.params)
 
     if(route.params.searchResults) {
       setSearchResults(route.params.searchResults)
     }
   }, []);
-
   const markers = searchResults.map((data, i) => {
-    return <Marker key={i} coordinate={{ latitude: Number(data.address.latitude.$numberDecimal), longitude: Number(data.address.longitude.$numberDecimal) }} title={data.name} />;
+    return (<Marker 
+      key={i} 
+      coordinate={{ latitude: Number(data.address.latitude.$numberDecimal), longitude: Number(data.address.longitude.$numberDecimal) }} 
+      >
+        <Callout onPress={() => console.log("go to the shop page")}>
+          <View>
+          <Text>{ data.name }</Text>
+          <Text>Vends { data.searchData.relevantProducts.length } produit que vous recherchez</Text>
+          </View>
+
+        </Callout>
+
+      </Marker>)
   });
+
+  const producersList = searchResults.map(sr => (
+      <ProducerSearchResult 
+        name={sr.name}
+        onPressFn={
+          () => { 
+            navigation.navigate('TabNavigatorUser', {
+              screen: 'Shop',
+              params: { 
+                shopId: sr._id,
+                relevantProducts: sr.searchData.relevantProducts 
+              },
+            }) 
+          }
+        }
+        key={sr._id}
+      />
+
+  ))
 
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
@@ -77,7 +106,11 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
             onChange={handleSheetChanges}
           >
             <BottomSheetView style={styles.contentContainer}>
-              <ProducerSearchResult></ProducerSearchResult>
+              <ScrollView style={{flex: 1, width: '100%'}} className='p-2'>
+                <Text>Resultats ({producersList.length})</Text>
+                {producersList}
+              </ScrollView>
+              
             </BottomSheetView>
           </BottomSheet>
         )
