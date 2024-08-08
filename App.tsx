@@ -1,5 +1,6 @@
 import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-expo'
 import * as SecureStore from 'expo-secure-store'
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react-navigation/native-stack';
@@ -132,6 +133,7 @@ const TabNavigatorProducer: React.FC = () => {
 
 export default function App(): JSX.Element {
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
       <ClerkLoaded>
         <NavigationContainer>
@@ -146,7 +148,9 @@ export default function App(): JSX.Element {
             <Stack.Screen name="TabNavigatorProducer" component={TabNavigatorProducer} />
           </Stack.Navigator>
         </NavigationContainer>
+      
       </ClerkLoaded>
     </ClerkProvider>
+    </GestureHandlerRootView>
   );
 }

@@ -8,22 +8,24 @@ type SimpleProps = {
 		keyboardType?: null | string,
 		textContentType?: string,
 		autoComplete?: string,
-		onChangeText?: {},
+		onChangeText: Function,
 		value?: string,
 		style?: {},
-		className: string
+		class: string
+		size: string
 }
 
 export default function Simple(props: SimpleProps): JSX.Element {
-
 	return (
-		<View className="w-full rounded-lg mx-1 px-2 py-1 border border-secondary dark:border-primary">
-      <Text className="text-xs font-bold text-secondary/50">{props.label}</Text>
+		<View className={`${props.class} rounded-lg p-2 border border-secondary dark:border-primary`}>
+      <Text className={`${props.size === 'large' ? 'text-lg' : 'text-xs'} font-bold text-secondary/50 uppercase p-0`}>{props.label}</Text>
 			<TextInput 
-				className={props.className}
+				value={props.value}
+				className={props.size === 'large' ? 'text-lg' : 'text-base'}
 				placeholder={props.placeholder}
+				onChangeText={(value) => props.onChangeText(value)}
 				autoCapitalize={props.autoCapitalize ? 'none' : props.autoCapitalize}
-				>
+			>
 			</TextInput>
 		</View>
 	)

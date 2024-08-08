@@ -75,7 +75,7 @@ export default function ComponentsScreen({ navigation }: Props) {
             placeholder="placeholder" 
             label="label"
             autoCapitalize="none"
-             ></Simple>
+          ></Simple>
           <View  className="mb-3"></View>
           <View  className="mb-3"></View>
           <StatusBar style="auto" />
