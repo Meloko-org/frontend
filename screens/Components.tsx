@@ -6,20 +6,20 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/Navigation'
 
 import { ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import Product from './../components/cards/Products';
+import Product from '../components/cards/Products';
 import ProductCategory from './../components/cards/ProductCategory';
-import Producer from './../components/cards/Producer';
-import Status from './../components/cards/Status';
-import Cancelled from './../components/utils/badges/Cancelled';
-import Delivered from './../components/utils/badges/Delivered';
-import Partial from './../components/utils/badges/Partial';
-import PrimaryEnd from './../components/utils/buttons/PrimaryEnd';
-import PrimaryStart from './../components/utils/buttons/PrimaryStart';
-import SecondaryEnd from './../components/utils/buttons/SecondaryEnd';
-import SecondaryStart from './../components/utils/buttons/SecondaryStart';
-import Edit from './../components/utils/buttons/Edit';
-import SimpleButton from './../components/utils/buttons/SimpleButton';
-import Simple from './../components/utils/inputs/Simple';
+import Producer from '../components/cards/Producer';
+import Status from '../components/cards/Status';
+import Cancelled from '../components/utils/badges/Cancelled';
+import Delivered from '../components/utils/badges/Delivered';
+import Partial from '../components/utils/badges/Partial';
+import PrimaryEnd from '../components/utils/buttons/PrimaryEnd';
+import PrimaryStart from '../components/utils/buttons/PrimaryStart';
+import SecondaryEnd from '../components/utils/buttons/SecondaryEnd';
+import SecondaryStart from '../components/utils/buttons/SecondaryStart';
+import Edit from '../components/utils/buttons/Edit';
+import SimpleButton from '../components/utils/buttons/SimpleButton';
+import Simple from '../components/utils/inputs/Simple';
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,

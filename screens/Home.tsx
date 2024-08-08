@@ -53,6 +53,7 @@ export default function HomeScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <Text>Bienvenue</Text>
+      <Button title="Components" onPress={() => navigation.navigate('Components')} /> 
       <Button title="Test" onPress={onTestPress} /> 
       <Text>Je veux</Text>
       <Button title="Voir tous les producteurs aux alentours" onPress={() => navigation.navigate('TabNavigatorUser')} />
