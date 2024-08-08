@@ -6,6 +6,7 @@ type RootStackParamList = {
   SignUp: undefined;
   TabNavigatorUser: undefined;
   TabNavigatorProducer: undefined;
+  GestionDesStocks: undefined;
   ShopProducer: undefined;
   ProfilProducer: undefined;
   SearchCustomer: undefined;

@@ -1,5 +1,6 @@
 import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-expo'
 import * as SecureStore from 'expo-secure-store'
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react-navigation/native-stack';
@@ -17,7 +18,8 @@ import FavoritesScreen from './screens/Favorites';
 import ProfilScreen from './screens/Profil';
 import ShopProducerScreen from './screens/producer/Shop';
 import BusinessScreen from './screens/Business';
-import ProfilProducerScreen from './screens/producer/Profil'
+import ProfilProducerScreen from './screens/producer/Profil';
+import StocksScreen from './screens/Stocks';
 import SearchCustomerScreen from './screens/customer/Search'
 import ComponentsScreen from './screens/Components'
 import ShopUserScreen from './screens/Shop'
@@ -112,7 +114,9 @@ const TabNavigatorProducer: React.FC = () => {
           iconName = 'file-invoice-dollar';
         } else if (route.name === 'ProducerProfile') {
           iconName = 'user-circle';
-        }
+        } else if (route.name === 'GestionDesStocks') {
+          iconName = 'boxes';
+        } 
 
         return <FontAwesome name={iconName} size={size} color={color} />;
       },
@@ -130,6 +134,7 @@ const TabNavigatorProducer: React.FC = () => {
 
 export default function App(): JSX.Element {
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
       <ClerkLoaded>
         <NavigationContainer>
@@ -140,11 +145,14 @@ export default function App(): JSX.Element {
             <Stack.Screen name="SearchCustomer" component={SearchCustomerScreen} />
             <Stack.Screen name="Components" component={ComponentsScreen} />
             <Stack.Screen name="ShopUser" component={ShopUserScreen} />
+            <Stack.Screen name="GestionDesStocks" component={StocksScreen} />
             <Stack.Screen name="TabNavigatorUser" component={TabNavigatorUser} />
             <Stack.Screen name="TabNavigatorProducer" component={TabNavigatorProducer} />
           </Stack.Navigator>
         </NavigationContainer>
+      
       </ClerkLoaded>
     </ClerkProvider>
+    </GestureHandlerRootView>
   );
 }

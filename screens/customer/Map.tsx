@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react'
-import { StyleSheet, Button, View, Text, TouchableOpacity } from 'react-native'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { StyleSheet, Button, View, ScrollView, Text, TouchableOpacity } from 'react-native'
 import { useAuth } from '@clerk/clerk-expo'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/Navigation'
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+
+import ProducerSearchResult from '../../components/cards/ProducerSearchResult'
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -16,6 +19,7 @@ type Props = {
 };
 
 export default function MapCustomerScreen({ route, navigation }: Props) {
+  const bottomSheetRef = useRef<BottomSheet>(null);
   const [currentPosition, setCurrentPosition] = useState(null);
   const [searchResults, setSearchResults] = useState([])
   const [region, setRegion] = useState({})
@@ -33,7 +37,6 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
       if (status === 'granted') {
         Location.watchPositionAsync({ distanceInterval: 10 },
           (location) => {
-            console.log(location)
             setCurrentPosition(location.coords);
             setRegion({
               ...location.coords,
@@ -44,33 +47,49 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
       }
     })();
 
+
     if(route.params.searchResults) {
       setSearchResults(route.params.searchResults)
     }
   }, []);
-
-  const onTestPress = async () => {
-    try {
-      const token = await getToken()
-      const response = await fetch(`${API_ROOT}/auth/login`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-          mode: 'cors',
-        },
-      })
-      const data = await response.json()
-
-      console.log(data)
-    } catch (err) {
-      console.error(err)   
-    }
-  }
-  console.log(searchResults)
   const markers = searchResults.map((data, i) => {
-    return <Marker key={i} coordinate={{ latitude: data.address.latitude.$numberDecimal, longitude: data.address.longitude.$numberDecimal }} title={data.name} />;
+    return (<Marker 
+      key={i} 
+      coordinate={{ latitude: Number(data.address.latitude.$numberDecimal), longitude: Number(data.address.longitude.$numberDecimal) }} 
+      >
+        <Callout onPress={() => console.log("go to the shop page")}>
+          <View>
+          <Text>{ data.name }</Text>
+          <Text>Vends { data.searchData.relevantProducts.length } produit que vous recherchez</Text>
+          </View>
+
+        </Callout>
+
+      </Marker>)
   });
+
+  const producersList = searchResults.map(sr => (
+      <ProducerSearchResult 
+        name={sr.name}
+        onPressFn={
+          () => { 
+            navigation.navigate('TabNavigatorUser', {
+              screen: 'Shop',
+              params: { 
+                shopId: sr._id,
+                relevantProducts: sr.searchData.relevantProducts 
+              },
+            }) 
+          }
+        }
+        key={sr._id}
+      />
+
+  ))
+
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log('handleSheetChanges', index);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -78,6 +97,25 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
         {/* {currentPosition && <Marker coordinate={currentPosition} title="My position" pinColor="#fecb2d" />} */}
         {markers}
       </MapView>
+      {
+        searchResults.length > 0 && (
+          <BottomSheet
+            ref={bottomSheetRef}
+            snapPoints={['10%', '50%']}
+    
+            onChange={handleSheetChanges}
+          >
+            <BottomSheetView style={styles.contentContainer}>
+              <ScrollView style={{flex: 1, width: '100%'}} className='p-2'>
+                <Text>Resultats ({producersList.length})</Text>
+                {producersList}
+              </ScrollView>
+              
+            </BottomSheetView>
+          </BottomSheet>
+        )
+      }
+
     </View>
   )
 }
@@ -88,5 +126,9 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
   },
 });

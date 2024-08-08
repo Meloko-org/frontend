@@ -49,6 +49,18 @@ export default function HomeScreen({ navigation }: Props) {
     }
   }
 
+  const onMapPress = async () => {
+    try {
+      navigation.navigate('TabNavigatorUser', {
+        screen: 'Accueil',
+        params: { 
+          searchResults: [] 
+        },
+      });
+    } catch (err) {
+      console.error(JSON.stringify(err, null, 2))   
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -57,7 +69,7 @@ export default function HomeScreen({ navigation }: Props) {
       <Button title="Shop" onPress={() => navigation.navigate('ShopUser')} /> 
       <Button title="Test" onPress={onTestPress} /> 
       <Text>Je veux</Text>
-      <Button title="Voir tous les producteurs aux alentours" onPress={() => navigation.navigate('TabNavigatorUser')} />
+      <Button title="Voir tous les producteurs aux alentours" onPress={onMapPress} />
       <Button title="Fair une recherche" onPress={() => navigation.navigate('SearchCustomer')} />
       <Button title="Gérer mes ventes" onPress={() => navigation.navigate('TabNavigatorProducer')} />
       {
