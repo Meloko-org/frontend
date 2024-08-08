@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';//temporaire
-import { faMinus, faPlus, faEye } from '@fortawesome/free-solid-svg-icons';// temporaire
+
 import { useAuth } from '@clerk/clerk-expo';// utliser dans stockcontroller.js
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/Navigation';
+
+import _Fontawesome from 'react-native-vector-icons/FontAwesome'
+
+const FontAwesome = _Fontawesome as React.ElementType
 
 //ma navigation pour l'écran des stocks(rajouter dans types)
 type StocksScreenNavigationProp = NativeStackNavigationProp<
