@@ -1,32 +1,69 @@
-import { Text, Image, StyleSheet, View } from 'react-native';
+import { Text, Image, StyleSheet, View, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import _FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/Navigation';
 
 const FontAwesome = _FontAwesome as React.ElementType;
+const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
-interface ShopData {
+type StocksScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'ShopUser'
+>;
+
+type Props = {
+  navigation: StocksScreenNavigationProp;
+};
+
+// TypeScript Function
+type ShopData = {
   name: string;
   logo: string;
   description: string;
-  [key: string]: any; 
+  notes: { note: { $numberDecimal: string } | number | any }[]; 
+  [key: string]: any;
 }
 
-export default function ShopUserScreen() {
+export default function ShopUserScreen({ navigation }: Props) {
+
   const [shopData, setShopData] = useState<ShopData[]>([]);
+  const [productData, setProductData] = useState<ShopData[]>([]);
   const [count, setCount] = useState<number>(0);
 
+// Shop recovery 
   useEffect(() => {
-    fetch(`http://localhost:3000/shops/66b339729a76167d3a93df3b`) // A MODIFIER ${AMODIFIER}
+    fetch(`${API_ROOT}/shops/66b339729a76167d3a93df3b`) // A MODIFIER (ID)
       .then(resp => resp.json())
       .then(data => {
-        let shopBase: ShopData[] = [];
         if (data.result) {
-          shopBase.push(data.shopFound);
+          const shopBase: ShopData[] = [data.shopFound];
+          const productBase: ShopData[] = [data.productFound];
+          setShopData(shopBase);
+          setProductData(productBase)
         }
-        setShopData(shopBase);
       });
   }, []);
 
+// Star calculation if shop loaded
+  useEffect(() => {
+    if (shopData.length > 0) {
+      calculNote(shopData);
+    }
+  }, [shopData]);
+
+// Star calculation
+  const calculNote = (shopData: ShopData[]) => { 
+    let calcul: number = 0;
+    const path = shopData[0].notes;
+    for (let i = 0; i < path.length; i++) {
+      calcul += parseFloat(path[i].note.$numberDecimal);
+    }
+    calcul /= path.length;
+    setCount(calcul);
+  }
+
+// Star formatting 
   const renderStars = (rating: number) => {
     const stars = [];
     for (let i = 0; i < 5; i++) {
@@ -41,21 +78,53 @@ export default function ShopUserScreen() {
     return stars;
   };
 
+// Formatting the shop received
   const shop = shopData.map((data, i) => {
     return (
-      <View key={i}>
-        <Text style={styles.texte}>{data.name}</Text>
+            <View key={i}>
+            <Text style={styles.texte}>{data.name}</Text>
         <View style={styles.starsContainer}>{renderStars(count)}</View>
-        <Image source={{ uri: data.logo }} style={styles.logo} />
+          {data.logo ? (
+            <Image source={{ uri: data.logo }} style={styles.logo} resizeMode="cover" />
+          ) : (
+            <Image source={require('../assets/icon.png')} style={styles.logo} resizeMode="cover" />
+          )}
         <Text>{data.description}</Text>
-      </View>
+        <Text>CLICK & COLLECT</Text>
+        <Text>MARCHE LOCAL</Text>
+        <Text>KILOMETRES</Text>
+        </View>
     );
   });
 
-  return (
-    <View style={styles.container}>
-      {shop}
+  // Formatting category
+  const category = productData.map((data, i) => {
+    for (let n = 0; n < data.length; n++) {
+      return (
+        <View key={i} className="flex rounded-lg shadow-lg bg-lightbg w-1/4">
+        <View className="flex justify-center rounded-t-lg w-auto h-auto">
+            <Image source={{uri: data[i].product.family.category.image}} className="rounded-t-lg w-24 h-16" alt={data[i].product.family.category.name} resizeMode="cover" width={100} height={50}/>
+        </View>
+        <View className="py-2">
+            <Text className="font-bold text-darkbg dark:text-lightbg text-center">{data[i].product.family.category.name}</Text>
+            <Text className="text-wrap text-slate-400 dark:text-slate-50 text-center">Nombre produits</Text>
+        </View>
     </View>
+    );
+    }
+  });
+
+  return (
+    <View>
+      {shop}
+      <View>
+      <Text>Votre Recherche</Text>
+      </View>
+      <View>
+      <Text>Catégories</Text>   
+      {category} 
+      </View>
+      </View>
   );
 }
 
@@ -82,4 +151,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 10,
   },
+  recherche: {
+    color: '#000000',
+    textAlign: 'center',
+    marginTop: '5%',
+  },
 });
+

@@ -20,6 +20,7 @@ import BusinessScreen from './screens/Business';
 import ProfilProducerScreen from './screens/producer/Profil'
 import SearchCustomerScreen from './screens/customer/Search'
 import ComponentsScreen from './screens/Components'
+import ShopUserScreen from './screens/Shop'
 
 const FontAwesome = _FontAwesome as React.ElementType;
 
@@ -138,6 +139,7 @@ export default function App(): JSX.Element {
             <Stack.Screen name="SignIn" component={SignInScreen} />
             <Stack.Screen name="SearchCustomer" component={SearchCustomerScreen} />
             <Stack.Screen name="Components" component={ComponentsScreen} />
+            <Stack.Screen name="ShopUser" component={ShopUserScreen} />
             <Stack.Screen name="TabNavigatorUser" component={TabNavigatorUser} />
             <Stack.Screen name="TabNavigatorProducer" component={TabNavigatorProducer} />
           </Stack.Navigator>
