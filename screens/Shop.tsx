@@ -1,5 +1,5 @@
-import { Text, Image, StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import { Text, Image, StyleSheet, View, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import _FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/Navigation';
@@ -32,6 +32,9 @@ export default function ShopUserScreen({ route, navigation }: Props) {
   const [productSearch, setProductSearch] = useState<ShopData[]>([]);
   const [resultCategory, setResultCategory] = useState<{ word: string; count: number; }[]>([]);
   const [count, setCount] = useState<number>(0);
+  const [shopProduct, setShopProduct] = useState<ShopData[]>([]);
+  const [selectedCategoryProducts, setSelectedCategoryProducts] = useState<ShopData[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
 // Shop recovery
   useEffect(() => {
@@ -59,13 +62,23 @@ export default function ShopUserScreen({ route, navigation }: Props) {
     }
   }, [shopData]);
 
-// Call family calculation if shop loaded  
+// Call families calculation & sorting of products if shop loaded  
   useEffect(() => {
     if (productData.length > 0) {
       let family: string[] = [];
+      let shopProduit: any[] = [];
       for (let i = 0; i < productData.length; i++) {
+        shopProduit.push({
+          category: productData[i].product.family.category.name, 
+          name: productData[i].product.family.name, 
+          stock: productData[i].stock, 
+          tarif: productData[i].price, 
+          variete: productData[i].product.name, 
+          logo: productData[i].product.image,
+      })
         family.push(productData[i].product.family.category.name);
       }
+      setShopProduct(shopProduit)
       familiesCount(family); 
     }
   }, [productData]);
@@ -121,14 +134,22 @@ export default function ShopUserScreen({ route, navigation }: Props) {
     );
   });
 
+// Sorting products from categories by clicking
+  const handleCategoryClick = (category: string) => {
+    const filteredProducts = shopProduct.filter(prod => prod.category === category);
+    setSelectedCategoryProducts(filteredProducts);
+    console.log(filteredProducts)
+    setIsModalVisible(true);
+  };
+
 // Formatting category  
   const category = resultCategory.map((cat, i) => {
     return (
-      <View key={i} style={styles.categoryCard}>
+      <TouchableOpacity key={i} style={styles.categoryCard} onPress={() => handleCategoryClick(cat.word)}>
         <Image source={require('../assets/icon.png')} style={styles.categoryImage} resizeMode="cover"/>
         <Text style={styles.categoryTitle}>{cat.word}</Text>
         <Text style={styles.categoryCount}>{cat.count} produits</Text>
-      </View>
+      </TouchableOpacity>
     );
   });
 
@@ -170,6 +191,31 @@ export default function ShopUserScreen({ route, navigation }: Props) {
     setResultCategory(result);
   };
 
+  // Formatting shop product click
+  const shopProductClick = selectedCategoryProducts.map((prod, i) => {
+    return (
+      <View key={i} style={styles.productCard}>
+        <Image source={require('../assets/icon.png')} style={styles.productImage} resizeMode="cover"/> 
+        <View style={styles.productDetails}>
+          <Text style={styles.productTitle}>{prod.name}</Text>
+          <Text style={styles.productDescription}>{prod.variete}</Text>
+          <View style={styles.priceTag}>
+            <Text style={styles.productPrice}>Stock : {prod.stock.$numberDecimal}</Text>
+          </View>
+          <View style={styles.priceTag}>
+            <Text style={styles.productPrice}>Tarif : {prod.tarif.$numberDecimal} €</Text>
+            </View>
+        </View>
+        <View style={styles.addToCartButton}>
+          <TouchableOpacity>
+            <FontAwesome name="cart-plus" size={30} color="#FCFFF0"/>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  });
+
+
   return (
     <ScrollView style={styles.container}>
       {shop}
@@ -187,6 +233,17 @@ export default function ShopUserScreen({ route, navigation }: Props) {
         <Text style={styles.sectionTitle}>Catégories</Text>
         <View style={styles.categoriesContainer}>{category}</View> 
       </View>
+      
+      <Modal visible={isModalVisible} animationType="slide" onRequestClose={() => setIsModalVisible(false)}>
+        <View style={styles.modalContainer}>
+        <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>←</Text>
+          </TouchableOpacity>
+          <ScrollView>
+            {shopProductClick}
+          </ScrollView>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -327,5 +384,19 @@ const styles = StyleSheet.create({
   resultsButtonText: {
     fontSize: 16,
   },
+  modalContainer: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#FCFFF0',
+  },
+  closeButton: {
+    alignSelf: 'flex-start',
+    marginBottom: 20,
+  },
+  closeButtonText: {
+    fontSize: 24,
+    color: '#333',
+  },
 });
+
 
