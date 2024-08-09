@@ -25,7 +25,7 @@ type ShopData = {
   [key: string]: any;
 }
 
-export default function ShopUserScreen({ navigation }: Props) {
+export default function ShopUserScreen({ route, navigation }: Props) {
 
   const [shopData, setShopData] = useState<ShopData[]>([]);
   const [productData, setProductData] = useState<ShopData[]>([]);
@@ -33,7 +33,8 @@ export default function ShopUserScreen({ navigation }: Props) {
 
 // Shop recovery 
   useEffect(() => {
-    fetch(`${API_ROOT}/shops/66b339729a76167d3a93df3b`) // A MODIFIER (ID)
+    const shopId = route.params.shopId
+    fetch(`${API_ROOT}/shops/${shopId}`) // A MODIFIER (ID)
       .then(resp => resp.json())
       .then(data => {
         if (data.result) {

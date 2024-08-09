@@ -60,9 +60,8 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
         <Callout onPress={() => console.log("go to the shop page")}>
           <View>
           <Text>{ data.name }</Text>
-          <Text>Vends { data.searchData.relevantProducts.length } produit que vous recherchez</Text>
+          { data.searchData.relevantProducts && <Text>Vends { data.searchData.relevantProducts.length } produit que vous recherchez</Text> }
           </View>
-
         </Callout>
 
       </Marker>)
@@ -74,10 +73,10 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
         onPressFn={
           () => { 
             navigation.navigate('TabNavigatorUser', {
-              screen: 'Shop',
+              screen: 'ShopUser',
               params: { 
                 shopId: sr._id,
-                relevantProducts: sr.searchData.relevantProducts 
+                relevantProducts: sr.searchData.relevantProducts ? sr.searchData.relevantProducts : [] 
               },
             }) 
           }

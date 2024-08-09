@@ -37,6 +37,7 @@ export default function SearchCustomerScreen({ navigation }: Props) {
   useEffect(() => {
     (async () => {
       if((userPosition.latitude !== 0 && search)) {
+        console.log("fetch api")
         const response = await fetch(`${API_ROOT}/shops/search`, {
           method: 'POST',
           headers: {

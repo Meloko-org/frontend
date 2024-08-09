@@ -3,6 +3,8 @@ import * as SecureStore from 'expo-secure-store'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { NavigationContainer } from '@react-navigation/native';
+import { View } from 'react-native'
+
 import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { RootStackParamList } from './types/Navigation'
@@ -91,11 +93,12 @@ const TabNavigatorUser: React.FC = () => {
       tabBarActiveTintColor: '#98B66E',
       tabBarInactiveTintColor: '#262E20',
       headerShown: false,
-    })}>
+    })}> 
       <Tab.Screen name="Accueil" component={MapCustomerScreen} />
       <Tab.Screen name="Panier" component={CartScreen} />
       <Tab.Screen name="Favoris" component={FavoritesScreen} />
       <Tab.Screen name="Profil" component={ProfilScreen} />
+      <Tab.Screen name="ShopUser" component={ShopUserScreen} options={{ tabBarButton: () => null }}/>
     </Tab.Navigator>
   );
 };
@@ -144,7 +147,6 @@ export default function App(): JSX.Element {
             <Stack.Screen name="SignIn" component={SignInScreen} />
             <Stack.Screen name="SearchCustomer" component={SearchCustomerScreen} />
             <Stack.Screen name="Components" component={ComponentsScreen} />
-            <Stack.Screen name="ShopUser" component={ShopUserScreen} />
             <Stack.Screen name="GestionDesStocks" component={StocksScreen} />
             <Stack.Screen name="TabNavigatorUser" component={TabNavigatorUser} />
             <Stack.Screen name="TabNavigatorProducer" component={TabNavigatorProducer} />
