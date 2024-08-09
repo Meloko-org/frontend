@@ -7,6 +7,7 @@ module.exports = {
     "./components/utils/badges/*.{js,jsx,ts,tsx}",
     "./components/utils/buttons/*.{js,jsx,ts,tsx}",
     "./components/utils/inputs/*.{js,jsx,ts,tsx}",
+    "./components/map/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { StyleSheet, Button, View, ScrollView, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, Button, View, ScrollView, Text, TouchableOpacity, SafeAreaView } from 'react-native'
 import { useAuth } from '@clerk/clerk-expo'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/Navigation'
@@ -8,6 +8,7 @@ import * as Location from 'expo-location';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
 import ProducerSearchResult from '../../components/cards/ProducerSearchResult'
+import MapSearchBox from '../../components/map/MapSearchBox'
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -96,6 +97,11 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
         {/* {currentPosition && <Marker coordinate={currentPosition} title="My position" pinColor="#fecb2d" />} */}
         {markers}
       </MapView>
+      <View className="flex flex-row justify-center" style={{position: 'absolute', top: 50, width: '100%'}}>
+        <MapSearchBox
+          search={route.params.search}
+        />
+      </View>
       {
         searchResults.length > 0 && (
           <BottomSheet
@@ -125,6 +131,7 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+    position: 'relative'
   },
   contentContainer: {
     flex: 1,
