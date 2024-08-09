@@ -11,6 +11,7 @@ type RootStackParamList = {
   ProfilProducer: undefined;
   SearchCustomer: undefined;
   MapCustomer: undefined; 
+  ShopUser: undefined;
 };
 
 export type {
