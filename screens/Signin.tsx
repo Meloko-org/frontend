@@ -6,6 +6,13 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/Navigation'
 
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "../reducers/user";
+import { UserState } from '../reducers/user'
+const { getUserInfos } = require('../modules/userTools')
+import { useAuth } from '@clerk/clerk-expo'
+
+
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'SignIn'
@@ -31,6 +38,13 @@ WebBrowser.maybeCompleteAuthSession()
 
 export default function SignInScreen({ navigation: { goBack } }: Props) {
   useWarmUpBrowser()  
+
+  // need to get the user infos
+  const { getToken } = useAuth()
+  const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
+  // and store user infos in the store
+  const dispatch = useDispatch()
+  const userStore = useSelector((state: { user : UserState}) => state.user.value)
 
   // Import the Clerk Auth functions
   const { signIn, setActive, isLoaded } = useSignIn()
@@ -68,6 +82,8 @@ export default function SignInScreen({ navigation: { goBack } }: Props) {
     }
   }, [])
 
+  
+
   // Signin the user with Clerk
   const onSignInPress = useCallback(async () => {
     // If Clerk is not loaded
@@ -85,6 +101,14 @@ export default function SignInScreen({ navigation: { goBack } }: Props) {
       // If the signing event went well
       if (signInAttempt.status === 'complete') {
         await setActive({ session: signInAttempt.createdSessionId })
+        
+        // store user's info in the store
+        const token = await getToken() 
+        const user = await getUserInfos(API_ROOT, token)
+        if(user) {
+          dispatch(updateUser(user))
+        }
+
         // Go back to the previous screen
         goBack()
       } else {
@@ -96,6 +120,10 @@ export default function SignInScreen({ navigation: { goBack } }: Props) {
       console.error(JSON.stringify(err, null, 2))
     }
   }, [isLoaded, emailAddress, password])
+
+
+  console.log(userStore)
+
 
   return (
     <View style={styles.container}>
@@ -117,6 +145,8 @@ export default function SignInScreen({ navigation: { goBack } }: Props) {
 
     </View>
   )
+
+  
 }
 
 const styles = StyleSheet.create({

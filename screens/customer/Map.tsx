@@ -53,6 +53,7 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
     }
   }, []);
   const markers = searchResults.map((data, i) => {
+<<<<<<< HEAD
     return (<Marker 
       key={i} 
       coordinate={{ latitude: Number(data.address.latitude.$numberDecimal), longitude: Number(data.address.longitude.$numberDecimal) }} 
@@ -65,6 +66,9 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
         </Callout>
 
       </Marker>)
+=======
+    return <Marker key={i} coordinate={{ latitude: Number(data.address.latitude.$numberDecimal), longitude: Number(data.address.longitude.$numberDecimal) }} title={data.name} />;
+>>>>>>> userInStore
   });
 
   const producersList = searchResults.map(sr => (

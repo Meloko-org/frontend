@@ -6,7 +6,7 @@ const FontAwesome = _Fontawesome as React.ElementType
 
 type ButtonProps = {
     name: string,
-		onPressFn: Function
+	onPressFn?: Function
 }
 
 export default function PrimaryEnd(props: ButtonProps): JSX.Element {

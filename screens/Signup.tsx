@@ -73,6 +73,8 @@ export default function SignUpScreen({ navigation: { goBack } }: Props) {
       // If the verification event is sucessfull 
       if (completeSignUp.status === 'complete') {
         await setActive({ session: completeSignUp.createdSessionId })
+        // redirection vers la page compte user pour saisie nom, prénom...
+        // -> enregistrement des nouvelles infos (nom, prénom) dans le store 
         // Go back to the previous screen
         goBack()
       } else {
