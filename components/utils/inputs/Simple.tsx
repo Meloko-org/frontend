@@ -11,7 +11,7 @@ type SimpleProps = {
 		onChangeText?: {},
 		value?: string,
 		style?: {},
-		className: string
+		className?: string
 }
 
 export default function Simple(props: SimpleProps): JSX.Element {

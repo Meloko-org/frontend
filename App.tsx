@@ -21,6 +21,13 @@ import ProfilProducerScreen from './screens/producer/Profil'
 import SearchCustomerScreen from './screens/customer/Search'
 import ComponentsScreen from './screens/Components'
 
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import user from './reducers/user';
+const store = configureStore({
+  reducer: {user},
+})
+
 const FontAwesome = _FontAwesome as React.ElementType;
 
 // Create a Natrive Stack Navigator
@@ -129,20 +136,22 @@ const TabNavigatorProducer: React.FC = () => {
 
 export default function App(): JSX.Element {
   return (
-    <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
-      <ClerkLoaded>
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={options}>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="SignUp" component={SignUpScreen} />
-            <Stack.Screen name="SignIn" component={SignInScreen} />
-            <Stack.Screen name="SearchCustomer" component={SearchCustomerScreen} />
-            <Stack.Screen name="Components" component={ComponentsScreen} />
-            <Stack.Screen name="TabNavigatorUser" component={TabNavigatorUser} />
-            <Stack.Screen name="TabNavigatorProducer" component={TabNavigatorProducer} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </ClerkLoaded>
-    </ClerkProvider>
+    <Provider store={store}>
+      <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
+        <ClerkLoaded>
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={options}>
+              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="SignUp" component={SignUpScreen} />
+              <Stack.Screen name="SignIn" component={SignInScreen} />
+              <Stack.Screen name="SearchCustomer" component={SearchCustomerScreen} />
+              <Stack.Screen name="Components" component={ComponentsScreen} />
+              <Stack.Screen name="TabNavigatorUser" component={TabNavigatorUser} />
+              <Stack.Screen name="TabNavigatorProducer" component={TabNavigatorProducer} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </ClerkLoaded>
+      </ClerkProvider>
+    </Provider>
   );
 }

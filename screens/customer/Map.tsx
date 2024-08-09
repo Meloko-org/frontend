@@ -69,7 +69,7 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
   }
   console.log(searchResults)
   const markers = searchResults.map((data, i) => {
-    return <Marker key={i} coordinate={{ latitude: data.address.latitude.$numberDecimal, longitude: data.address.longitude.$numberDecimal }} title={data.name} />;
+    return <Marker key={i} coordinate={{ latitude: Number(data.address.latitude.$numberDecimal), longitude: Number(data.address.longitude.$numberDecimal) }} title={data.name} />;
   });
 
   return (
