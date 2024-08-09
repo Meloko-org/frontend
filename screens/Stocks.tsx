@@ -11,8 +11,6 @@ type StocksScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'GestionDesStocks'
 >;
-
-
 type Props = {
   navigation: StocksScreenNavigationProp;
 };
@@ -35,19 +33,19 @@ export default function StocksScreen({ navigation }: Props) {
   
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
- //dois-je utiliser une variable pour reduire ou ajouter des categories plus tard?? 
-
+  //dois-je utiliser une variable pour reduire ou ajouter des categories plus tard?? 
+  
   //Clerk
   const { getToken } = useAuth();
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
-
+  
   // pour récupérer les stocks via l'API si jamais il existe.
-  useEffect(() => {
+ /* useEffect(() => {
     const fetchStocks = async () => {
       try {
         const token = await getToken();
         // MArequête pour récupérer les stocks
-        const response = await fetch(`${API_ROOT}/stocks`, {
+        const response = await fetch(`${API_ROOT}/stocks/{shopId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -65,10 +63,10 @@ export default function StocksScreen({ navigation }: Props) {
         console.error(error);
       }
     };
-
+    
     fetchStocks();
-  }, [API_ROOT, getToken]);
-
+  }, [API_ROOT, getToken]);*/
+  
   // fonction pour le changement de quantité de stock
   const handleQuantityChange = useCallback(async (id: string, change: number) => {
     const stockToUpdate = stocks.find(stock => stock._id === id);
