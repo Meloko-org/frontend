@@ -91,7 +91,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
           })
         })
         const data = await response.json()
-
+        // console.log(data.searchResults[0].searchData.relevantProducts)
         if(props.displayMode === 'widget') {
           props.refrechResultsFn && props.refrechResultsFn(data.searchResults)
         } 
@@ -156,11 +156,6 @@ export default function MapSearchBox(props: Props): JSX.Element {
         },
       }));
 
-      // setUserPosition({
-      //   latitude: latitude,
-      //   longitude: longitude
-      // });
-
     } catch (error) {
       console.error(error)
     }
@@ -199,14 +194,6 @@ export default function MapSearchBox(props: Props): JSX.Element {
                 iconName='search'
                 onIconPressFn={onSearchPress}
               />
-
-            {/* <View className='w-1/4 flex flex-row justify-end'>
-              <SimpleButton 
-                iconName="search"
-                extraClasses='w-20'
-                onPressFn={onSearchPress}
-              />
-            </View> */}
 
           </View>
           {

@@ -29,11 +29,11 @@ export default function StarsNotation(props: StarsNotationProps): JSX.Element {
     const stars: JSX.Element[] = [];
     for (let i = 0; i < 5; i++) {
       if (i < Math.floor(rating)) {
-        stars.push(<FontAwesome key={i} name={props.iconNames[0]} className='text-primary pr-0.5' />);
+        stars.push(<FontAwesome key={i} name={props.iconNames[0]} size={15} className='text-primary pr-0.5' />);
       } else if (i < rating) {
-        stars.push(<FontAwesome key={i} name={props.iconNames[1]} className='text-primary pr-0.5' />);
+        stars.push(<FontAwesome key={i} name={props.iconNames[1]} size={15} className='text-primary pr-0.5' />);
       } else {
-        stars.push(<FontAwesome key={i} name={props.iconNames[2]} className='text-primary pr-0.5' />);
+        stars.push(<FontAwesome key={i} name={props.iconNames[2]} size={15} className='text-primary pr-0.5' />);
       }
     }
     return stars;
@@ -42,9 +42,9 @@ export default function StarsNotation(props: StarsNotationProps): JSX.Element {
 
 
 	return (
-		<View className={`${props.extraClasses} flex flex-row w-1/4 justify-between items-center`}>
+		<View className={`${props.extraClasses} flex flex-row w-auto justify-between items-center`}>
       {renderStars(props.shopData)} 
-      <Text className='text-xs'>({props.shopData.notes.length})</Text>
+      <Text className='text-sm'>({props.shopData.notes.length})</Text>
     </View>
 	)
 }

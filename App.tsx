@@ -24,7 +24,7 @@ import ProfilProducerScreen from './screens/producer/Profil';
 import StocksScreen from './screens/Stocks';
 import SearchCustomerScreen from './screens/customer/Search'
 import ComponentsScreen from './screens/Components'
-import ShopUserScreen from './screens/Shop'
+import ShopUserScreen from './screens/customer/Shop'
 
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';

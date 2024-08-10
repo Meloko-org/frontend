@@ -1,6 +1,6 @@
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from 'react-native'
-import ProductsNumber from "../utils/badges/ProductsNumber";
+import BadgeSecondary from "../utils/badges/Secondary";
 import StarsNotation from "../utils/StarsNotation";
 import _Fontawesome from 'react-native-vector-icons/FontAwesome6'
 import { GestureResponderEvent } from "react-native";
@@ -31,7 +31,7 @@ export default function CardProducerSearchResult(props: CardProducerSearchResult
 					<StarsNotation iconNames={['star', 'star-half', 'star-o']} shopData={props.shopData} extraClasses="pb-1"/>
 					 { 
 					 	props.shopData.searchData.relevantProducts && 
-							<ProductsNumber>{ `${props.shopData.searchData.relevantProducts.length} produit que vous recherchez` }</ProductsNumber>
+							<BadgeSecondary>{ `${props.shopData.searchData.relevantProducts.length} produit que vous recherchez` }</BadgeSecondary>
 					 }
 				</View>
 			</View>
