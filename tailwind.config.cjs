@@ -2,12 +2,17 @@
 module.exports = {
   content: [
     "./App.{js,jsx,ts,tsx}",
-    "./screens/**/*.{js,jsx,ts,tsx}",
+    "./screens/*.{js,jsx,ts,tsx}",
+    "./screens/customer/*.{js,jsx,ts,tsx}",
+    "./screens/producer/*.{js,jsx,ts,tsx}",
+    "./components/*.{js,jsx,ts,tsx}",
     "./components/cards/*.{js,jsx,ts,tsx}",
+    "./components/utils/*.{js,jsx,ts,tsx}",
     "./components/utils/badges/*.{js,jsx,ts,tsx}",
     "./components/utils/buttons/*.{js,jsx,ts,tsx}",
     "./components/utils/inputs/*.{js,jsx,ts,tsx}",
     "./components/map/*.{js,jsx,ts,tsx}",
+    "./components/utils/texts/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {

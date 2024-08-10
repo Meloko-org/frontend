@@ -6,7 +6,7 @@ import { RootStackParamList } from '../../types/Navigation'
 import MapView, { Marker, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-
+import TextHeading3 from '../../components/utils/texts/Heading3'
 import ProducerSearchResult from '../../components/cards/ProducerSearchResult'
 import MapSearchBox from '../../components/map/MapSearchBox'
 
@@ -53,39 +53,61 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
       setSearchResults(route.params.searchResults)
     }
   }, []);
-  const markers = searchResults.map((data, i) => {
-    return (<Marker 
-      key={i} 
-      coordinate={{ latitude: Number(data.address.latitude.$numberDecimal), longitude: Number(data.address.longitude.$numberDecimal) }} 
-      >
-        <Callout onPress={() => console.log("go to the shop page")}>
-          <View>
-          <Text>{ data.name }</Text>
-          { data.searchData.relevantProducts && <Text>Vends { data.searchData.relevantProducts.length } produit que vous recherchez</Text> }
-          </View>
-        </Callout>
-
-      </Marker>)
-  });
 
   const producersList = searchResults.map(sr => (
-      <ProducerSearchResult 
-        name={sr.name}
-        onPressFn={
+    <ProducerSearchResult 
+      data={sr}
+      onPressFn={
+        () => { 
+          navigation.navigate('TabNavigatorUser', {
+            screen: 'ShopUser',
+            params: { 
+              shopId: sr._id,
+              relevantProducts: sr.searchData.relevantProducts ? sr.searchData.relevantProducts : [] 
+            },
+          }) 
+        }
+      }
+      key={sr._id}
+      extraClasses='mb-1'
+      displayMode='bottomSheet'
+    />
+
+))
+
+
+  const markers = searchResults.map((data, i) => {
+    return (
+      <Marker 
+        key={i} 
+        coordinate={{ latitude: Number(data.address.latitude.$numberDecimal), longitude: Number(data.address.longitude.$numberDecimal) }} 
+        
+      >
+        <Callout onPress={
           () => { 
             navigation.navigate('TabNavigatorUser', {
               screen: 'ShopUser',
               params: { 
-                shopId: sr._id,
-                relevantProducts: sr.searchData.relevantProducts ? sr.searchData.relevantProducts : [] 
+                shopId: data._id,
+                relevantProducts: data.searchData.relevantProducts ? data.searchData.relevantProducts : [] 
               },
             }) 
           }
-        }
-        key={sr._id}
-      />
+        }>
+          {/* <View>
+            <TextHeading3 centered>{ data.name }</TextHeading3>
+            { data.searchData.relevantProducts && <Text>Vends { data.searchData.relevantProducts.length } produit que vous recherchez</Text> }
+          </View> */}
+            <ProducerSearchResult 
+              data={data}
+              key={data._id}
+            />
+        </Callout>
+      </Marker>
+    )
+  });
 
-  ))
+
 
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
@@ -100,19 +122,27 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
       <View className="flex flex-row justify-center" style={{position: 'absolute', top: 50, width: '100%'}}>
         <MapSearchBox
           search={route.params.search}
+          refrechResultsFn={(newSearchResults) => setSearchResults(newSearchResults)}
+          displayMode='widget'
         />
       </View>
       {
         searchResults.length > 0 && (
           <BottomSheet
             ref={bottomSheetRef}
-            snapPoints={['10%', '50%']}
+            snapPoints={['20%', '50%']}
     
             onChange={handleSheetChanges}
           >
             <BottomSheetView style={styles.contentContainer}>
-              <ScrollView style={{flex: 1, width: '100%'}} className='p-2'>
-                <Text>Resultats ({producersList.length})</Text>
+              <ScrollView style={{flex: 1, width: '100%'}} className='pt-2 px-3'>
+                
+                <TextHeading3
+                  extraClasses='mt-2 mb-4'
+                >
+                  { `${producersList.length.toString()} Resultats `} 
+                </TextHeading3>
+
                 {producersList}
               </ScrollView>
               
@@ -136,5 +166,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     alignItems: 'center',
+    backgroundColor: '#FCFFF0'
   },
 });
