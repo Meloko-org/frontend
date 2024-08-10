@@ -13,7 +13,7 @@ type Props = {
   navigation: ProfileScreenNavigationProp;
 };
 
-export default function SearchCustomerScreen({ navigation }: Props) {
+export default function SearchCustomerScreen({ navigation }: Props): JSX.Element {
 
   return (
     <MapSearchBox

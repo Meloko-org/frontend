@@ -1,34 +1,35 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { StyleSheet, Button, View, ScrollView, Text, TouchableOpacity, SafeAreaView } from 'react-native'
-import { useAuth } from '@clerk/clerk-expo'
+import { StyleSheet, View, ScrollView, } from 'react-native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/Navigation'
+import { Region } from 'react-native-maps';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import TextHeading3 from '../../components/utils/texts/Heading3'
 import ProducerSearchResult from '../../components/cards/ProducerSearchResult'
 import MapSearchBox from '../../components/map/MapSearchBox'
+import { ShopData } from '../../types/API';
 
-type ProfileScreenNavigationProp = NativeStackNavigationProp<
+type userPosition = {
+  latitude: number;
+  longitude: number;
+} | null
+
+type MapScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'MapCustomer'
 >;
 
-type Props = {
-  navigation: ProfileScreenNavigationProp;
+type MapProps = {
+  navigation: MapScreenNavigationProp;
 };
 
-export default function MapCustomerScreen({ route, navigation }: Props) {
+export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.Element {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const [currentPosition, setCurrentPosition] = useState(null);
-  const [searchResults, setSearchResults] = useState([])
-  const [region, setRegion] = useState({})
-  // Import the Clerk Auth functions
-  const { signOut, isSignedIn, getToken } = useAuth()
-
-  // Import the public api root address
-  const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
+  const [currentPosition, setCurrentPosition] = useState<userPosition>(null);
+  const [searchResults, setSearchResults] = useState<ShopData[]>([])
+  const [region, setRegion] = useState<Region | undefined>(undefined)
 
   useEffect(() => {
     (async () => {
@@ -54,9 +55,9 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
     }
   }, []);
 
-  const producersList = searchResults.map(sr => (
+  const producersList = searchResults.map((sr: ShopData) => (
     <ProducerSearchResult 
-      data={sr}
+      shopData={sr}
       onPressFn={
         () => { 
           navigation.navigate('TabNavigatorUser', {
@@ -76,12 +77,11 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
 ))
 
 
-  const markers = searchResults.map((data, i) => {
+  const markers = searchResults.map((data: ShopData, i) => {
     return (
       <Marker 
         key={i} 
         coordinate={{ latitude: Number(data.address.latitude.$numberDecimal), longitude: Number(data.address.longitude.$numberDecimal) }} 
-        
       >
         <Callout onPress={
           () => { 
@@ -94,14 +94,10 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
             }) 
           }
         }>
-          {/* <View>
-            <TextHeading3 centered>{ data.name }</TextHeading3>
-            { data.searchData.relevantProducts && <Text>Vends { data.searchData.relevantProducts.length } produit que vous recherchez</Text> }
-          </View> */}
-            <ProducerSearchResult 
-              data={data}
-              key={data._id}
-            />
+          <ProducerSearchResult 
+            shopData={data}
+            key={data._id}
+          />
         </Callout>
       </Marker>
     )
@@ -122,7 +118,7 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
       <View className="flex flex-row justify-center" style={{position: 'absolute', top: 50, width: '100%'}}>
         <MapSearchBox
           search={route.params.search}
-          refrechResultsFn={(newSearchResults) => setSearchResults(newSearchResults)}
+          refrechResultsFn={(newSearchResults: ShopData[]) => setSearchResults(newSearchResults)}
           displayMode='widget'
         />
       </View>

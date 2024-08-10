@@ -4,7 +4,7 @@ import { Text } from 'react-native'
 type TextHeading2Props = {
 		children: string,
     extraClasses?: string
-    centered: boolean
+    centered?: boolean
 }
 
 export default function TextHeading1(props: TextHeading2Props): JSX.Element {

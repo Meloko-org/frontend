@@ -18,8 +18,8 @@ import PrimaryStart from '../components/utils/buttons/PrimaryStart';
 import SecondaryEnd from '../components/utils/buttons/SecondaryEnd';
 import SecondaryStart from '../components/utils/buttons/SecondaryStart';
 import Edit from '../components/utils/buttons/Edit';
-import SimpleButton from '../components/utils/buttons/SimpleButton';
-import Simple from '../components/utils/inputs/Simple';
+import SimpleButton from '../components/utils/buttons/Icon';
+import Simple from '../components/utils/inputs/Text';
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,

@@ -1,14 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { UserData } from "../types/API";
 
 export type UserState = {
-  value: {
-    email: string | null
-    firstname: string | null 
-    lastname: string | null
-    avatar: string | null
-    favSearch: string[] | null
-    bookmarks: string[] | null
-  },
+  value: UserData,
 }
 
 const initialState: UserState = {
@@ -26,7 +20,7 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    updateUser: (state : UserState, action : PayloadAction<UserState>) => {
+    updateUser: (state: UserState, action: PayloadAction<UserData>): void => {
       state.value.email = action.payload.email
       state.value.firstname = action.payload.firstname
       state.value.lastname = action.payload.lastname

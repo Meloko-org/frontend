@@ -1,6 +1,6 @@
 import { Text, StyleSheet, View } from 'react-native';
 import React from "react";
-import Simple from '../components/utils/inputs/Simple'
+import Simple from '../components/utils/inputs/Text'
 import PrimaryEnd from '../components/utils/buttons/PrimaryEnd'
 
 export default function ProfilScreen() {

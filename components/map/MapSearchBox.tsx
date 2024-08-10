@@ -1,13 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react'
 import * as Location from 'expo-location';
-
 import { Animated, View, Text, Pressable, StyleSheet, SafeAreaView } from 'react-native'
-import Simple from '../utils/inputs/Simple';
+import TextInput from '../utils/inputs/Text';
 import PrimaryEnd from '../utils/buttons/PrimaryEnd';
-import SimpleButton from '../utils/buttons/SimpleButton';
+import ButtonIcon from '../utils/buttons/Icon';
 import {Slider} from '@miblanchard/react-native-slider';
 import TextHeading2 from '../../components/utils/texts/Heading2'
 import TextHeading3 from '../../components/utils/texts/Heading3'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+type userPosition = {
+  latitude: number;
+  longitude: number;
+}
 
 type searchOptions = {
   query: string;
@@ -15,10 +20,7 @@ type searchOptions = {
   radius: {
     value: number[];
   }
-  userPosition: {
-    latitude: number;
-    longitude: number;
-  }
+  userPosition: userPosition
 }
 
 type Props = {
@@ -92,8 +94,9 @@ export default function MapSearchBox(props: Props): JSX.Element {
 
         if(props.displayMode === 'widget') {
           props.refrechResultsFn && props.refrechResultsFn(data.searchResults)
-
-        } else {
+        } 
+        
+        if(props.navigation) {
           props.navigation.navigate('TabNavigatorUser', {
             screen: 'Accueil',
             params: { 
@@ -116,7 +119,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
 
   }, [searchOptions.userPosition, performSearch])
 
-  const useMyPosition = async () => {
+  const useMyPosition = async (): Promise<void> => {
     const result = await Location.requestForegroundPermissionsAsync();
     const status = result?.status;
 
@@ -137,12 +140,12 @@ export default function MapSearchBox(props: Props): JSX.Element {
     }
   }
 
-  const searchAddress = async () => {
+  const searchAddress = async (): Promise<void> => {
     try {
       const response = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${searchOptions.address}`)
       const data = await response.json()
-      const latitude = data.features[0].geometry.coordinates[1]
-      const longitude = data.features[0].geometry.coordinates[0]
+      const latitude: number = data.features[0].geometry.coordinates[1]
+      const longitude: number = data.features[0].geometry.coordinates[0]
 
       setSearchOptions((prevState) => ({
         ...prevState,
@@ -164,7 +167,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
   }
 
  
-  const onSearchPress = async () => {
+  const onSearchPress = async (): Promise<void> => {
     try {
       if(searchOptions.address !== 'Ma Position' && searchOptions.address !== '') {
         await searchAddress()
@@ -182,7 +185,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
         <Animated.View className={`rounded-lg w-100 mx-3 bg-lightbg p-2 shadow-sm dark:bg-ternary`} style={{ height: size, overflow: 'hidden' }}>
           <View className='w-full flex flex-row justify-between'>
 
-              <Simple 
+              <TextInput 
                 value={searchOptions.query}
                 onChangeText={(newQuery: string) => setSearchOptions((prevState) => ({
                   ...prevState,
@@ -191,7 +194,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
                 placeholder="Fruits moche, legume bio, pomme, banane ..." 
                 label="Votre recherche"
                 autoCapitalize="none"
-                class="w-full"
+                extraClasses="w-full"
                 size="large"
                 iconName='search'
                 onIconPressFn={onSearchPress}
@@ -226,7 +229,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
           </TextHeading3>
           <View className='w-full flex flex-row justify-between'>
             <View className='w-3/4'>
-            <Simple 
+            <TextInput 
               value={searchOptions.address}
               onChangeText={(newAddress: string) => setSearchOptions((prevState) => ({
                 ...prevState,
@@ -235,11 +238,11 @@ export default function MapSearchBox(props: Props): JSX.Element {
               placeholder="Adresse, code postal, ville ..." 
               label="Adresse"
               autoCapitalize="none"
-              class="w-full"
+              extraClasses="w-full"
             />
             </View>
             <View className='w-1/4 flex flex-row justify-end'>
-            <SimpleButton 
+            <ButtonIcon 
               iconName="map-marker"
               extraClasses='w-20'
               onPressFn={useMyPosition}
@@ -261,7 +264,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
                 step={20}
                 minimumValue={0}
                 maximumValue={100}
-                onValueChange={(newRadius: [number]) => { 
+                onValueChange={(newRadius) => { 
                     setSearchOptions((prevState) => ({
                       ...prevState,
                       radius: {
@@ -287,7 +290,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
           >
             Que cherchez-vous ?
           </TextHeading2>
-          <Simple 
+          <TextInput 
             value={searchOptions.query}
             onChangeText={(newQuery: string) => setSearchOptions((prevState) => ({
               ...prevState,
@@ -296,7 +299,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
             placeholder="Fruits moche, legume bio, pomme, banane ..." 
             label="Votre recherche"
             autoCapitalize="none"
-            class="w-full"
+            extraClasses="w-full"
             size="large"
           />
           <TextHeading3
@@ -305,7 +308,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
             Localisation
           </TextHeading3>
           <View className='w-full flex flex-row justify-between'>
-            <Simple 
+            <TextInput 
               value={searchOptions.address}
               onChangeText={(newAddress: string) => setSearchOptions((prevState) => ({
                 ...prevState,
@@ -314,9 +317,9 @@ export default function MapSearchBox(props: Props): JSX.Element {
               placeholder="Adresse, code postal, ville ..." 
               label="Adresse"
               autoCapitalize="none"
-              class="w-72"
+              extraClasses="w-72"
             />
-            <SimpleButton 
+            <ButtonIcon 
               iconName="map-marker"
               extraClasses='w-20'
               onPressFn={useMyPosition}
@@ -336,7 +339,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
                 step={20}
                 minimumValue={0}
                 maximumValue={100}
-                onValueChange={(newRadius: [number]) => { 
+                onValueChange={(newRadius) => { 
                     setSearchOptions((prevState) => ({
                       ...prevState,
                       radius: {

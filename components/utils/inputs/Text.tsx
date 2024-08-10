@@ -2,8 +2,9 @@ import React from 'react'
 import { View, Text, TextInput, TouchableOpacity } from 'react-native'
 import _Fontawesome from 'react-native-vector-icons/FontAwesome'
 const FontAwesome = _Fontawesome as React.ElementType
+import { GestureResponderEvent } from 'react-native'
 
-type SimpleProps = {
+type InputTextProps = {
 		placeholder: string,
 		label: string,
 		autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters' | undefined,
@@ -12,19 +13,17 @@ type SimpleProps = {
 		autoComplete?: string,
 		onChangeText: Function,
 		value?: string,
-		style?: {},
-		class?: string
 		size?: string
-		className?: string
+		extraClasses?: string
 		iconName?: string
-		onIconPressFn?: Function
+		onIconPressFn?: ((event: GestureResponderEvent) => void) | undefined
 }
 
-export default function Simple(props: SimpleProps): JSX.Element {
+export default function InputText(props: InputTextProps): JSX.Element {
 
 
 	return (
-		<View className={`${props.class} flex flex-row rounded-lg p-2 shadow-sm border border-secondary bg-white ${props.size === 'large' ? 'h-[70px]' : 'text-xs'} dark:border-primary`}>
+		<View className={`${props.extraClasses} flex flex-row rounded-lg p-2 shadow-sm border border-secondary bg-white ${props.size === 'large' ? 'h-[70px]' : 'text-xs'} dark:border-primary`}>
 			<View className='flex w-4/6'>
 				<Text className={`${props.size === 'large' ? 'text-lg' : 'text-xs'} font-bold text-secondary/50 uppercase p-0`}>{props.label}</Text>
 				<TextInput 
@@ -38,9 +37,9 @@ export default function Simple(props: SimpleProps): JSX.Element {
 			</View>
 
 			{
-				props.iconName && (
+				(props.iconName && props.onIconPressFn) && (
 					<View className='w-2/6 h-full pr-1'>
-						<TouchableOpacity className='flex flex-row justify-end items-center h-full m-0 p-0' onPress={() => props.onIconPressFn && props.onIconPressFn()}>
+						<TouchableOpacity className='flex flex-row justify-end items-center h-full m-0 p-0' onPress={props.onIconPressFn}>
 							<FontAwesome name={props.iconName} size={35} color="#98B66E" />
 						</TouchableOpacity>
 					</View>

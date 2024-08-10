@@ -15,7 +15,7 @@ export default function Producer(): JSX.Element {
 				</View>
 				<View className="grow px-1">
 					<Text className="font-bold text-wrap text-darkbg dar:text-lightbg mb-1">Nom du producteur</Text>
-					<ProductsNumber></ProductsNumber>
+					<ProductsNumber>1 produit que vous recherchez</ProductsNumber>
 				</View>
 				<View className="flex-none w-12 justify-center">
 					<TouchableOpacity className="bg-primary rounded-sm justify-center items-center w-12 h-16">

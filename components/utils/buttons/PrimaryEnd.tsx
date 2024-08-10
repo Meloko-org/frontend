@@ -1,17 +1,17 @@
 import React from 'react'
 import { Text, View, TouchableOpacity } from 'react-native'
 import _Fontawesome from 'react-native-vector-icons/FontAwesome'
-
+import { GestureResponderEvent } from 'react-native'
 const FontAwesome = _Fontawesome as React.ElementType
 
 type ButtonPrimaryEndProps = {
 	label: string,
 	iconName: string,
 	extraClasses?: string,
-	onPressFn: Function
+	onPressFn: ((event: GestureResponderEvent) => void) | undefined
 }
 
-export default function PrimaryEnd(props: ButtonPrimaryEndProps): JSX.Element {
+export default function ButtonPrimaryEnd(props: ButtonPrimaryEndProps): JSX.Element {
 
 	return (
 		<TouchableOpacity className="flex flex-row rounded-lg bg-primary shadow-sm py-1 justify-between items-center px-4 w-min" onPress={props.onPressFn}>

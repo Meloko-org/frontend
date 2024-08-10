@@ -1,28 +1,19 @@
 import React, { useState } from 'react'
 import { View, Text } from 'react-native'
 import _Fontawesome from 'react-native-vector-icons/FontAwesome'
+import { ShopData } from '../../types/API';
 
 const FontAwesome = _Fontawesome as React.ElementType
-
-type ShopData = {
-  name: string;
-  logo: string;
-  description: string;
-  notes: { note: { $numberDecimal: string } | number | any }[]; 
-  product?: any;
-  [key: string]: any;
-}
 
 type StarsNotationProps = {
     iconNames: string[];
 		extraClasses?: string;
     shopData: ShopData;
-		onPressFn: Function
 }
 
 export default function StarsNotation(props: StarsNotationProps): JSX.Element {
   // Note calculation  
-  const calculNote = (shopData: ShopData) => { 
+  const calculNote = (shopData: ShopData): number => { 
     let calcul: number = 0;
     const path = shopData.notes;
     for (let i = 0; i < path.length; i++) {
@@ -34,8 +25,8 @@ export default function StarsNotation(props: StarsNotationProps): JSX.Element {
 
   // Star formatting  
   const renderStars = (shopData: ShopData) => {
-    const rating = calculNote(shopData)
-    const stars = [];
+    const rating: number = calculNote(shopData)
+    const stars: JSX.Element[] = [];
     for (let i = 0; i < 5; i++) {
       if (i < Math.floor(rating)) {
         stars.push(<FontAwesome key={i} name={props.iconNames[0]} className='text-primary pr-0.5' />);

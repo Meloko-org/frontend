@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import _FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/Navigation';
+import { ShopData } from '../types/API';
 
 const FontAwesome = _FontAwesome as React.ElementType;
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
@@ -15,16 +16,6 @@ type StocksScreenNavigationProp = NativeStackNavigationProp<
 type Props = {
   navigation: StocksScreenNavigationProp;
 };
-
-// TypeScript Function
-type ShopData = {
-  name: string;
-  logo: string;
-  description: string;
-  notes: { note: { $numberDecimal: string } | number | any }[]; 
-  product?: any;
-  [key: string]: any;
-}
 
 export default function ShopUserScreen({ route, navigation }: Props) {
   const [shopData, setShopData] = useState<ShopData[]>([]);

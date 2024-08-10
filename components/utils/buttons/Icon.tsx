@@ -1,15 +1,16 @@
 import React from 'react'
-import { Text, TouchableOpacity } from 'react-native'
+import { TouchableOpacity } from 'react-native'
 import _Fontawesome from 'react-native-vector-icons/FontAwesome'
 const FontAwesome = _Fontawesome as React.ElementType
+import { GestureResponderEvent } from 'react-native'
 
-type ButtonSimpleProps = {
+type ButtonIconProps = {
     iconName: string,
 		extraClasses?: string,
-		onPressFn: Function
+		onPressFn: ((event: GestureResponderEvent) => void) | undefined
 }
 
-export default function SimpleButton(props: ButtonSimpleProps): JSX.Element {
+export default function ButtonIcon(props: ButtonIconProps): JSX.Element {
 
 	return (
 		<TouchableOpacity className={`${props.extraClasses} flex flex-row rounded-lg shadow-sm bg-primary py-1 justify-center items-center`} onPress={props.onPressFn}>
