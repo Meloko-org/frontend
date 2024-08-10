@@ -1,19 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserData } from "../types/API";
+import { UserData, CartData } from "../types/API";
 
 export type UserState = {
-  value: UserData,
+  data: UserData,
+  cart: CartData[] | []
 }
 
 const initialState: UserState = {
-  value: {
+  data: {
     email: null,
     firstname: null ,
     lastname: null,
     avatar: null,
     favSearch: [],
     bookmarks: []
-  }
+  },
+  cart: []
 }
 
 export const userSlice = createSlice({
@@ -21,15 +23,26 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     updateUser: (state: UserState, action: PayloadAction<UserData>): void => {
-      state.value.email = action.payload.email
-      state.value.firstname = action.payload.firstname
-      state.value.lastname = action.payload.lastname
-      state.value.avatar = action.payload.avatar
-      state.value.bookmarks = action.payload.bookmarks
-      state.value.favSearch = action.payload.favSearch
-    }
+      state.data.email = action.payload.email
+      state.data.firstname = action.payload.firstname
+      state.data.lastname = action.payload.lastname
+      state.data.avatar = action.payload.avatar
+      state.data.bookmarks = action.payload.bookmarks
+      state.data.favSearch = action.payload.favSearch
+    },
+    addProductToCart: (state: UserState, action: PayloadAction<CartData>): void => {
+      state.cart.push(action.payload)
+    },
+    increaseCartQuantity: (state: UserState, action: PayloadAction): void => {
+      const product = state.cart.find(c => c.stockData._id === action.payload._id)
+      product.quantity++
+    },
+    decreaseCartQuantity: (state: UserState, action: PayloadAction): void => {
+      const product = state.cart.find(c => c.stockData._id === action.payload._id)
+      product.quantity > 1 ? product.quantity-- : state.cart = state.cart.filter(c => c !== product)
+    },
   }
 })
 
-export const { updateUser } = userSlice.actions
+export const { updateUser, addProductToCart, increaseCartQuantity, decreaseCartQuantity } = userSlice.actions
 export default userSlice.reducer

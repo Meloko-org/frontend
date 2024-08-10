@@ -3,14 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/Navigation';
 import { ShopData, ProductData, StockData } from '../../types/API';
+
 import StarsNotation from '../../components/utils/StarsNotation';
 import TextHeading2 from '../../components/utils/texts/Heading2';
 import TextBody1 from '../../components/utils/texts/Body1';
 import BadgeSecondary from '../../components/utils/badges/Secondary';
 import ButtonIcon from '../../components/utils/buttons/Icon';
 import ButtonPrimaryEnd from '../../components/utils/buttons/PrimaryEnd';
-import CardProductSearchResult from '../../components/cards/ProductSearchResult';
-import CardProductsAll from '../../components/cards/ProductsAll';
+import CardProduct from '../../components/cards/Product';
 import ProductCategory from '../../components/cards/ProductCategory';
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
@@ -43,7 +43,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
   // const [shopStocks, setShopStocks] = useState<StockData[]>([]);
   // const [resultCategory, setResultCategory] = useState<{ word: string; count: number; }[]>([]);
   // const [shopProduct, setShopProduct] = useState<ProductData[]>([]);
-  const [selectedCategoryProducts, setSelectedCategoryProducts] = useState<ProductData[]>([]);
+  const [selectedCategoryProducts, setSelectedCategoryProducts] = useState<StockData[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
 // Shop recovery
@@ -73,41 +73,43 @@ export default function ShopUserScreen({ route, navigation }: Props) {
   }
 
 
+
+
   // Sorting products from categories by clicking
   const handleCategoryClick = (categoryName: string) => {
     const categoryData = shopData && shopData.categories.find(category => category.name === categoryName)
-    // console.log("cat", categoryData)
     const filteredProducts = categoryData ? categoryData.products : [];
     setSelectedCategoryProducts(filteredProducts);
-    console.log("filtered", filteredProducts)
     setIsModalVisible(true);
   };
 
   // Formatting category  
-  const categories = shopData && shopData.categories.map((category, i) => {
+  const categories = shopData && shopData.categories.map(category => {
     return (
       <ProductCategory category={category} onPressFn={() => handleCategoryClick(category.name)} key={category._id} />
     );
   });
 
   // Formatting search product  
-  const searchProduct = searchProducts.map((p, i) => {
+  const searchProduct = searchProducts.map((stockData, i) => {
     return (
-        <CardProductSearchResult 
-          stockData={p}
-          key={p._id}
+        <CardProduct 
+          stockData={stockData}
+          key={stockData._id}
           extraClasses='mb-1'
+          displayMode='shop'
         />
     );
   });
 
   // Formatting shop product click
-  const categoryProducts = selectedCategoryProducts.map((p, i) => {
+  const categoryProducts = selectedCategoryProducts.map(stockData => {
     return (
-      <CardProductsAll
-        productData={p}
-        key={p._id}
+      <CardProduct 
+        stockData={stockData}
+        key={stockData._id}
         extraClasses='mb-1'
+        displayMode='shop'
       />
     );
   });
@@ -145,49 +147,46 @@ export default function ShopUserScreen({ route, navigation }: Props) {
 
             <View className='flex flex-row w-full justify-evenly mb-3'>
               <StarsNotation iconNames={['star', 'star-half', 'star-o']} shopData={shopData}/>
-              <BadgeSecondary uppercase>Click & collect</BadgeSecondary>
-              <BadgeSecondary uppercase>Marché local</BadgeSecondary>
+              { shopData.clickCollect && <BadgeSecondary uppercase>Click & collect</BadgeSecondary> }
+              { shopData.markets.length > 0 && <BadgeSecondary uppercase>Marché local</BadgeSecondary> }
               <BadgeSecondary>{`${shopDistance}km`}</BadgeSecondary>
             </View>
           </View>
           )
         }
 
-
-
-
-          {
-            searchProduct.length > 0 && 
-            (
-              <View>
-                  <TextHeading2>Votre recherche</TextHeading2>
-                  <View className='my-4'>
-                    {searchProduct} 
-                  </View>
-                  <ButtonPrimaryEnd label="Tous les résultats" iconName="arrow-right" onPressFn={handleAllResultsPress}></ButtonPrimaryEnd>
-              </View>
-            )
-          }
+        {
+          searchProduct.length > 0 && 
+          (
+            <View>
+                <TextHeading2>Votre recherche</TextHeading2>
+                <View className='my-4'>
+                  {searchProduct} 
+                </View>
+                <ButtonPrimaryEnd label={`Tous les résultats (${searchProduct.length})`} iconName="arrow-right" onPressFn={handleAllResultsPress}></ButtonPrimaryEnd>
+            </View>
+          )
+        }
+        <View className='my-3'>
+          <TextHeading2>Rayons</TextHeading2>
           <View className='my-3'>
-            <TextHeading2>Rayons</TextHeading2>
-            <View className='my-3'>
-              {categories}
-            </View> 
-          </View>
-        
-          <Modal visible={isModalVisible} animationType="slide" onRequestClose={() => setIsModalVisible(false)}>
-            <SafeAreaView className='bg-lightbg flex-1'>
-              <View className='p-3'>
-                <TouchableOpacity onPress={() => setIsModalVisible(false)} className='mb-3'>
-                  <Text className='text-xl font-bold'>←</Text>
-                </TouchableOpacity>
-                <TextHeading2 extraClasses='mb-4'>Tous les produits</TextHeading2>
-                <ScrollView>
-                  {categoryProducts}
-                </ScrollView>
-              </View>
-            </SafeAreaView>
-          </Modal>
+            {categories}
+          </View> 
+        </View>
+      
+        <Modal visible={isModalVisible} animationType="slide" onRequestClose={() => setIsModalVisible(false)}>
+          <SafeAreaView className='bg-lightbg flex-1'>
+            <View className='p-3'>
+              <TouchableOpacity onPress={() => setIsModalVisible(false)} className='mb-3'>
+                <Text className='text-xl font-bold'>←</Text>
+              </TouchableOpacity>
+              <TextHeading2 extraClasses='mb-4'>Tous les produits</TextHeading2>
+              <ScrollView>
+                {categoryProducts}
+              </ScrollView>
+            </View>
+          </SafeAreaView>
+        </Modal>
       </ScrollView>    
     </SafeAreaView>
   );

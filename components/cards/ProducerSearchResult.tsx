@@ -18,10 +18,10 @@ type CardProducerSearchResultProps = {
 export default function CardProducerSearchResult(props: CardProducerSearchResultProps): JSX.Element {
 	return (
 		<TouchableOpacity onPress={props.onPressFn}>
-		<View className={`${props.extraClasses} ${props.displayMode === 'bottomSheet' ? 'rounded-lg shadow-sm bg-white p-1 dark:bg-darkbg' : 'p-2'} flex flex-row w-full`}>
+		<View className={`${props.extraClasses} ${props.displayMode === 'bottomSheet' ? 'rounded-lg shadow-sm bg-white p-2 dark:bg-darkbg' : 'p-2'} flex flex-row w-full`}>
 			<View className="flex flex-row items-center w-full">
-				<View className="flex flex-row items-center rounded-lg w-28 h-full">
-					<Image source={require('../../assets/images/tomate.webp')} className="rounded-lg w-full h-24" alt={`logo de la boutique ${props.shopData.name}`} resizeMode="cover" width={96} height={64}/>
+				<View className="flex flex-row items-center rounded-lg w-24 h-full">
+					<Image source={require('../../assets/images/tomate.webp')} className="rounded-full w-24 h-24" alt={`logo de la boutique ${props.shopData.name}`} resizeMode="cover" width={96} height={64}/>
 				</View>
 				<View className="h-full pl-2 items-start">
 					<View className="flex flex-row items-center">

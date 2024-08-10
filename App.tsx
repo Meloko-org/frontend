@@ -15,7 +15,7 @@ import HomeScreen from './screens/Home';
 import MapCustomerScreen from './screens/customer/Map'
 import SignUpScreen from './screens/Signup';
 import SignInScreen from './screens/Signin';
-import CartScreen from './screens/Cart';
+import CartScreen from './screens/customer/Cart';
 import FavoritesScreen from './screens/Favorites';
 import ProfilScreen from './screens/Profil';
 import ShopProducerScreen from './screens/producer/Shop';

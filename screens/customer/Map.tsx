@@ -52,6 +52,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
 
     if(route.params.searchResults) {
       setSearchResults(route.params.searchResults)
+      // console.log(route.params.searchResults[0].searchData.relevantProducts)
     }
   }, []);
 

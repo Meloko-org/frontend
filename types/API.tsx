@@ -4,15 +4,24 @@ type ProductData = {
   image: string;
   description: string;
   family?: any;
-  stock?: { $numberDecimal: string }
-  price?: { $numberDecimal: string }
 }
 
 type StockData = {
-  price: number
-  stock: number
+  _id: string
+  price: { $numberDecimal: string }
+  stock: { $numberDecimal: string }
+  shop: {
+    _id: string
+    name: string
+  }
   product: ProductData
 }
+
+type CartData = {
+  stockData: StockData,
+  quantity: number
+}
+
 
 type ShopData = {
   _id: string
@@ -20,7 +29,7 @@ type ShopData = {
   logo: string;
   description: string;
   notes: { note: { $numberDecimal: string } | number | any }[]; 
-  product?: ProductData[];
+  products?: StockData[];
   [key: string]: any;
 } | null
 
@@ -37,5 +46,6 @@ export type {
   ProductData,
   ShopData,
   UserData,
-  StockData
+  StockData,
+  CartData
 }

@@ -44,7 +44,7 @@ export default function SignInScreen({ navigation: { goBack } }: Props) {
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
   // and store user infos in the store
   const dispatch = useDispatch()
-  const userStore = useSelector((state: { user : UserState}) => state.user.value)
+  const userStore = useSelector((state: { user : UserState}) => state.user.data)
 
   // Import the Clerk Auth functions
   const { signIn, setActive, isLoaded } = useSignIn()
