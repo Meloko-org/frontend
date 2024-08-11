@@ -6,8 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { addProductToCart, increaseCartQuantity, decreaseCartQuantity } from "../../reducers/user";
 import CardProduct from '../../components/cards/Product';
 import ButtonPrimaryEnd from '../../components/utils/buttons/PrimaryEnd';
+import ButtonPrimaryStart from '../../components/utils/buttons/PrimaryStart';
 
-export default function CartScreen() {
+export default function CartScreen({ navigation }) {
   const cartStore = useSelector((state: { cart }) => state.user.cart)
   const [cartByShop, setCartByShop] = useState([])
   const [cartTotal, setCartTotal] = useState<number>(0)
@@ -48,6 +49,9 @@ export default function CartScreen() {
               stockData={stockData}
               key={stockData._id}
               extraClasses='mb-1'
+              displayMode='cart'
+              quantityControllable
+              showImage
             />
           )
         })
@@ -61,9 +65,14 @@ export default function CartScreen() {
     )
   })
 
-  const handlePaymentPress = () => {
-    console.log("pay")
+  const handleWithdrawModePress = () => {
+    console.log("go to withdraw modes")
+    navigation.navigate('TabNavigatorUser', {
+      screen: 'WithdrawModesUser',
+    }) 
   }
+
+
   return (
     <SafeAreaView className='flex-1 bg-lightbg'>
       <View className='p-3'>
@@ -73,12 +82,13 @@ export default function CartScreen() {
             <>
               {products}
               <TextHeading3 extraClasses='py-3 text-right'>{`TOTAL: ${cartTotal}€`}</TextHeading3>
-              <ButtonPrimaryEnd label="Mes modes de retrait" iconName="arrow-right" onPressFn={handlePaymentPress} />
+              <ButtonPrimaryStart label="Continuer vos achats" iconName="arrow-left" onPressFn={handleWithdrawModePress} extraClasses='mb-3' />
+              <ButtonPrimaryEnd label="Mes modes de retrait" iconName="arrow-right" onPressFn={handleWithdrawModePress} />
             </>
           ) : (
             <View className='h-full flex flex-column justify-center items-center'>
               <TextHeading2 extraClasses='mb-4'>Votre panier est vide :(</TextHeading2>
-              <ButtonPrimaryEnd label="Continuer vos achats" iconName="arrow-right" onPressFn={handlePaymentPress} />
+              <ButtonPrimaryStart label="Continuer vos achats" iconName="arrow-left" onPressFn={handleWithdrawModePress} />
             </View>
 
           )

@@ -13,24 +13,33 @@ type StockData = {
   shop: {
     _id: string
     name: string
+    markets: object[]
+    clickCollect: object
   }
   product: ProductData
 }
 
 type CartData = {
-  stockData: StockData,
-  quantity: number
+  shop: ShopData
+  products: [{
+    product: StockData
+    quantity: number
+  }]
+  withdrawMode: 'market' | 'clickCollect' | null | undefined
+  market?: string
 }
 
 
 type ShopData = {
   _id: string
-  name: string;
-  logo: string;
-  description: string;
-  notes: { note: { $numberDecimal: string } | number | any }[]; 
-  products?: StockData[];
-  [key: string]: any;
+  name: string
+  logo: string
+  description: string
+  markets: object[]
+  clickCollect: object
+  notes: { note: { $numberDecimal: string } | number | any }[]
+  products?: StockData[]
+  [key: string]: any
 } | null
 
 type UserData = {

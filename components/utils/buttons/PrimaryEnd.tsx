@@ -5,20 +5,29 @@ import { GestureResponderEvent } from 'react-native'
 const FontAwesome = _Fontawesome as React.ElementType
 
 type ButtonPrimaryEndProps = {
-	label: string,
-	iconName: string,
-	extraClasses?: string,
+	label: string
+	iconName: string
+	extraClasses?: string
+	disabled: boolean
 	onPressFn: ((event: GestureResponderEvent) => void) | undefined
 }
 
 export default function ButtonPrimaryEnd(props: ButtonPrimaryEndProps): JSX.Element {
 
 	return (
-		<TouchableOpacity className="flex flex-row rounded-lg bg-primary shadow-sm py-1 justify-between items-center px-4 w-min" onPress={props.onPressFn}>
-			<View className='w-5/6 text-center'>
+		<TouchableOpacity 
+			className={
+				`
+					${props.extraClasses} 
+					${props.disabled ? 'bg-primary/60' : 'bg-primary'}
+					relative flex flex-row rounded-lg shadow-sm py-1 justify-center items-center px-4 w-min
+				`
+			} 
+			onPress={props.onPressFn}
+			disabled={props.disabled}
+		>
 				<Text className="text-lightbg text-center m-2 font-bold text-[24px]">{props.label}</Text>
-			</View>
-				<FontAwesome name={props.iconName} size={25} color="#FFFFFF" className="ps-2"/>
+				<FontAwesome name={props.iconName} size={25} color="#FFFFFF" className="absolute" style={{right: 20}} />
 		</TouchableOpacity>
 	)
 }

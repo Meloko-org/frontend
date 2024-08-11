@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import * as Location from 'expo-location';
 import { Animated, View, Text, Pressable, StyleSheet, SafeAreaView } from 'react-native'
 import TextInput from '../utils/inputs/Text';
-import PrimaryEnd from '../utils/buttons/PrimaryEnd';
+import ButtonPrimaryEnd from '../utils/buttons/PrimaryEnd';
 import ButtonIcon from '../utils/buttons/Icon';
 import {Slider} from '@miblanchard/react-native-slider';
 import TextHeading2 from '../../components/utils/texts/Heading2'
@@ -271,7 +271,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
         </Pressable>
       ) : (
         <SafeAreaView style={{flex: 1}} className='bg-lightbg dark:bg-darkbg'>
-        <View style={styles.container} className='p-3'>
+        <View className='p-3 flex-1 w-full'>
           <TextHeading2
             extraClasses='mb-6'
           >
@@ -343,7 +343,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
             </View>
           </View>
   
-          <PrimaryEnd label="Chercher" iconName="search" onPressFn={onSearchPress}></PrimaryEnd>
+          <ButtonPrimaryEnd disabled={searchOptions.address === ''} label="Chercher" iconName="search" onPressFn={onSearchPress}></ButtonPrimaryEnd>
         </View>
       </SafeAreaView>
       )

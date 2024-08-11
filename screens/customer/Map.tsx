@@ -91,6 +91,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
               screen: 'ShopUser',
               params: { 
                 shopId: data._id,
+                distance: data.searchData.distance,
                 relevantProducts: data.searchData.relevantProducts ? data.searchData.relevantProducts : [] 
               },
             }) 

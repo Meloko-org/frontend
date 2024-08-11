@@ -21,6 +21,8 @@ type CardProductProps = {
 	onPressFn?: ((event: GestureResponderEvent) => void) | undefined
 	extraClasses?: string
 	displayMode: 'cart' | 'shop'
+	quantityControllable: boolean
+	showImage: boolean
 }
 
 export default function CardProduct(props: CardProductProps): JSX.Element {
@@ -39,17 +41,23 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 				price: props.stockData.price,
 				shop: props.stockData.shop 
 			},
-      quantity: 1
+      quantity: 1,
+			withdrawMode: null
     }))
   }
 
 	return (
 		<View className={`${props.extraClasses} rounded-lg shadow-sm bg-white p-2 dark:bg-darkbg flex flex-row w-full`}>
 			<View className="flex flex-row items-center w-full">
-				<View className="flex flex-row items-center rounded-lg w-auto h-full">
-					<Image source={require('../../assets/images/tomate.webp')} className="rounded-full w-20 h-20" alt={`logo de la boutique ${props.stockData.product.name}`} resizeMode="cover" width={96} height={64}/>
-				</View>
-				<View className="h-full px-2 items-start w-3/5">
+				{
+					props.showImage && (
+						<View className="flex flex-row items-center rounded-lg w-auto h-full">
+							<Image source={require('../../assets/images/tomate.webp')} className="rounded-full w-20 h-20" alt={`logo de la boutique ${props.stockData.product.name}`} resizeMode="cover" width={96} height={64}/>
+						</View>
+					)
+				}
+
+				<View className={`${props.showImage ? 'w-3/5' : 'w-4/5' } h-full px-2 items-start`}>
 					<TextHeading4>{ `${props.stockData.product.family.name} ${props.stockData.product.name}` }</TextHeading4>
 					<PricePer>{props.stockData.price.$numberDecimal}€ / 100gr</PricePer>
 				</View>
@@ -59,9 +67,9 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 							return c.stockData._id === props.stockData._id
 						}) ? (
 							<>
-								<TouchableOpacity onPress={() => dispatch(increaseCartQuantity(props.stockData))}><Text className="text-2xl">+</Text></TouchableOpacity>
+								{ props.quantityControllable && <TouchableOpacity onPress={() => dispatch(increaseCartQuantity(props.stockData))}><Text className="text-2xl">+</Text></TouchableOpacity> }
 								<BadgeGrey>{cartStore.find(c => c.stockData._id === props.stockData._id).quantity}</BadgeGrey>
-								<TouchableOpacity onPress={() => dispatch(decreaseCartQuantity(props.stockData))}><Text className="text-2xl">-</Text></TouchableOpacity>
+								{ props.quantityControllable && <TouchableOpacity onPress={() => dispatch(decreaseCartQuantity(props.stockData))}><Text className="text-2xl">-</Text></TouchableOpacity> }
 							</>
 						) : (
 							<ButtonIcon 

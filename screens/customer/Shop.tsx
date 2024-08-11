@@ -40,9 +40,6 @@ export default function ShopUserScreen({ route, navigation }: Props) {
   const [shopData, setShopData] = useState<ShopData>(null);
   const [searchProducts, setSearchProducts] = useState<StockData[]>([]);
   const [shopDistance, setShopDistance] = useState<number>(0)
-  // const [shopStocks, setShopStocks] = useState<StockData[]>([]);
-  // const [resultCategory, setResultCategory] = useState<{ word: string; count: number; }[]>([]);
-  // const [shopProduct, setShopProduct] = useState<ProductData[]>([]);
   const [selectedCategoryProducts, setSelectedCategoryProducts] = useState<StockData[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
@@ -98,6 +95,8 @@ export default function ShopUserScreen({ route, navigation }: Props) {
           key={stockData._id}
           extraClasses='mb-1'
           displayMode='shop'
+          quantityControllable
+          showImage
         />
     );
   });
@@ -110,6 +109,8 @@ export default function ShopUserScreen({ route, navigation }: Props) {
         key={stockData._id}
         extraClasses='mb-1'
         displayMode='shop'
+        quantityControllable
+        showImage
       />
     );
   });

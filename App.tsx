@@ -25,12 +25,14 @@ import StocksScreen from './screens/Stocks';
 import SearchCustomerScreen from './screens/customer/Search'
 import ComponentsScreen from './screens/Components'
 import ShopUserScreen from './screens/customer/Shop'
+import WithdrawModesUserScreen from './screens/customer/WithdrawModes';
 
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import user from './reducers/user';
+import cart from './reducers/cart';
 const store = configureStore({
-  reducer: {user},
+  reducer: {user, cart},
 })
 
 const FontAwesome = _FontAwesome as React.ElementType;
@@ -106,6 +108,7 @@ const TabNavigatorUser: React.FC = () => {
       <Tab.Screen name="Favoris" component={FavoritesScreen} />
       <Tab.Screen name="Profil" component={ProfilScreen} />
       <Tab.Screen name="ShopUser" component={ShopUserScreen} options={{ tabBarButton: () => null }}/>
+      <Tab.Screen name="WithdrawModesUser" component={WithdrawModesUserScreen} options={{ tabBarButton: () => null }}/>
     </Tab.Navigator>
   );
 };
