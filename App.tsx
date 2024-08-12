@@ -27,6 +27,7 @@ import ComponentsScreen from './screens/Components'
 import ShopUserScreen from './screens/customer/Shop'
 import WithdrawModesUserScreen from './screens/customer/WithdrawModes';
 import OrderCustomerScreen from './screens/customer/Order';
+import PaymentCustomerScreen from './screens/customer/Payment'
 
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
@@ -111,6 +112,7 @@ const TabNavigatorUser: React.FC = () => {
       <Tab.Screen name="ShopUser" component={ShopUserScreen} options={{ tabBarButton: () => null }}/>
       <Tab.Screen name="WithdrawModesUser" component={WithdrawModesUserScreen} options={{ tabBarButton: () => null }}/>
       <Tab.Screen name="OrderCustomer" component={OrderCustomerScreen} options={{ tabBarButton: () => null }}/>
+      <Tab.Screen name="PaymentCustomer" component={PaymentCustomerScreen} options={{ tabBarButton: () => null }}/>
     </Tab.Navigator>
   );
 };

@@ -2,14 +2,22 @@ import { StripeProvider, useStripe } from '@stripe/stripe-react-native';
 import React, { useState, useEffect } from 'react'
 import { Alert } from 'react-native'
 import ButtonPrimaryEnd from './PrimaryEnd';
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from '../../../reducers/user';
+import { useAuth } from '@clerk/clerk-expo'
 
 export default function StripePaymentButton(props) {
+  const dispatch = useDispatch()
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [loading, setLoading] = useState(false);
   const [publishableKey, setPublishableKey] = useState('');
-  
+  const userStore = useSelector((state: { user }) => state.user.value)
+
   // Import the public api root address
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
+
+  const { getToken } = useAuth()
+
 
   const fetchPublishableKey = async () => {
     const key = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY;
@@ -21,15 +29,20 @@ export default function StripePaymentButton(props) {
   }, []);
 
   const fetchPaymentSheetParams = async () => {
+    const token = await getToken() 
     const response = await fetch(`${API_ROOT}/stripe/paymentIntent`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type' : 'application/json',
+        Authorization: `Bearer ${token}`,
+        mode: 'cors'
       },
-      body: JSON.stringify({amount: props.totalCartAmount})
+      body: JSON.stringify({
+        amount: props.totalCartAmount,
+        customer: props.user
+      })
     });
     const { paymentIntent, ephemeralKey, customer } = await response.json();
-
     return {
       paymentIntent,
       ephemeralKey,
@@ -51,10 +64,10 @@ export default function StripePaymentButton(props) {
       paymentIntentClientSecret: paymentIntent,
       // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
       //methods that complete payment after a delay, like SEPA Debit and Sofort.
-      allowsDelayedPaymentMethods: true,
-      defaultBillingDetails: {
-        name: 'Jane Doe',
-      }
+      // allowsDelayedPaymentMethods: true,
+      // defaultBillingDetails: {
+      //   name: `${props.user.firstname} ${props.user.lastname}`,
+      // }
     });
     if (!error) {
       setLoading(true);
@@ -63,6 +76,7 @@ export default function StripePaymentButton(props) {
 
   const openPaymentSheet = async () => {
     try {
+      dispatch(updateUser({...userStore, firstname: props.user.firstname, lastname: props.user.lastname}))
       await initializePaymentSheet();
       const { error } = await presentPaymentSheet();
 

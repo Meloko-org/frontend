@@ -186,7 +186,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
                   ...prevState,
                   query: newQuery
                 }))}
-                placeholder="Fruits moche, legume bio, pomme, banane ..." 
+                placeholder="ex: Fruits moche, legume bio, pomme, banane ..." 
                 label="Votre recherche"
                 autoCapitalize="none"
                 extraClasses="w-full"
@@ -283,7 +283,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
               ...prevState,
               query: newQuery
             }))}
-            placeholder="Fruits moche, legume bio, pomme, banane ..." 
+            placeholder="ex: Fruits moche, legume bio, pomme, banane ..." 
             label="Votre recherche"
             autoCapitalize="none"
             extraClasses="w-full"

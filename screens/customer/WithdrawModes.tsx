@@ -35,7 +35,6 @@ export default function WithdrawModesScreen({ navigation }) {
             return (currentValue.quantity * Number(currentValue.stockData.price.$numberDecimal)) + accumulator },
           0,
         );
-        console.log("c total cost", cartTotalCost)
         allShopsCost += cartTotalCost
         
       })
@@ -129,25 +128,14 @@ export default function WithdrawModesScreen({ navigation }) {
         {products}
         <TextHeading3 extraClasses='py-3 text-right'>{`TOTAL : ${cartTotal}€`}</TextHeading3>
 
-        {
-          isSignedIn ? (
-            <StripePaymentButton 
-              label="Passer au paiement"
-              iconName="arrow-right"
-              disabled={isPaymentDisabledButton} 
-              totalCartAmount={cartTotal}
-              onPaymentSuccessFn={() => navigation.navigate('TabNavigatorUser', { screen: 'OrderCustomer' })}
-            />
-          ) : (
-            <ButtonPrimaryEnd 
-              disabled={isPaymentDisabledButton} 
-              label="Passer au paiement" 
-              iconName="arrow-right" 
-              onPressFn={() => setIsSigninModalVisible(true)} 
-            />
-          )
-        }
-
+          <ButtonPrimaryEnd 
+            disabled={isPaymentDisabledButton} 
+            label="Passer au paiement" 
+            iconName="arrow-right" 
+            onPressFn={() => {
+              !isSignedIn ? setIsSigninModalVisible(true) : navigation.navigate('TabNavigatorUser', { screen: 'PaymentCustomer' })
+            }} 
+          />
         
       </View>
 
@@ -163,12 +151,10 @@ export default function WithdrawModesScreen({ navigation }) {
         </SafeAreaView>
       </Modal>
 
-        <SignInScreen 
-          showModal={isSigninModalVisible}
-          onCloseFn={() => setIsSigninModalVisible(false)}
-        />
-
-
+      <SignInScreen 
+        showModal={isSigninModalVisible}
+        onCloseFn={() => setIsSigninModalVisible(false)}
+      />
 
     </SafeAreaView>
   );
