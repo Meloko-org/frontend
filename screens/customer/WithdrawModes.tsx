@@ -1,33 +1,60 @@
 import { SafeAreaView, View, Modal, TouchableOpacity, Text } from 'react-native';
 import React, { useState, useEffect } from "react";
+import { useAuth } from '@clerk/clerk-expo'
+
 import TextHeading2 from '../../components/utils/texts/Heading2';
 import TextHeading3 from '../../components/utils/texts/Heading3';
 import { useDispatch, useSelector } from "react-redux";
 import CardProduct from '../../components/cards/Product';
 import ButtonPrimaryEnd from '../../components/utils/buttons/PrimaryEnd';
+import StripePaymentButton from '../../components/utils/buttons/StripePayment';
 import InputRadioGroup from '../../components/utils/inputs/radioGroup';
+import ButtonBack from '../../components/utils/buttons/Back'
 import Market from '../../components/cards/Market';
+import SignInScreen from '../Signin';
 import { updateWithdrawMode } from '../../reducers/cart'
 
 export default function WithdrawModesScreen({ navigation }) {
+  // Import the Clerk Auth functions
+  const { isSignedIn, getToken } = useAuth()
   const dispatch = useDispatch()
   const cartStore = useSelector((state: { cart }) => state.cart.value)
   const [cartTotal, setCartTotal] = useState<number>(0)
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [isMarketSelectModalVisible, setIsMarketSelectModalVisible] = useState<boolean>(false);
+  const [isSigninModalVisible, setIsSigninModalVisible] = useState<boolean>(false);
   const [selectedMarkets, setSelectedMarkets] = useState([])
   const [isPaymentDisabledButton, setIsPaymentDisabledButton] = useState(false)
 
+
   useEffect(() => {
     if(cartStore.length > 0) {
+      let allShopsCost = 0
       cartStore.forEach(c => {
         const cartTotalCost = c.products.reduce(
           (accumulator, currentValue) => {
             return (currentValue.quantity * Number(currentValue.stockData.price.$numberDecimal)) + accumulator },
           0,
         );
-        setCartTotal(cartTotalCost)
+        console.log("c total cost", cartTotalCost)
+        allShopsCost += cartTotalCost
+        
       })
+      setCartTotal(allShopsCost)
       setIsPaymentDisabledButton(cartStore.some(c => !c.withdrawMode))
+
+    } else {
+      navigation.navigate('TabNavigatorUser', {
+        screen: 'Accueil',
+        params: { 
+          search: {
+            address: null,
+            query: null,
+            radius: null,
+            userPosition: null
+          },
+          searchResults: []
+        },
+      });
     }
   }, [cartStore])
 
@@ -37,7 +64,7 @@ export default function WithdrawModesScreen({ navigation }) {
     dispatch(updateWithdrawMode({shopId: selectedShop.shop._id, withdrawMode: value}))
     if(value === 'market') {
       setSelectedMarkets(selectedShop.shop.markets)
-      setIsModalVisible(true) 
+      setIsMarketSelectModalVisible(true) 
     } 
     
   }
@@ -51,8 +78,6 @@ export default function WithdrawModesScreen({ navigation }) {
             key={p.stockData._id}
             extraClasses='mb-1'
             displayMode='cart'
-            quantityControllable
-            showImage
           />
         )
       })
@@ -89,10 +114,6 @@ export default function WithdrawModesScreen({ navigation }) {
 
   })
 
-  const handlePaymentPress = () => {
-    console.log("pay")
-  }
-
   const markets = selectedMarkets.map(m => {
     return (
       <Market key={m.name} name={m.name} />
@@ -106,26 +127,48 @@ export default function WithdrawModesScreen({ navigation }) {
         <TextHeading2 extraClasses='mb-4'>Vos modes de retrait</TextHeading2>
 
         {products}
-        <TextHeading3 extraClasses='py-3 text-right'>{`TOTAL: ${cartTotal}€`}</TextHeading3>
-        <ButtonPrimaryEnd 
-          disabled={isPaymentDisabledButton} 
-          label="Passer au paiement" 
-          iconName="arrow-right" 
-          onPressFn={handlePaymentPress} 
-        />
+        <TextHeading3 extraClasses='py-3 text-right'>{`TOTAL : ${cartTotal}€`}</TextHeading3>
+
+        {
+          isSignedIn ? (
+            <StripePaymentButton 
+              label="Passer au paiement"
+              iconName="arrow-right"
+              disabled={isPaymentDisabledButton} 
+              totalCartAmount={cartTotal}
+            />
+          ) : (
+            <ButtonPrimaryEnd 
+              disabled={isPaymentDisabledButton} 
+              label="Passer au paiement" 
+              iconName="arrow-right" 
+              onPressFn={() => setIsSigninModalVisible(true)} 
+            />
+          )
+        }
+
         
       </View>
-      <Modal visible={isModalVisible} animationType="slide" onRequestClose={() => setIsModalVisible(false)}>
-          <SafeAreaView className='bg-lightbg flex-1'>
-            <View className='p-3'>
-              <TouchableOpacity onPress={() => setIsModalVisible(false)} className='mb-3'>
-                <Text className='text-xl font-bold'>←</Text>
-              </TouchableOpacity>
-              <TextHeading2 extraClasses='mb-4'>Choisissez un marché</TextHeading2>
-              {markets}
-            </View>
-          </SafeAreaView>
-        </Modal>
+
+      <Modal visible={isMarketSelectModalVisible} animationType="slide" onRequestClose={() => setIsMarketSelectModalVisible(false)}>
+        <SafeAreaView className='bg-lightbg flex-1'>
+          <View className='p-3'>
+            <ButtonBack 
+              onPressFn={() => setIsMarketSelectModalVisible(false)}
+            />
+            <TextHeading2 extraClasses='mb-4'>Choisissez un marché</TextHeading2>
+            {markets}
+          </View>
+        </SafeAreaView>
+      </Modal>
+
+        <SignInScreen 
+          showModal={isSigninModalVisible}
+          onCloseFn={() => setIsSigninModalVisible(false)}
+        />
+
+
+
     </SafeAreaView>
   );
 }

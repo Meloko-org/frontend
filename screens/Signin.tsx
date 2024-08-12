@@ -1,11 +1,15 @@
 import { useSignIn, useOAuth } from '@clerk/clerk-expo'
 import * as WebBrowser from 'expo-web-browser'
 import * as Linking from 'expo-linking'
-import { StyleSheet, Text, TextInput, Button, View } from 'react-native'
+import { TextInput, Button, View, Modal, SafeAreaView, TouchableOpacity, Text } from 'react-native'
 import React, { useState, useCallback, useEffect } from 'react'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/Navigation'
-
+import TextHeading2 from '../components/utils/texts/Heading2'
+import TextHeading3 from '../components/utils/texts/Heading3'
+import InputText from '../components/utils/inputs/Text'
+import ButtonPrimaryEnd from '../components/utils/buttons/PrimaryEnd'
+import ButtonBack from '../components/utils/buttons/Back'
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "../reducers/user";
 import { UserState } from '../reducers/user'
@@ -36,15 +40,19 @@ export const useWarmUpBrowser = () => {
 
 WebBrowser.maybeCompleteAuthSession()
 
-export default function SignInScreen({ navigation: { goBack } }: Props) {
+export default function SignInScreen(props) {
   useWarmUpBrowser()  
+  const [isSigninModalVisible, setIsSigninModalVisible] = useState<boolean>(false);
 
   // need to get the user infos
   const { getToken } = useAuth()
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
   // and store user infos in the store
   const dispatch = useDispatch()
-  const userStore = useSelector((state: { user : UserState}) => state.user.data)
+  // Email verification status
+  const [pendingVerification, setPendingVerification] = useState<boolean>(false)
+  // Email verification code
+  const [code, setCode] = useState<string>('')
 
   // Import the Clerk Auth functions
   const { signIn, setActive, isLoaded } = useSignIn()
@@ -55,6 +63,12 @@ export default function SignInScreen({ navigation: { goBack } }: Props) {
   // Form fields
   const [emailAddress, setEmailAddress] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+
+
+  useEffect(() => {
+    setIsSigninModalVisible(props.showModal ? true : false)
+  }, [props.showModal])
+
 
   // Signin/up with Google
   const onGoogleAuthPress = useCallback(async () => {
@@ -72,8 +86,7 @@ export default function SignInScreen({ navigation: { goBack } }: Props) {
       // If the signin event went well
       if (createdSessionId) {
         setActive!({ session: createdSessionId })
-        // Go back to the previous screen
-        goBack()
+        handleCloseModal()
       } else {
 
       }
@@ -83,6 +96,60 @@ export default function SignInScreen({ navigation: { goBack } }: Props) {
   }, [])
 
   
+  const onSignUpPress = async () => {
+    // If Clerk is not loaded
+    if (!isLoaded) {
+      return
+    }
+
+    try {
+      // Try to signup
+      await signUp.create({
+        emailAddress,
+        password,
+      })
+
+      // Send the email verification code
+      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' })
+
+      // Verification is pending
+      setPendingVerification(true)
+    } catch (err: any) {
+      // See https://clerk.com/docs/custom-flows/error-handling
+      // for more info on error handling
+      console.error(JSON.stringify(err, null, 2))
+    }
+  }
+
+  const onPressVerify = async () => {
+    // If Clerk is not loaded
+    if (!isLoaded) {
+      return
+    }
+
+    try {
+      // Try to verify the email with the provided code
+      const completeSignUp = await signUp.attemptEmailAddressVerification({
+        code,
+      })
+
+      // If the verification event is sucessfull 
+      if (completeSignUp.status === 'complete') {
+        await setActive({ session: completeSignUp.createdSessionId })
+        // redirection vers la page compte user pour saisie nom, prénom...
+        // -> enregistrement des nouvelles infos (nom, prénom) dans le store 
+        // Go back to the previous screen
+        goBack()
+      } else {
+        console.error(JSON.stringify(completeSignUp, null, 2))
+      }
+    } catch (err: any) {
+      // See https://clerk.com/docs/custom-flows/error-handling
+      // for more info on error handling
+      console.error(JSON.stringify(err, null, 2))
+    }
+  }
+
 
   // Signin the user with Clerk
   const onSignInPress = useCallback(async () => {
@@ -109,8 +176,7 @@ export default function SignInScreen({ navigation: { goBack } }: Props) {
           dispatch(updateUser(user))
         }
 
-        // Go back to the previous screen
-        goBack()
+        handleCloseModal()
       } else {
         // See https://clerk.com/docs/custom-flows/error-handling
         // for more info on error handling
@@ -121,39 +187,88 @@ export default function SignInScreen({ navigation: { goBack } }: Props) {
     }
   }, [isLoaded, emailAddress, password])
 
-
-  console.log(userStore)
-
+  const handleCloseModal = () => {
+    props.onCloseFn()
+    setIsSigninModalVisible(false)
+  }
 
   return (
-    <View style={styles.container}>
-      <Button title="Sign in with Google" onPress={onGoogleAuthPress} />
+    <Modal visible={isSigninModalVisible} animationType="slide" onRequestClose={handleCloseModal}>
+      <SafeAreaView className='bg-lightbg flex-1'>
+        <View className='p-3 flex items-center'>
+          <ButtonBack 
+            onPressFn={handleCloseModal}
+          />
+          <TextHeading2 extraClasses='mb-3'>Se connecter</TextHeading2>
+          <ButtonPrimaryEnd 
+              label="Google" 
+              iconName="google" 
+              onPressFn={onGoogleAuthPress} 
+              extraClasses='w-80 mb-5'
+            />
+          <InputText 
+            value={emailAddress}
+            onChangeText={(newEmail: string) => setEmailAddress(newEmail)}
+            placeholder="example@gmail.com" 
+            label="Email"
+            autoCapitalize="none"
+            extraClasses="w-80 mb-2"
+          />
+          <InputText 
+            value={password}
+            onChangeText={(newPassword: string) => setPassword(newPassword)}
+            placeholder="example@gmail.com" 
+            label="Mot de passe"
+            autoCapitalize="none"
+            extraClasses="w-80 mb-2"
+            secureTextEntry={true}
+          />
+          <ButtonPrimaryEnd 
+              label="Connection" 
+              iconName="sign-in" 
+              onPressFn={onSignInPress} 
+              extraClasses='w-80 mb-5'
+            />
 
-      <TextInput
-        autoCapitalize="none"
-        value={emailAddress}
-        placeholder="Email..."
-        onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
-      />
-      <TextInput
-        value={password}
-        placeholder="Password..."
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-      <Button title="Sign In" onPress={onSignInPress} />
+          <TextHeading2 extraClasses='mb-2'>Créer un compte</TextHeading2>
 
-    </View>
+
+          {!pendingVerification ? (
+            <>
+              <InputText 
+                value={emailAddress}
+                onChangeText={(newEmail: string) => setEmailAddress(newEmail)}
+                placeholder="example@gmail.com" 
+                label="Email"
+                autoCapitalize="none"
+                extraClasses="w-80 mb-2"
+              />
+              <InputText 
+                value={password}
+                onChangeText={(newPassword: string) => setPassword(newPassword)}
+                placeholder="example@gmail.com" 
+                label="Mot de passe"
+                autoCapitalize="none"
+                extraClasses="w-80 mb-2"
+                secureTextEntry={true}
+              />
+              <ButtonPrimaryEnd 
+                label="Inscription" 
+                iconName="arrow-right" 
+                onPressFn={onSignUpPress} 
+                extraClasses='w-80 mb-5'
+              />
+            </>
+          ) : (
+            <>
+              <TextInput value={code} placeholder="Code..." onChangeText={(code) => setCode(code)} />
+              <Button title="Verify Email" onPress={onPressVerify} />
+            </>
+          )}
+        </View>
+      </SafeAreaView>
+  </Modal>
   )
 
   
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

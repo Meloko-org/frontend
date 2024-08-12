@@ -14,14 +14,18 @@ export default function CartScreen({ navigation }) {
 
   useEffect(() => {
     if(cartStore.length > 0) {
+      let allShopsCost = 0
       cartStore.forEach(c => {
         const cartTotalCost = c.products.reduce(
           (accumulator, currentValue) => {
             return (currentValue.quantity * Number(currentValue.stockData.price.$numberDecimal)) + accumulator },
           0,
         );
-        setCartTotal(cartTotalCost)
+        console.log("c total cost", cartTotalCost)
+        allShopsCost += cartTotalCost
+        
       })
+      setCartTotal(allShopsCost)
     }
   }, [cartStore])
 
@@ -49,7 +53,6 @@ export default function CartScreen({ navigation }) {
   })
 
   const handleWithdrawModePress = () => {
-    console.log("go to withdraw modes")
     navigation.navigate('TabNavigatorUser', {
       screen: 'WithdrawModesUser',
     }) 
@@ -69,15 +72,13 @@ export default function CartScreen({ navigation }) {
               <ButtonPrimaryEnd label="Mes modes de retrait" iconName="arrow-right" onPressFn={handleWithdrawModePress} />
             </>
           ) : (
-            <View className='h-full flex flex-column justify-center items-center'>
+            <View className='h-full flex flex-column justify-center items-center w-full'>
               <TextHeading2 extraClasses='mb-4'>Votre panier est vide :(</TextHeading2>
-              <ButtonPrimaryStart label="Continuer vos achats" iconName="arrow-left" onPressFn={handleWithdrawModePress} />
+              <ButtonPrimaryStart label="Continuer vos achats" iconName="arrow-left" onPressFn={() => navigation.goBack()} extraClasses='w-full'/>
             </View>
 
           )
         }
-        
-
       </View>
     </SafeAreaView>
   );

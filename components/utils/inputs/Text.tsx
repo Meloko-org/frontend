@@ -16,6 +16,7 @@ type InputTextProps = {
 		size?: string
 		extraClasses?: string
 		iconName?: string
+		secureTextEntry?: boolean
 		onIconPressFn?: ((event: GestureResponderEvent) => void) | undefined
 }
 
@@ -32,6 +33,7 @@ export default function InputText(props: InputTextProps): JSX.Element {
 					placeholder={props.placeholder}
 					onChangeText={(value) => props.onChangeText(value)}
 					autoCapitalize={props.autoCapitalize ? 'none' : props.autoCapitalize}
+					secureTextEntry={props.secureTextEntry}
 				>
 				</TextInput>
 			</View>

@@ -11,6 +11,7 @@ import BadgeSecondary from '../../components/utils/badges/Secondary';
 import ButtonIcon from '../../components/utils/buttons/Icon';
 import ButtonPrimaryEnd from '../../components/utils/buttons/PrimaryEnd';
 import CardProduct from '../../components/cards/Product';
+import ButtonBack from '../../components/utils/buttons/Back'
 import ProductCategory from '../../components/cards/ProductCategory';
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
@@ -178,9 +179,10 @@ export default function ShopUserScreen({ route, navigation }: Props) {
         <Modal visible={isModalVisible} animationType="slide" onRequestClose={() => setIsModalVisible(false)}>
           <SafeAreaView className='bg-lightbg flex-1'>
             <View className='p-3'>
-              <TouchableOpacity onPress={() => setIsModalVisible(false)} className='mb-3'>
-                <Text className='text-xl font-bold'>←</Text>
-              </TouchableOpacity>
+              <ButtonBack 
+                onPressFn={() => setIsModalVisible(false)}
+              />
+
               <TextHeading2 extraClasses='mb-4'>Tous les produits</TextHeading2>
               <ScrollView>
                 {categoryProducts}
