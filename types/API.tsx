@@ -10,12 +10,7 @@ type StockData = {
   _id: string
   price: { $numberDecimal: string }
   stock: { $numberDecimal: string }
-  shop: {
-    _id: string
-    name: string
-    markets: object[]
-    clickCollect: object
-  }
+  shop: ShopData
   product: ProductData
 }
 

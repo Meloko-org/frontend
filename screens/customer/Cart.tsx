@@ -3,51 +3,34 @@ import React, { useState, useEffect } from "react";
 import TextHeading2 from '../../components/utils/texts/Heading2';
 import TextHeading3 from '../../components/utils/texts/Heading3';
 import { useDispatch, useSelector } from "react-redux";
-import { addProductToCart, increaseCartQuantity, decreaseCartQuantity } from "../../reducers/user";
+import { addProductToCart, increaseCartQuantity, decreaseCartQuantity } from "../../reducers/cart";
 import CardProduct from '../../components/cards/Product';
 import ButtonPrimaryEnd from '../../components/utils/buttons/PrimaryEnd';
 import ButtonPrimaryStart from '../../components/utils/buttons/PrimaryStart';
 
 export default function CartScreen({ navigation }) {
-  const cartStore = useSelector((state: { cart }) => state.user.cart)
-  const [cartByShop, setCartByShop] = useState([])
+  const cartStore = useSelector((state: { cart }) => state.cart.value)
   const [cartTotal, setCartTotal] = useState<number>(0)
 
   useEffect(() => {
     if(cartStore.length > 0) {
-      const cartTotalCost = cartStore.reduce(
-        (accumulator, currentValue) => {
-          return (currentValue.quantity * Number(currentValue.stockData.price.$numberDecimal)) + accumulator },
-        0,
-      );
-      
-      setCartTotal(cartTotalCost.toFixed(2))
-      const shops = []
-      cartStore.forEach(data => {
-        const existingShop = shops.find(cbs => cbs.name === data.stockData.shop.name)
-        if(existingShop) {
-          existingShop.stockDatas.push(data.stockData)
-        } else {
-          shops.push({
-            name: data.stockData.shop.name,
-            stockDatas: [data.stockData]
-          })
-        }
-        
-        
+      cartStore.forEach(c => {
+        const cartTotalCost = c.products.reduce(
+          (accumulator, currentValue) => {
+            return (currentValue.quantity * Number(currentValue.stockData.price.$numberDecimal)) + accumulator },
+          0,
+        );
+        setCartTotal(cartTotal + cartTotalCost)
       })
-      setCartByShop(shops)
     }
-
   }, [cartStore])
 
-  const products = cartByShop && cartByShop.map(data => {
-    console.log('cart', data.stockDatas[0].stock)
-    const productsByShop = data.stockDatas.map(stockData => {
+  const products = cartStore.map(cart => {
+    const productsByShop = cart.products.map(p => {
           return (
             <CardProduct
-              stockData={stockData}
-              key={stockData._id}
+              stockData={p.stockData}
+              key={p.stockData._id}
               extraClasses='mb-1'
               displayMode='cart'
               quantityControllable
@@ -58,7 +41,7 @@ export default function CartScreen({ navigation }) {
  
     return (
       <View className='mb-3'>
-        <TextHeading3 centered extraClasses='mb-3'>{data.name}</TextHeading3> 
+        <TextHeading3 centered extraClasses='mb-3'>{cart.shop.name}</TextHeading3> 
         {productsByShop}
       </View>
 
