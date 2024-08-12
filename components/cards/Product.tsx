@@ -29,10 +29,8 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
   const dispatch = useDispatch()
   const cartStore = useSelector((state: { cart }) => state.cart.value)
 
-	console.log("store", cartStore)
-	console.log("data", props.stockData)
-
   const handleAddCartPress = async ():Promise<void> => {
+		console.log("shop", props.stockData.shop)
     dispatch(addProductToCart({
 			shop: props.stockData.shop,
       stockData: props.stockData
@@ -50,7 +48,7 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 									shopId: props.stockData.shop._id, 
 									stockId: props.stockData._id
 								})
-								)}
+							)}
 					>
 						<Text className="text-2xl">+</Text>
 					</TouchableOpacity> }

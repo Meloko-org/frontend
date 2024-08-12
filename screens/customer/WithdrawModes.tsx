@@ -12,7 +12,6 @@ import { updateWithdrawMode } from '../../reducers/cart'
 export default function WithdrawModesScreen({ navigation }) {
   const dispatch = useDispatch()
   const cartStore = useSelector((state: { cart }) => state.cart.value)
-  const [cartByShop, setCartByShop] = useState([])
   const [cartTotal, setCartTotal] = useState<number>(0)
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [selectedMarkets, setSelectedMarkets] = useState([])
@@ -26,7 +25,7 @@ export default function WithdrawModesScreen({ navigation }) {
             return (currentValue.quantity * Number(currentValue.stockData.price.$numberDecimal)) + accumulator },
           0,
         );
-        setCartTotal(cartTotal + cartTotalCost)
+        setCartTotal(cartTotalCost)
       })
       setIsPaymentDisabledButton(cartStore.some(c => !c.withdrawMode))
     }

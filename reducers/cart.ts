@@ -43,6 +43,7 @@ export const cartSlice = createSlice({
       const shop = state.value.find(c => c.shop._id === action.payload.shopId)
       const product = shop.products.find(p => p.stockData._id === action.payload.stockId)
       product.quantity > 1 ? product.quantity-- : shop.products = shop.products.filter(p => p.stockData._id !== action.payload.stockId)
+      shop?.products.length === 0 && state.value.filter(c => c.shop._id !== action.payload.shopId)
     },
     updateWithdrawMode: (state: CartState, action: PayloadAction) => {
       const shop = state.value.find(c => c.shop._id === action.payload.shopId)

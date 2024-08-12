@@ -20,7 +20,7 @@ export default function CartScreen({ navigation }) {
             return (currentValue.quantity * Number(currentValue.stockData.price.$numberDecimal)) + accumulator },
           0,
         );
-        setCartTotal(cartTotal + cartTotalCost)
+        setCartTotal(cartTotalCost)
       })
     }
   }, [cartStore])
