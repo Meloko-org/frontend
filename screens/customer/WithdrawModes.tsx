@@ -136,6 +136,7 @@ export default function WithdrawModesScreen({ navigation }) {
               iconName="arrow-right"
               disabled={isPaymentDisabledButton} 
               totalCartAmount={cartTotal}
+              onPaymentSuccessFn={() => navigation.navigate('TabNavigatorUser', { screen: 'OrderCustomer' })}
             />
           ) : (
             <ButtonPrimaryEnd 

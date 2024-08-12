@@ -4,9 +4,10 @@
  * @param token  the clerk token needed to fetch
  * @returns {object} Get only email, firstname, lastname, avatar, favSearch and bookmarks
  */
-const getUserInfos = async (apiUrl: string, token: string) => {
+const getUserInfos = async (token: string) => {
 	try {
-    const response = await fetch(`${apiUrl}/users/getuserinfos`, {
+    const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
+    const response = await fetch(`${API_ROOT}/users/logged`, {
       method: 'GET',
       headers: {
         'Content-Type' : 'application/json',
@@ -22,4 +23,6 @@ const getUserInfos = async (apiUrl: string, token: string) => {
   }
 }
 
-module.exports = { getUserInfos }
+export default { 
+  getUserInfos 
+}

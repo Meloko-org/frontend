@@ -21,7 +21,6 @@ export default function StripePaymentButton(props) {
   }, []);
 
   const fetchPaymentSheetParams = async () => {
-    console.log("cart amount", props.totalCartAmount)
     const response = await fetch(`${API_ROOT}/stripe/paymentIntent`, {
       method: 'POST',
       headers: {
@@ -64,14 +63,13 @@ export default function StripePaymentButton(props) {
 
   const openPaymentSheet = async () => {
     try {
-      console.log("open payment sheet")
       await initializePaymentSheet();
       const { error } = await presentPaymentSheet();
 
       if (error) {
         Alert.alert(`Error code: ${error.code}`, error.message);
       } else {
-        Alert.alert('Success', 'Your order is confirmed!');
+        props.onPaymentSuccessFn()
       }
     } catch (error) {
       console.error(error)

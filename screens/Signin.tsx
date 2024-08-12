@@ -1,4 +1,4 @@
-import { useSignIn, useOAuth } from '@clerk/clerk-expo'
+import { useSignIn, useSignUp, useOAuth } from '@clerk/clerk-expo'
 import * as WebBrowser from 'expo-web-browser'
 import * as Linking from 'expo-linking'
 import { TextInput, Button, View, Modal, SafeAreaView, TouchableOpacity, Text } from 'react-native'
@@ -13,7 +13,7 @@ import ButtonBack from '../components/utils/buttons/Back'
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "../reducers/user";
 import { UserState } from '../reducers/user'
-const { getUserInfos } = require('../modules/userTools')
+import userTools from '../modules/userTools'
 import { useAuth } from '@clerk/clerk-expo'
 
 
@@ -45,7 +45,7 @@ export default function SignInScreen(props) {
   const [isSigninModalVisible, setIsSigninModalVisible] = useState<boolean>(false);
 
   // need to get the user infos
-  const { getToken } = useAuth()
+  const { signOut, isSignedIn, getToken } = useAuth()
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
   // and store user infos in the store
   const dispatch = useDispatch()
@@ -56,6 +56,7 @@ export default function SignInScreen(props) {
 
   // Import the Clerk Auth functions
   const { signIn, setActive, isLoaded } = useSignIn()
+  const { signUp } = useSignUp()
 
   // import the Clerk Google OAuth flow
   const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' })
@@ -63,11 +64,39 @@ export default function SignInScreen(props) {
   // Form fields
   const [emailAddress, setEmailAddress] = useState<string>('')
   const [password, setPassword] = useState<string>('')
-
+  const [newEmailAddress, setNewEmailAddress] = useState<string>('')
+  const [newPassword, setNewPassword] = useState<string>('')
 
   useEffect(() => {
     setIsSigninModalVisible(props.showModal ? true : false)
   }, [props.showModal])
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // store user's info in the store
+        const token = await getToken() 
+        const user = await userTools.getUserInfos(token)
+        console.log(user)
+        if(user) {
+          dispatch(updateUser(user))
+          handleCloseModal()
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    if(isSignedIn) {
+      setTimeout(() => {
+        console.log("execute timeout")
+        fetchData()
+      }, 3000);
+    }
+  }, [isSignedIn])
+
+
 
 
   // Signin/up with Google
@@ -85,8 +114,9 @@ export default function SignInScreen(props) {
 
       // If the signin event went well
       if (createdSessionId) {
+        console.log("session id", createdSessionId)
         setActive!({ session: createdSessionId })
-        handleCloseModal()
+        
       } else {
 
       }
@@ -105,8 +135,8 @@ export default function SignInScreen(props) {
     try {
       // Try to signup
       await signUp.create({
-        emailAddress,
-        password,
+        emailAddress: newEmailAddress,
+        password: newPassword,
       })
 
       // Send the email verification code
@@ -139,7 +169,6 @@ export default function SignInScreen(props) {
         // redirection vers la page compte user pour saisie nom, prénom...
         // -> enregistrement des nouvelles infos (nom, prénom) dans le store 
         // Go back to the previous screen
-        goBack()
       } else {
         console.error(JSON.stringify(completeSignUp, null, 2))
       }
@@ -168,15 +197,6 @@ export default function SignInScreen(props) {
       // If the signing event went well
       if (signInAttempt.status === 'complete') {
         await setActive({ session: signInAttempt.createdSessionId })
-        
-        // store user's info in the store
-        const token = await getToken() 
-        const user = await getUserInfos(API_ROOT, token)
-        if(user) {
-          dispatch(updateUser(user))
-        }
-
-        handleCloseModal()
       } else {
         // See https://clerk.com/docs/custom-flows/error-handling
         // for more info on error handling
@@ -236,16 +256,16 @@ export default function SignInScreen(props) {
           {!pendingVerification ? (
             <>
               <InputText 
-                value={emailAddress}
-                onChangeText={(newEmail: string) => setEmailAddress(newEmail)}
+                value={newEmailAddress}
+                onChangeText={(newEmail: string) => setNewEmailAddress(newEmail)}
                 placeholder="example@gmail.com" 
                 label="Email"
                 autoCapitalize="none"
                 extraClasses="w-80 mb-2"
               />
               <InputText 
-                value={password}
-                onChangeText={(newPassword: string) => setPassword(newPassword)}
+                value={newPassword}
+                onChangeText={(newPassword: string) => setNewPassword(newPassword)}
                 placeholder="example@gmail.com" 
                 label="Mot de passe"
                 autoCapitalize="none"
