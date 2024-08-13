@@ -20,18 +20,19 @@ const FontAwesome = _Fontawesome as React.ElementType
 
 export default function ProfilScreen() {
   const { colorScheme, toggleColorScheme } = useColorScheme();
+  // Import the Clerk Auth functions
+  const { signOut, isSignedIn, getToken } = useAuth()
 
   const dispatch = useDispatch()
-  const { getToken } = useAuth()
   const user = useSelector((state: { user: UserState }) => state.user.value);
 
-  const { isSignedIn } = useAuth()
   const [isSigninModalVisible, setIsSigninModalVisible] = useState<boolean>(false);
   const [email, setEmail ] = useState('')
   const [password, setPassword ] = useState('')
   const [confirm, setConfirm ] = useState('')
   const [firstname, setFirstname ] = useState('')
   const [lastname, setLastname ] = useState('')
+  const [isUserSaveLoading, setUserSaveLoading] = useState(false)
 
  
 
@@ -46,26 +47,38 @@ export default function ProfilScreen() {
     }
   }, [user])
 
-  const handleRecord = async () => {
+  const handleSaveUser = async () => {
     try {
+      setUserSaveLoading(true)
       const token = await getToken()
       console.log("token", token)
       const values = (email) ? {email, firstname,  lastname} : {email: null, firstname,  lastname}
       const data = await userTools.updateUser(token, values)
 
       if(data) {
-        Alert.alert("Bienvenue", "Vous etes identifié!")
-        dispatch(updateUser(data))
+        Alert.alert("Mise à jour de votre profil", "Votre profil à bien été mis à jour.")
+        dispatch(updateUser(data.user))
       }
-
+      setUserSaveLoading(false)
     } catch (error) {
       console.log(error)
+      setUserSaveLoading(false)
+
+    }
+  }
+
+  // Signout the user from Clerk
+  const onSignoutPress = async () => {
+    try {
+      await signOut()
+    } catch (err) {
+      console.error(JSON.stringify(err, null, 2))   
     }
   }
   return (
 
-    <SafeAreaView style={styles.container} className="bg-lightbg dark:bg-darkbg">
-      <View className="p-5">
+    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
+      <View className="p-3">
       <TextHeading2 extraClasses="mb-5">Profil</TextHeading2>
       {
         isSignedIn && (
@@ -122,18 +135,24 @@ export default function ProfilScreen() {
             </View>
             <ButtonPrimaryEnd 
               label="Enregistrer"
-              iconName="arrow-right"
+              iconName="save"
+              disabled={isUserSaveLoading}
+              onPressFn={() => handleSaveUser()}
+              extraClasses='mb-3'
+              isLoading={isUserSaveLoading}
+            />
+            <ButtonPrimaryEnd 
+              label="Déconnection" 
+              iconName="arrow-right" 
+              onPressFn={onSignoutPress} 
+              extraClasses='mb-3' 
+            />
+            <ButtonPrimaryEnd
+              label={colorScheme === 'dark' ? 'Mode clair' : 'Mode sombre' }
+              iconName={ colorScheme === 'dark' ? 'sun-o' : 'moon-o'}
               disabled={false}
-              onPressFn={() => handleRecord()}
-              ></ButtonPrimaryEnd>
-            <View className="mt-5">
-              <ButtonPrimaryEnd
-                label="dark mode"
-                iconName="arrow-right"
-                disabled={false}
-                onPressFn={toggleColorScheme}
-              ></ButtonPrimaryEnd>
-            </View>
+              onPressFn={toggleColorScheme}
+            />
           </View>
           
         )
@@ -148,9 +167,3 @@ export default function ProfilScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-});

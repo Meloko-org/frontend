@@ -60,7 +60,7 @@ export default function CartScreen({ navigation }) {
 
   return (
     <SafeAreaView className='flex-1 bg-lightbg dark:bg-darkbg'>
-      <View className='p-3'>
+      <View className='p-3 flex flex-column h-full'>
         <TextHeading2 extraClasses='mb-4'>Votre panier</TextHeading2>
         {
           products.length > 0 ? (
@@ -71,7 +71,7 @@ export default function CartScreen({ navigation }) {
               <ButtonPrimaryEnd label="Mes modes de retrait" iconName="arrow-right" onPressFn={handleWithdrawModePress} />
             </>
           ) : (
-            <View className='h-full flex flex-column justify-center items-center w-full'>
+            <View className='h-full justify-center items-center'>
               <TextHeading2 extraClasses='mb-4'>Votre panier est vide :(</TextHeading2>
               <ButtonPrimaryStart label="Continuer vos achats" iconName="arrow-left" onPressFn={() => navigation.goBack()} extraClasses='w-full'/>
             </View>

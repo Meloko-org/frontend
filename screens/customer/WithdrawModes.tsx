@@ -162,8 +162,8 @@ export default function WithdrawModesScreen({ navigation }) {
         </ScrollView>
       </View>
 
-      <Modal visible={isMarketSelectModalVisible} animationType="slide" onRequestClose={() => setIsMarketSelectModalVisible(false)} className=' dark:bg-darkbg'>
-        <SafeAreaView className='bg-lightbg flex-1'>
+      <Modal visible={isMarketSelectModalVisible} animationType="slide" onRequestClose={() => setIsMarketSelectModalVisible(false)} className=''>
+        <SafeAreaView className='flex-1 dark:bg-darkbg'>
           <View className='p-3'>
             <ButtonBack 
               onPressFn={() => setIsMarketSelectModalVisible(false)}

@@ -14,6 +14,7 @@ export default function StripePaymentButton(props) {
   const [publishableKey, setPublishableKey] = useState('');
   const userStore = useSelector((state: { user }) => state.user.value)
   const cartStore = useSelector((state: { cart }) => state.cart.value)
+  const [isPaymentScreenLoading, setIsPaymentScreenLoading] = useState(false)
 
   // Import the public api root address
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
@@ -86,14 +87,17 @@ export default function StripePaymentButton(props) {
 
   const openPaymentSheet = async () => {
     try {
+      setIsPaymentScreenLoading(true)
       dispatch(updateUser({...userStore, firstname: props.user.firstname, lastname: props.user.lastname}))
       const order = await initializePaymentSheet();
       const { error } = await presentPaymentSheet();
 
       if (error) {
         Alert.alert(`Error code: ${error.code}`, error.message);
+        setIsPaymentScreenLoading(false)
       } else {
         dispatch(emptyCart())
+        setIsPaymentScreenLoading(false)
         props.navigation.navigate('TabNavigatorUser', { screen: 'OrderCustomer',
           params: {
             orderId: order._id
@@ -117,10 +121,11 @@ export default function StripePaymentButton(props) {
       urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
     >
       <ButtonPrimaryEnd 
-        disabled={props.disabled} 
+        disabled={props.disabled || isPaymentScreenLoading} 
         label={props.label}
         iconName={props.iconName}
         onPressFn={() => openPaymentSheet()} 
+        isLoading={isPaymentScreenLoading}
       />
     </StripeProvider>
   );

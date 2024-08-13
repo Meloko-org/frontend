@@ -118,7 +118,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
 
   return (
     <View style={styles.container}>
-      <MapView mapType="hybrid" showsUserLocation={true} style={styles.map} region={region}>
+      <MapView mapType="hybrid" showsUserLocation={true} style={styles.map} region={region} userInterfaceStyle='dark'>
         {/* {currentPosition && <Marker coordinate={currentPosition} title="My position" pinColor="#fecb2d" />} */}
         {markers}
       </MapView>
