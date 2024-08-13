@@ -55,7 +55,7 @@ type UserData = {
   bookmarks: object[] | null
   favSearch: object[] | null
   orders: object[]
-  ClerkPasswordEnabled: boolean | null
+  clerkPasswordEnabled: boolean | null
 }
 
 export type {

@@ -14,7 +14,7 @@ const initialState: UserState = {
     favSearch: [],
     bookmarks: [],
     orders: [],
-    ClerkPasswordEnabled: null,
+    clerkPasswordEnabled: null,
   }
 }
 

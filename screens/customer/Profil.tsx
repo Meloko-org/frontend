@@ -1,18 +1,18 @@
 import { StyleSheet, View, SafeAreaView } from 'react-native';
 import React from "react";
-import Text from '../components/utils/inputs/Text'
-import ButtonPrimaryEnd from '../components/utils/buttons/PrimaryEnd'
+import Text from '../../components/utils/inputs/Text'
+import ButtonPrimaryEnd from '../../components/utils/buttons/PrimaryEnd'
 import { useAuth } from '@clerk/clerk-expo'
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { UserState, updateUser } from '../reducers/user';
-import SignInScreen from './Signin';
-import TextHeading2 from '../components/utils/texts/Heading2';
-import TextHeading4 from '../components/utils/texts/Heading4';
-import TextBody1 from '../components/utils/texts/Body1';
-import TextBody2 from '../components/utils/texts/Body2';
-import userTools from '../modules/userTools'
+import { UserState, updateUser } from '../../reducers/user';
+import SignInScreen from '../Signin';
+import TextHeading2 from '../../components/utils/texts/Heading2';
+import TextHeading4 from '../../components/utils/texts/Heading4';
+import TextBody1 from '../../components/utils/texts/Body1';
+import TextBody2 from '../../components/utils/texts/Body2';
+import userTools from '../../modules/userTools'
 import _Fontawesome from 'react-native-vector-icons/FontAwesome'
 const FontAwesome = _Fontawesome as React.ElementType
 
@@ -24,22 +24,29 @@ export default function ProfilScreen() {
 
   const { isSignedIn } = useAuth()
   const [isSigninModalVisible, setIsSigninModalVisible] = useState<boolean>(false);
-  const [email, setEmail ] = useState(user.email)
+  const [email, setEmail ] = useState('')
   const [password, setPassword ] = useState('')
   const [confirm, setConfirm ] = useState('')
-  const [firstname, setFirstname ] = useState(user.firstname)
-  const [lastname, setLastname ] = useState(user.lastname)
+  const [firstname, setFirstname ] = useState('')
+  const [lastname, setLastname ] = useState('')
 
  
 
   useEffect(() =>{
-    if(!isSignedIn) setIsSigninModalVisible(true)
-  }, [])
+    if(!isSignedIn) { 
+      setIsSigninModalVisible(true)
+    } else {
+      setFirstname(user.firstname)
+      setLastname(user.lastname)
+      setEmail(user.email)
+    }
+  }, [isSignedIn])
 
   const handleRecord = async () => {
     try {
       const token = await getToken()
-      const values = (email) ? {email, firstname,  lastname} : {firstname,  lastname}
+      console.log("token", token)
+      const values = (email) ? {email, firstname,  lastname} : {email: null, firstname,  lastname}
       const data = await userTools.updateUser(token, values)
 
       if(data) {
@@ -50,9 +57,6 @@ export default function ProfilScreen() {
       console.log(error)
     }
   }
-
-  console.log("userStore: ", user)
-
   return (
 
     <SafeAreaView style={styles.container} className="bg-lightbg dark:bg-darkbg">
@@ -61,7 +65,7 @@ export default function ProfilScreen() {
       {
         isSignedIn && (
           <View>
-            { user.ClerkPasswordEnabled ? (
+            { user.clerkPasswordEnabled ? (
               <>
                 <Text 
                   placeholder="Changez votre email"
@@ -89,7 +93,7 @@ export default function ProfilScreen() {
               <>
                 <View className="">
                   <TextBody2 extraClasses='font-bold text-secondary/60'>EMAIL</TextBody2>
-                  <TextBody1 extraClasses="mb-5">test@email.com{user.email}</TextBody1>
+                  <TextBody1 extraClasses="mb-5">{user.email}</TextBody1>
                 </View>
               </>
             )}
@@ -115,14 +119,14 @@ export default function ProfilScreen() {
               label="Enregistrer"
               iconName="arrow-right"
               disabled={false}
-              onPressFn={undefined}
+              onPressFn={() => handleRecord()}
               ></ButtonPrimaryEnd>
             <View className="mt-5">
               <ButtonPrimaryEnd
                 label="dark mode"
                 iconName="arrow-right"
                 disabled={false}
-                onPressFn={() => handleRecord()}
+                onPressFn={undefined}
               ></ButtonPrimaryEnd>
             </View>
           </View>
