@@ -1,5 +1,7 @@
-import { StyleSheet, View, SafeAreaView } from 'react-native';
+import { StyleSheet, View, SafeAreaView, Alert } from 'react-native';
 import React from "react";
+import { useColorScheme } from "nativewind";
+
 import Text from '../../components/utils/inputs/Text'
 import ButtonPrimaryEnd from '../../components/utils/buttons/PrimaryEnd'
 import { useAuth } from '@clerk/clerk-expo'
@@ -9,7 +11,6 @@ import { useDispatch } from 'react-redux';
 import { UserState, updateUser } from '../../reducers/user';
 import SignInScreen from '../Signin';
 import TextHeading2 from '../../components/utils/texts/Heading2';
-import TextHeading4 from '../../components/utils/texts/Heading4';
 import TextBody1 from '../../components/utils/texts/Body1';
 import TextBody2 from '../../components/utils/texts/Body2';
 import userTools from '../../modules/userTools'
@@ -18,6 +19,8 @@ const FontAwesome = _Fontawesome as React.ElementType
 
 
 export default function ProfilScreen() {
+  const { colorScheme, toggleColorScheme } = useColorScheme();
+
   const dispatch = useDispatch()
   const { getToken } = useAuth()
   const user = useSelector((state: { user: UserState }) => state.user.value);
@@ -33,6 +36,7 @@ export default function ProfilScreen() {
  
 
   useEffect(() =>{
+    console.log(user.firstname)
     if(!isSignedIn) { 
       setIsSigninModalVisible(true)
     } else {
@@ -40,7 +44,7 @@ export default function ProfilScreen() {
       setLastname(user.lastname)
       setEmail(user.email)
     }
-  }, [isSignedIn])
+  }, [user])
 
   const handleRecord = async () => {
     try {
@@ -50,6 +54,7 @@ export default function ProfilScreen() {
       const data = await userTools.updateUser(token, values)
 
       if(data) {
+        Alert.alert("Bienvenue", "Vous etes identifié!")
         dispatch(updateUser(data))
       }
 
@@ -126,7 +131,7 @@ export default function ProfilScreen() {
                 label="dark mode"
                 iconName="arrow-right"
                 disabled={false}
-                onPressFn={undefined}
+                onPressFn={toggleColorScheme}
               ></ButtonPrimaryEnd>
             </View>
           </View>

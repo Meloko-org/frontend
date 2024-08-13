@@ -73,7 +73,7 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 	)
 
 	return (
-		<View className={`${props.extraClasses} rounded-lg shadow-sm bg-white p-2 dark:bg-darkbg flex flex-row w-full`}>
+		<View className={`${props.extraClasses} rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary flex flex-row w-full`}>
 			<View className="flex flex-row items-center w-full">
 				{
 					props.showImage && (

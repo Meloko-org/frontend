@@ -78,7 +78,7 @@ export default function SearchCustomerScreen({ route, navigation }: Props): JSX.
 
 
   return (
-    <SafeAreaView className='flex-1 bg-lightbg'>
+    <SafeAreaView className='flex-1 bg-lightbg dark:bg-darkbg'>
       <View className='p-3'>
         <TextHeading2 extraClasses='mb-3'>Commande payée</TextHeading2>
         <TextBody1 centered extraClasses='mb-2'>Votre commande est maintenant payée. Vous recevrez un e-mail lorsqu'elle sera confirmée.</TextBody1>

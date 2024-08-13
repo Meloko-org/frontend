@@ -10,7 +10,7 @@ type TextHeading3Props = {
 export default function TextHeading3(props: TextHeading3Props): JSX.Element {
 	return (
     <>
-      <Text className={`${props.extraClasses} ${props.centered && 'text-center'} font-bold text-secondary text-[24px] w-full`}>{props.children}</Text>
+      <Text className={`${props.extraClasses} ${props.centered && 'text-center'} font-bold text-secondary text-[24px] w-full dark:text-lightbg`}>{props.children}</Text>
     </>
 	)
 }

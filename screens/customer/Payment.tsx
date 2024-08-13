@@ -42,7 +42,7 @@ export default function PaymentCustomerScreen({ navigation }: Props): JSX.Elemen
   }, [cartStore])
 
   return (
-    <SafeAreaView className="bg-lightbg flex-1">
+    <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
       <View className="p-3">
         <TextHeading2 extraClasses="mb-3">Facturation</TextHeading2>
         <InputText

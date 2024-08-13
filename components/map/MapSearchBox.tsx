@@ -177,7 +177,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
     {
       props.displayMode === 'widget' ? (
       <Pressable onPress={() => setOpenSearchBox(!openSearchBox)}>
-        <Animated.View className={`rounded-lg w-100 mx-3 bg-lightbg p-2 shadow-sm dark:bg-ternary`} style={{ height: size, overflow: 'hidden' }}>
+        <Animated.View className={`rounded-lg w-100 mx-3 bg-lightbg p-2 shadow-sm dark:bg-tertiary`} style={{ height: size, overflow: 'hidden' }}>
           <View className='w-full flex flex-row justify-between'>
 
               <TextInput 
@@ -200,7 +200,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
     
               <View className='h-7'>
                 <Text 
-                  className={`${openSearchBox && 'hidden'} text-sm w-full text-center font-bold text-secondary/40 my-1`}
+                  className={`${openSearchBox && 'hidden'} text-sm w-full text-center font-bold text-secondary/40 my-1 dark:text-lightbg`}
                 >
                   Cliquez pour plus d'options !
                 </Text>
@@ -264,7 +264,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
                 thumbTintColor='#98B66E'
             />
             <View className='flex flex-row items-center justify-center w-20'>
-              <Text>{searchOptions.radius.value[0]} km</Text>
+              <Text className=' dark:text-lightbg'>{searchOptions.radius.value[0]} km</Text>
             </View>
           </View>
         </Animated.View>

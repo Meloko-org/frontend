@@ -64,7 +64,7 @@ export default function HomeScreen({ navigation }: Props) {
   }
 
   return (
-    <SafeAreaView className='flex-1 bg-lightbg'>
+    <SafeAreaView className='flex-1 bg-lightbg dark:bg-darkbg'>
       <View className='p-3 w-full'>
       <TextHeading1 extraClasses='mb-3'>Bienvenue</TextHeading1>
       <ButtonPrimaryEnd label="Tous les producteurs" iconName="map" onPressFn={onMapPress} extraClasses='mb-3' />

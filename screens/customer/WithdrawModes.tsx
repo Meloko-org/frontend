@@ -142,7 +142,7 @@ export default function WithdrawModesScreen({ navigation }) {
 
 
   return (
-    <SafeAreaView className='flex-1 bg-lightbg'>
+    <SafeAreaView className='flex-1 bg-lightbg dark:bg-darkbg'>
       <View className='p-3 flex-1'>
         <View>
           <TextHeading2 extraClasses='mb-4'>Vos modes de retrait</TextHeading2>
@@ -162,7 +162,7 @@ export default function WithdrawModesScreen({ navigation }) {
         </ScrollView>
       </View>
 
-      <Modal visible={isMarketSelectModalVisible} animationType="slide" onRequestClose={() => setIsMarketSelectModalVisible(false)}>
+      <Modal visible={isMarketSelectModalVisible} animationType="slide" onRequestClose={() => setIsMarketSelectModalVisible(false)} className=' dark:bg-darkbg'>
         <SafeAreaView className='bg-lightbg flex-1'>
           <View className='p-3'>
             <ButtonBack 

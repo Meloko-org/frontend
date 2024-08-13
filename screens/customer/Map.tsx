@@ -10,6 +10,7 @@ import TextHeading3 from '../../components/utils/texts/Heading3'
 import CardProducer from '../../components/cards/ProducerSearchResult'
 import MapSearchBox from '../../components/map/MapSearchBox'
 import { ShopData } from '../../types/API';
+import { useColorScheme } from "nativewind";
 
 type userPosition = {
   latitude: number;
@@ -26,6 +27,8 @@ type MapProps = {
 };
 
 export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.Element {
+  const { colorScheme, toggleColorScheme } = useColorScheme();
+
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [currentPosition, setCurrentPosition] = useState<userPosition>(null);
   const [searchResults, setSearchResults] = useState<ShopData[]>([])
@@ -84,7 +87,9 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
         key={i} 
         coordinate={{ latitude: Number(data.address.latitude.$numberDecimal), longitude: Number(data.address.longitude.$numberDecimal) }} 
       >
-        <Callout onPress={
+        <Callout 
+          tooltip={true}
+          onPress={
           () => { 
             navigation.navigate('TabNavigatorUser', {
               screen: 'ShopUser',
@@ -95,7 +100,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
               },
             }) 
           }
-        }>
+        } style={{ backgroundColor: (colorScheme === "dark") ? '#262E20' : '#FCFFF0', borderRadius: 10 }}>
           <CardProducer 
             shopData={data}
             key={data._id}
@@ -128,11 +133,15 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
         searchResults.length > 0 && (
           <BottomSheet
             ref={bottomSheetRef}
-            snapPoints={['20%', '50%']}
-    
+            snapPoints={['30%', '50%']}
+            handleStyle={{ backgroundColor: (colorScheme === "dark") ? '#444C3D' : '#FFF' }}
+            handleIndicatorStyle={{ backgroundColor: (colorScheme === "dark") ? '#FCFFF0' : '#444C3D' }}
             onChange={handleSheetChanges}
           >
-            <BottomSheetView style={styles.contentContainer}>
+            <BottomSheetView 
+              style={[styles.contentContainer, { backgroundColor: (colorScheme === "dark") ? '#262E20' : '#FCFFF0' }]} 
+              
+            >
               <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1, width: '100%'}} className='pt-2 px-3'>
                 
                 <TextHeading3
@@ -163,7 +172,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#FCFFF0'
+    alignItems: 'center'
   },
 });

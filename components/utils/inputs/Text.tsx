@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity } from 'react-native'
 import _Fontawesome from 'react-native-vector-icons/FontAwesome'
 const FontAwesome = _Fontawesome as React.ElementType
 import { GestureResponderEvent } from 'react-native'
+import { useColorScheme } from "nativewind";
 
 type InputTextProps = {
 		placeholder: string,
@@ -21,16 +22,18 @@ type InputTextProps = {
 }
 
 export default function InputText(props: InputTextProps): JSX.Element {
+  const { colorScheme, toggleColorScheme } = useColorScheme();
 
 
 	return (
-		<View className={`${props.extraClasses} flex flex-row rounded-lg p-2 shadow-sm border border-secondary bg-white ${props.size === 'large' ? 'h-[70px]' : 'text-xs'} dark:border-primary`}>
+		<View className={`${props.extraClasses} flex flex-row rounded-lg p-2 shadow-sm border border-secondary bg-white ${props.size === 'large' ? 'h-[70px]' : 'text-xs'} dark:border-primary/20 dark:bg-tertiary`}>
 			<View className='flex w-4/6'>
-				<Text className={`${props.size === 'large' ? 'text-lg' : 'text-xs'} font-bold text-secondary/50 uppercase p-0`}>{props.label}</Text>
+				<Text className={`${props.size === 'large' ? 'text-lg' : 'text-xs'} font-bold text-secondary/50 uppercase p-0 dark:text-lightbg/50`}>{props.label}</Text>
 				<TextInput 
 					value={props.value}
-					className={`${props.size === 'large' ? 'text-lg' : 'text-xs'} ${props.iconName ? 'w-80' : 'w-full'}`}
+					className={`${props.size === 'large' ? 'text-lg' : 'text-xs'} ${props.iconName ? 'w-80' : 'w-full'} dark:text-lightbg`}
 					placeholder={props.placeholder}
+					placeholderTextColor={colorScheme === 'dark' ? '#FCFFF0' : '#444C3D' }
 					onChangeText={(value) => props.onChangeText(value)}
 					autoCapitalize={props.autoCapitalize ? 'none' : props.autoCapitalize}
 					secureTextEntry={props.secureTextEntry}

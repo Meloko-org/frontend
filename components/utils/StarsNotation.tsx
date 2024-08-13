@@ -52,7 +52,7 @@ export default function StarsNotation(props: StarsNotationProps): JSX.Element {
 	return (
 		<View className={`${props.extraClasses} flex flex-row w-auto justify-between items-center`}>
       {renderStars()} 
-      { (!props.note && props.shopData) && <Text className='text-sm'>({props.shopData.notes.length})</Text> }
+      { (!props.note && props.shopData) && <Text className='text-sm dark:text-lightbg'>({props.shopData.notes.length})</Text> }
     </View>
 	)
 }

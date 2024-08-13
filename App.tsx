@@ -10,6 +10,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { RootStackParamList } from './types/Navigation'
 
 import _FontAwesome from 'react-native-vector-icons/FontAwesome6';
+import { useColorScheme } from "nativewind";
 
 import HomeScreen from './screens/Home';
 import MapCustomerScreen from './screens/customer/Map'
@@ -84,6 +85,8 @@ if (!publishableKey) {
 }
 
 const TabNavigatorUser: React.FC = () => {
+  const { colorScheme, toggleColorScheme } = useColorScheme();
+  const tabBarBackgroundColor = colorScheme === 'dark' ? '#444C3D' : '#FFF'
   return (
     <Tab.Navigator screenOptions={({ route }) => ({
       tabBarIcon: ({ color, size }) => {
@@ -104,6 +107,14 @@ const TabNavigatorUser: React.FC = () => {
       tabBarActiveTintColor: '#98B66E',
       tabBarInactiveTintColor: '#262E20',
       headerShown: false,
+      tabBarStyle: {
+        height: 90,
+        paddingHorizontal: 5,
+        paddingTop: 0,
+        backgroundColor: tabBarBackgroundColor,
+        position: 'absolute',
+        borderTopWidth: 0,
+      }
     })}> 
       <Tab.Screen name="Accueil" component={MapCustomerScreen} />
       <Tab.Screen name="Panier" component={CartScreen} />

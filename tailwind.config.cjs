@@ -21,7 +21,7 @@ module.exports = {
         'secondary': '#262E20',
         'lightbg': '#FCFFF0',
         'darkbg': '#262E20',
-        'ternary': '#444C3D',
+        'tertiary': '#444C3D',
         'danger': '#942911',
         'warning': '#D16014',
       }},

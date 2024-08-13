@@ -8,7 +8,7 @@ type BadgeSecondaryProps = {
 
 export default function BadgeSecondary(props: BadgeSecondaryProps): JSX.Element {
 	return (
-		<View className={`rounded-lg border w-fit bg-lightbg dark:bg-ternary border-primary p-1`}>
+		<View className={`rounded-lg border w-fit bg-lightbg border-primary p-1 dark:bg-tertiary `}>
 			<Text className={`${props.uppercase && 'uppercase'} text-[11px] text-darkbg dark:text-lightbg text-center w-fit`}>{props.children}</Text>
 		</View>
 	)

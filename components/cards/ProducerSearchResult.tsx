@@ -21,7 +21,7 @@ type CardProducerSearchResultProps = {
 export default function CardProducerSearchResult(props: CardProducerSearchResultProps): JSX.Element {
 	return (
 		<TouchableOpacity onPress={props.onPressFn}>
-		<View className={`${props.extraClasses} ${(props.displayMode === 'bottomSheet' || props.displayMode === 'order')  ? 'rounded-lg shadow-sm bg-white p-2 dark:bg-darkbg' : 'p-2'} flex flex-row w-full`}>
+		<View className={`${props.extraClasses} ${(props.displayMode === 'bottomSheet' || props.displayMode === 'order')  ? 'rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary' : 'p-2'} flex flex-row w-full`}>
 			<View className="flex flex-row items-center w-4/5">
 				{
 					props.displayMode !== 'order' && (
@@ -33,10 +33,10 @@ export default function CardProducerSearchResult(props: CardProducerSearchResult
 
 				<View className="h-full pl-2 items-start">
 					<View className="flex flex-row items-center">
-						<Text className="text-lg font-bold text-darkbg dar:text-lightbg">{ props.shopData.name }</Text>
+						<Text className="text-lg font-bold text-darkbg dark:text-lightbg">{ props.shopData.name }</Text>
 						{ 
 							(props.shopData.searchData && props.shopData.searchData.distance) && 
-								<Text className="text-xs text-darkbg dar:text-lightbg"> - {props.shopData.searchData.distance.toFixed(2)}km</Text> 
+								<Text className="text-xs text-darkbg dark:text-lightbg"> - {props.shopData.searchData.distance.toFixed(2)}km</Text> 
 						}
 					</View>
 					<StarsNotation iconNames={['star', 'star-half', 'star-o']} shopData={props.shopData} extraClasses="pb-1"/>

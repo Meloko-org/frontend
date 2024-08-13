@@ -3,7 +3,7 @@ import React from "react";
 
 export default function FavoritesScreen() {
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className=' dark:bg-darkbg'>
     <Text style={styles.texte}>Favorites</Text>
     </View>
   );

@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity } from 'react-native'
 import _Fontawesome from 'react-native-vector-icons/FontAwesome'
 const FontAwesome = _Fontawesome as React.ElementType
 import { GestureResponderEvent } from 'react-native'
-
+import { useColorScheme } from "nativewind";
 type InputTextareaProps = {
 		placeholder: string,
 		label: string,
@@ -21,10 +21,11 @@ type InputTextareaProps = {
 }
 
 export default function InputTextarea(props: InputTextareaProps): JSX.Element {
+  const { colorScheme, toggleColorScheme } = useColorScheme();
 
 
 	return (
-		<View className={`${props.extraClasses} flex flex-row rounded-lg p-2 shadow-sm border border-secondary bg-white ${props.size === 'large' ? 'h-[70px]' : 'text-xs'} dark:border-primary`}>
+		<View className={`${props.extraClasses} flex flex-row rounded-lg p-2 shadow-sm border border-secondary bg-white ${props.size === 'large' ? 'h-[70px]' : 'text-xs'} dark:border-primary/20 dark:bg-tertiary`}>
 			<View className='flex w-4/6'>
 				<Text className={`${props.size === 'large' ? 'text-lg' : 'text-xs'} font-bold text-secondary/50 uppercase p-0`}>{props.label}</Text>
 				<TextInput 
@@ -37,6 +38,7 @@ export default function InputTextarea(props: InputTextareaProps): JSX.Element {
 					multiline
 					textAlignVertical="top"
 					numberOfLines={3}
+					placeholderTextColor={colorScheme === 'dark' ? '#FCFFF0' : '#444C3D' }
 				>
 				</TextInput>
 			</View>

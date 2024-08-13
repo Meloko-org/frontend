@@ -59,7 +59,7 @@ export default function CartScreen({ navigation }) {
 
 
   return (
-    <SafeAreaView className='flex-1 bg-lightbg'>
+    <SafeAreaView className='flex-1 bg-lightbg dark:bg-darkbg'>
       <View className='p-3'>
         <TextHeading2 extraClasses='mb-4'>Votre panier</TextHeading2>
         {

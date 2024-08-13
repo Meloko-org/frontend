@@ -9,7 +9,7 @@ type TextBody2Props = {
 export default function TextBody2(props: TextBody2Props): JSX.Element {
 	return (
     <>
-      <Text className={`${props.extraClasses} text-left text-xs`}>{props.children}</Text>
+      <Text className={`${props.extraClasses} text-left text-xs dark:text-lightbg`}>{props.children}</Text>
     </>
 	)
 }

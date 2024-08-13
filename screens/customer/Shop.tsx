@@ -136,7 +136,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
 
   
   return (
-    <SafeAreaView className='flex-1 bg-lightbg'>
+    <SafeAreaView className='flex-1 bg-lightbg dark:bg-darkbg'>
       <ScrollView  showsVerticalScrollIndicator={false} className='p-3'>
         {
           shopData && (
@@ -176,6 +176,18 @@ export default function ShopUserScreen({ route, navigation }: Props) {
         }
 
         {
+          topComments && (
+            <View className='mb-3'>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={['my-3 flex flex-row justify-start items-center']}>
+              <View className='p-2 flex flex-row'>
+                {topComments}
+              </View>
+            </ScrollView> 
+          </View>
+          )
+        }
+
+        {
           searchProduct.length > 0 && 
           (
             <View>
@@ -188,17 +200,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
           )
         }
 
-        {
-          topComments && (
-            <View className='mb-3'>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={['my-3 flex flex-row justify-start items-center']}>
-              <View className='p-2 flex flex-row'>
-                {topComments}
-              </View>
-            </ScrollView> 
-          </View>
-          )
-        }
+
         <View className='my-3'>
           <TextHeading2>Rayons</TextHeading2>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={['my-3 flex flex-row justify-start items-center']}>
@@ -209,7 +211,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
         </View>
       
         <Modal visible={isModalVisible} animationType="slide" onRequestClose={() => setIsModalVisible(false)}>
-          <SafeAreaView className='bg-lightbg flex-1'>
+          <SafeAreaView className='bg-lightbg flex-1 dark:bg-darkbg'>
             <View className='p-3'>
               <ButtonBack 
                 onPressFn={() => setIsModalVisible(false)}
