@@ -133,7 +133,6 @@ export default function WithdrawModesScreen({ navigation }) {
   const markets = selectedShop && selectedShop.markets.map(m => {
     return (
       <Market key={m._id} marketData={m} onPressFn={(market) => {
-        console.log("selected market: ", market)
         dispatch(updateWithdrawMode({shopId: selectedShop._id, withdrawMode: 'market', market}))
         // setSelectedMarket(market)
         setIsMarketSelectModalVisible(false)

@@ -52,7 +52,6 @@ export default function ProfilProducerScreen({ navigation }: Props) {
       })
       const data = await response.json()
 
-      console.log(data)
     } catch(error) {
       console.error(error)
     }
