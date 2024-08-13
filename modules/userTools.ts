@@ -1,3 +1,5 @@
+const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
+
 /**
  * Get the user's info to store
  * @param apiUrl the url of the backend
@@ -6,7 +8,6 @@
  */
 const getUserInfos = async (token: string) => {
 	try {
-    const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
     const response = await fetch(`${API_ROOT}/users/logged`, {
       method: 'GET',
       headers: {
@@ -23,6 +24,34 @@ const getUserInfos = async (token: string) => {
   }
 }
 
+
+
+const updateUser = async (token: string, values: string) => {
+  try {
+    const body: { [key: string]: string }  = {}
+    for (const [key, value] of Object.entries(values)) {
+      body[key] = value
+    }
+
+    const response = await fetch(`${API_ROOT}/users/update`, {
+      method: 'GET',
+      headers: {
+        'Content-Type' : 'application/json',
+        Authorization: `Bearer ${token}`,
+        mode: 'cors'
+      },
+      body: JSON.stringify(body)
+    })
+
+    const data = await response.json()
+    return (data) ? data : false
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export default { 
-  getUserInfos 
+  getUserInfos,
+  updateUser
 }

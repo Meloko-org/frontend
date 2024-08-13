@@ -13,7 +13,8 @@ const initialState: UserState = {
     avatar: null,
     favSearch: [],
     bookmarks: [],
-    orders: []
+    orders: [],
+    ClerkPasswordEnabled: null,
   }
 }
 
