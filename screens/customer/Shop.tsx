@@ -84,17 +84,18 @@ export default function ShopUserScreen({ route, navigation }: Props) {
 
   const topComments = shopData && shopData.notes.filter(n => n.comment).map(c => {
     return (
-      <>
+      <View key={c._id}>
       {
         c && (
           <CardNote 
             note={c}
             extraClasses='mr-2'
+            
           />
         )
       }
 
-      </>
+      </View>
     )
   })
 

@@ -55,7 +55,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
     }
   }, []);
 
-  const producersList = searchResults.map((sr: ShopData) => (
+  const producersList = searchResults && searchResults.map((sr: ShopData) => (
     <CardProducer 
       shopData={sr}
       onPressFn={
@@ -78,7 +78,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
 ))
 
 
-  const markers = searchResults.map((data: ShopData, i) => {
+  const markers = searchResults && searchResults.map((data: ShopData, i) => {
     return (
       <Marker 
         key={i} 
@@ -108,7 +108,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
 
 
   const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
+    // console.log('handleSheetChanges', index);
   }, []);
 
   return (

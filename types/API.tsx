@@ -31,7 +31,7 @@ type CartData = {
     quantity: number
   }]
   withdrawMode: 'market' | 'clickCollect' | null | undefined
-  market?: string
+  market?: MarketData
 }
 
 

@@ -72,7 +72,8 @@ export default function WithdrawModesScreen({ navigation }) {
       setSelectedShop(selectedShop.shop)
       setIsMarketSelectModalVisible(true) 
     } else {
-      setSelectedMarket(null)
+      dispatch(updateWithdrawMode({shopId: selectedShop.shop._id, withdrawMode: value, market: null}))
+      // setSelectedMarket(null)
     }
     
   }
@@ -114,8 +115,8 @@ export default function WithdrawModesScreen({ navigation }) {
               onPressFn={(value) => handleSelectedModePress(cart.shop.name, value)}
             />
             {
-              selectedMarket && (
-                <Market key={selectedMarket._id} marketData={selectedMarket} extraClasses='mt-3'/>
+              (cart.withdrawMode === 'market' && cart.market) && (
+                <Market key={cart.market._id} marketData={cart.market} extraClasses='mt-3'/>
               )
             }
           </View>
@@ -134,7 +135,7 @@ export default function WithdrawModesScreen({ navigation }) {
       <Market key={m._id} marketData={m} onPressFn={(market) => {
         console.log("selected market: ", market)
         dispatch(updateWithdrawMode({shopId: selectedShop._id, withdrawMode: 'market', market}))
-        setSelectedMarket(market)
+        // setSelectedMarket(market)
         setIsMarketSelectModalVisible(false)
       }}/>
     )
