@@ -12,7 +12,8 @@ const initialState: UserState = {
     lastname: null,
     avatar: null,
     favSearch: [],
-    bookmarks: []
+    bookmarks: [],
+    ClerkPasswordEnabled: null
   }
 }
 
@@ -27,6 +28,7 @@ export const userSlice = createSlice({
       state.value.avatar = action.payload.avatar
       state.value.bookmarks = action.payload.bookmarks
       state.value.favSearch = action.payload.favSearch
+      state.value.ClerkPasswordEnabled = action.payload.ClerkPasswordEnabled
     }
   }
 })

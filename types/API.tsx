@@ -44,6 +44,7 @@ type UserData = {
   avatar: string | null
   bookmarks: object[] | null
   favSearch: object[] | null
+  ClerkPasswordEnabled: boolean | null
 }
 
 export type {
