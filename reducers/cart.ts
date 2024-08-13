@@ -30,9 +30,6 @@ export const cartSlice = createSlice({
           withdrawMode: null
         })
       }
-
-
-      console.log(`Product added, cart is now`, state.value)
     },
     increaseCartQuantity: (state: CartState, action: PayloadAction) => {
       const shop = state.value.find(c => c.shop._id === action.payload.shopId)
@@ -50,8 +47,11 @@ export const cartSlice = createSlice({
       shop.withdrawMode = action.payload.withdrawMode
       if(action.payload.market) shop.market = action.payload.market
     },
+    emptyCart: (state: CartState) => {
+      state.value = []
+    },
   }
 })
 
-export const { addProductToCart, increaseCartQuantity, decreaseCartQuantity, updateWithdrawMode } = cartSlice.actions
+export const { addProductToCart, increaseCartQuantity, decreaseCartQuantity, updateWithdrawMode, emptyCart } = cartSlice.actions
 export default cartSlice.reducer

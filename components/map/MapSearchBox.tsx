@@ -91,7 +91,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
           })
         })
         const data = await response.json()
-        // console.log(data.searchResults[0].searchData.relevantProducts)
+
         if(props.displayMode === 'widget') {
           props.refrechResultsFn && props.refrechResultsFn(data.searchResults)
         } 

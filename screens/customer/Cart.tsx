@@ -21,7 +21,6 @@ export default function CartScreen({ navigation }) {
             return (currentValue.quantity * Number(currentValue.stockData.price.$numberDecimal)) + accumulator },
           0,
         );
-        console.log("c total cost", cartTotalCost)
         allShopsCost += cartTotalCost
         
       })
@@ -44,7 +43,7 @@ export default function CartScreen({ navigation }) {
         })
  
     return (
-      <View className='mb-3'>
+      <View className='mb-3' key={cart.shop._id}>
         <TextHeading3 centered extraClasses='mb-3'>{cart.shop.name}</TextHeading3> 
         {productsByShop}
       </View>

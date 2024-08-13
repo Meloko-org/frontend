@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react'
 import { Alert } from 'react-native'
 import ButtonPrimaryEnd from './PrimaryEnd';
 import { useDispatch, useSelector } from "react-redux";
-import { updateUser } from '../../../reducers/user';
+import { updateUser, addOrder } from '../../../reducers/user';
+import { emptyCart } from '../../../reducers/cart';
 import { useAuth } from '@clerk/clerk-expo'
 
 export default function StripePaymentButton(props) {
@@ -12,6 +13,7 @@ export default function StripePaymentButton(props) {
   const [loading, setLoading] = useState(false);
   const [publishableKey, setPublishableKey] = useState('');
   const userStore = useSelector((state: { user }) => state.user.value)
+  const cartStore = useSelector((state: { cart }) => state.cart.value)
 
   // Import the public api root address
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
@@ -39,14 +41,19 @@ export default function StripePaymentButton(props) {
       },
       body: JSON.stringify({
         amount: props.totalCartAmount,
-        customer: props.user
+        customer: props.user,
+        cart: cartStore
       })
     });
-    const { paymentIntent, ephemeralKey, customer } = await response.json();
+    const { paymentIntent, ephemeralKey, customer, order } = await response.json();
+
+    dispatch(addOrder(order))
+
     return {
       paymentIntent,
       ephemeralKey,
       customer,
+      order
     };
   };
 
@@ -55,6 +62,7 @@ export default function StripePaymentButton(props) {
       paymentIntent,
       ephemeralKey,
       customer,
+      order
     } = await fetchPaymentSheetParams();
 
     const { error } = await initPaymentSheet({
@@ -72,18 +80,25 @@ export default function StripePaymentButton(props) {
     if (!error) {
       setLoading(true);
     }
+
+    return order
   };
 
   const openPaymentSheet = async () => {
     try {
       dispatch(updateUser({...userStore, firstname: props.user.firstname, lastname: props.user.lastname}))
-      await initializePaymentSheet();
+      const order = await initializePaymentSheet();
       const { error } = await presentPaymentSheet();
 
       if (error) {
         Alert.alert(`Error code: ${error.code}`, error.message);
       } else {
-        props.onPaymentSuccessFn()
+        dispatch(emptyCart())
+        props.navigation.navigate('TabNavigatorUser', { screen: 'OrderCustomer',
+          params: {
+            orderId: order._id
+          }
+         })
       }
     } catch (error) {
       console.error(error)
@@ -91,9 +106,9 @@ export default function StripePaymentButton(props) {
 
   };
 
-  useEffect(() => {
-    initializePaymentSheet();
-  }, []);
+  // useEffect(() => {
+  //   initializePaymentSheet();
+  // }, []);
 
   return (
     <StripeProvider
@@ -105,7 +120,7 @@ export default function StripePaymentButton(props) {
         disabled={props.disabled} 
         label={props.label}
         iconName={props.iconName}
-        onPressFn={openPaymentSheet} 
+        onPressFn={() => openPaymentSheet()} 
       />
     </StripeProvider>
   );

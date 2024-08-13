@@ -13,6 +13,7 @@ import ButtonPrimaryEnd from '../../components/utils/buttons/PrimaryEnd';
 import CardProduct from '../../components/cards/Product';
 import ButtonBack from '../../components/utils/buttons/Back'
 import ProductCategory from '../../components/cards/ProductCategory';
+import CardNote from '../../components/cards/Note';
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -81,10 +82,26 @@ export default function ShopUserScreen({ route, navigation }: Props) {
     setIsModalVisible(true);
   };
 
-  // Formatting category  
-  const categories = shopData && shopData.categories.map(category => {
+  const topComments = shopData && shopData.notes.filter(n => n.comment).map(c => {
     return (
-      <ProductCategory category={category} onPressFn={() => handleCategoryClick(category.name)} key={category._id} />
+      <>
+      {
+        c && (
+          <CardNote 
+            note={c}
+            extraClasses='mr-2'
+          />
+        )
+      }
+
+      </>
+    )
+  })
+
+  // Formatting category  
+  const categories = (shopData && shopData.notes) && shopData.categories.map(category => {
+    return (
+      <ProductCategory category={category} onPressFn={() => handleCategoryClick(category.name)} key={category._id}/>
     );
   });
 
@@ -119,7 +136,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
   
   return (
     <SafeAreaView className='flex-1 bg-lightbg'>
-      <ScrollView className='p-3'>
+      <ScrollView  showsVerticalScrollIndicator={false} className='p-3'>
         {
           shopData && (
             <View>
@@ -148,7 +165,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
 
 
             <View className='flex flex-row w-full justify-evenly mb-3'>
-              <StarsNotation iconNames={['star', 'star-half', 'star-o']} shopData={shopData}/>
+              <StarsNotation iconNames={['star', 'star-half', 'star-o']} shopData={shopData} />
               { shopData.clickCollect && <BadgeSecondary uppercase>Click & collect</BadgeSecondary> }
               { shopData.markets.length > 0 && <BadgeSecondary uppercase>Marché local</BadgeSecondary> }
               <BadgeSecondary>{`${shopDistance}km`}</BadgeSecondary>
@@ -169,11 +186,25 @@ export default function ShopUserScreen({ route, navigation }: Props) {
             </View>
           )
         }
+
+        {
+          topComments && (
+            <View className='mb-3'>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={['my-3 flex flex-row justify-start items-center']}>
+              <View className='p-2 flex flex-row'>
+                {topComments}
+              </View>
+            </ScrollView> 
+          </View>
+          )
+        }
         <View className='my-3'>
           <TextHeading2>Rayons</TextHeading2>
-          <View className='my-3'>
-            {categories}
-          </View> 
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={['my-3 flex flex-row justify-start items-center']}>
+            <View className='p-2 flex flex-row'>
+              {categories}
+            </View>
+          </ScrollView> 
         </View>
       
         <Modal visible={isModalVisible} animationType="slide" onRequestClose={() => setIsModalVisible(false)}>
@@ -184,7 +215,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
               />
 
               <TextHeading2 extraClasses='mb-4'>Tous les produits</TextHeading2>
-              <ScrollView>
+              <ScrollView showsVerticalScrollIndicator={false} className='w-full'>
                 {categoryProducts}
               </ScrollView>
             </View>

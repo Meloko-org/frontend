@@ -1,7 +1,7 @@
-import { SafeAreaView, View, Modal, TouchableOpacity, Text } from 'react-native';
+import { SafeAreaView, View, Modal, ScrollView } from 'react-native';
 import React, { useState, useEffect } from "react";
 import { useAuth } from '@clerk/clerk-expo'
-
+import { MarketData, ShopData } from '../../types/API';
 import TextHeading2 from '../../components/utils/texts/Heading2';
 import TextHeading3 from '../../components/utils/texts/Heading3';
 import { useDispatch, useSelector } from "react-redux";
@@ -13,6 +13,11 @@ import ButtonBack from '../../components/utils/buttons/Back'
 import Market from '../../components/cards/Market';
 import SignInScreen from '../Signin';
 import { updateWithdrawMode } from '../../reducers/cart'
+import TextHeading4 from '../../components/utils/texts/Heading4';
+
+type SelectedMarkets = {
+  
+}
 
 export default function WithdrawModesScreen({ navigation }) {
   // Import the Clerk Auth functions
@@ -22,7 +27,8 @@ export default function WithdrawModesScreen({ navigation }) {
   const [cartTotal, setCartTotal] = useState<number>(0)
   const [isMarketSelectModalVisible, setIsMarketSelectModalVisible] = useState<boolean>(false);
   const [isSigninModalVisible, setIsSigninModalVisible] = useState<boolean>(false);
-  const [selectedMarkets, setSelectedMarkets] = useState([])
+  const [selectedShop, setSelectedShop] = useState<ShopData | null>(null)
+  const [selectedMarket, setSelectedMarket] = useState<MarketData | null>(null)
   const [isPaymentDisabledButton, setIsPaymentDisabledButton] = useState(false)
 
 
@@ -60,11 +66,14 @@ export default function WithdrawModesScreen({ navigation }) {
   const handleSelectedModePress = (shopName, value, market = null) => {
     const selectedShop = cartStore.find(c => c.shop.name === shopName)
 
-    dispatch(updateWithdrawMode({shopId: selectedShop.shop._id, withdrawMode: value}))
+    dispatch(updateWithdrawMode({shopId: selectedShop.shop._id, withdrawMode: value, market: null}))
+
     if(value === 'market') {
-      setSelectedMarkets(selectedShop.shop.markets)
+      setSelectedShop(selectedShop.shop)
       setIsMarketSelectModalVisible(true) 
-    } 
+    } else {
+      setSelectedMarket(null)
+    }
     
   }
 
@@ -96,16 +105,23 @@ export default function WithdrawModesScreen({ navigation }) {
       })
    
       return (
-        <View className='mb-3'>
+        <View className='mb-3' key={cart.shop._id}>
           <TextHeading3 centered extraClasses='mb-1'>{cart.shop.name}</TextHeading3> 
-          <View className='flex flex-row justify-around mb-5'>
+          <View className='flex'>
             <InputRadioGroup 
               data={withdrawModeButtonData}
               size='base'
               onPressFn={(value) => handleSelectedModePress(cart.shop.name, value)}
             />
+            {
+              selectedMarket && (
+                <Market key={selectedMarket._id} marketData={selectedMarket} extraClasses='mt-3'/>
+              )
+            }
           </View>
-          {productsByShop}
+          <View className='mt-3'>
+            {productsByShop}
+          </View>
         </View>
   
       )
@@ -113,20 +129,27 @@ export default function WithdrawModesScreen({ navigation }) {
 
   })
 
-  const markets = selectedMarkets.map(m => {
+  const markets = selectedShop && selectedShop.markets.map(m => {
     return (
-      <Market key={m.name} name={m.name} />
+      <Market key={m._id} marketData={m} onPressFn={(market) => {
+        console.log("selected market: ", market)
+        dispatch(updateWithdrawMode({shopId: selectedShop._id, withdrawMode: 'market', market}))
+        setSelectedMarket(market)
+        setIsMarketSelectModalVisible(false)
+      }}/>
     )
   })
 
 
   return (
     <SafeAreaView className='flex-1 bg-lightbg'>
-      <View className='p-3'>
-        <TextHeading2 extraClasses='mb-4'>Vos modes de retrait</TextHeading2>
-
-        {products}
-        <TextHeading3 extraClasses='py-3 text-right'>{`TOTAL : ${cartTotal}€`}</TextHeading3>
+      <View className='p-3 flex-1'>
+        <View>
+          <TextHeading2 extraClasses='mb-4'>Vos modes de retrait</TextHeading2>
+        </View>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {products}
+          <TextHeading3 extraClasses='py-3 text-right'>{`TOTAL : ${cartTotal}€`}</TextHeading3>
 
           <ButtonPrimaryEnd 
             disabled={isPaymentDisabledButton} 
@@ -136,7 +159,7 @@ export default function WithdrawModesScreen({ navigation }) {
               !isSignedIn ? setIsSigninModalVisible(true) : navigation.navigate('TabNavigatorUser', { screen: 'PaymentCustomer' })
             }} 
           />
-        
+        </ScrollView>
       </View>
 
       <Modal visible={isMarketSelectModalVisible} animationType="slide" onRequestClose={() => setIsMarketSelectModalVisible(false)}>

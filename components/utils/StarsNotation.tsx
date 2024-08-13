@@ -8,24 +8,32 @@ const FontAwesome = _Fontawesome as React.ElementType
 type StarsNotationProps = {
     iconNames: string[];
 		extraClasses?: string;
-    shopData: ShopData;
+    shopData?: ShopData;
+    note?: number
 }
 
 export default function StarsNotation(props: StarsNotationProps): JSX.Element {
   // Note calculation  
-  const calculNote = (shopData: ShopData): number => { 
-    let calcul: number = 0;
-    const path = shopData.notes;
-    for (let i = 0; i < path.length; i++) {
-      calcul += parseFloat(path[i].note.$numberDecimal);
+  const calculNote = (): number => { 
+    if(props.shopData !== undefined) {
+      let calcul: number = 0;
+      const path = props.shopData.notes;
+      for (let i = 0; i < path.length; i++) {
+        calcul += parseFloat(path[i].note.$numberDecimal);
+      } 
+      calcul /= path.length;
+      return calcul
+    } else {
+      return 0
     }
-    calcul /= path.length;
-    return calcul
+
+
+
   }
 
   // Star formatting  
-  const renderStars = (shopData: ShopData) => {
-    const rating: number = calculNote(shopData)
+  const renderStars = () => {
+    const rating: number = props.note ? props.note : calculNote()
     const stars: JSX.Element[] = [];
     for (let i = 0; i < 5; i++) {
       if (i < Math.floor(rating)) {
@@ -43,8 +51,8 @@ export default function StarsNotation(props: StarsNotationProps): JSX.Element {
 
 	return (
 		<View className={`${props.extraClasses} flex flex-row w-auto justify-between items-center`}>
-      {renderStars(props.shopData)} 
-      <Text className='text-sm'>({props.shopData.notes.length})</Text>
+      {renderStars()} 
+      { (!props.note && props.shopData) && <Text className='text-sm'>({props.shopData.notes.length})</Text> }
     </View>
 	)
 }

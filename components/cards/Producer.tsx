@@ -6,7 +6,7 @@ import _Fontawesome from 'react-native-vector-icons/FontAwesome6'
 
 const FontAwesome = _Fontawesome as React.ElementType
 
-export default function Producer(): JSX.Element {
+export default function CardProducer(): JSX.Element {
 	return (
 		<View className="flex rounded-lg p-2 shadow-lg bg-lightbg dark:bg-darkbg w-full">
 			<View className="flex flex-row w-full mb-2">

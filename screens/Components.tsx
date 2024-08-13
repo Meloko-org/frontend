@@ -34,7 +34,7 @@ export default function ComponentsScreen({ navigation }: Props) {
  
 
   return (
-<ScrollView contentContainerStyle={styles.UIcontainer}>
+<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.UIcontainer}>
         <View className="flex-1 items-center justify-center p-3 overflow-y-auto">
         <View  className="mb-3">
           <TouchableOpacity ></TouchableOpacity>

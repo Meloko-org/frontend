@@ -7,7 +7,7 @@ import MapView, { Marker, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import TextHeading3 from '../../components/utils/texts/Heading3'
-import ProducerSearchResult from '../../components/cards/ProducerSearchResult'
+import CardProducer from '../../components/cards/ProducerSearchResult'
 import MapSearchBox from '../../components/map/MapSearchBox'
 import { ShopData } from '../../types/API';
 
@@ -56,7 +56,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
   }, []);
 
   const producersList = searchResults.map((sr: ShopData) => (
-    <ProducerSearchResult 
+    <CardProducer 
       shopData={sr}
       onPressFn={
         () => { 
@@ -96,7 +96,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
             }) 
           }
         }>
-          <ProducerSearchResult 
+          <CardProducer 
             shopData={data}
             key={data._id}
           />
@@ -133,7 +133,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
             onChange={handleSheetChanges}
           >
             <BottomSheetView style={styles.contentContainer}>
-              <ScrollView style={{flex: 1, width: '100%'}} className='pt-2 px-3'>
+              <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1, width: '100%'}} className='pt-2 px-3'>
                 
                 <TextHeading3
                   extraClasses='mt-2 mb-4'

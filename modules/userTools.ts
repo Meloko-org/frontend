@@ -19,7 +19,7 @@ const getUserInfos = async (token: string) => {
     return (data) ? data : false
 
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 

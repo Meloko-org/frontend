@@ -78,7 +78,7 @@ export default function SignInScreen(props) {
         // store user's info in the store
         const token = await getToken() 
         const user = await userTools.getUserInfos(token)
-        console.log(user)
+
         if(user) {
           dispatch(updateUser(user))
           handleCloseModal()
@@ -114,9 +114,7 @@ export default function SignInScreen(props) {
 
       // If the signin event went well
       if (createdSessionId) {
-        console.log("session id", createdSessionId)
         setActive!({ session: createdSessionId })
-        
       } else {
 
       }

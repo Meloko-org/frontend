@@ -28,7 +28,6 @@ export default function PaymentCustomerScreen({ navigation }: Props): JSX.Elemen
   }, [])
 
   useEffect(() => {
-    if(cartStore.length > 0) {
       let allShopsCost = 0
       cartStore.forEach(c => {
         const cartTotalCost = c.products.reduce(
@@ -40,20 +39,6 @@ export default function PaymentCustomerScreen({ navigation }: Props): JSX.Elemen
         
       })
       setCartTotal(allShopsCost)
-    } else {
-      navigation.navigate('TabNavigatorUser', {
-        screen: 'Accueil',
-        params: { 
-          search: {
-            address: null,
-            query: null,
-            radius: null,
-            userPosition: null
-          },
-          searchResults: []
-        },
-      });
-    }
   }, [cartStore])
 
   return (
@@ -102,7 +87,7 @@ export default function PaymentCustomerScreen({ navigation }: Props): JSX.Elemen
           iconName="credit-card"
           user={user}
           totalCartAmount={cartTotal}
-          onPaymentSuccessFn={() => navigation.navigate('TabNavigatorUser', { screen: 'OrderCustomer' })}
+          navigation={navigation}
           disabled={!user.firstname || !user.lastname}
         />
       </View>

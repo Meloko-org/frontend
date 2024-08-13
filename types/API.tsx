@@ -6,6 +6,16 @@ type ProductData = {
   family?: any;
 }
 
+type MarketData = {
+  _id: string
+  name: string;
+  image: string;
+  description: string;
+  address: object
+  openingHours: object[]
+}
+
+
 type StockData = {
   _id: string
   price: { $numberDecimal: string }
@@ -30,7 +40,7 @@ type ShopData = {
   name: string
   logo: string
   description: string
-  markets: object[]
+  markets: MarketData[]
   clickCollect: object
   notes: { note: { $numberDecimal: string } | number | any }[]
   products?: StockData[]
@@ -44,6 +54,7 @@ type UserData = {
   avatar: string | null
   bookmarks: object[] | null
   favSearch: object[] | null
+  orders: object[]
 }
 
 export type {
@@ -51,5 +62,6 @@ export type {
   ShopData,
   UserData,
   StockData,
-  CartData
+  CartData,
+  MarketData
 }

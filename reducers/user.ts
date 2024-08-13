@@ -12,7 +12,8 @@ const initialState: UserState = {
     lastname: null,
     avatar: null,
     favSearch: [],
-    bookmarks: []
+    bookmarks: [],
+    orders: []
   }
 }
 
@@ -21,11 +22,13 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     updateUser: (state: UserState, action: PayloadAction<UserData>): void => {
-      console.log("payload", action.payload)
       state.value = action.payload
+    },
+    addOrder: (state: UserState, action: PayloadAction): void => {
+      state.value.orders.push(action.payload)
     }
   }
 })
 
-export const { updateUser } = userSlice.actions
+export const { updateUser, addOrder } = userSlice.actions
 export default userSlice.reducer

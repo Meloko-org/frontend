@@ -30,7 +30,6 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
   const cartStore = useSelector((state: { cart }) => state.cart.value)
 
   const handleAddCartPress = async ():Promise<void> => {
-		console.log("shop", props.stockData.shop)
     dispatch(addProductToCart({
 			shop: props.stockData.shop,
       stockData: props.stockData
