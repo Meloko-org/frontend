@@ -10,21 +10,33 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { RootStackParamList } from './types/Navigation'
 
 import _FontAwesome from 'react-native-vector-icons/FontAwesome6';
+import { useColorScheme } from "nativewind";
 
 import HomeScreen from './screens/Home';
 import MapCustomerScreen from './screens/customer/Map'
 import SignUpScreen from './screens/Signup';
 import SignInScreen from './screens/Signin';
-import CartScreen from './screens/Cart';
+import CartScreen from './screens/customer/Cart';
 import FavoritesScreen from './screens/Favorites';
-import ProfilScreen from './screens/Profil';
+import ProfilScreen from './screens/customer/Profil';
 import ShopProducerScreen from './screens/producer/Shop';
 import BusinessScreen from './screens/Business';
 import ProfilProducerScreen from './screens/producer/Profil';
 import StocksScreen from './screens/Stocks';
 import SearchCustomerScreen from './screens/customer/Search'
 import ComponentsScreen from './screens/Components'
-import ShopUserScreen from './screens/Shop'
+import ShopUserScreen from './screens/customer/Shop'
+import WithdrawModesUserScreen from './screens/customer/WithdrawModes';
+import OrderCustomerScreen from './screens/customer/Order';
+import PaymentCustomerScreen from './screens/customer/Payment'
+
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import user from './reducers/user';
+import cart from './reducers/cart';
+const store = configureStore({
+  reducer: {user, cart},
+})
 
 const FontAwesome = _FontAwesome as React.ElementType;
 
@@ -73,6 +85,8 @@ if (!publishableKey) {
 }
 
 const TabNavigatorUser: React.FC = () => {
+  const { colorScheme, toggleColorScheme } = useColorScheme();
+  const tabBarBackgroundColor = colorScheme === 'dark' ? '#444C3D' : '#FFF'
   return (
     <Tab.Navigator screenOptions={({ route }) => ({
       tabBarIcon: ({ color, size }) => {
@@ -93,12 +107,23 @@ const TabNavigatorUser: React.FC = () => {
       tabBarActiveTintColor: '#98B66E',
       tabBarInactiveTintColor: '#262E20',
       headerShown: false,
+      tabBarStyle: {
+        height: 90,
+        paddingHorizontal: 5,
+        paddingTop: 0,
+        backgroundColor: tabBarBackgroundColor,
+        position: 'absolute',
+        borderTopWidth: 0,
+      }
     })}> 
       <Tab.Screen name="Accueil" component={MapCustomerScreen} />
       <Tab.Screen name="Panier" component={CartScreen} />
       <Tab.Screen name="Favoris" component={FavoritesScreen} />
       <Tab.Screen name="Profil" component={ProfilScreen} />
       <Tab.Screen name="ShopUser" component={ShopUserScreen} options={{ tabBarButton: () => null }}/>
+      <Tab.Screen name="WithdrawModesUser" component={WithdrawModesUserScreen} options={{ tabBarButton: () => null }}/>
+      <Tab.Screen name="OrderCustomer" component={OrderCustomerScreen} options={{ tabBarButton: () => null }}/>
+      <Tab.Screen name="PaymentCustomer" component={PaymentCustomerScreen} options={{ tabBarButton: () => null }}/>
     </Tab.Navigator>
   );
 };
@@ -137,24 +162,25 @@ const TabNavigatorProducer: React.FC = () => {
 
 export default function App(): JSX.Element {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-    <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
-      <ClerkLoaded>
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={options}>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="SignUp" component={SignUpScreen} />
-            <Stack.Screen name="SignIn" component={SignInScreen} />
-            <Stack.Screen name="SearchCustomer" component={SearchCustomerScreen} />
-            <Stack.Screen name="Components" component={ComponentsScreen} />
-            <Stack.Screen name="GestionDesStocks" component={StocksScreen} />
-            <Stack.Screen name="TabNavigatorUser" component={TabNavigatorUser} />
-            <Stack.Screen name="TabNavigatorProducer" component={TabNavigatorProducer} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      
-      </ClerkLoaded>
-    </ClerkProvider>
-    </GestureHandlerRootView>
+    <Provider store={store}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
+          <ClerkLoaded>
+            <NavigationContainer>
+              <Stack.Navigator screenOptions={options}>
+                <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="SignUp" component={SignUpScreen} />
+                <Stack.Screen name="SignIn" component={SignInScreen} />
+                <Stack.Screen name="SearchCustomer" component={SearchCustomerScreen} />
+                <Stack.Screen name="Components" component={ComponentsScreen} />
+                <Stack.Screen name="TabNavigatorUser" component={TabNavigatorUser} />
+                <Stack.Screen name="TabNavigatorProducer" component={TabNavigatorProducer} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </ClerkLoaded>
+        </ClerkProvider>
+      </GestureHandlerRootView>
+    </Provider>
+    
   );
 }

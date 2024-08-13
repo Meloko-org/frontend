@@ -17,6 +17,7 @@ export default function ProfilProducerScreen({ navigation }: Props) {
   // Import the Clerk Auth functions
   const { getToken } = useAuth()
 
+
   // Import the public api root address
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
 
@@ -52,7 +53,6 @@ export default function ProfilProducerScreen({ navigation }: Props) {
       })
       const data = await response.json()
 
-      console.log(data)
     } catch(error) {
       console.error(error)
     }

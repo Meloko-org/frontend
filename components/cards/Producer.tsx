@@ -1,12 +1,12 @@
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from 'react-native'
-import ProductsNumber from "../utils/badges/ProductsNumber";
+import ProductsNumber from "../utils/badges/Secondary";
 import _Fontawesome from 'react-native-vector-icons/FontAwesome6'
 
 
 const FontAwesome = _Fontawesome as React.ElementType
 
-export default function Producer(): JSX.Element {
+export default function CardProducer(): JSX.Element {
 	return (
 		<View className="flex rounded-lg p-2 shadow-lg bg-lightbg dark:bg-darkbg w-full">
 			<View className="flex flex-row w-full mb-2">
@@ -15,7 +15,7 @@ export default function Producer(): JSX.Element {
 				</View>
 				<View className="grow px-1">
 					<Text className="font-bold text-wrap text-darkbg dar:text-lightbg mb-1">Nom du producteur</Text>
-					<ProductsNumber></ProductsNumber>
+					<ProductsNumber>1 produit que vous recherchez</ProductsNumber>
 				</View>
 				<View className="flex-none w-12 justify-center">
 					<TouchableOpacity className="bg-primary rounded-sm justify-center items-center w-12 h-16">

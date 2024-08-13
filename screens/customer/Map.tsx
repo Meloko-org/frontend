@@ -1,33 +1,38 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { StyleSheet, Button, View, ScrollView, Text, TouchableOpacity } from 'react-native'
-import { useAuth } from '@clerk/clerk-expo'
+import { StyleSheet, View, ScrollView, } from 'react-native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/Navigation'
+import { Region } from 'react-native-maps';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import TextHeading3 from '../../components/utils/texts/Heading3'
+import CardProducer from '../../components/cards/ProducerSearchResult'
+import MapSearchBox from '../../components/map/MapSearchBox'
+import { ShopData } from '../../types/API';
+import { useColorScheme } from "nativewind";
 
-import ProducerSearchResult from '../../components/cards/ProducerSearchResult'
+type userPosition = {
+  latitude: number;
+  longitude: number;
+} | null
 
-type ProfileScreenNavigationProp = NativeStackNavigationProp<
+type MapScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'MapCustomer'
 >;
 
-type Props = {
-  navigation: ProfileScreenNavigationProp;
+type MapProps = {
+  navigation: MapScreenNavigationProp;
 };
 
-export default function MapCustomerScreen({ route, navigation }: Props) {
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const [currentPosition, setCurrentPosition] = useState(null);
-  const [searchResults, setSearchResults] = useState([])
-  const [region, setRegion] = useState({})
-  // Import the Clerk Auth functions
-  const { signOut, isSignedIn, getToken } = useAuth()
+export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.Element {
+  const { colorScheme, toggleColorScheme } = useColorScheme();
 
-  // Import the public api root address
-  const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [currentPosition, setCurrentPosition] = useState<userPosition>(null);
+  const [searchResults, setSearchResults] = useState<ShopData[]>([])
+  const [region, setRegion] = useState<Region | undefined>(undefined)
 
   useEffect(() => {
     (async () => {
@@ -52,61 +57,99 @@ export default function MapCustomerScreen({ route, navigation }: Props) {
       setSearchResults(route.params.searchResults)
     }
   }, []);
-  const markers = searchResults.map((data, i) => {
-    return (<Marker 
-      key={i} 
-      coordinate={{ latitude: Number(data.address.latitude.$numberDecimal), longitude: Number(data.address.longitude.$numberDecimal) }} 
+
+  const producersList = searchResults && searchResults.map((sr: ShopData) => (
+    <CardProducer 
+      shopData={sr}
+      onPressFn={
+        () => { 
+          navigation.navigate('TabNavigatorUser', {
+            screen: 'ShopUser',
+            params: { 
+              shopId: sr._id,
+              distance: sr.searchData.distance,
+              relevantProducts: sr.searchData.relevantProducts ? sr.searchData.relevantProducts : [] 
+            },
+          }) 
+        }
+      }
+      key={sr._id}
+      extraClasses='mb-1'
+      displayMode='bottomSheet'
+    />
+
+))
+
+
+  const markers = searchResults && searchResults.map((data: ShopData, i) => {
+    return (
+      <Marker 
+        key={i} 
+        coordinate={{ latitude: Number(data.address.latitude.$numberDecimal), longitude: Number(data.address.longitude.$numberDecimal) }} 
       >
-        <Callout onPress={() => console.log("go to the shop page")}>
-          <View>
-          <Text>{ data.name }</Text>
-          { data.searchData.relevantProducts && <Text>Vends { data.searchData.relevantProducts.length } produit que vous recherchez</Text> }
-          </View>
-        </Callout>
-
-      </Marker>)
-  });
-
-  const producersList = searchResults.map(sr => (
-      <ProducerSearchResult 
-        name={sr.name}
-        onPressFn={
+        <Callout 
+          tooltip={true}
+          onPress={
           () => { 
             navigation.navigate('TabNavigatorUser', {
               screen: 'ShopUser',
               params: { 
-                shopId: sr._id,
-                relevantProducts: sr.searchData.relevantProducts ? sr.searchData.relevantProducts : [] 
+                shopId: data._id,
+                distance: data.searchData.distance,
+                relevantProducts: data.searchData.relevantProducts ? data.searchData.relevantProducts : [] 
               },
             }) 
           }
-        }
-        key={sr._id}
-      />
+        } style={{ backgroundColor: (colorScheme === "dark") ? '#262E20' : '#FCFFF0', borderRadius: 10 }}>
+          <CardProducer 
+            shopData={data}
+            key={data._id}
+          />
+        </Callout>
+      </Marker>
+    )
+  });
 
-  ))
+
 
   const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
+    // console.log('handleSheetChanges', index);
   }, []);
 
   return (
     <View style={styles.container}>
-      <MapView mapType="hybrid" showsUserLocation={true} style={styles.map} region={region}>
+      <MapView mapType="hybrid" showsUserLocation={true} style={styles.map} region={region} userInterfaceStyle='dark'>
         {/* {currentPosition && <Marker coordinate={currentPosition} title="My position" pinColor="#fecb2d" />} */}
         {markers}
       </MapView>
+      <View className="flex flex-row justify-center" style={{position: 'absolute', top: 50, width: '100%'}}>
+        <MapSearchBox
+          search={route.params.search}
+          refrechResultsFn={(newSearchResults: ShopData[]) => setSearchResults(newSearchResults)}
+          displayMode='widget'
+        />
+      </View>
       {
         searchResults.length > 0 && (
           <BottomSheet
             ref={bottomSheetRef}
-            snapPoints={['10%', '50%']}
-    
+            snapPoints={['30%', '50%']}
+            handleStyle={{ backgroundColor: (colorScheme === "dark") ? '#444C3D' : '#FFF' }}
+            handleIndicatorStyle={{ backgroundColor: (colorScheme === "dark") ? '#FCFFF0' : '#444C3D' }}
             onChange={handleSheetChanges}
           >
-            <BottomSheetView style={styles.contentContainer}>
-              <ScrollView style={{flex: 1, width: '100%'}} className='p-2'>
-                <Text>Resultats ({producersList.length})</Text>
+            <BottomSheetView 
+              style={[styles.contentContainer, { backgroundColor: (colorScheme === "dark") ? '#262E20' : '#FCFFF0' }]} 
+              
+            >
+              <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1, width: '100%'}} className='pt-2 px-3'>
+                
+                <TextHeading3
+                  extraClasses='mt-2 mb-4'
+                >
+                  { `${producersList.length.toString()} Resultats `} 
+                </TextHeading3>
+
                 {producersList}
               </ScrollView>
               
@@ -125,9 +168,10 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+    position: 'relative'
   },
   contentContainer: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: 'center'
   },
 });

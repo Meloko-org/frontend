@@ -1,6 +1,6 @@
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from 'react-native'
-import PricePer from "../utils/badges/PricePer";
+import PricePer from "../utils/badges/Dark";
 import _Fontawesome from 'react-native-vector-icons/FontAwesome6'
 
 

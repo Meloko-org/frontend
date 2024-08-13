@@ -117,7 +117,7 @@ export default function StocksScreen({ navigation }: Props) {
   const categories = Array.from(new Set(stocks.map(stock => stock.shop)));
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
       <Text style={styles.title}>Mes Stocks</Text>
       {categories.map(category => (
         <View key={category}>

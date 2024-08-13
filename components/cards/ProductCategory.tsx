@@ -1,19 +1,21 @@
 import React from "react";
-import { Image, Text, View } from 'react-native'
+import { Image, Text, View, TouchableOpacity } from 'react-native'
+import { GestureResponderEvent } from 'react-native'
 
+type CardProductCategoryProps = {
+	category: object
+	extraClasses?: string,
+	onPressFn: ((event: GestureResponderEvent) => void) | undefined
+}
 
-
-export default function ProductCategory(): JSX.Element {
+export default function ProductCategory(props: CardProductCategoryProps):JSX.Element {
     return (
-        <View className="flex rounded-lg shadow-lg bg-lightbg w-1/4">
-            <View className="flex justify-center rounded-t-lg w-auto h-auto">
-                <Image source={require('../../assets/images/tomate.webp')} className="rounded-t-lg w-24 h-16" alt="fgsd" resizeMode="cover" width={100} height={50}/>
-            </View>
-            <View className="py-2">
-                <Text className="font-bold text-darkbg dark:text-lightbg text-center">Légumes</Text>
-                <Text className="text-wrap text-slate-400 dark:text-slate-50 text-center">12 produits</Text>
-            </View>
-            
+      <TouchableOpacity onPress={(event) => props.onPressFn && props.onPressFn(props.category.name)} className='w-[150px] bg-white shadow-sm rounded-lg dark:bg-tertiary'>
+        <Image source={{uri: props.category.image}} resizeMode="cover" className='w-full h-20 rounded-t-lg'/>
+        <View className='rounded-b-lg p-2'>
+          <Text className="text-base font-bold dark:text-lightbg">{props.category.name}</Text>
+          <Text className="text-xs uppercase dark:text-lightbg">{props.category.products.length} produit{ props.category.products.length > 1 && 's' }</Text>
         </View>
+      </TouchableOpacity>
     )
 }
