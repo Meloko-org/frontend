@@ -4,6 +4,10 @@ type ProductData = {
   image: string;
   description: string;
   family?: any;
+  weight: {
+    unit: string
+    measurement: number
+  }
 }
 
 type MarketData = {

@@ -41,7 +41,7 @@ export default function InputButtonGroup(props: InputRadioGroupProps): JSX.Eleme
     key={b.value}
       className={
         `
-          ${b.selected ? ' bg-primary' : 'bg-lightbg'} 
+          ${b.selected ? ' bg-primary' : 'bg-lightbg dark:bg-tertiary'} 
           ${i === 0 && 'rounded-l-lg'}
           ${i === radioData.length - 1 && 'rounded-r-lg'}
           flex flex-row p-2 justify-center items-center border border-primary
@@ -51,7 +51,7 @@ export default function InputButtonGroup(props: InputRadioGroupProps): JSX.Eleme
     >
 			<Text className={
         `
-          ${b.selected && 'font-bold text-white'}
+          ${b.selected ? 'font-bold text-white' : ' dark:text-lightbg'}
           ${props.size === 'large' ? 'text-lg' : 'text-base'}
         `
       }>{b.label}</Text>

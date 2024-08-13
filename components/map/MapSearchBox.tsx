@@ -33,7 +33,7 @@ type Props = {
 export default function MapSearchBox(props: Props): JSX.Element {
 
   const size = useRef(new Animated.Value(110)).current;
-
+  const [isSearchLoading, setIsSearchLoading] = useState(false)
   const [searchOptions, setSearchOptions] = useState<searchOptions>({
     query: '',
     address: '',
@@ -91,12 +91,13 @@ export default function MapSearchBox(props: Props): JSX.Element {
           })
         })
         const data = await response.json()
-
+        setIsSearchLoading(false)
         if(props.displayMode === 'widget') {
           props.refrechResultsFn && props.refrechResultsFn(data.searchResults)
         } 
         
         if(props.navigation) {
+          
           props.navigation.navigate('TabNavigatorUser', {
             screen: 'Accueil',
             params: { 
@@ -164,11 +165,13 @@ export default function MapSearchBox(props: Props): JSX.Element {
  
   const onSearchPress = async (): Promise<void> => {
     try {
+      setIsSearchLoading(true)
       if(searchOptions.address !== 'Ma Position' && searchOptions.address !== '') {
         await searchAddress()
       }
       setPerformSearch(true)
     } catch (err) {
+      setIsSearchLoading(false)
       console.error(err)   
     }
   }
@@ -291,6 +294,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
           />
           <TextHeading3
             extraClasses='my-4'
+            centered
           >
             Localisation
           </TextHeading3>
@@ -315,6 +319,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
   
           <TextHeading3
             extraClasses='mt-4 mb-2'
+            centered
           >
             Distance
           </TextHeading3>
@@ -343,7 +348,13 @@ export default function MapSearchBox(props: Props): JSX.Element {
             </View>
           </View>
   
-          <ButtonPrimaryEnd disabled={searchOptions.address === ''} label="Chercher" iconName="search" onPressFn={onSearchPress}></ButtonPrimaryEnd>
+          <ButtonPrimaryEnd 
+            disabled={searchOptions.address === '' || isSearchLoading} 
+            label="Chercher" 
+            iconName="search" 
+            onPressFn={onSearchPress}
+            isLoading={isSearchLoading}
+          />
         </View>
       </SafeAreaView>
       )

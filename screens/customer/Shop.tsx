@@ -137,94 +137,97 @@ export default function ShopUserScreen({ route, navigation }: Props) {
   
   return (
     <SafeAreaView className='flex-1 bg-lightbg dark:bg-darkbg'>
-      <ScrollView  showsVerticalScrollIndicator={false} className='p-3'>
-        {
-          shopData && (
-            <View>
-              <View>
-              <TextHeading2 extraClasses='mb-4'>{shopData.name}</TextHeading2>
-              <View className='flex flex-row items-center mb-3'>
-                <View className='w-2/6'>
-                  {shopData.logo ? (
-                    <Image source={{ uri: shopData.logo }} resizeMode="cover" className='rounded-full'/>
-                  ) : (
-                    <Image source={require('../../assets/icon.png')} resizeMode="cover" width={112} height={112} className='w-28 h-28 rounded-full'/>
-                  )}
-                </View>
-                <View className='flex flex-row justify-start w-3/6 h-full'>
-                  <TextBody1>{shopData.description}</TextBody1>
-                </View>
-                <View className='w-1/6 h-full'>
-                  <ButtonIcon 
-                    iconName="heart"
-                    extraClasses='h-16'
-                    onPressFn={handleBookmarkPress}
-                  />
+      <View className='flex-1'>
+        <ScrollView  showsVerticalScrollIndicator={false} className='p-3'>
+          {
+            shopData && ( 
+              <View className='flex-1'>
+                <View>
+                <TextHeading2 extraClasses='mb-4'>{shopData.name}</TextHeading2>
+                <View className='flex flex-row items-center mb-3'>
+                  <View className='w-2/6'>
+                    {shopData.logo ? (
+                      <Image source={{ uri: shopData.logo }} resizeMode="cover" className='rounded-full'/>
+                    ) : (
+                      <Image source={require('../../assets/icon.png')} resizeMode="cover" width={112} height={112} className='w-28 h-28 rounded-full'/>
+                    )}
+                  </View>
+                  <View className='flex flex-row justify-start w-3/6 h-full'>
+                    <TextBody1>{shopData.description}</TextBody1>
+                  </View>
+                  <View className='w-1/6 h-full'>
+                    <ButtonIcon 
+                      iconName="heart"
+                      extraClasses='h-16'
+                      onPressFn={handleBookmarkPress}
+                    />
+                  </View>
                 </View>
               </View>
+
+
+              <View className='flex flex-row w-full justify-evenly mb-3'>
+                <StarsNotation iconNames={['star', 'star-half', 'star-o']} shopData={shopData} />
+                { shopData.clickCollect && <BadgeSecondary uppercase>Click & collect</BadgeSecondary> }
+                { shopData.markets.length > 0 && <BadgeSecondary uppercase>Marché local</BadgeSecondary> }
+                <BadgeSecondary>{`${shopDistance}km`}</BadgeSecondary>
+              </View>
             </View>
+            )
+          }
 
-
-            <View className='flex flex-row w-full justify-evenly mb-3'>
-              <StarsNotation iconNames={['star', 'star-half', 'star-o']} shopData={shopData} />
-              { shopData.clickCollect && <BadgeSecondary uppercase>Click & collect</BadgeSecondary> }
-              { shopData.markets.length > 0 && <BadgeSecondary uppercase>Marché local</BadgeSecondary> }
-              <BadgeSecondary>{`${shopDistance}km`}</BadgeSecondary>
+          {
+            topComments && (
+              <View className='mb-3'>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={['my-3 flex flex-row justify-start items-center']}>
+                <View className='p-2 flex flex-row'>
+                  {topComments}
+                </View>
+              </ScrollView> 
             </View>
-          </View>
-          )
-        }
+            )
+          }
 
-        {
-          topComments && (
-            <View className='mb-3'>
+          {
+            searchProduct.length > 0 && 
+            (
+              <View>
+                  <TextHeading2>Votre recherche</TextHeading2>
+                  <View className='my-4'>
+                    {searchProduct} 
+                  </View>
+                  <ButtonPrimaryEnd label={`Tous les résultats (${searchProduct.length})`} iconName="arrow-right" onPressFn={handleAllResultsPress}></ButtonPrimaryEnd>
+              </View>
+            )
+          }
+
+
+          <View className='my-3'>
+            <TextHeading2>Rayons</TextHeading2>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={['my-3 flex flex-row justify-start items-center']}>
               <View className='p-2 flex flex-row'>
-                {topComments}
+                {categories}
               </View>
             </ScrollView> 
           </View>
-          )
-        }
+        
+          <Modal visible={isModalVisible} animationType="slide" onRequestClose={() => setIsModalVisible(false)}>
+            <SafeAreaView className='bg-lightbg flex-1 dark:bg-darkbg'>
+              <View className='p-3'>
+                <ButtonBack 
+                  onPressFn={() => setIsModalVisible(false)}
+                />
 
-        {
-          searchProduct.length > 0 && 
-          (
-            <View>
-                <TextHeading2>Votre recherche</TextHeading2>
-                <View className='my-4'>
-                  {searchProduct} 
-                </View>
-                <ButtonPrimaryEnd label={`Tous les résultats (${searchProduct.length})`} iconName="arrow-right" onPressFn={handleAllResultsPress}></ButtonPrimaryEnd>
-            </View>
-          )
-        }
-
-
-        <View className='my-3'>
-          <TextHeading2>Rayons</TextHeading2>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={['my-3 flex flex-row justify-start items-center']}>
-            <View className='p-2 flex flex-row'>
-              {categories}
-            </View>
-          </ScrollView> 
-        </View>
-      
-        <Modal visible={isModalVisible} animationType="slide" onRequestClose={() => setIsModalVisible(false)}>
-          <SafeAreaView className='bg-lightbg flex-1 dark:bg-darkbg'>
-            <View className='p-3'>
-              <ButtonBack 
-                onPressFn={() => setIsModalVisible(false)}
-              />
-
-              <TextHeading2 extraClasses='mb-4'>Tous les produits</TextHeading2>
-              <ScrollView showsVerticalScrollIndicator={false} className='w-full'>
-                {categoryProducts}
-              </ScrollView>
-            </View>
-          </SafeAreaView>
-        </Modal>
-      </ScrollView>    
+                <TextHeading2 extraClasses='mb-4'>Tous les produits</TextHeading2>
+                <ScrollView showsVerticalScrollIndicator={false} className='w-full'>
+                  {categoryProducts}
+                </ScrollView>
+              </View>
+            </SafeAreaView>
+          </Modal>
+        </ScrollView>
+      </View>
+    
     </SafeAreaView>
   );
 }

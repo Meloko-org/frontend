@@ -85,7 +85,9 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 
 				<View className={`${props.showImage ? 'w-3/5' : 'w-4/5' } h-full px-2 items-start`}>
 					<TextHeading4>{ `${props.stockData.product.family.name} ${props.stockData.product.name}` }</TextHeading4>
-					<PricePer>{props.stockData.price.$numberDecimal}€ / 100gr</PricePer>
+					<PricePer>{
+						`${props.stockData.price.$numberDecimal}€ / ${props.stockData.product.weight.measurement.$numberDecimal}${props.stockData.product.weight.unit}`
+					}</PricePer>
 				</View>
 				<View className="w-1/5 pr-1 flex flex-column justify-center items-center">
  					{cartButton}
