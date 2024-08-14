@@ -56,7 +56,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
     if(route.params.searchResults) {
       setSearchResults(route.params.searchResults)
     }
-  }, []);
+  }, [route.params]);
 
   const producersList = searchResults && searchResults.map((sr: ShopData) => (
     <CardProducer 
@@ -111,7 +111,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
   });
 
 
-
+  console.log("receive", route.params)
   const handleSheetChanges = useCallback((index: number) => {
     // console.log('handleSheetChanges', index);
   }, []);
@@ -133,7 +133,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
         searchResults.length > 0 && (
           <BottomSheet
             ref={bottomSheetRef}
-            snapPoints={['30%', '50%']}
+            snapPoints={['25%', '50%']}
             handleStyle={{ backgroundColor: (colorScheme === "dark") ? '#444C3D' : '#FFF' }}
             handleIndicatorStyle={{ backgroundColor: (colorScheme === "dark") ? '#FCFFF0' : '#444C3D' }}
             onChange={handleSheetChanges}
@@ -142,13 +142,17 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
               style={[styles.contentContainer, { backgroundColor: (colorScheme === "dark") ? '#262E20' : '#FCFFF0' }]} 
               
             >
-              <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1, width: '100%'}} className='pt-2 px-3'>
-                
+              <View className='px-3 w-full'>
                 <TextHeading3
-                  extraClasses='mt-2 mb-4'
+                  extraClasses='mt-2 mb-4 h-10'
                 >
                   { `${producersList.length.toString()} Resultats `} 
                 </TextHeading3>
+              </View>
+
+              <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1, width: '100%'}} className='px-3'>
+                
+
 
                 {producersList}
               </ScrollView>

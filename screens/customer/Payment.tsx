@@ -7,6 +7,7 @@ import StripePaymentButton from '../../components/utils/buttons/StripePayment';
 import InputText from "../../components/utils/inputs/Text";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import InputTextarea from "../../components/utils/inputs/Textarea";
+import ButtonSecondaryStart from "../../components/utils/buttons/SecondaryStart";
 type PaymentScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'PaymentCustomer'
@@ -89,6 +90,14 @@ export default function PaymentCustomerScreen({ navigation }: Props): JSX.Elemen
           totalCartAmount={cartTotal}
           navigation={navigation}
           disabled={!user.firstname || !user.lastname}
+ 
+        />
+
+        <ButtonSecondaryStart 
+          label="Modes de retrait" 
+          iconName="arrow-left" 
+          onPressFn={() => navigation.navigate('TabNavigatorUser', { screen: 'WithdrawModesUser' })} 
+          
         />
       </View>
 

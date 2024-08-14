@@ -24,7 +24,7 @@ export default function Market(props: CardMarketProps): JSX.Element {
 	
 	return (
 		<TouchableOpacity onPress={(event) => props.onPressFn && props.onPressFn(props.marketData)}>
-		<View className={`${props.extraClasses} flex rounded-lg p-2 shadow-lg bg-white dark:bg-darkbg w-full`}>
+		<View className={`${props.extraClasses} flex rounded-lg p-2 shadow-lg bg-white dark:bg-tertiary w-full`}>
 			<View className="flex flex-row w-full mb-2">
 				<View className="flex-none justify-center rounded-lg w-auto h-16">
 					<Image source={require('../../assets/images/tomate.webp')} className="rounded-full w-16 h-16" alt="fgsd" resizeMode="cover" width={100} height={50}/>

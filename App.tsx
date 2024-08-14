@@ -3,13 +3,12 @@ import * as SecureStore from 'expo-secure-store'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { NavigationContainer } from '@react-navigation/native';
-import { View } from 'react-native'
 
 import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { RootStackParamList } from './types/Navigation'
 
-import _FontAwesome from 'react-native-vector-icons/FontAwesome6';
+import _FontAwesome from 'react-native-vector-icons/FontAwesome5';
 import { useColorScheme } from "nativewind";
 
 import HomeScreen from './screens/Home';
@@ -17,7 +16,7 @@ import MapCustomerScreen from './screens/customer/Map'
 import SignUpScreen from './screens/Signup';
 import SignInScreen from './screens/Signin';
 import CartScreen from './screens/customer/Cart';
-import FavoritesScreen from './screens/Favorites';
+import BookmarksScreen from './screens/customer/Bookmarks';
 import ProfilScreen from './screens/customer/Profil';
 import ShopProducerScreen from './screens/producer/Shop';
 import BusinessScreen from './screens/Business';
@@ -29,6 +28,7 @@ import ShopUserScreen from './screens/customer/Shop'
 import WithdrawModesUserScreen from './screens/customer/WithdrawModes';
 import OrderCustomerScreen from './screens/customer/Order';
 import PaymentCustomerScreen from './screens/customer/Payment'
+import OrdersCustomerScreen from './screens/customer/Orders';
 
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
@@ -85,7 +85,7 @@ if (!publishableKey) {
 }
 
 const TabNavigatorUser: React.FC = () => {
-  const { colorScheme, toggleColorScheme } = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const tabBarBackgroundColor = colorScheme === 'dark' ? '#444C3D' : '#FFF'
   return (
     <Tab.Navigator screenOptions={({ route }) => ({
@@ -93,22 +93,21 @@ const TabNavigatorUser: React.FC = () => {
         let iconName: string = '';
 
         if (route.name === 'Accueil') {
-          iconName = 'house';
+          iconName = 'home';
         } else if (route.name === 'Panier') {
-          iconName = 'cart-shopping';
-        } else if (route.name === 'Favoris') {
+          iconName = 'shopping-basket';
+        } else if (route.name === 'BookmarksCustomer') {
           iconName = 'heart';
         } else if (route.name === 'Profil') {
           iconName = 'user-circle';
         }
 
-        return <FontAwesome name={iconName} size={size} color={color} />;
+        return <FontAwesome name={iconName} size={size} color={color} solid/>;
       },
       tabBarActiveTintColor: '#98B66E',
       tabBarInactiveTintColor: '#262E20',
       headerShown: false,
       tabBarStyle: {
-        height: 90,
         paddingHorizontal: 5,
         paddingTop: 0,
         backgroundColor: tabBarBackgroundColor,
@@ -118,12 +117,13 @@ const TabNavigatorUser: React.FC = () => {
     })}> 
       <Tab.Screen name="Accueil" component={MapCustomerScreen} />
       <Tab.Screen name="Panier" component={CartScreen} />
-      <Tab.Screen name="Favoris" component={FavoritesScreen} />
+      <Tab.Screen name="BookmarksCustomer" component={BookmarksScreen} options={{title: 'Favoris'}}/>
       <Tab.Screen name="Profil" component={ProfilScreen} />
       <Tab.Screen name="ShopUser" component={ShopUserScreen} options={{ tabBarButton: () => null }}/>
       <Tab.Screen name="WithdrawModesUser" component={WithdrawModesUserScreen} options={{ tabBarButton: () => null }}/>
       <Tab.Screen name="OrderCustomer" component={OrderCustomerScreen} options={{ tabBarButton: () => null }}/>
       <Tab.Screen name="PaymentCustomer" component={PaymentCustomerScreen} options={{ tabBarButton: () => null }}/>
+      <Tab.Screen name="OrdersCustomer" component={OrdersCustomerScreen} options={{ tabBarButton: () => null }}/>
     </Tab.Navigator>
   );
 };

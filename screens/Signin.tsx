@@ -66,6 +66,8 @@ export default function SignInScreen(props) {
   const [password, setPassword] = useState<string>('')
   const [newEmailAddress, setNewEmailAddress] = useState<string>('')
   const [newPassword, setNewPassword] = useState<string>('')
+  const [performedSignedIn, setPerformedSignedIn] = useState(false)
+  const [performedSignedUp, setPerformedSignedUp] = useState(false)
 
   useEffect(() => {
     setIsSigninModalVisible(props.showModal ? true : false)
@@ -73,30 +75,47 @@ export default function SignInScreen(props) {
 
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // store user's info in the store
-        const token = await getToken() 
-        const user = await userTools.getUserInfos(token)
-
-        if(user) {
-          dispatch(updateUser(user))
-          handleCloseModal()
-        }
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
     if(isSignedIn) {
-      setTimeout(() => {
-        console.log("execute timeout")
+      console.log("is signedin")
+      if(performedSignedIn) {
+        console.log("performed signedin")
         fetchData()
-      }, 3000);
+        setPerformedSignedIn(false)
+        setPerformedSignedUp(false)
+      }
+
+      if(performedSignedUp) {
+        console.log("performed signup")
+        setTimeout(() => {
+          console.log("execute timeout")
+          fetchData()
+          setPerformedSignedIn(false)
+          setPerformedSignedUp(false)
+        }, 3000);
+      }
+    } else {
+      console.log("is not signedin")
+
     }
-  }, [isSignedIn])
 
 
+  }, [isSignedIn, performedSignedIn, performedSignedUp])
+
+  const fetchData = async () => {
+    try {
+      console.log("fetch data")
+      // store user's info in the store
+      const token = await getToken() 
+      const user = await userTools.getUserInfos(token)
+
+      if(user) {
+        dispatch(updateUser(user))
+        handleCloseModal()
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
 
   // Signin/up with Google
@@ -115,6 +134,7 @@ export default function SignInScreen(props) {
       // If the signin event went well
       if (createdSessionId) {
         setActive!({ session: createdSessionId })
+        setPerformedSignedIn(true)
       } else {
 
       }
@@ -164,9 +184,7 @@ export default function SignInScreen(props) {
       // If the verification event is sucessfull 
       if (completeSignUp.status === 'complete') {
         await setActive({ session: completeSignUp.createdSessionId })
-        // redirection vers la page compte user pour saisie nom, prénom...
-        // -> enregistrement des nouvelles infos (nom, prénom) dans le store 
-        // Go back to the previous screen
+        setPerformedSignedUp(true)
       } else {
         console.error(JSON.stringify(completeSignUp, null, 2))
       }
@@ -195,6 +213,8 @@ export default function SignInScreen(props) {
       // If the signing event went well
       if (signInAttempt.status === 'complete') {
         await setActive({ session: signInAttempt.createdSessionId })
+        setPerformedSignedIn(true)
+
       } else {
         // See https://clerk.com/docs/custom-flows/error-handling
         // for more info on error handling
@@ -212,7 +232,7 @@ export default function SignInScreen(props) {
 
   return (
     <Modal visible={isSigninModalVisible} animationType="slide" onRequestClose={handleCloseModal}>
-      <SafeAreaView className='bg-lightbg flex-1'>
+      <SafeAreaView className='bg-lightbg flex-1 dark:bg-darkbg'>
         <View className='p-3 flex items-center'>
           <ButtonBack 
             onPressFn={handleCloseModal}
@@ -222,7 +242,7 @@ export default function SignInScreen(props) {
               label="Google" 
               iconName="google" 
               onPressFn={onGoogleAuthPress} 
-              extraClasses='w-80 mb-5'
+              extraClasses='w-full mb-5'
             />
           <InputText 
             value={emailAddress}
@@ -230,7 +250,7 @@ export default function SignInScreen(props) {
             placeholder="example@gmail.com" 
             label="Email"
             autoCapitalize="none"
-            extraClasses="w-80 mb-2"
+            extraClasses="w-full mb-2"
           />
           <InputText 
             value={password}
@@ -238,14 +258,14 @@ export default function SignInScreen(props) {
             placeholder="example@gmail.com" 
             label="Mot de passe"
             autoCapitalize="none"
-            extraClasses="w-80 mb-2"
+            extraClasses="w-full mb-2"
             secureTextEntry={true}
           />
           <ButtonPrimaryEnd 
               label="Connection" 
               iconName="sign-in" 
               onPressFn={onSignInPress} 
-              extraClasses='w-80 mb-5'
+              extraClasses='w-full mb-5'
             />
 
           <TextHeading2 extraClasses='mb-2'>Créer un compte</TextHeading2>
@@ -259,7 +279,7 @@ export default function SignInScreen(props) {
                 placeholder="example@gmail.com" 
                 label="Email"
                 autoCapitalize="none"
-                extraClasses="w-80 mb-2"
+                extraClasses="w-full mb-2"
               />
               <InputText 
                 value={newPassword}
@@ -267,14 +287,14 @@ export default function SignInScreen(props) {
                 placeholder="example@gmail.com" 
                 label="Mot de passe"
                 autoCapitalize="none"
-                extraClasses="w-80 mb-2"
+                extraClasses="w-full mb-2"
                 secureTextEntry={true}
               />
               <ButtonPrimaryEnd 
                 label="Inscription" 
                 iconName="arrow-right" 
                 onPressFn={onSignUpPress} 
-                extraClasses='w-80 mb-5'
+                extraClasses='w-full mb-5'
               />
             </>
           ) : (

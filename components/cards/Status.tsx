@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View } from 'react-native'
 import Price from "../utils/badges/Price";
 import Cancelled from "../utils/badges/Cancelled";
-import Partial from "../utils/badges/Partial";
+import Partial from "../utils/badges/WithdrawStatus";
 
 
 

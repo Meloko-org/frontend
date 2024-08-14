@@ -7,7 +7,7 @@ import { addProductToCart, increaseCartQuantity, decreaseCartQuantity } from "..
 import CardProduct from '../../components/cards/Product';
 import ButtonPrimaryEnd from '../../components/utils/buttons/PrimaryEnd';
 import ButtonPrimaryStart from '../../components/utils/buttons/PrimaryStart';
-
+import ButtonSecondaryStart from '../../components/utils/buttons/SecondaryStart';
 export default function CartScreen({ navigation }) {
   const cartStore = useSelector((state: { cart }) => state.cart.value)
   const [cartTotal, setCartTotal] = useState<number>(0)
@@ -61,14 +61,27 @@ export default function CartScreen({ navigation }) {
   return (
     <SafeAreaView className='flex-1 bg-lightbg dark:bg-darkbg'>
       <View className='p-3 flex flex-column h-full'>
-        <TextHeading2 extraClasses='mb-4'>Votre panier</TextHeading2>
+        
         {
           products.length > 0 ? (
             <>
+              <TextHeading2 extraClasses='mb-4'>Votre panier</TextHeading2>
               {products}
               <TextHeading3 extraClasses='py-3 text-right'>{`TOTAL: ${cartTotal}€`}</TextHeading3>
-              <ButtonPrimaryStart label="Continuer vos achats" iconName="arrow-left" onPressFn={handleWithdrawModePress} extraClasses='mb-3' />
-              <ButtonPrimaryEnd label="Mes modes de retrait" iconName="arrow-right" onPressFn={handleWithdrawModePress} />
+
+              <ButtonPrimaryEnd label="Mes modes de retrait" iconName="arrow-right" onPressFn={handleWithdrawModePress} extraClasses='mb-3' />
+
+              <ButtonSecondaryStart 
+                label="Continuer vos achats" 
+                iconName="arrow-left" 
+                onPressFn={() =>     navigation.navigate('TabNavigatorUser', {
+                  screen: 'Accueil',
+                  params: {
+                    search: {}
+                  }
+                }) } 
+                
+              />
             </>
           ) : (
             <View className='h-full justify-center items-center'>

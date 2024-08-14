@@ -49,7 +49,7 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 								})
 							)}
 					>
-						<Text className="text-2xl">+</Text>
+						<Text className="text-3xl dark:text-lightbg">+</Text>
 					</TouchableOpacity> }
 			<BadgeGrey>{cartStore.find(c => c.shop._id == props.stockData.shop._id).products.find(p => p.stockData._id === props.stockData._id).quantity}</BadgeGrey>
 			{ 
@@ -61,7 +61,7 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 					})
 					)}
 					>
-						<Text className="text-2xl">-</Text>
+						<Text className="text-3xl dark:text-lightbg">-</Text>
 					</TouchableOpacity> }
 		</>
 	) : (

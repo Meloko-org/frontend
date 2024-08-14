@@ -79,9 +79,9 @@ export default function ButtonPrimaryEnd(props: ButtonPrimaryEndProps): JSX.Elem
 		>	
 		{ props.isLoading ? (
 			<View className='flex flex-row space-x-2 justify-center items-center h-12'>
-				<Animated.View className='h-6 w-6 bg-lightbg rounded-full' style={{transform: [{ translateY: ball1 }]}}></Animated.View>
-				<Animated.View className='h-6 w-6 bg-lightbg rounded-full' style={{transform: [{ translateY: ball2 }]}}></Animated.View>
-				<Animated.View className='h-6 w-6 bg-lightbg rounded-full' style={{transform: [{ translateY: ball3 }]}}></Animated.View>
+				<Animated.View className='h-4 w-4 bg-lightbg rounded-full' style={{transform: [{ translateY: ball1 }]}}></Animated.View>
+				<Animated.View className='h-4 w-4 bg-lightbg rounded-full' style={{transform: [{ translateY: ball2 }]}}></Animated.View>
+				<Animated.View className='h-4 w-4 bg-lightbg rounded-full' style={{transform: [{ translateY: ball3 }]}}></Animated.View>
 			</View>
 		) : (
 			<>

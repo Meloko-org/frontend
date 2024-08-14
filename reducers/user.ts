@@ -23,6 +23,7 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     updateUser: (state: UserState, action: PayloadAction<UserData>): void => {
+      console.log(state.value.clerkPasswordEnabled)
       state.value = action.payload
     },
     addOrder: (state: UserState, action: PayloadAction): void => {

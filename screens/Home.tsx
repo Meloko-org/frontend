@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { StyleSheet, Button, View, Text, TouchableOpacity, SafeAreaView } from 'react-native'
 import { useAuth } from '@clerk/clerk-expo'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -6,6 +6,9 @@ import { RootStackParamList } from '../types/Navigation'
 import ButtonPrimaryEnd from '../components/utils/buttons/PrimaryEnd';
 import TextHeading1 from '../components/utils/texts/Heading1';
 import TextHeading2 from '../components/utils/texts/Heading2';
+import userTools from '../modules/userTools'
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "../reducers/user";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -22,6 +25,31 @@ export default function HomeScreen({ navigation }: Props) {
 
   // Import the public api root address
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
+  // and store user infos in the store
+  const dispatch = useDispatch()
+
+  const fetchData = async () => {
+    try {
+      // store user's info in the store
+      const token = await getToken() 
+      const user = await userTools.getUserInfos(token)
+
+      if(user) {
+        console.log("updated user from home", user)
+        dispatch(updateUser(user))
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    if(isSignedIn) {
+      (async () => {
+        await fetchData()
+      })()
+    }
+  }, [])
 
   const onTestPress = async () => {
     try {
