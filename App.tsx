@@ -168,6 +168,7 @@ export default function App(): JSX.Element {
           <ClerkLoaded>
             <NavigationContainer>
               <Stack.Navigator screenOptions={options}>
+                <Stack.Screen name="Stocks" component={StocksScreen} />
                 <Stack.Screen name="Home" component={HomeScreen} />
                 <Stack.Screen name="SignUp" component={SignUpScreen} />
                 <Stack.Screen name="SignIn" component={SignInScreen} />
