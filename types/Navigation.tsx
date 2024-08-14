@@ -4,8 +4,22 @@ type RootStackParamList = {
   Home: undefined;
   SignIn: undefined;
   SignUp: undefined;
-  TabNavigatorUser: undefined;
-  TabNavigatorProducer: undefined;
+  TabNavigatorUser: {
+    screen: 'Accueil' 
+    | 'Panier'
+    | 'Favoris'
+    | 'Profil'
+    | 'ShopUser'
+    | 'WithdrawModesUser'
+    | 'OrderCustomer'
+    | 'PaymentCustomer'
+  };
+  TabNavigatorProducer: {
+    screen: 'Accueil' 
+    | 'Boutique'
+    | 'Business Center'
+    | 'ProducerProfile'
+  };
   GestionDesStocks: undefined;
   ShopProducer: undefined;
   ProfilProducer: undefined;

@@ -93,14 +93,14 @@ export default function ProfilScreen({ navigation }: Props) {
 
   const switchProducer = () => {
     navigation.navigate('TabNavigatorProducer', {
-      screen: 'Accueil',
+      screen: 'ProducerProfile',
     })
   }
 
 
   const handleOrdersPress = () => {
     navigation.navigate('TabNavigatorUser', {
-      screen: 'OrdersCustomer',
+      screen: 'OrderCustomer',
     })
   }
 
