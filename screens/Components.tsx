@@ -12,7 +12,7 @@ import Producer from '../components/cards/Producer';
 import Status from '../components/cards/Status';
 import Cancelled from '../components/utils/badges/Cancelled';
 import Delivered from '../components/utils/badges/Delivered';
-import Partial from '../components/utils/badges/Partial';
+import Partial from '../components/utils/badges/WithdrawStatus';
 import PrimaryEnd from '../components/utils/buttons/PrimaryEnd';
 import PrimaryStart from '../components/utils/buttons/PrimaryStart';
 import SecondaryEnd from '../components/utils/buttons/SecondaryEnd';

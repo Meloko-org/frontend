@@ -28,7 +28,7 @@ export default function SearchCustomerScreen({ route, navigation }: Props): JSX.
   useEffect(() => {
     const newOrder = userStore.orders.find(o => o._id === route.params.orderId)
     setNewOrderDetails(newOrder)
-  }, [])
+  }, [route.params])
 
   let clickCollectOrdersDisplay = <></>
   let marketOrdersDisplay = <></>
@@ -84,8 +84,11 @@ export default function SearchCustomerScreen({ route, navigation }: Props): JSX.
         <TextBody1 centered extraClasses='mb-2'>Votre commande est maintenant payée. Vous recevrez un e-mail lorsqu'elle sera confirmée.</TextBody1>
         <TextHeading4 centered extraClasses='mb-4'>{`Commande n° ${route.params.orderId.slice(0, 7)}`}</TextHeading4>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {clickCollectOrdersDisplay}
-          {marketOrdersDisplay}
+          <View className='p-3'>
+            {clickCollectOrdersDisplay}
+            {marketOrdersDisplay}
+          </View>
+
         </ScrollView>
       </View>
     </SafeAreaView>

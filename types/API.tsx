@@ -1,3 +1,15 @@
+type OrderData = {
+  _id: string
+  user: UserData
+  details: [{
+    products: [StockData]
+    withdrawMode: string
+    shop: ShopData
+  }]
+  isWithdraw: boolean
+  isPaid: boolean
+}
+
 type ProductData = {
   _id: string
   name: string;
@@ -59,7 +71,7 @@ type UserData = {
   bookmarks: object[] | null
   favSearch: object[] | null
   orders: object[]
-  clerkPasswordEnabled: boolean | null
+  clerkPasswordEnabled: boolean | null | undefined
 }
 
 export type {
@@ -68,5 +80,6 @@ export type {
   UserData,
   StockData,
   CartData,
-  MarketData
+  MarketData,
+  OrderData
 }

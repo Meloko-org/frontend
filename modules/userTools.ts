@@ -17,7 +17,8 @@ const getUserInfos = async (token: string) => {
       }
     })
     const data = await response.json()
-    return (data) ? data : false
+    
+    return data
 
   } catch (error) {
     console.error(error)

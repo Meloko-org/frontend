@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/Navigation';
 import { ShopData, ProductData, StockData } from '../../types/API';
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from '../../reducers/user';
+import { useAuth } from '@clerk/clerk-expo'
 
 import StarsNotation from '../../components/utils/StarsNotation';
 import TextHeading2 from '../../components/utils/texts/Heading2';
@@ -39,16 +42,21 @@ type Route = {
 }
 
 export default function ShopUserScreen({ route, navigation }: Props) {
+  const dispatch = useDispatch()
+  const userStore = useSelector((state: { user }) => state.user.value)
+  const { signOut, isSignedIn, getToken } = useAuth()
+
   const [shopData, setShopData] = useState<ShopData>(null);
   const [searchProducts, setSearchProducts] = useState<StockData[]>([]);
-  const [shopDistance, setShopDistance] = useState<number>(0)
+  const [shopDistance, setShopDistance] = useState<number | null>(null)
   const [selectedCategoryProducts, setSelectedCategoryProducts] = useState<StockData[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-
-// Shop recovery
+  const [isSearchResultsModalVisible, setIsSearchResultsModalVisible] = useState(false)
+  const [isBookmarked, setIsBookmarked] = useState(false)
+  // Shop recovery
   useEffect(() => {
     const { shopId, relevantProducts, distance }: Route = route.params
-    setShopDistance(distance.toFixed(2))
+    distance ? setShopDistance(distance.toFixed(2)) : null
 
     if (relevantProducts.length > 0) {
       setSearchProducts(relevantProducts)
@@ -63,12 +71,59 @@ export default function ShopUserScreen({ route, navigation }: Props) {
       });
   }, [route.params]);
 
+  useEffect(() => {
+    if(userStore.bookmarks && shopData && userStore.bookmarks.some(i => i._id === shopData._id)) {
+      setIsBookmarked(true)
+    } else {
+      setIsBookmarked(false)
+    }
+
+  }, [userStore, shopData, route.params])
+
   const handleBookmarkPress = async ():Promise<void> => {
-    console.log("bookmark")
+    isBookmarked ? removeFromBookmark() : addToBookmark()
+  }
+
+  const addToBookmark = async () => {
+    try {
+      const token = await getToken()
+      const response = await fetch(`${API_ROOT}/users/bookmarks/${shopData._id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          mode: 'cors', 
+        }
+      })
+      const data = await response.json()
+      setIsBookmarked(true)
+      dispatch(updateUser(data.user))
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const removeFromBookmark = async () => {
+    try {
+      const token = await getToken()
+      const response = await fetch(`${API_ROOT}/users/bookmarks/${shopData._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          mode: 'cors', 
+        }
+      })
+      const data = await response.json()
+      setIsBookmarked(false)
+      dispatch(updateUser(data.user))
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const handleAllResultsPress =  async ():Promise<void> => {
-    console.log("all results")
+    setIsSearchResultsModalVisible(true)
   }
 
 
@@ -152,16 +207,21 @@ export default function ShopUserScreen({ route, navigation }: Props) {
                       <Image source={require('../../assets/icon.png')} resizeMode="cover" width={112} height={112} className='w-28 h-28 rounded-full'/>
                     )}
                   </View>
-                  <View className='flex flex-row justify-start w-3/6 h-full'>
+                  <View className={`${isSignedIn ? 'w-3/6' : 'w-4/6'} flex flex-row justify-start h-full`}>
                     <TextBody1>{shopData.description}</TextBody1>
                   </View>
-                  <View className='w-1/6 h-full'>
-                    <ButtonIcon 
-                      iconName="heart"
-                      extraClasses='h-16'
-                      onPressFn={handleBookmarkPress}
-                    />
-                  </View>
+                  {
+                    isSignedIn && (
+                      <View className='w-1/6 h-full'>
+                        <ButtonIcon 
+                          iconName={isBookmarked ? 'heart' : 'heart-o'}
+                          extraClasses='h-16'
+                          onPressFn={handleBookmarkPress}
+                        />
+                      </View>
+                    )
+                  }
+
                 </View>
               </View>
 
@@ -170,7 +230,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
                 <StarsNotation iconNames={['star', 'star-half', 'star-o']} shopData={shopData} />
                 { shopData.clickCollect && <BadgeSecondary uppercase>Click & collect</BadgeSecondary> }
                 { shopData.markets.length > 0 && <BadgeSecondary uppercase>Marché local</BadgeSecondary> }
-                <BadgeSecondary>{`${shopDistance}km`}</BadgeSecondary>
+                { shopDistance && <BadgeSecondary>{`${shopDistance}km`}</BadgeSecondary> }
               </View>
             </View>
             )
@@ -197,6 +257,9 @@ export default function ShopUserScreen({ route, navigation }: Props) {
                     {searchProduct} 
                   </View>
                   <ButtonPrimaryEnd label={`Tous les résultats (${searchProduct.length})`} iconName="arrow-right" onPressFn={handleAllResultsPress}></ButtonPrimaryEnd>
+              
+              
+              
               </View>
             )
           }
@@ -225,6 +288,26 @@ export default function ShopUserScreen({ route, navigation }: Props) {
               </View>
             </SafeAreaView>
           </Modal>
+          {
+            searchProduct.length > 0 && 
+            (
+              <Modal visible={isSearchResultsModalVisible} animationType="slide" onRequestClose={() => setIsSearchResultsModalVisible(false)}>
+                <SafeAreaView className='bg-lightbg flex-1 dark:bg-darkbg'>
+                  <View className='p-3'>
+                    <ButtonBack 
+                      onPressFn={() => setIsSearchResultsModalVisible(false)}
+                    />
+
+                    <TextHeading2 extraClasses='mb-4'>Tous vos resultats</TextHeading2>
+                    <ScrollView showsVerticalScrollIndicator={false} className='w-full'>
+                      {searchProduct} 
+                    </ScrollView>
+                  </View>
+                </SafeAreaView>
+              </Modal>
+            ) 
+          }
+
         </ScrollView>
       </View>
     

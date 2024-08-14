@@ -126,6 +126,7 @@ export default function StripePaymentButton(props) {
         iconName={props.iconName}
         onPressFn={() => openPaymentSheet()} 
         isLoading={isPaymentScreenLoading}
+        extraClasses='mb-3'
       />
     </StripeProvider>
   );

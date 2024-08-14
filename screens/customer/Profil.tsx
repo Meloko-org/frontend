@@ -1,15 +1,15 @@
-import { StyleSheet, View, SafeAreaView, Alert } from 'react-native';
+import { View, SafeAreaView, Alert } from 'react-native';
 import React from "react";
 import { useColorScheme } from "nativewind";
 
 
 import Text from '../../components/utils/inputs/Text'
 import ButtonPrimaryEnd from '../../components/utils/buttons/PrimaryEnd'
+import ButtonSecondaryEnd from '../../components/utils/buttons/SecondaryEnd';
 import Custom from '../../components/utils/buttons/Custom';
 import { useAuth } from '@clerk/clerk-expo'
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { UserState, updateUser } from '../../reducers/user';
 import SignInScreen from '../Signin';
 import TextHeading2 from '../../components/utils/texts/Heading2';
@@ -22,6 +22,7 @@ const FontAwesome = _Fontawesome as React.ElementType
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/Navigation'
+import TextHeading4 from '../../components/utils/texts/Heading4';
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'Home'
@@ -59,7 +60,7 @@ export default function ProfilScreen({ navigation }: Props) {
       setLastname(user.lastname)
       setEmail(user.email)
     }
-  }, [user])
+  }, [user, isSignedIn])
 
   const handleSaveUser = async () => {
     try {
@@ -96,25 +97,25 @@ export default function ProfilScreen({ navigation }: Props) {
     })
   }
 
-  const toggleMode = () => {
-    if(graphicMode === 'Light') {
-      setGraphicMode('Dark')
-    } else {
-      setGraphicMode('Light')
-    }
-    toggleColorScheme()
+
+  const handleOrdersPress = () => {
+    navigation.navigate('TabNavigatorUser', {
+      screen: 'OrdersCustomer',
+    })
   }
 
   return (
 
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <View className="p-3">
-      <TextHeading2 extraClasses="mb-5">Profil</TextHeading2>
+      
       {
-        isSignedIn && (
+        isSignedIn ? (
+          
           <View className="h-full relative flex items-center">
+            <TextHeading2 extraClasses="mb-5">Profil</TextHeading2>
             <View className="w-full">
-            { user.clerkPasswordEnabled ? (
+            { user.clerkPasswordEnabled === true ? (
               <>
                 <Text 
                   placeholder="Changez votre email"
@@ -142,51 +143,83 @@ export default function ProfilScreen({ navigation }: Props) {
               <>
                 <View className="ml-2">
                   <TextBody2 extraClasses='font-bold text-secondary/60'>EMAIL</TextBody2>
-                  <TextBody1 extraClasses="mb-5">{user.email}</TextBody1>
+                  <TextHeading4 extraClasses="mb-5">{user.email}</TextHeading4>
                 </View>
               </>
             )}
-            
-            <Text 
-              placeholder="Saisissez votre nom"
-              label="Nom"
-              onChangeText={(value: string) => setFirstname(value)}
-              value={firstname}
-              extraClasses='mb-2'
-              ></Text>
-            <Text 
-              placeholder="Saisissez votre prénom"
-              label="Prénom"
-              onChangeText={(value: string) => setLastname(value)}
-              value={lastname}
-              extraClasses='mb-2'
-              ></Text>
-            <View className="rounded-full bg-warning flex justify-center items-center mb-5 w-[50px] h-[50px]">
-              <FontAwesome name="github-alt" size={35} color="#FFFFFF"  className="absolute" />
+            <View className='flex flex-row justify-between items-center'>
+              <View className='flex flex-row justify-center items-center w-2/6'>
+                <View className="rounded-full bg-warning flex flex-row justify-center items-center mb-5 w-[100px] h-[100px]">
+                  <FontAwesome name="github-alt" size={80} color="#FFFFFF"  className="absolute" />
+                </View>
+              </View>
+
+              <View className='w-4/6'>
+                <Text 
+                  placeholder="Saisissez votre nom"
+                  label="Nom"
+                  onChangeText={(value: string) => setFirstname(value)}
+                  value={firstname}
+                  extraClasses='mb-2'
+                  />
+                <Text 
+                  placeholder="Saisissez votre prénom"
+                  label="Prénom"
+                  onChangeText={(value: string) => setLastname(value)}
+                  value={lastname}
+                  extraClasses='mb-2'
+                  />
+              </View>
+
+
             </View>
+
             <ButtonPrimaryEnd 
               label="Enregistrer"
               iconName="save"
+              disabled={isUserSaveLoading}
+              onPressFn={() => handleSaveUser()}
+              extraClasses='mb-6'
+              isLoading={isUserSaveLoading}
+            />
+            <ButtonPrimaryEnd 
+              label="Mes commandes" 
+              iconName="arrow-right" 
+              onPressFn={handleOrdersPress} 
+              extraClasses='mb-3' 
+            />
+            <ButtonPrimaryEnd
+              label={colorScheme === 'dark' ? 'Mode clair' : 'Mode sombre' }
+              iconName={ colorScheme === 'dark' ? 'sun-o' : 'moon-o'}
               disabled={false}
-              onPressFn={() => handleRecord()}
-              ></ButtonPrimaryEnd>
-            <View className="mt-5">
-              <ButtonPrimaryEnd
-                label={`version ${(graphicMode === 'Light') ? "Dark" : "Light"}`}
-                iconName="arrow-right"
-                disabled={false}
-                onPressFn={toggleMode}
-              ></ButtonPrimaryEnd>
-            </View>
+              onPressFn={toggleColorScheme}
+              extraClasses='mb-3'
+            />
+            <ButtonSecondaryEnd 
+              label="Déconnection" 
+              iconName="arrow-right" 
+              onPressFn={onSignoutPress} 
+              extraClasses='mb-3' 
+            />
           </View>
               <Custom
                 label="Basculer en mode Producteur"
-                extraClasses="bg-tertiary dark:bg-lightbg rounded-full px-5 absolute bottom-[250px] h-[60px]"
+                extraClasses="bg-tertiary dark:bg-lightbg rounded-full px-5 absolute bottom-[100px] h-[60px]"
                 textClasses="text-lightbg dark:text-tertiary text-lg font-bold"
                 onPressFn={switchProducer}
               ></Custom>
           </View>
           
+        ) : (
+          <View className='flex justify-center items-center h-full'>
+            <TextHeading2 extraClasses='mb-3'>Connectez-vous pour voir votre profil.</TextHeading2>
+            <ButtonPrimaryEnd 
+              label="Connexion"
+              iconName='sign-in'
+              extraClasses='w-full'
+              onPressFn={() => setIsSigninModalVisible(true)}
+            />
+          </View>
         )
       }
       </View>

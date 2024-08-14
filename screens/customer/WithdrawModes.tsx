@@ -14,7 +14,7 @@ import Market from '../../components/cards/Market';
 import SignInScreen from '../Signin';
 import { updateWithdrawMode } from '../../reducers/cart'
 import TextHeading4 from '../../components/utils/texts/Heading4';
-
+import ButtonSecondaryStart from '../../components/utils/buttons/SecondaryStart';
 type SelectedMarkets = {
   
 }
@@ -155,15 +155,22 @@ export default function WithdrawModesScreen({ navigation }) {
             disabled={isPaymentDisabledButton} 
             label="Passer au paiement" 
             iconName="arrow-right" 
+            extraClasses=' mb-3'
             onPressFn={() => {
               !isSignedIn ? setIsSigninModalVisible(true) : navigation.navigate('TabNavigatorUser', { screen: 'PaymentCustomer' })
             }} 
+          />
+          <ButtonSecondaryStart 
+            label="Retour au panier" 
+            iconName="arrow-left" 
+            onPressFn={() => navigation.navigate('TabNavigatorUser', { screen: 'Panier' })} 
+            extraClasses='mb-3' 
           />
         </ScrollView>
       </View>
 
       <Modal visible={isMarketSelectModalVisible} animationType="slide" onRequestClose={() => setIsMarketSelectModalVisible(false)} className=''>
-        <SafeAreaView className='flex-1 dark:bg-darkbg'>
+        <SafeAreaView className='flex-1 bg-lightbg dark:bg-darkbg'>
           <View className='p-3'>
             <ButtonBack 
               onPressFn={() => setIsMarketSelectModalVisible(false)}

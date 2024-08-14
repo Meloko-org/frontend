@@ -97,7 +97,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
         } 
         
         if(props.navigation) {
-          
+          console.log("will transmit", searchOptions.address)
           props.navigation.navigate('TabNavigatorUser', {
             screen: 'Accueil',
             params: { 
@@ -199,17 +199,14 @@ export default function MapSearchBox(props: Props): JSX.Element {
               />
 
           </View>
-          {
     
-              <View className='h-7'>
-                <Text 
-                  className={`${openSearchBox && 'hidden'} text-sm w-full text-center font-bold text-secondary/40 my-1 dark:text-lightbg`}
-                >
-                  Cliquez pour plus d'options !
-                </Text>
-              </View>    
-
-          }
+          <View className='h-7'>
+            <Text 
+              className={`${openSearchBox && 'hidden'} text-sm w-full text-center font-bold text-secondary/40 my-1 dark:text-lightbg`}
+            >
+              Cliquez pour plus d'options !
+            </Text>
+          </View>    
 
           <TextHeading3
             extraClasses='mb-4'
@@ -250,7 +247,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
           <View style={{width: '100%'}} className='px-3 flex-row'>
             <Slider
                 containerStyle={{width: '80%'}}
-                value={searchOptions.radius.value}
+                value={searchOptions.radius ? searchOptions.radius.value : [20]}
                 step={20}
                 minimumValue={0}
                 maximumValue={100}
