@@ -157,7 +157,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
   // Formatting category  
   const categories = (shopData && shopData.notes) && shopData.categories.map(category => {
     return (
-      <ProductCategory category={category} onPressFn={() => handleCategoryClick(category.name)} key={category._id}/>
+      <ProductCategory category={category} onPressFn={() => handleCategoryClick(category.name)} key={category._id} extraClasses='mr-2'/>
     );
   });
 
@@ -202,9 +202,9 @@ export default function ShopUserScreen({ route, navigation }: Props) {
                 <View className='flex flex-row items-center mb-3'>
                   <View className='w-2/6'>
                     {shopData.logo ? (
-                      <Image source={{ uri: shopData.logo }} resizeMode="cover" className='rounded-full'/>
+                      <Image source={{ uri: shopData.logo }} resizeMode="cover" width={112} height={112} className='rounded-full border border-primary'/>
                     ) : (
-                      <Image source={require('../../assets/icon.png')} resizeMode="cover" width={112} height={112} className='w-28 h-28 rounded-full'/>
+                      <Image source={require('../../assets/icon.png')} resizeMode="cover" width={112} height={112} className='w-28 h-28 rounded-full border border-primary'/>
                     )}
                   </View>
                   <View className={`${isSignedIn ? 'w-3/6' : 'w-4/6'} flex flex-row justify-start h-full`}>

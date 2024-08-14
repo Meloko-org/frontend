@@ -37,7 +37,7 @@ export default function BookmarksScreen({ navigation }) {
           producersList.length > 0 ? (
             <>
               <TextHeading2 extraClasses='mb-3'>Vos producteurs favoris</TextHeading2>
-              <ScrollView showsVerticalScrollIndicator={false} className='flex-1 p-3'>
+              <ScrollView showsVerticalScrollIndicator={false} className='flex-1'>
                 { producersList }
               </ScrollView>
             </>

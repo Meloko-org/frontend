@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { StyleSheet, View, ScrollView, } from 'react-native'
+import { StyleSheet, View, ScrollView, SafeAreaView, } from 'react-native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/Navigation'
 import { Region } from 'react-native-maps';
@@ -122,6 +122,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
         {/* {currentPosition && <Marker coordinate={currentPosition} title="My position" pinColor="#fecb2d" />} */}
         {markers}
       </MapView>
+      <SafeAreaView className='w-full h-full absolute'>
       <View className="flex flex-row justify-center" style={{position: 'absolute', top: 50, width: '100%'}}>
         <MapSearchBox
           search={route.params.search}
@@ -151,9 +152,6 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
               </View>
 
               <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1, width: '100%'}} className='px-3'>
-                
-
-
                 {producersList}
               </ScrollView>
               
@@ -162,7 +160,10 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
         )
       }
 
+      </SafeAreaView>      
+
     </View>
+
   )
 }
 

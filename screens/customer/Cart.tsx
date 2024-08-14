@@ -1,4 +1,4 @@
-import { SafeAreaView, View } from 'react-native';
+import { SafeAreaView, View, ScrollView } from 'react-native';
 import React, { useState, useEffect } from "react";
 import TextHeading2 from '../../components/utils/texts/Heading2';
 import TextHeading3 from '../../components/utils/texts/Heading3';
@@ -60,28 +60,32 @@ export default function CartScreen({ navigation }) {
 
   return (
     <SafeAreaView className='flex-1 bg-lightbg dark:bg-darkbg'>
+
       <View className='p-3 flex flex-column h-full'>
         
         {
           products.length > 0 ? (
             <>
               <TextHeading2 extraClasses='mb-4'>Votre panier</TextHeading2>
-              {products}
-              <TextHeading3 extraClasses='py-3 text-right'>{`TOTAL: ${cartTotal}€`}</TextHeading3>
+              <ScrollView>
+                {products}
+                <TextHeading3 extraClasses='py-3 text-right'>{`TOTAL: ${cartTotal.toFixed(2)}€`}</TextHeading3>
 
-              <ButtonPrimaryEnd label="Mes modes de retrait" iconName="arrow-right" onPressFn={handleWithdrawModePress} extraClasses='mb-3' />
+                <ButtonPrimaryEnd label="Mes modes de retrait" iconName="arrow-right" onPressFn={handleWithdrawModePress} extraClasses='mb-3' />
 
-              <ButtonSecondaryStart 
-                label="Continuer vos achats" 
-                iconName="arrow-left" 
-                onPressFn={() =>     navigation.navigate('TabNavigatorUser', {
-                  screen: 'Accueil',
-                  params: {
-                    search: {}
-                  }
-                }) } 
-                
-              />
+                <ButtonSecondaryStart 
+                  label="Continuer vos achats" 
+                  iconName="arrow-left" 
+                  onPressFn={() =>     navigation.navigate('TabNavigatorUser', {
+                    screen: 'Accueil',
+                    params: {
+                      search: {}
+                    }
+                  }) } 
+                  
+                />
+              </ScrollView>
+
             </>
           ) : (
             <View className='h-full justify-center items-center'>

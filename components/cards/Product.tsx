@@ -78,7 +78,16 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 				{
 					props.showImage && (
 						<View className="flex flex-row items-center rounded-lg w-auto h-full">
-							<Image source={require('../../assets/images/tomate.webp')} className="rounded-full w-20 h-20" alt={`logo de la boutique ${props.stockData.product.name}`} resizeMode="cover" width={96} height={64}/>
+							<Image 
+								source={
+									props.stockData.product.image ? 
+									{uri: props.stockData.product.image} :
+									require('../../assets/icon.png')
+								} 
+								className="rounded-full w-20 h-20" 
+								alt={`Illustration du produit ${props.stockData.product.name}`} 
+								resizeMode="cover" width={96} height={64}
+							/>
 						</View>
 					)
 				}

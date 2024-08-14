@@ -26,7 +26,11 @@ export default function CardProducerSearchResult(props: CardProducerSearchResult
 				{
 					props.displayMode !== 'order' && (
 						<View className="flex flex-row items-center rounded-lg w-24 h-full">
-							<Image source={require('../../assets/images/tomate.webp')} className="rounded-full w-24 h-24" alt={`logo de la boutique ${props.shopData.name}`} resizeMode="cover" width={96} height={64}/>
+							<Image source={
+									props.shopData.logo ? 
+									{uri: props.shopData.logo} :
+									require('../../assets/icon.png')
+								} className="rounded-full border border-primary w-24 h-24" alt={`logo de la boutique ${props.shopData.name}`} resizeMode="cover" width={96} height={64}/>
 						</View>
 					)
 				}
