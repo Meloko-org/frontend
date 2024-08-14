@@ -162,21 +162,6 @@ export default function StocksScreen({ navigation }: Props) {
         ))}
       </ScrollView>
 
-      {/* Footer */}
-      <View style={styles.footer}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <FontAwesome name="home" style={styles.footerIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Panier')}>
-          <FontAwesome name="shopping-cart" style={styles.footerIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Favoris')}>
-          <FontAwesome name="heart" style={styles.footerIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Profil')}>
-          <FontAwesome name="user-circle" style={styles.footerIcon} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }

@@ -106,6 +106,7 @@ export default function HomeScreen({ navigation }: Props) {
         )
       }
       <Button title="Test" onPress={onTestPress} /> 
+      <Button title="Test" onPress={() => navigation.navigate('TabNavigatorProducer', { screen: 'Stocks'})} /> 
     </View>
     </SafeAreaView>
 

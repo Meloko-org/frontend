@@ -156,6 +156,8 @@ const TabNavigatorProducer: React.FC = () => {
       <Tab.Screen name="Boutique" component={ShopProducerScreen} />
       <Tab.Screen name="Business Center" component={BusinessScreen} />
       <Tab.Screen name="ProducerProfile" component={ProfilProducerScreen} />
+      <Tab.Screen name="Stocks" component={StocksScreen} options={{ tabBarButton: () => null }} />
+
     </Tab.Navigator>
   );
 };
@@ -168,7 +170,6 @@ export default function App(): JSX.Element {
           <ClerkLoaded>
             <NavigationContainer>
               <Stack.Navigator screenOptions={options}>
-                <Stack.Screen name="Stocks" component={StocksScreen} />
                 <Stack.Screen name="Home" component={HomeScreen} />
                 <Stack.Screen name="SignUp" component={SignUpScreen} />
                 <Stack.Screen name="SignIn" component={SignInScreen} />
