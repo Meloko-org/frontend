@@ -29,7 +29,7 @@ export default function Market(props: CardMarketProps): JSX.Element {
 				<View className="flex-none justify-center rounded-lg w-auto h-16">
 					<Image source={require('../../assets/images/tomate.webp')} className="rounded-full w-16 h-16" alt="fgsd" resizeMode="cover" width={100} height={50}/>
 				</View>
-				<View className="grow px-1 w-3/5">
+				<View className="px-1 w-3/5">
 					<TextHeading4>{ props.marketData.name }</TextHeading4>
 					<TextBody1>{ props.marketData.description }</TextBody1>
 				</View>

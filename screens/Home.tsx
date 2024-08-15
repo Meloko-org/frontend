@@ -132,8 +132,14 @@ export default function HomeScreen({ navigation }: Props) {
               <>
                 <ButtonPrimaryEnd 
                   label={`Mes favoris (${userStore.bookmarks.length})`}
+                  iconName="user-circle"  
+                  onPressFn={() => navigation.navigate('TabNavigatorUser', { screen: 'Profil' })} 
+                  extraClasses='mb-3' 
+                />
+                <ButtonPrimaryEnd 
+                  label={`Mon profil`}
                   iconName="heart"  
-                  onPressFn={() => navigation.navigate('TabNavigatorUser', { screen: 'BookmarksCustomer' })} 
+                  onPressFn={() => navigation.navigate('TabNavigatorUser', { screen: 'Profil' })} 
                   extraClasses='mb-3' 
                 />
               </>
@@ -150,7 +156,7 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
 
         <View className="flex-1 w-full justify-end items-center mb-5">
-          <TextHeading3 centered>Vous étes un producteur ?</TextHeading3>
+          <TextHeading3 centered>Vous êtes un producteur ?</TextHeading3>
           <TextBody1 extraClasses='px-5 mb-3 text-wrap w-full' centered>Connectez-vous ou créez votre compte pro.</TextBody1>
           <ButtonPrimaryEnd
             label="Compte Pro"

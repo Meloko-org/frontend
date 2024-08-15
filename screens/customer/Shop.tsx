@@ -198,7 +198,9 @@ export default function ShopUserScreen({ route, navigation }: Props) {
             shopData && ( 
               <View className='flex-1'>
                 <View>
-                <TextHeading2 extraClasses='mb-4'>{shopData.name}</TextHeading2>
+                <TextHeading2>{shopData.name}</TextHeading2>
+                <StarsNotation iconNames={['star', 'star-half', 'star-o']} shopData={shopData}  extraClasses='mb-4'/>
+
                 <View className='flex flex-row items-center mb-3'>
                   <View className='w-2/6'>
                     {shopData.logo ? (
@@ -227,7 +229,6 @@ export default function ShopUserScreen({ route, navigation }: Props) {
 
 
               <View className='flex flex-row w-full justify-evenly mb-3'>
-                <StarsNotation iconNames={['star', 'star-half', 'star-o']} shopData={shopData} />
                 { shopData.clickCollect && <BadgeSecondary uppercase>Click & collect</BadgeSecondary> }
                 { shopData.markets.length > 0 && <BadgeSecondary uppercase>Marché local</BadgeSecondary> }
                 { shopDistance && <BadgeSecondary>{`${shopDistance}km`}</BadgeSecondary> }

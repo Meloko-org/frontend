@@ -120,7 +120,6 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
         {/* {currentPosition && <Marker coordinate={currentPosition} title="My position" pinColor="#fecb2d" />} */}
         {markers}
       </MapView>
-      <SafeAreaView className='w-full h-full absolute'>
       <View className="flex flex-row justify-center" style={{position: 'absolute', top: 50, width: '100%'}}>
         <MapSearchBox
           search={(route.params && route.params.search) ? route.params.search : undefined}
@@ -157,8 +156,6 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
           </BottomSheet>
         )
       }
-
-      </SafeAreaView>      
 
     </View>
 
