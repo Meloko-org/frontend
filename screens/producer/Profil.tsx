@@ -113,7 +113,7 @@ export default function ProfilProducerScreen({ navigation }: Props) {
             />
             <Text
               label="BIC"
-              placeholder="Saisissez vitre Bic"
+              placeholder="Saisissez votre Bic"
               value={bic}
               onChangeText={(value: string) => setBic(value)}
               extraClasses='mb-2'
