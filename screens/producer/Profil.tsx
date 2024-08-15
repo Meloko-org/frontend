@@ -82,7 +82,7 @@ export default function ProfilProducerScreen({ navigation }: Props) {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-lightbg dark:darkbg">
+    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
 
       <View className="items-center w-full flex-1">
         
@@ -191,14 +191,12 @@ export default function ProfilProducerScreen({ navigation }: Props) {
               onPressFn={() => handleProducerSave()} />
           {/* </View> */}
         </ScrollView>
-
-        <Custom
-          label="Basculer en mode Utilisateur"
-          extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-5 px-5 h-[60px]"
-          textClasses="text-lightbg dark:text-tertiary text-lg font-bold"
-          onPressFn={switchUser}
-        ></Custom>
-
+          <Custom
+            label="Basculer en mode Utilisateur"
+            extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-5 px-5 h-[60px]"
+            textClasses="text-lightbg dark:text-tertiary text-lg font-bold"
+            onPressFn={switchUser}
+          />
       </View>
     </SafeAreaView>
   );

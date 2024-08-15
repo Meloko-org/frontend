@@ -44,9 +44,10 @@ const updateUser = async (token: string, values: string) => {
 
     return data
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
+
 
 export default { 
   getUserInfos,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { SafeAreaView, ScrollView, View, Modal } from 'react-native';
+import { SafeAreaView, ScrollView, View, Modal, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/Navigation'
 import TextHeading2 from '../../components/utils/texts/Heading2';
@@ -9,6 +9,7 @@ import ButtonBack from '../../components/utils/buttons/Back';
 import CardProducer from '../../components/cards/ProducerSearchResult';
 import TextHeading3 from '../../components/utils/texts/Heading3';
 import ButtonPrimaryEnd from '../../components/utils/buttons/PrimaryEnd';
+import CardProduct from '../../components/cards/Product';
 
 type OrdersScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -33,15 +34,20 @@ export default function OrdersCustomerScreen({ navigation }: Props): JSX.Element
     const marketOrders = selectedOrder.details.filter(d => d.withdrawMode === 'market')
     
     clickCollectOrdersDisplay = clickCollectOrders.map(cco => {
+      const productList = cco.products.map(p => {
+        return  (
+          <CardProduct
+            stockData={{...p.product, notes: cco.shop.notes, quantity: p.quantity}}
+            key={p.product._id}
+            extraClasses='mb-1'
+            displayMode='cart'
+          />
+        )         
+      })
+
+
       return (
         <View key={cco._id} className='my-2 flex items-center'>
-          <TextHeading2 centered extraClasses='mb-2'>Click & Collect</TextHeading2>
-          <ButtonPrimaryEnd 
-            label="Itinéraire optimal"
-            iconName='location-arrow'
-            onPressFn={() => console.log("open google map")}
-            extraClasses='w-80 mb-3'            
-          />
           <CardProducer 
             shopData={cco.shop}
             withdrawData={cco.products}
@@ -49,15 +55,38 @@ export default function OrdersCustomerScreen({ navigation }: Props): JSX.Element
             extraClasses='mb-1'
             displayMode='order'
             showDirectionButton
+            onPressFn={
+              () => { 
+                setIsOrderDetailModalVisible(false)
+                navigation.navigate('TabNavigatorUser', {
+                  screen: 'ShopUser',
+                  params: { 
+                    shopId: cco.shop._id,
+                    distance: null,
+                    relevantProducts: [] 
+                  },
+                }) 
+              }
+            }
           />
+          {productList}
         </View>
       )
     })
 
     marketOrdersDisplay = marketOrders.map(mo => {
+      const productList = mo.products.map(p => {
+        return  (
+          <CardProduct
+            stockData={{...p.product, notes: mo.shop.notes, quantity: p.quantity}}
+            key={p.product._id}
+            extraClasses='mb-1'
+            displayMode='cart'
+          />
+        )         
+      })
       return (
         <View key={mo._id} className='my-2'>
-          <TextHeading2 centered extraClasses='mb-2'>Marchés locaux</TextHeading2>
           <CardProducer 
             shopData={mo.shop}
             withdrawData={mo.products}
@@ -65,7 +94,21 @@ export default function OrdersCustomerScreen({ navigation }: Props): JSX.Element
             extraClasses='mb-1'
             displayMode='order'
             showDirectionButton
+            onPressFn={
+              () => { 
+                setIsOrderDetailModalVisible(false)
+                navigation.navigate('TabNavigatorUser', {
+                  screen: 'ShopUser',
+                  params: { 
+                    shopId: mo.shop._id,
+                    distance: null,
+                    relevantProducts: [] 
+                  },
+                }) 
+              }
+            }
           />
+          {productList}
         </View>
       )
     })
@@ -93,25 +136,6 @@ export default function OrdersCustomerScreen({ navigation }: Props): JSX.Element
     </>
   )
 
-  const producersPerOrder = (producers) => {
-    console.log(producers)
-    const producersDisplay = producers.map(p => {
-      return (
-        <>
-          <CardProducer 
-            shopData={p.shop}
-            key={p._id}
-            displayMode='bottomSheet'
-            extraClasses='mb-2'
-          />
-        </>
-
-      )
-    })
-
-    return producersDisplay
-  }
-
   return (
     <SafeAreaView className='flex-1 bg-lightbg dark:bg-darkbg'>
       <View className='flex-1'>
@@ -134,11 +158,28 @@ export default function OrdersCustomerScreen({ navigation }: Props): JSX.Element
                 {
                   selectedOrder && (
                     <>
-                      <TextHeading2 extraClasses='mb-4'>{ `Commande n° ${selectedOrder._id.slice(0, 7)}`}</TextHeading2>
-
+                      <TextHeading2 extraClasses='mb-1'>{ `Commande n° ${selectedOrder._id.slice(0, 7)}`}</TextHeading2>
+                      <TextHeading3 extraClasses='mb-4' centered>{new Date(selectedOrder.createdAt).toLocaleString()}</TextHeading3>
                       <ScrollView showsVerticalScrollIndicator={false}>
+                        <View className='items-center'>
+                        {clickCollectOrdersDisplay.length > 0 && (
+                          <>
+                            <TextHeading2 centered extraClasses='mb-2'>Click & Collect</TextHeading2>
+                            <ButtonPrimaryEnd 
+                              label="Itinéraire optimal"
+                              iconName='location-arrow'
+                              onPressFn={() => console.log("open google map")}
+                              extraClasses='w-80 mb-3'            
+                            />
+                          </> 
+
+                        )}
                         {clickCollectOrdersDisplay}
+                        {marketOrdersDisplay.length > 0 && <TextHeading2 centered extraClasses='mb-2'>Marchés locaux</TextHeading2>}
                         {marketOrdersDisplay}
+                        
+                        </View>                        
+
                       </ScrollView>
 
                     </>

@@ -76,25 +76,20 @@ export default function SignInScreen(props) {
 
   useEffect(() => {
     if(isSignedIn) {
-      console.log("is signedin")
       if(performedSignedIn) {
-        console.log("performed signedin")
         fetchData()
         setPerformedSignedIn(false)
         setPerformedSignedUp(false)
       }
 
       if(performedSignedUp) {
-        console.log("performed signup")
         setTimeout(() => {
-          console.log("execute timeout")
           fetchData()
           setPerformedSignedIn(false)
           setPerformedSignedUp(false)
         }, 3000);
       }
     } else {
-      console.log("is not signedin")
 
     }
 
@@ -103,7 +98,6 @@ export default function SignInScreen(props) {
 
   const fetchData = async () => {
     try {
-      console.log("fetch data")
       // store user's info in the store
       const token = await getToken() 
       const user = await userTools.getUserInfos(token)
@@ -255,7 +249,7 @@ export default function SignInScreen(props) {
           <InputText 
             value={password}
             onChangeText={(newPassword: string) => setPassword(newPassword)}
-            placeholder="example@gmail.com" 
+            placeholder="Mot de passe" 
             label="Mot de passe"
             autoCapitalize="none"
             extraClasses="w-full mb-2"
@@ -284,8 +278,17 @@ export default function SignInScreen(props) {
               <InputText 
                 value={newPassword}
                 onChangeText={(newPassword: string) => setNewPassword(newPassword)}
-                placeholder="example@gmail.com" 
+                placeholder="Mot de passe" 
                 label="Mot de passe"
+                autoCapitalize="none"
+                extraClasses="w-full mb-2"
+                secureTextEntry={true}
+              />
+              <InputText 
+                value={newPassword}
+                onChangeText={(newPassword: string) => setNewPassword(newPassword)}
+                placeholder="Confirmer mot de passe" 
+                label="Confirmer mot de passe"
                 autoCapitalize="none"
                 extraClasses="w-full mb-2"
                 secureTextEntry={true}

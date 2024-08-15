@@ -21,14 +21,13 @@ type CardProductProps = {
 	onPressFn?: ((event: GestureResponderEvent) => void) | undefined
 	extraClasses?: string
 	displayMode: 'cart' | 'shop'
-	quantityControllable: boolean	
-	showImage: boolean
+	quantityControllable?: boolean	
+	showImage?: boolean
 }
 
 export default function CardProduct(props: CardProductProps): JSX.Element {
   const dispatch = useDispatch()
   const cartStore = useSelector((state: { cart }) => state.cart.value)
-
   const handleAddCartPress = async ():Promise<void> => {
     dispatch(addProductToCart({
 			shop: props.stockData.shop,
@@ -37,8 +36,23 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 
   }
 
-	const cartButton = cartStore.find(c => c.shop._id === props.stockData.shop._id) && 
-		cartStore.find(c => c.shop._id == props.stockData.shop._id).products.find(p => p.stockData._id === props.stockData._id) ? (
+	const productQuantity = () => {
+		if(cartStore.length > 0 
+			&& cartStore.find(c => c.shop._id === props.stockData.shop._id) 
+			&& cartStore.find(c => c.shop._id == props.stockData.shop._id).products.find(p => p.stockData._id === props.stockData._id)) {
+
+
+			} else {
+
+			}
+	}
+
+	const isInCart = () => {
+		return cartStore.find(c => c.shop._id === props.stockData.shop._id) 
+		&& cartStore.find(c => c.shop._id == props.stockData.shop._id).products.find(p => p.stockData._id === props.stockData._id)
+	}
+
+	const cartButton = (isInCart()) ? (
 		<>
 			{ 
 				props.quantityControllable && 
@@ -65,11 +79,16 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 					</TouchableOpacity> }
 		</>
 	) : (
-		<ButtonIcon 
-			iconName="cart-plus"
-			onPressFn={() => handleAddCartPress()}
-			extraClasses="h-20 w-full"
-		/>
+		props.stockData.quantity ? (
+			<BadgeGrey>{props.stockData.quantity}</BadgeGrey>
+		) : (
+			<ButtonIcon 
+				iconName="cart-plus"
+				onPressFn={() => handleAddCartPress()}
+				extraClasses="h-20 w-full"
+			/>
+		)
+
 	)
 
 	return (

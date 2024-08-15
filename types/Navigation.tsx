@@ -13,6 +13,7 @@ type RootStackParamList = {
     | 'WithdrawModesUser'
     | 'OrderCustomer'
     | 'PaymentCustomer'
+    | 'BookmarksCustomer'
   };
   TabNavigatorProducer: {
     screen: 'Accueil' 

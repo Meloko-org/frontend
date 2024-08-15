@@ -27,7 +27,7 @@ export default function InputText(props: InputTextProps): JSX.Element {
 
 	return (
 		<View className={`${props.extraClasses} flex flex-row rounded-lg p-2 shadow-sm border border-secondary bg-white ${props.size === 'large' ? 'h-[70px]' : 'text-xs'} dark:border-primary/20 dark:bg-tertiary`}>
-			<View className='flex w-4/6'>
+			<View className={`flex ${props.iconName ? 'w-4/6' : 'w-full'}`}>
 				<Text className={`${props.size === 'large' ? 'text-lg' : 'text-sm'} font-bold text-secondary/50 uppercase p-0 dark:text-lightbg/50`}>{props.label}</Text>
 				<TextInput 
 					value={props.value}

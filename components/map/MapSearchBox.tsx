@@ -71,6 +71,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
 
   useEffect(() => {
     if(props.search) {
+      console.log("search", props.search)
       setSearchOptions(props.search)
     }
   }, [])
@@ -97,7 +98,6 @@ export default function MapSearchBox(props: Props): JSX.Element {
         } 
         
         if(props.navigation) {
-          console.log("will transmit", searchOptions.address)
           props.navigation.navigate('TabNavigatorUser', {
             screen: 'Accueil',
             params: { 
@@ -342,7 +342,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
                 thumbTintColor='#98B66E'
             />
             <View className='flex flex-row items-center justify-center w-20'>
-              <Text>{searchOptions.radius.value[0]} km</Text>
+              <Text className='dark:text-lightbg'>{searchOptions.radius.value[0]} km</Text>
             </View>
           </View>
   

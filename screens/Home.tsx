@@ -9,8 +9,10 @@ import TextHeading1 from '../components/utils/texts/Heading1';
 import TextHeading2 from '../components/utils/texts/Heading2';
 import TextBody1 from '../components/utils/texts/Body1';
 import userTools from '../modules/userTools'
-import { useDispatch, useSelector } from "react-redux";
-import { UserState, updateUser } from '../reducers/user';
+import { useSelector, useDispatch } from 'react-redux';
+import { UserState, updateUser, resetUser } from '../reducers/user';
+import TextHeading4 from '../components/utils/texts/Heading4';
+import TextHeading3 from '../components/utils/texts/Heading3';
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -24,8 +26,8 @@ type Props = {
 export default function HomeScreen({ navigation }: Props) {
   // Import the Clerk Auth functions
   const { signOut, isSignedIn, getToken } = useAuth()
-  const [ isSigninModalVisible, setIsSigninModalVisible ] = useState(false)
-
+  const [isSigninModalVisible, setIsSigninModalVisible] = useState(false)
+  const [isSigninCustomerModalVisible, setIsSigninCustomerModalVisible] = useState(false)
   // Import the public api root address
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
   
@@ -39,7 +41,6 @@ export default function HomeScreen({ navigation }: Props) {
       const user = await userTools.getUserInfos(token)
 
       if(user) {
-        console.log("updated user from home", user)
         dispatch(updateUser(user))
       }
     } catch (error) {
@@ -58,7 +59,6 @@ export default function HomeScreen({ navigation }: Props) {
   const onTestPress = async () => {
     try {
       const token = await getToken()
-      console.log(token)
       const response = await fetch(`${API_ROOT}/auth/login`, {
         method: 'GET',
         headers: {
@@ -109,14 +109,11 @@ export default function HomeScreen({ navigation }: Props) {
   }
 
   const redirectProducer = () => {
-    console.log("producerId: ", userStore.producerId)
     if(userStore.producerId === null) {
-      console.log("navigate profile")
       navigation.navigate('TabNavigatorProducer', {
         screen: 'ProducerProfile'
       })
     } else {
-      console.log("navigate accueil")
       navigation.navigate('TabNavigatorProducer', {
         screen: 'Accueil'
       })
@@ -125,40 +122,54 @@ export default function HomeScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView className='flex-1 bg-lightbg dark:darkbg mt-5'>
-      <View className='flex-1 p-3 w-full h-full'>
-        <TextHeading1 extraClasses='mb-3'>Bienvenue</TextHeading1>
-        <ButtonPrimaryEnd label="Tous les producteurs" iconName="map" onPressFn={onMapPress} extraClasses='mb-3' />
-        <ButtonPrimaryEnd label="Recherche" iconName="search" onPressFn={() => navigation.navigate('SearchCustomer')} extraClasses='mb-3' />
-        <ButtonPrimaryEnd label="Gérer mes ventes" iconName="gear" onPressFn={() => navigation.navigate('TabNavigatorProducer')} extraClasses='mb-3' />
-        {
-          isSignedIn && (
-            <>
-              <ButtonPrimaryEnd label="Déconnection" iconName="arrow-right" onPressFn={onSignoutPress} extraClasses='mb-3' />
-            </>
-          )
-        }
-        <Button title="Test" onPress={onTestPress} />
-        <Button title="Test" onPress={() => navigation.navigate('TabNavigatorProducer', { screen: 'Stocks'})} /> 
+      <View className='flex justify-between p-3 w-full h-full'>
+        <View className='flex-1'>
+          <TextHeading1 extraClasses='mb-3'>Bienvenue</TextHeading1>
+          {/* <ButtonPrimaryEnd label="Tous les producteurs" iconName="map" onPressFn={onMapPress} extraClasses='mb-3' /> */}
+          <ButtonPrimaryEnd label="Recherche" iconName="search" onPressFn={() => navigation.navigate('SearchCustomer')} extraClasses='mb-3' />
+          {
+            isSignedIn ? (
+              <>
+                <ButtonPrimaryEnd 
+                  label={`Mes favoris (${userStore.bookmarks.length})`}
+                  iconName="heart"  
+                  onPressFn={() => navigation.navigate('TabNavigatorUser', { screen: 'BookmarksCustomer' })} 
+                  extraClasses='mb-3' 
+                />
+              </>
+            ) : (
+              <>
+                <ButtonPrimaryEnd label="Connexion" iconName="sign-in" onPressFn={() => setIsSigninCustomerModalVisible(true)} extraClasses='mb-3' />
+              </>
+            )
+          }
+          {/* <Button title="Test" onPress={onTestPress} />
+          <Button title="Test" onPress={() => navigation.navigate('TabNavigatorProducer', { screen: 'Stocks'})} />  */}
 
-        <View className="relative h-full w-full"> 
-          <View className="flex-1 absolute bottom-[500px] w-full h-[100px] items-center">
-            <TextBody1 extraClasses='px-5 text-wrap' centered={true}>Producteurs, connectez-vous ou créez votre compte professionel</TextBody1>
-            <ButtonPrimaryEnd
-              label="Compte Pro"
-              iconName="arrow-right"
-              disabled={false}
-              onPressFn={() => handleProducer()}
-              extraClasses='w-full'
-              ></ButtonPrimaryEnd>
-          </View>
+
         </View>
+
+        <View className="flex-1 w-full justify-end items-center mb-5">
+          <TextHeading3 centered>Vous étes un producteur ?</TextHeading3>
+          <TextBody1 extraClasses='px-5 mb-3 text-wrap w-full' centered>Connectez-vous ou créez votre compte pro.</TextBody1>
+          <ButtonPrimaryEnd
+            label="Compte Pro"
+            iconName="tags"
+            disabled={false}
+            onPressFn={() => handleProducer()}
+            extraClasses='w-full'
+            ></ButtonPrimaryEnd>
+        </View>
+
       </View>
 
       <SignInScreen   
-        showModal={isSigninModalVisible}
+        showModal={isSigninModalVisible || isSigninCustomerModalVisible}
         onCloseFn={() => {
+          isSigninModalVisible && redirectProducer()
           setIsSigninModalVisible(false)
-          redirectProducer()
+          setIsSigninCustomerModalVisible(false)
+          
         }}
       />
 

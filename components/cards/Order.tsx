@@ -32,7 +32,7 @@ export default function CardOrder(props: CardOrderProps): JSX.Element {
 	}
 
 	const dateDisplay = () => {
-		return new Date(props.orderData.createdAt).toLocaleDateString()
+		return new Date(props.orderData.createdAt).toLocaleString()
 	}
 
 	return (
@@ -44,7 +44,7 @@ export default function CardOrder(props: CardOrderProps): JSX.Element {
 						<TextBody2 extraClasses="mb-2">{`${dateDisplay()}`}</TextBody2>
 						<BadgeSecondary>{ `${nbProducts()} produit${nbProducts() > 1 ? 's' : ''} chez ${props.orderData.details.length} producteur${props.orderData.details.length > 1 ? 's' : ''}` }</BadgeSecondary>
 					</View>
-					<View className="pr-1 flex flex-column justify-center items-center">
+					<View className="pr-1 flex flex-column justify-start items-center h-full">
 						<BadgeWithdrawStatus 
 							type='none'
 						/>

@@ -8,9 +8,9 @@ type ButtonPrimaryEndProps = {
 	label: string
 	iconName: string
 	extraClasses?: string
-	disabled: boolean
+	disabled?: boolean
 	onPressFn: ((event: GestureResponderEvent) => void) | undefined
-	isLoading: boolean
+	isLoading?: boolean
 }
 
 export default function ButtonPrimaryEnd(props: ButtonPrimaryEndProps): JSX.Element {

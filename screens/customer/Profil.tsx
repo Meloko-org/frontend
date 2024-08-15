@@ -10,7 +10,9 @@ import Custom from '../../components/utils/buttons/Custom';
 import { useAuth } from '@clerk/clerk-expo'
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { UserState, updateUser } from '../../reducers/user';
+import { UserState, updateUser, resetUser } from '../../reducers/user';
+import { emptyCart } from '../../reducers/cart';
+
 import SignInScreen from '../Signin';
 import TextHeading2 from '../../components/utils/texts/Heading2';
 import TextBody1 from '../../components/utils/texts/Body1';
@@ -48,12 +50,8 @@ export default function ProfilScreen({ navigation }: Props) {
   const [firstname, setFirstname ] = useState('')
   const [lastname, setLastname ] = useState('')
   const [isUserSaveLoading, setUserSaveLoading] = useState(false)
-
-  const [graphicMode, setGraphicMode] = useState('Light')
  
-
   useEffect(() =>{
-    console.log(user.firstname)
     if(!isSignedIn) { 
       setIsSigninModalVisible(true)
     } else {
@@ -67,7 +65,6 @@ export default function ProfilScreen({ navigation }: Props) {
     try {
       setUserSaveLoading(true)
       const token = await getToken()
-      console.log("token", token)
       const values = (email) ? {email, firstname,  lastname} : {email: null, firstname,  lastname}
       const data = await userTools.updateUser(token, values)
 
@@ -77,7 +74,7 @@ export default function ProfilScreen({ navigation }: Props) {
       }
       setUserSaveLoading(false)
     } catch (error) {
-      console.log(error)
+      console.error(error)
       setUserSaveLoading(false)
 
     }
@@ -87,6 +84,8 @@ export default function ProfilScreen({ navigation }: Props) {
   const onSignoutPress = async () => {
     try {
       await signOut()
+      dispatch(resetUser())
+      dispatch(emptyCart())
     } catch (err) {
       console.error(JSON.stringify(err, null, 2))   
     }
@@ -101,7 +100,7 @@ export default function ProfilScreen({ navigation }: Props) {
 
   const handleOrdersPress = () => {
     navigation.navigate('TabNavigatorUser', {
-      screen: 'OrderCustomer',
+      screen: 'OrdersCustomer',
     })
   }
 
@@ -205,10 +204,9 @@ export default function ProfilScreen({ navigation }: Props) {
               />
             </View>
             </ScrollView>
-
               <Custom
                 label="Basculer en mode Producteur"
-                extraClasses="bg-tertiary dark:bg-lightbg rounded-full px-5 absolute bottom-[70px] h-[60px]"
+                extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-5 px-5 h-[60px]"
                 textClasses="text-lightbg dark:text-tertiary text-lg font-bold"
                 onPressFn={switchProducer}
               ></Custom>

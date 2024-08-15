@@ -7,6 +7,7 @@ import ButtonPrimaryStart from '../../components/utils/buttons/PrimaryStart';
 export default function BookmarksScreen({ navigation }) {
   const userStore = useSelector((state: { user }) => state.user.value)
 
+  
   const producersList = userStore && userStore.bookmarks.map((sr: ShopData) => {
     return (
     <CardProducer 

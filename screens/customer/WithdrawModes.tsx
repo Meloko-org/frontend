@@ -149,7 +149,7 @@ export default function WithdrawModesScreen({ navigation }) {
         </View>
         <ScrollView showsVerticalScrollIndicator={false}>
           {products}
-          <TextHeading3 extraClasses='py-3 text-right'>{`TOTAL : ${cartTotal}€`}</TextHeading3>
+          <TextHeading3 extraClasses='py-3 text-right'>{`TOTAL : ${cartTotal.toFixed(2)}€`}</TextHeading3>
 
           <ButtonPrimaryEnd 
             disabled={isPaymentDisabledButton} 

@@ -106,12 +106,10 @@ const TabNavigatorUser: React.FC = () => {
       },
       tabBarActiveTintColor: '#98B66E',
       tabBarInactiveTintColor: '#262E20',
+      tabBarShowLabel: false,
       headerShown: false,
       tabBarStyle: {
-        paddingHorizontal: 5,
-        paddingTop: 0,
         backgroundColor: tabBarBackgroundColor,
-        position: 'absolute',
         borderTopWidth: 0,
       }
     })}> 
@@ -129,15 +127,18 @@ const TabNavigatorUser: React.FC = () => {
 };
 
 const TabNavigatorProducer: React.FC = () => {
+  const { colorScheme } = useColorScheme();
+  const tabBarBackgroundColor = colorScheme === 'dark' ? '#444C3D' : '#FFF'
+
   return (
     <Tab.Navigator screenOptions={({ route }) => ({
       tabBarIcon: ({ color, size }) => {
         let iconName: string = '';
 
         if (route.name === 'Accueil') {
-          iconName = 'house';
+          iconName = 'home';
         } else if (route.name === 'Boutique') {
-          iconName = 'shop';
+          iconName = 'store';
         } else if (route.name === 'Business Center') {
           iconName = 'file-invoice-dollar';
         } else if (route.name === 'ProducerProfile') {
@@ -146,11 +147,16 @@ const TabNavigatorProducer: React.FC = () => {
           iconName = 'boxes';
         } 
 
-        return <FontAwesome name={iconName} size={size} color={color} />;
+        return <FontAwesome name={iconName} size={size} color={color} solid/>;
       },
       tabBarActiveTintColor: '#98B66E',
       tabBarInactiveTintColor: '#262E20',
       headerShown: false,
+      tabBarShowLabel: false,
+      tabBarStyle: {
+        backgroundColor: tabBarBackgroundColor,
+        borderTopWidth: 0,
+      },
     })}>
       <Tab.Screen name="Accueil" component={HomeScreen} />
       <Tab.Screen name="Boutique" component={ShopProducerScreen} />

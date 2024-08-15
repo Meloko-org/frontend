@@ -72,7 +72,7 @@ type UserData = {
   favSearch: object[] | null
   orders: object[]
   clerkPasswordEnabled: boolean | null | undefined
-  producerId: string | null
+  producer: ProductData | null
 }
 
 export type {

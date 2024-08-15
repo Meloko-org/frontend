@@ -53,7 +53,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
     })();
 
 
-    if(route.params.searchResults) {
+    if(route.params && route.params.searchResults) {
       setSearchResults(route.params.searchResults)
     }
   }, [route.params]);
@@ -111,9 +111,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
   });
 
 
-  console.log("receive", route.params)
   const handleSheetChanges = useCallback((index: number) => {
-    // console.log('handleSheetChanges', index);
   }, []);
 
   return (
@@ -125,7 +123,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
       <SafeAreaView className='w-full h-full absolute'>
       <View className="flex flex-row justify-center" style={{position: 'absolute', top: 50, width: '100%'}}>
         <MapSearchBox
-          search={route.params.search}
+          search={(route.params && route.params.search) ? route.params.search : undefined}
           refrechResultsFn={(newSearchResults: ShopData[]) => setSearchResults(newSearchResults)}
           displayMode='widget'
         />

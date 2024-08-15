@@ -24,14 +24,28 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     updateUser: (state: UserState, action: PayloadAction<UserData>): void => {
-      console.log(state.value.clerkPasswordEnabled)
       state.value = action.payload
     },
     addOrder: (state: UserState, action: PayloadAction): void => {
       state.value.orders.push(action.payload)
+    },
+    resetUser: (state: UserState): void => {
+      state.value = {
+        email: null,
+        firstname: null ,
+        lastname: null,
+        avatar: null,
+        favSearch: [],
+        bookmarks: [],
+        orders: [],
+        clerkPasswordEnabled: null,
+        producer: null
+      }
+
+      console.log("user reset", state)
     }
   }
 })
 
-export const { updateUser, addOrder } = userSlice.actions
+export const { updateUser, addOrder, resetUser } = userSlice.actions
 export default userSlice.reducer
