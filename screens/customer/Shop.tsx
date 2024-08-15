@@ -298,7 +298,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
                       onPressFn={() => setIsSearchResultsModalVisible(false)}
                     />
 
-                    <TextHeading2 extraClasses='mb-4'>Tous vos resultats</TextHeading2>
+                    <TextHeading2 extraClasses='mb-4'>Tous vos résultats</TextHeading2>
                     <ScrollView showsVerticalScrollIndicator={false} className='w-full'>
                       {searchProduct} 
                     </ScrollView>

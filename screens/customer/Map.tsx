@@ -147,7 +147,7 @@ export default function MapCustomerScreen({ route, navigation }: MapProps): JSX.
                 <TextHeading3
                   extraClasses='mt-2 mb-4 h-10'
                 >
-                  { `${producersList.length.toString()} Resultats `} 
+                  { `${producersList.length.toString()} Résultats `} 
                 </TextHeading3>
               </View>
 
