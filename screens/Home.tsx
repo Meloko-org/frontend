@@ -140,7 +140,7 @@ export default function HomeScreen({ navigation }: Props) {
             isSignedIn ? (
               <View>
                 <ButtonPrimaryEnd 
-                  label={`Mes favoris (${userStore.bookmarks.length})`}
+                  label={`Mes favoris (${userStore.bookmarks ? userStore.bookmarks.length : 0})`}
                   iconName="heart"  
                   onPressFn={() => navigation.navigate('TabNavigatorUser', { screen: 'BookmarksCustomer' })} 
                   extraClasses='mb-3' 
