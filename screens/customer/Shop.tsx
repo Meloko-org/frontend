@@ -202,14 +202,14 @@ export default function ShopUserScreen({ route, navigation }: Props) {
                 <StarsNotation iconNames={['star', 'star-half', 'star-o']} shopData={shopData}  extraClasses='mb-4'/>
 
                 <View className='flex flex-row items-center mb-3'>
-                  <View className='w-2/6'>
+                  <View className='w-2/6 h-full'>
                     {shopData.logo ? (
                       <Image source={{ uri: shopData.logo }} resizeMode="cover" width={112} height={112} className='rounded-full border border-primary'/>
                     ) : (
                       <Image source={require('../../assets/icon.png')} resizeMode="cover" width={112} height={112} className='w-28 h-28 rounded-full border border-primary'/>
                     )}
                   </View>
-                  <View className={`${isSignedIn ? 'w-3/6' : 'w-4/6'} flex flex-row justify-start h-full`}>
+                  <View className={`${isSignedIn ? 'w-3/6' : 'w-4/6'} flex flex-row justify-start h-full pr-1`}>
                     <TextBody1>{shopData.description}</TextBody1>
                   </View>
                   {

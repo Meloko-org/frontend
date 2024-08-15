@@ -36,17 +36,6 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 
   }
 
-	const productQuantity = () => {
-		if(cartStore.length > 0 
-			&& cartStore.find(c => c.shop._id === props.stockData.shop._id) 
-			&& cartStore.find(c => c.shop._id == props.stockData.shop._id).products.find(p => p.stockData._id === props.stockData._id)) {
-
-
-			} else {
-
-			}
-	}
-
 	const isInCart = () => {
 		return cartStore.find(c => c.shop._id === props.stockData.shop._id) 
 		&& cartStore.find(c => c.shop._id == props.stockData.shop._id).products.find(p => p.stockData._id === props.stockData._id)
@@ -91,6 +80,12 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 
 	)
 
+	const tags = props.stockData.tags && props.stockData.tags.map(s => {
+			console.log("s", s)
+		return (
+				<BadgeSecondary key={s._id} uppercase extraClasses="mt-1">{ `${s.name}` }</BadgeSecondary>
+	)})
+	// console.log(props.stockData)
 	return (
 		<View className={`${props.extraClasses} rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary flex flex-row w-full`}>
 			<View className="flex flex-row items-center w-full">
@@ -116,6 +111,11 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 					<PricePer>{
 						`${props.stockData.price.$numberDecimal}€ / ${props.stockData.product.weight.measurement.$numberDecimal}${props.stockData.product.weight.unit}`
 					}</PricePer>
+					<View className="flex flex-row justify-start items-center">
+						{tags}
+					</View>
+					
+
 				</View>
 				<View className="w-1/5 pr-1 flex flex-column justify-center items-center">
  					{cartButton}
