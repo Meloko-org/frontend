@@ -15,6 +15,7 @@ const initialState: UserState = {
     bookmarks: [],
     orders: [],
     clerkPasswordEnabled: null,
+    producer: null
   }
 }
 
