@@ -10,6 +10,7 @@ import CardProducer from '../../components/cards/ProducerSearchResult';
 import TextHeading3 from '../../components/utils/texts/Heading3';
 import ButtonPrimaryEnd from '../../components/utils/buttons/PrimaryEnd';
 import CardProduct from '../../components/cards/Product';
+import BadgeWithdrawStatus from '../../components/utils/badges/WithdrawStatus';
 
 type OrdersScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -151,7 +152,7 @@ export default function OrdersCustomerScreen({ navigation }: Props): JSX.Element
         
         <Modal visible={isOrderDetailModalVisible} animationType="slide" onRequestClose={() => setIsOrderDetailModalVisible(false)} className='p-3'>
           <SafeAreaView className='bg-lightbg flex-1 dark:bg-darkbg'>
-            <View className='p-3'>
+            <View className='p-3 justify-center items-center'>
               <ButtonBack 
                 onPressFn={() => setIsOrderDetailModalVisible(false)}
               />
@@ -159,7 +160,12 @@ export default function OrdersCustomerScreen({ navigation }: Props): JSX.Element
                   selectedOrder && (
                     <>
                       <TextHeading2 extraClasses='mb-1'>{ `Commande n° ${selectedOrder._id.slice(0, 7)}`}</TextHeading2>
-                      <TextHeading3 extraClasses='mb-4' centered>{new Date(selectedOrder.createdAt).toLocaleString()}</TextHeading3>
+                      <TextHeading3 extraClasses='mb-1' centered>{new Date(selectedOrder.createdAt).toLocaleString()}</TextHeading3>
+                      <BadgeWithdrawStatus 
+                        type={
+                          selectedOrder.isWithdrawn ? 'full' : 'none'}
+                          extraClasses='w-[100px] mb-4'
+                      />
                       <ScrollView showsVerticalScrollIndicator={false}>
                         <View className='items-center'>
                         {clickCollectOrdersDisplay.length > 0 && (

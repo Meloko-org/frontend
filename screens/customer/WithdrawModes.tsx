@@ -65,7 +65,7 @@ export default function WithdrawModesScreen({ navigation }) {
 
   const handleSelectedModePress = (shopName, value, market = null) => {
     const selectedShop = cartStore.find(c => c.shop.name === shopName)
-
+    console.log("select", selectedShop)
     dispatch(updateWithdrawMode({shopId: selectedShop.shop._id, withdrawMode: value, market: null}))
 
     if(value === 'market') {
@@ -131,6 +131,7 @@ export default function WithdrawModesScreen({ navigation }) {
   })
 
   const markets = selectedShop && selectedShop.markets.map(m => {
+    console.log("m", m)
     return (
       <Market key={m._id} marketData={m} onPressFn={(market) => {
         dispatch(updateWithdrawMode({shopId: selectedShop._id, withdrawMode: 'market', market}))

@@ -1,3 +1,6 @@
+import { LogBox } from "react-native"
+LogBox.ignoreAllLogs()
+
 import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-expo'
 import * as SecureStore from 'expo-secure-store'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';

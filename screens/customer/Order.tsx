@@ -11,7 +11,7 @@ import TextHeading4 from '../../components/utils/texts/Heading4';
 import TextBody1 from '../../components/utils/texts/Body1';
 import CardProducer from '../../components/cards/ProducerSearchResult';
 import ButtonPrimaryEnd from '../../components/utils/buttons/PrimaryEnd';
-
+import CardProduct from '../../components/cards/Product';
 type OrderScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'OrderCustomer'
@@ -38,15 +38,20 @@ export default function SearchCustomerScreen({ route, navigation }: Props): JSX.
     const marketOrders = newOrderDetails.details.filter(d => d.withdrawMode === 'market')
     
     clickCollectOrdersDisplay = clickCollectOrders.map(cco => {
+      const productList = cco.products.map(p => {
+        return  (
+          <CardProduct
+            stockData={{...p.product, notes: cco.shop.notes, quantity: p.quantity}}
+            key={p.product._id}
+            extraClasses='mb-1'
+            displayMode='cart'
+          />
+        )         
+      })
+
+
       return (
         <View key={cco._id} className='my-2 flex items-center'>
-          <TextHeading2 centered extraClasses='mb-2'>Click & Collect</TextHeading2>
-          <ButtonPrimaryEnd 
-            label="Itinéraire optimal"
-            iconName='location-arrow'
-            onPressFn={() => console.log("open google map")}
-            extraClasses='w-80 mb-3'            
-          />
           <CardProducer 
             shopData={cco.shop}
             withdrawData={cco.products}
@@ -54,15 +59,37 @@ export default function SearchCustomerScreen({ route, navigation }: Props): JSX.
             extraClasses='mb-1'
             displayMode='order'
             showDirectionButton
+            onPressFn={
+              () => { 
+                navigation.navigate('TabNavigatorUser', {
+                  screen: 'ShopUser',
+                  params: { 
+                    shopId: cco.shop._id,
+                    distance: null,
+                    relevantProducts: [] 
+                  },
+                }) 
+              }
+            }
           />
+          {productList}
         </View>
       )
     })
 
     marketOrdersDisplay = marketOrders.map(mo => {
+      const productList = mo.products.map(p => {
+        return  (
+          <CardProduct
+            stockData={{...p.product, notes: mo.shop.notes, quantity: p.quantity}}
+            key={p.product._id}
+            extraClasses='mb-1'
+            displayMode='cart'
+          />
+        )         
+      })
       return (
         <View key={mo._id} className='my-2'>
-          <TextHeading2 centered extraClasses='mb-2'>Marchés locaux</TextHeading2>
           <CardProducer 
             shopData={mo.shop}
             withdrawData={mo.products}
@@ -70,10 +97,24 @@ export default function SearchCustomerScreen({ route, navigation }: Props): JSX.
             extraClasses='mb-1'
             displayMode='order'
             showDirectionButton
+            onPressFn={
+              () => { 
+                navigation.navigate('TabNavigatorUser', {
+                  screen: 'ShopUser',
+                  params: { 
+                    shopId: mo.shop._id,
+                    distance: null,
+                    relevantProducts: [] 
+                  },
+                }) 
+              }
+            }
           />
+          {productList}
         </View>
       )
     })
+
   }
 
 

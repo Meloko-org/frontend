@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react'
 import { Alert } from 'react-native'
 import ButtonPrimaryEnd from './PrimaryEnd';
 import { useDispatch, useSelector } from "react-redux";
-import { updateUser, addOrder } from '../../../reducers/user';
+import { updateUser } from '../../../reducers/user';
 import { emptyCart } from '../../../reducers/cart';
 import { useAuth } from '@clerk/clerk-expo'
+import userTools from '../../../modules/userTools'
 
 export default function StripePaymentButton(props) {
   const dispatch = useDispatch()
@@ -47,8 +48,6 @@ export default function StripePaymentButton(props) {
       })
     });
     const { paymentIntent, ephemeralKey, customer, order } = await response.json();
-
-    dispatch(addOrder(order))
 
     return {
       paymentIntent,
@@ -97,7 +96,9 @@ export default function StripePaymentButton(props) {
         setIsPaymentScreenLoading(false)
       } else {
         dispatch(emptyCart())
+        await fetchData()  
         setIsPaymentScreenLoading(false)
+
         props.navigation.navigate('TabNavigatorUser', { screen: 'OrderCustomer',
           params: {
             orderId: order._id
@@ -110,6 +111,19 @@ export default function StripePaymentButton(props) {
 
   };
 
+  const fetchData = async () => {
+    try {
+      // store user's info in the store
+      const token = await getToken() 
+      const user = await userTools.getUserInfos(token)
+
+      if(user) {
+        dispatch(updateUser(user))
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
   // useEffect(() => {
   //   initializePaymentSheet();
   // }, []);

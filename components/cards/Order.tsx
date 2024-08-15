@@ -34,7 +34,7 @@ export default function CardOrder(props: CardOrderProps): JSX.Element {
 	const dateDisplay = () => {
 		return new Date(props.orderData.createdAt).toLocaleString()
 	}
-
+	console.log(props.orderData)
 	return (
 		<TouchableOpacity onPress={(value) => props.onPressFn && props.onPressFn(value)}>
 			<View className={`${props.extraClasses} rounded-lg shadow-sm bg-white p-2 flex flex-row w-full dark:bg-tertiary`}>
@@ -46,7 +46,8 @@ export default function CardOrder(props: CardOrderProps): JSX.Element {
 					</View>
 					<View className="pr-1 flex flex-column justify-start items-center h-full">
 						<BadgeWithdrawStatus 
-							type='none'
+							type={
+								props.orderData.isWithdrawn ? 'full' : 'none'}
 						/>
 					</View>
 				</View>

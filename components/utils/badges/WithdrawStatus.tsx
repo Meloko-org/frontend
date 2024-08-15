@@ -23,7 +23,7 @@ export default function BadgeWithdraw(props: BadgeWithdrawStatusProps): JSX.Elem
 	}
 	return (
 		<View 
-			className={`rounded-lg py-1 px-2 ${backgroundColor()}`}
+			className={`${props.extraClasses} flex flex-row justify-center items-center rounded-lg py-1 px-2 ${backgroundColor()}`}
 		>
 			<TextBody2 extraClasses="text-lightbg font-bold uppercase">
 				{

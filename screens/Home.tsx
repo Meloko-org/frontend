@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Button, View, Text, TouchableOpacity, SafeAreaView } from 'react-native'
+import { StyleSheet, Button, View, Text, TouchableOpacity, SafeAreaView, Image } from 'react-native'
 import { useAuth } from '@clerk/clerk-expo'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/Navigation'
@@ -13,6 +13,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { UserState, updateUser, resetUser } from '../reducers/user';
 import TextHeading4 from '../components/utils/texts/Heading4';
 import TextHeading3 from '../components/utils/texts/Heading3';
+import { useColorScheme } from 'nativewind';
+import LogoDark from '../assets/images/logo_meloko-dark.png'
+import LogoLight from '../assets/images/logo_meloko-light.png'
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -24,6 +27,7 @@ type Props = {
 };
 
 export default function HomeScreen({ navigation }: Props) {
+  const { colorScheme } = useColorScheme();
   // Import the Clerk Auth functions
   const { signOut, isSignedIn, getToken } = useAuth()
   const [isSigninModalVisible, setIsSigninModalVisible] = useState(false)
@@ -120,29 +124,34 @@ export default function HomeScreen({ navigation }: Props) {
     }
   }
 
+  const logo = colorScheme === 'dark' ? LogoDark : LogoLight
   return (
-    <SafeAreaView className='flex-1 bg-lightbg dark:darkbg mt-5'>
+    <View className='flex-1 h-full bg-lightbg dark:bg-darkbg'>
+      <SafeAreaView>
       <View className='flex justify-between p-3 w-full h-full'>
-        <View className='flex-1'>
-          <TextHeading1 extraClasses='mb-3'>Bienvenue</TextHeading1>
+        <View>
+          <View className='w-full h-[300px] mb-7 mt-4'>
+            <Image source={logo} alt={`Logo MELOKO`} resizeMode="contain" className='w-full h-full'/>
+          </View>
+          
           {/* <ButtonPrimaryEnd label="Tous les producteurs" iconName="map" onPressFn={onMapPress} extraClasses='mb-3' /> */}
           <ButtonPrimaryEnd label="Recherche" iconName="search" onPressFn={() => navigation.navigate('SearchCustomer')} extraClasses='mb-3' />
           {
             isSignedIn ? (
-              <>
+              <View>
                 <ButtonPrimaryEnd 
                   label={`Mes favoris (${userStore.bookmarks.length})`}
-                  iconName="user-circle"  
-                  onPressFn={() => navigation.navigate('TabNavigatorUser', { screen: 'Profil' })} 
+                  iconName="heart"  
+                  onPressFn={() => navigation.navigate('TabNavigatorUser', { screen: 'BookmarksCustomer' })} 
                   extraClasses='mb-3' 
                 />
                 <ButtonPrimaryEnd 
                   label={`Mon profil`}
-                  iconName="heart"  
+                  iconName="user-circle"  
                   onPressFn={() => navigation.navigate('TabNavigatorUser', { screen: 'Profil' })} 
                   extraClasses='mb-3' 
                 />
-              </>
+              </View>
             ) : (
               <>
                 <ButtonPrimaryEnd label="Connexion" iconName="sign-in" onPressFn={() => setIsSigninCustomerModalVisible(true)} extraClasses='mb-3' />
@@ -180,6 +189,8 @@ export default function HomeScreen({ navigation }: Props) {
       />
 
     </SafeAreaView>
+    </View>
+    
     
 
   )
