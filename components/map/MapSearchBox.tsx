@@ -156,7 +156,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
           longitude: longitude
         },
       }));
-
+      
     } catch (error) {
       console.error(error)
     }
@@ -170,6 +170,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
         await searchAddress()
       }
       setPerformSearch(true)
+      setIsSearchLoading(false)
     } catch (err) {
       setIsSearchLoading(false)
       console.error(err)   

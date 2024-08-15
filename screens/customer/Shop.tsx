@@ -254,7 +254,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
               <View>
                   <TextHeading2>Votre recherche</TextHeading2>
                   <View className='my-4'>
-                    {searchProduct} 
+                    {searchProduct.slice(0,4)} 
                   </View>
                   <ButtonPrimaryEnd label={`Tous les résultats (${searchProduct.length})`} iconName="arrow-right" onPressFn={handleAllResultsPress}></ButtonPrimaryEnd>
               
