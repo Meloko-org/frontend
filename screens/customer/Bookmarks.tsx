@@ -8,7 +8,7 @@ export default function BookmarksScreen({ navigation }) {
   const userStore = useSelector((state: { user }) => state.user.value)
 
   
-  const producersList = userStore && userStore.bookmarks.map((sr: ShopData) => {
+  const producersList = (userStore && userStore.bookmarks) ? userStore.bookmarks.map((sr: ShopData) => {
     return (
     <CardProducer 
       shopData={sr}
@@ -29,7 +29,7 @@ export default function BookmarksScreen({ navigation }) {
       displayMode='bottomSheet'
     />
 
-  )})
+  )}) : ([])
 
   return (
     <SafeAreaView className='flex-1 bg-lightbg dark:bg-darkbg'>
