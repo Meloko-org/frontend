@@ -11,6 +11,7 @@ import { useAuth } from '@clerk/clerk-expo'
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { UserState, updateUser, resetUser } from '../../reducers/user';
+import { ModeState, changeMode } from '../../reducers/mode'
 import { emptyCart } from '../../reducers/cart';
 
 import SignInScreen from '../Signin';
@@ -42,6 +43,7 @@ export default function ProfilScreen({ navigation }: Props) {
 
   const dispatch = useDispatch()
   const user = useSelector((state: { user: UserState }) => state.user.value);
+  const modeStore = useSelector((state: {mode: ModeState}) => state.mode.value)
 
   const [isSigninModalVisible, setIsSigninModalVisible] = useState<boolean>(false);
   const [email, setEmail ] = useState('')
@@ -65,7 +67,7 @@ export default function ProfilScreen({ navigation }: Props) {
     try {
       setUserSaveLoading(true)
       const token = await getToken()
-      const values = (email) ? {email, firstname,  lastname} : {email: null, firstname,  lastname}
+      const values = (email) ? {email, firstname, lastname} : {email: null, firstname, lastname}
       const data = await userTools.updateUser(token, values)
 
       if(data) {
@@ -104,7 +106,14 @@ export default function ProfilScreen({ navigation }: Props) {
     })
   }
 
+  const toggleMode = () => {
+    toggleColorScheme()
+    const displayMode = (modeStore.mode === "light") ? "dark" : "light"
+    dispatch(changeMode(displayMode))
+  }
+
   console.log("Profil User -> store: ", user)
+  console.log("display mode: ", modeStore)
 
   return (
 
@@ -195,7 +204,7 @@ export default function ProfilScreen({ navigation }: Props) {
                 label={colorScheme === 'dark' ? 'Mode clair' : 'Mode sombre' }
                 iconName={ colorScheme === 'dark' ? 'sun-o' : 'moon-o'}
                 disabled={false}
-                onPressFn={toggleColorScheme}
+                onPressFn={toggleMode}
                 extraClasses='mb-3'
               />
               <ButtonSecondaryEnd 
@@ -203,6 +212,8 @@ export default function ProfilScreen({ navigation }: Props) {
                 iconName="arrow-right" 
                 onPressFn={onSignoutPress} 
                 extraClasses='mb-3' 
+                disabled={false}
+                isLoading={false}
               />
             </View>
             </ScrollView>

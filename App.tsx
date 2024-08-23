@@ -34,12 +34,25 @@ import PaymentCustomerScreen from './screens/customer/Payment'
 import OrdersCustomerScreen from './screens/customer/Orders';
 
 import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
+import { persistStore, persistReducer } from "redux-persist";
+import { PersistGate } from "redux-persist/integration/react";
+// import storage from "redux-persist/lib/storage";
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import user from './reducers/user';
 import cart from './reducers/cart';
+import mode from "./reducers/mode"
+const reducers =combineReducers({user, cart, mode})
+const persistConfig = { 
+  key: 'meloko', 
+  storage: AsyncStorage,
+  whitelist: ['mode']
+}
 const store = configureStore({
-  reducer: {user, cart},
+  reducer: persistReducer(persistConfig, reducers),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false})
 })
+const persistor = persistStore(store)
 
 const FontAwesome = _FontAwesome as React.ElementType;
 
@@ -174,23 +187,25 @@ const TabNavigatorProducer: React.FC = () => {
 export default function App(): JSX.Element {
   return (
     <Provider store={store}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
-          <ClerkLoaded>
-            <NavigationContainer>
-              <Stack.Navigator screenOptions={options}>
-                <Stack.Screen name="Home" component={HomeScreen} />
-                <Stack.Screen name="SignUp" component={SignUpScreen} />
-                <Stack.Screen name="SignIn" component={SignInScreen} />
-                <Stack.Screen name="SearchCustomer" component={SearchCustomerScreen} />
-                <Stack.Screen name="Components" component={ComponentsScreen} />
-                <Stack.Screen name="TabNavigatorUser" component={TabNavigatorUser} />
-                <Stack.Screen name="TabNavigatorProducer" component={TabNavigatorProducer} />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </ClerkLoaded>
-        </ClerkProvider>
-      </GestureHandlerRootView>
+      <PersistGate persistor={persistor}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
+            <ClerkLoaded>
+              <NavigationContainer>
+                <Stack.Navigator screenOptions={options}>
+                  <Stack.Screen name="Home" component={HomeScreen} />
+                  <Stack.Screen name="SignUp" component={SignUpScreen} />
+                  <Stack.Screen name="SignIn" component={SignInScreen} />
+                  <Stack.Screen name="SearchCustomer" component={SearchCustomerScreen} />
+                  <Stack.Screen name="Components" component={ComponentsScreen} />
+                  <Stack.Screen name="TabNavigatorUser" component={TabNavigatorUser} />
+                  <Stack.Screen name="TabNavigatorProducer" component={TabNavigatorProducer} />
+                </Stack.Navigator>
+              </NavigationContainer>
+            </ClerkLoaded>
+          </ClerkProvider>
+        </GestureHandlerRootView>
+        </PersistGate>
     </Provider>
     
   );

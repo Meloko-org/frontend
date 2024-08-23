@@ -11,6 +11,7 @@ import TextBody1 from '../components/utils/texts/Body1';
 import userTools from '../modules/userTools'
 import { useSelector, useDispatch } from 'react-redux';
 import { UserState, updateUser, resetUser } from '../reducers/user';
+import { ModeState } from '../reducers/mode';
 import TextHeading4 from '../components/utils/texts/Heading4';
 import TextHeading3 from '../components/utils/texts/Heading3';
 import { useColorScheme } from 'nativewind';
@@ -27,7 +28,7 @@ type Props = {
 };
 
 export default function HomeScreen({ navigation }: Props) {
-  const { colorScheme } = useColorScheme();
+  const { colorScheme, toggleColorScheme } = useColorScheme();
   // Import the Clerk Auth functions
   const { signOut, isSignedIn, getToken } = useAuth()
   const [isSigninModalVisible, setIsSigninModalVisible] = useState(false)
@@ -37,6 +38,7 @@ export default function HomeScreen({ navigation }: Props) {
   
   const dispatch = useDispatch()
   const userStore = useSelector((state: { user: UserState }) => state.user.value)
+  const modeStore = useSelector((state: { mode: ModeState }) => state.mode.value)
 
   const fetchData = async () => {
     try {
@@ -53,6 +55,9 @@ export default function HomeScreen({ navigation }: Props) {
   }
 
   useEffect(() => {
+    if(modeStore.mode === "dark") {
+      toggleColorScheme()
+    }
     if(isSignedIn) {
       (async () => {
         await fetchData()
@@ -124,8 +129,9 @@ export default function HomeScreen({ navigation }: Props) {
       })
     }
   }
-
+  
   const logo = colorScheme === 'dark' ? LogoDark : LogoLight
+
   return (
     <View className='flex-1 h-full bg-lightbg dark:bg-darkbg'>
       <SafeAreaView>
