@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, View, TouchableOpacity } from 'react-native'
+import { Text, TouchableOpacity } from 'react-native'
 import { GestureResponderEvent } from 'react-native'
 
 type CustomProps = {
@@ -13,17 +13,14 @@ export default function Custom(props: CustomProps): JSX.Element {
 
 	return (
 		<TouchableOpacity 
-			className={
-				`
+			className={`
 					${props.extraClasses} 
 					 flex justify-center items-center w-min
-				`
-			} 
+				`} 
 			onPress={props.onPressFn}
 		>
 			<Text 
-				className={
-					`
+				className={`
 						${props.textClasses}
 						text-center
 					`}>

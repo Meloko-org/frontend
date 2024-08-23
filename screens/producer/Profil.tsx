@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { UserState, updateUser } from '../../reducers/user';
+import producerTools from '../../modules/producerTools';
+import userTools from '../../modules/userTools';
 
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -31,8 +33,9 @@ type Props = {
 export default function ProfilProducerScreen({ navigation }: Props) {
   // Import the Clerk Auth functions
   const { getToken } = useAuth()
-
-
+  const [ isProducerSaveLoading, setProducerSaveLoading ] = useState(false)
+  const userStore = useSelector((state: { user: UserState}) => state.user.value)
+  const dispatch = useDispatch()
 
   // Import the public api root address
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
@@ -49,9 +52,29 @@ export default function ProfilProducerScreen({ navigation }: Props) {
     country: ''
   })
 
+  useEffect(() => {
+    console.log("PROFIL PROd -> userStore.prod: ", userStore.producer)
+    if(userStore.producer !== null) {
+      console.log("Profil Producer -> store: ",userStore)
+      console.log(userStore.producer.socialReason)
+      setSocialReason(userStore.producer.socialReason)
+      setSiren(userStore.producer.siren)
+      setIban(userStore.producer.iban)
+      setBic(userStore.producer.bic)
+      setAddress({
+        address1: userStore.producer.address.address1,
+        address2: userStore.producer.address.address2,
+        postalCode: userStore.producer.address.postalCode,
+        city: userStore.producer.address.city,
+        country: userStore.producer.address.country
+      })
+    }
+  }, [])
+
   
   const handleProducerSave = async () => {
     try {
+      setProducerSaveLoading(true)
       const token = await getToken()
       const response = await fetch(`${API_ROOT}/producers`, {
         method: 'POST',
@@ -70,10 +93,38 @@ export default function ProfilProducerScreen({ navigation }: Props) {
       })
       const data = await response.json()
 
+      if(data) {
+        const userInfos = await userTools.getUserInfos(token)
+        if(userInfos) {
+          dispatch(updateUser(userInfos))
+        }
+        Alert.alert("Création de compte pro", "Votre comptre pro a bien été crée.")
+      }
+      setProducerSaveLoading(false)
     } catch(error) {
       console.error(error)
+      setProducerSaveLoading(false)
     }
   }
+
+  const handleProducerUpdate = async () => {
+    try {
+      setProducerSaveLoading(true)
+      const token = await getToken()
+      const values = {socialReason, siren, iban, bic, address}
+      const data = await producerTools.updateProducer(token, values)
+
+      if(data) {
+        Alert.alert("Mise à jour de votre profil", "Votre profil à bien été mis à jour.")
+      }
+      setProducerSaveLoading(false)
+    } catch (error) {
+      console.error(error)
+      setProducerSaveLoading(false)
+    }
+  }
+
+
 
   const switchUser = () => {
     navigation.navigate('TabNavigatorUser', {
@@ -87,7 +138,6 @@ export default function ProfilProducerScreen({ navigation }: Props) {
       <View className="items-center w-full flex-1">
         
         <ScrollView className="w-full p-5">
-          {/* <View className="p-5"> */}
             <TextHeading2 extraClasses="my-3">Profil Producteur</TextHeading2>
 
             <Text
@@ -184,13 +234,28 @@ export default function ProfilProducerScreen({ navigation }: Props) {
               })}
               extraClasses='mb-2'
             />
-            <ButtonPrimaryEnd
-              label="Créer mon profil producteur" 
-              iconName="arrow-right"
-              disabled={false}
-              onPressFn={() => handleProducerSave()} />
-          {/* </View> */}
+
+            {
+              userStore.producer !== null ? (
+                <ButtonPrimaryEnd
+                  label="Mettre à jour" 
+                  iconName="arrow-right"
+                  disabled={isProducerSaveLoading}
+                  onPressFn={() => handleProducerUpdate()}
+                  isLoading={isProducerSaveLoading} />
+              ) : (
+                <ButtonPrimaryEnd
+                  label="Créer mon profil producteur" 
+                  iconName="arrow-right"
+                  disabled={isProducerSaveLoading}
+                  onPressFn={() => handleProducerSave()}
+                  isLoading={isProducerSaveLoading} />
+              )
+            }
+
+            
         </ScrollView>
+
           <Custom
             label="Basculer en mode Utilisateur"
             extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-5 px-5 h-[60px]"

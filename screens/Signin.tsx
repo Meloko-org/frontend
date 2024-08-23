@@ -68,6 +68,7 @@ export default function SignInScreen(props) {
   const [newPassword, setNewPassword] = useState<string>('')
   const [performedSignedIn, setPerformedSignedIn] = useState(false)
   const [performedSignedUp, setPerformedSignedUp] = useState(false)
+  const [ isConnectionLoading, setConnectionLoading ] = useState(false)
 
   useEffect(() => {
     setIsSigninModalVisible(props.showModal ? true : false)
@@ -198,6 +199,7 @@ export default function SignInScreen(props) {
     }
 
     try {
+      setConnectionLoading(true)
       // Try to signin
       const signInAttempt = await signIn.create({
         identifier: emailAddress,
@@ -208,14 +210,16 @@ export default function SignInScreen(props) {
       if (signInAttempt.status === 'complete') {
         await setActive({ session: signInAttempt.createdSessionId })
         setPerformedSignedIn(true)
-
+        
       } else {
         // See https://clerk.com/docs/custom-flows/error-handling
         // for more info on error handling
         console.error(JSON.stringify(signInAttempt, null, 2))
       }
+      setConnectionLoading(false)
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2))
+      setConnectionLoading(false)
     }
   }, [isLoaded, emailAddress, password])
 
@@ -256,9 +260,10 @@ export default function SignInScreen(props) {
             secureTextEntry={true}
           />
           <ButtonPrimaryEnd 
-              label="Connection" 
+              label="Connexion" 
               iconName="sign-in" 
               onPressFn={onSignInPress} 
+              isLoading={isConnectionLoading}
               extraClasses='w-full mb-5'
             />
 
@@ -297,6 +302,7 @@ export default function SignInScreen(props) {
                 label="Inscription" 
                 iconName="arrow-right" 
                 onPressFn={onSignUpPress} 
+                isLoading={isConnectionLoading}
                 extraClasses='w-full mb-5'
               />
             </>

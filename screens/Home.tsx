@@ -43,9 +43,9 @@ export default function HomeScreen({ navigation }: Props) {
       // store user's info in the store
       const token = await getToken() 
       const user = await userTools.getUserInfos(token)
-
       if(user) {
         dispatch(updateUser(user))
+        console.log("home -> store: ",userStore)
       }
     } catch (error) {
       console.error(error)
@@ -56,6 +56,7 @@ export default function HomeScreen({ navigation }: Props) {
     if(isSignedIn) {
       (async () => {
         await fetchData()
+        
       })()
     }
   }, [])
@@ -113,7 +114,7 @@ export default function HomeScreen({ navigation }: Props) {
   }
 
   const redirectProducer = () => {
-    if(userStore.producerId === null) {
+    if(userStore.producer === null) {
       navigation.navigate('TabNavigatorProducer', {
         screen: 'ProducerProfile'
       })

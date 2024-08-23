@@ -72,7 +72,15 @@ type UserData = {
   favSearch: object[] | null
   orders: object[]
   clerkPasswordEnabled: boolean | null | undefined
-  producer: ProductData | null
+  producer: ProducerData | null
+}
+
+type ProducerData = {
+  socialReason: string | null
+  siren: number | null
+  owner: UserData
+  iban: string | null
+  address: Object | null
 }
 
 export type {
@@ -82,5 +90,6 @@ export type {
   StockData,
   CartData,
   MarketData,
-  OrderData
+  OrderData,
+  ProducerData
 }

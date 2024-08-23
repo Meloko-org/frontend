@@ -104,6 +104,8 @@ export default function ProfilScreen({ navigation }: Props) {
     })
   }
 
+  console.log("Profil User -> store: ", user)
+
   return (
 
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -218,8 +220,10 @@ export default function ProfilScreen({ navigation }: Props) {
             <ButtonPrimaryEnd 
               label="Connexion"
               iconName='sign-in'
+              disabled={isUserSaveLoading}
               extraClasses='w-full'
               onPressFn={() => setIsSigninModalVisible(true)}
+              isLoading={isUserSaveLoading}
             />
           </View>
         ) 

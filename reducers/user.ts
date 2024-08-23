@@ -39,7 +39,7 @@ export const userSlice = createSlice({
         bookmarks: [],
         orders: [],
         clerkPasswordEnabled: null,
-        producer: null
+        producer: null,
       }
 
       console.log("user reset", state)

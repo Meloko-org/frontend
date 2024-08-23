@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, View, TouchableOpacity } from 'react-native'
+import { Text, TouchableOpacity } from 'react-native'
 import _Fontawesome from 'react-native-vector-icons/FontAwesome'
 import { GestureResponderEvent } from 'react-native'
 const FontAwesome = _Fontawesome as React.ElementType
