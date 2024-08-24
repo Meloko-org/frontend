@@ -72,7 +72,7 @@ export default function ProfilScreen({ navigation }: Props) {
 
       if(data) {
         Alert.alert("Mise à jour de votre profil", "Votre profil à bien été mis à jour.")
-        dispatch(updateUser(data.user))
+        dispatch(updateUser(data))
       }
       setUserSaveLoading(false)
     } catch (error) {
