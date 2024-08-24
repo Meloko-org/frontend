@@ -4,8 +4,6 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { UserState, updateUser } from '../../reducers/user';
 import producerTools from '../../modules/producerTools';
-import userTools from '../../modules/userTools';
-
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/Navigation'
@@ -14,8 +12,6 @@ import { RootStackParamList } from '../../types/Navigation'
 import { View, SafeAreaView, ScrollView, Alert } from 'react-native';
 import TextHeading2 from '../../components/utils/texts/Heading2';
 import TextHeading3 from '../../components/utils/texts/Heading3';
-import TextBody1 from '../../components/utils/texts/Body1';
-import TextBody2 from '../../components/utils/texts/Body2';
 import Text from '../../components/utils/inputs/Text';
 import ButtonPrimaryEnd from '../../components/utils/buttons/PrimaryEnd'
 import Custom from '../../components/utils/buttons/Custom';
@@ -37,9 +33,6 @@ export default function ProfilProducerScreen({ navigation }: Props) {
   const userStore = useSelector((state: { user: UserState}) => state.user.value)
   const dispatch = useDispatch()
 
-  // Import the public api root address
-  const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
-
   const [socialReason, setSocialReason] = useState<string>('')
   const [siren, setSiren] = useState<string>('')
   const [iban, setIban] = useState<string>('')
@@ -55,8 +48,6 @@ export default function ProfilProducerScreen({ navigation }: Props) {
   useEffect(() => {
     console.log("PROFIL PROd -> userStore.prod: ", userStore.producer)
     if(userStore.producer !== null) {
-      console.log("Profil Producer -> store: ",userStore)
-      console.log(userStore.producer.socialReason)
       setSocialReason(userStore.producer.socialReason)
       setSiren(userStore.producer.siren)
       setIban(userStore.producer.iban)
@@ -69,43 +60,7 @@ export default function ProfilProducerScreen({ navigation }: Props) {
         country: userStore.producer.address.country
       })
     }
-  }, [])
-
-  
-  const handleProducerSave = async () => {
-    try {
-      setProducerSaveLoading(true)
-      const token = await getToken()
-      const response = await fetch(`${API_ROOT}/producers`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-          mode: 'cors',
-        },
-        body: JSON.stringify({
-          socialReason,
-          siren,
-          iban,
-          bic,
-          address
-        })
-      })
-      const data = await response.json()
-
-      if(data) {
-        const userInfos = await userTools.getUserInfos(token)
-        if(userInfos) {
-          dispatch(updateUser(userInfos))
-        }
-        Alert.alert("Création de compte pro", "Votre comptre pro a bien été crée.")
-      }
-      setProducerSaveLoading(false)
-    } catch(error) {
-      console.error(error)
-      setProducerSaveLoading(false)
-    }
-  }
+  }, [userStore])
 
   const handleProducerUpdate = async () => {
     try {
@@ -113,8 +68,9 @@ export default function ProfilProducerScreen({ navigation }: Props) {
       const token = await getToken()
       const values = {socialReason, siren, iban, bic, address}
       const data = await producerTools.updateProducer(token, values)
-
+      console.log(data)
       if(data) {
+        dispatch(updateUser(data))
         Alert.alert("Mise à jour de votre profil", "Votre profil à bien été mis à jour.")
       }
       setProducerSaveLoading(false)
@@ -235,23 +191,13 @@ export default function ProfilProducerScreen({ navigation }: Props) {
               extraClasses='mb-2'
             />
 
-            {
-              userStore.producer !== null ? (
-                <ButtonPrimaryEnd
-                  label="Mettre à jour" 
-                  iconName="arrow-right"
-                  disabled={isProducerSaveLoading}
-                  onPressFn={() => handleProducerUpdate()}
-                  isLoading={isProducerSaveLoading} />
-              ) : (
-                <ButtonPrimaryEnd
-                  label="Créer mon profil producteur" 
-                  iconName="arrow-right"
-                  disabled={isProducerSaveLoading}
-                  onPressFn={() => handleProducerSave()}
-                  isLoading={isProducerSaveLoading} />
-              )
-            }
+            <ButtonPrimaryEnd
+              label="Mettre à jour" 
+              iconName="arrow-right"
+              disabled={isProducerSaveLoading}
+              onPressFn={() => handleProducerUpdate()}
+              isLoading={isProducerSaveLoading} 
+            />
 
             
         </ScrollView>

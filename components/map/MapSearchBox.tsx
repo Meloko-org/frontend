@@ -71,7 +71,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
 
   useEffect(() => {
     if(props.search) {
-      console.log("search", props.search)
+      // console.log("search", props.search)
       setSearchOptions(props.search)
     }
   }, [])

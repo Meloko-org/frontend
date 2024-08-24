@@ -81,7 +81,7 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 	)
 
 	const tags = props.stockData.tags && props.stockData.tags.map(s => {
-			console.log("s", s)
+			// console.log("s", s)
 		return (
 				<BadgeSecondary key={s._id} uppercase extraClasses="mt-1">{ `${s.name}` }</BadgeSecondary>
 	)})

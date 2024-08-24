@@ -112,8 +112,8 @@ export default function ProfilScreen({ navigation }: Props) {
     dispatch(changeMode(displayMode))
   }
 
-  console.log("Profil User -> store: ", user)
-  console.log("display mode: ", modeStore)
+  // console.log("Profil User -> store: ", user)
+  // console.log("display mode: ", modeStore)
 
   return (
 
