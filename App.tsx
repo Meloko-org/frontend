@@ -32,6 +32,11 @@ import WithdrawModesUserScreen from './screens/customer/WithdrawModes';
 import OrderCustomerScreen from './screens/customer/Order';
 import PaymentCustomerScreen from './screens/customer/Payment'
 import OrdersCustomerScreen from './screens/customer/Orders';
+import PhotoShopProducerScreen from "./screens/producer/Photo";
+import VideoShopProducerScreen from "./screens/producer/Video";
+import ClickCollectShopProducerScreen from "./screens/producer/ClickCollect";
+import MarketsShopProducerScreen from "./screens/producer/Markets";
+
 
 import { Provider } from 'react-redux';
 import { persistStore, persistReducer } from "redux-persist";
@@ -197,6 +202,10 @@ export default function App(): JSX.Element {
                   <Stack.Screen name="SignUp" component={SignUpScreen} />
                   <Stack.Screen name="SignIn" component={SignInScreen} />
                   <Stack.Screen name="SearchCustomer" component={SearchCustomerScreen} />
+                  <Stack.Screen name="PhotoShopProducer" component={PhotoShopProducerScreen} />
+                  <Stack.Screen name="VideoShopProducer" component={VideoShopProducerScreen} />
+                  <Stack.Screen name="ClickCollectShopProducer" component={ClickCollectShopProducerScreen} />
+                  <Stack.Screen name="MarketsShopProducer" component={MarketsShopProducerScreen} />
                   <Stack.Screen name="Components" component={ComponentsScreen} />
                   <Stack.Screen name="TabNavigatorUser" component={TabNavigatorUser} />
                   <Stack.Screen name="TabNavigatorProducer" component={TabNavigatorProducer} />

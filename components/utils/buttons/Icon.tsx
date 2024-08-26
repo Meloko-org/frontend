@@ -5,9 +5,9 @@ const FontAwesome = _Fontawesome as React.ElementType
 import { GestureResponderEvent } from 'react-native'
 
 type ButtonIconProps = {
-    iconName: string,
-		extraClasses?: string,
-		onPressFn: ((event: GestureResponderEvent) => void) | undefined
+  iconName: string,
+	extraClasses?: string,
+	onPressFn: ((event: GestureResponderEvent) => void) | undefined
 }
 
 export default function ButtonIcon(props: ButtonIconProps): JSX.Element {
