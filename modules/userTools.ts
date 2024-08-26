@@ -1,4 +1,4 @@
-const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
+const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
 /**
  * Get the user's info to store
@@ -7,50 +7,45 @@ const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
  * @returns {object} Get only email, firstname, lastname, avatar, favSearch and bookmarks
  */
 const getUserInfos = async (token: string) => {
-	try {
+  try {
     const response = await fetch(`${API_ROOT}/users/logged`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type' : 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        mode: 'cors'
-      }
-    })
-    const data = await response.json()
+        mode: "cors",
+      },
+    });
+    const data = await response.json();
     // console.log("getUserInfos-> data: ", data)
-    
-    return data
 
+    return data;
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
-}
-
-
+};
 
 const updateUser = async (token: string, values: string) => {
   try {
-
     const response = await fetch(`${API_ROOT}/users/logged`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type' : 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        mode: 'cors'
+        mode: "cors",
       },
-      body: JSON.stringify(values)
-    })
+      body: JSON.stringify(values),
+    });
 
-    const data = await response.json()
+    const data = await response.json();
 
-    return data
+    return data;
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
-}
+};
 
-
-export default { 
+export default {
   getUserInfos,
-  updateUser
-}
+  updateUser,
+};

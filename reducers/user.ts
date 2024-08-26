@@ -2,37 +2,37 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserData } from "../types/API";
 
 export type UserState = {
-  value: UserData
-}
+  value: UserData;
+};
 
 const initialState: UserState = {
   value: {
     email: null,
-    firstname: null ,
+    firstname: null,
     lastname: null,
     avatar: null,
     favSearch: [],
     bookmarks: [],
     orders: [],
     clerkPasswordEnabled: null,
-    producer: null
-  }
-}
+    producer: null,
+  },
+};
 
 export const userSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState,
   reducers: {
     updateUser: (state: UserState, action: PayloadAction<UserData>): void => {
-      state.value = action.payload
+      state.value = action.payload;
     },
     addOrder: (state: UserState, action: PayloadAction): void => {
-      state.value.orders.push(action.payload)
+      state.value.orders.push(action.payload);
     },
     resetUser: (state: UserState): void => {
       state.value = {
         email: null,
-        firstname: null ,
+        firstname: null,
         lastname: null,
         avatar: null,
         favSearch: [],
@@ -40,12 +40,12 @@ export const userSlice = createSlice({
         orders: [],
         clerkPasswordEnabled: null,
         producer: null,
-      }
+      };
 
-      console.log("user reset", state)
-    }
-  }
-})
+      console.log("user reset", state);
+    },
+  },
+});
 
-export const { updateUser, addOrder, resetUser } = userSlice.actions
-export default userSlice.reducer
+export const { updateUser, addOrder, resetUser } = userSlice.actions;
+export default userSlice.reducer;

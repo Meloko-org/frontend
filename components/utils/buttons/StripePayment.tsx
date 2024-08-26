@@ -1,27 +1,26 @@
-import { StripeProvider, useStripe } from '@stripe/stripe-react-native';
-import React, { useState, useEffect } from 'react'
-import { Alert } from 'react-native'
-import ButtonPrimaryEnd from './PrimaryEnd';
+import { StripeProvider, useStripe } from "@stripe/stripe-react-native";
+import React, { useState, useEffect } from "react";
+import { Alert } from "react-native";
+import ButtonPrimaryEnd from "./PrimaryEnd";
 import { useDispatch, useSelector } from "react-redux";
-import { updateUser } from '../../../reducers/user';
-import { emptyCart } from '../../../reducers/cart';
-import { useAuth } from '@clerk/clerk-expo'
-import userTools from '../../../modules/userTools'
+import { updateUser } from "../../../reducers/user";
+import { emptyCart } from "../../../reducers/cart";
+import { useAuth } from "@clerk/clerk-expo";
+import userTools from "../../../modules/userTools";
 
 export default function StripePaymentButton(props) {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [loading, setLoading] = useState(false);
-  const [publishableKey, setPublishableKey] = useState('');
-  const userStore = useSelector((state: { user }) => state.user.value)
-  const cartStore = useSelector((state: { cart }) => state.cart.value)
-  const [isPaymentScreenLoading, setIsPaymentScreenLoading] = useState(false)
+  const [publishableKey, setPublishableKey] = useState("");
+  const userStore = useSelector((state: { user }) => state.user.value);
+  const cartStore = useSelector((state: { cart }) => state.cart.value);
+  const [isPaymentScreenLoading, setIsPaymentScreenLoading] = useState(false);
 
   // Import the public api root address
-  const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!
+  const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
-  const { getToken } = useAuth()
-
+  const { getToken } = useAuth();
 
   const fetchPublishableKey = async () => {
     const key = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY;
@@ -33,37 +32,34 @@ export default function StripePaymentButton(props) {
   }, []);
 
   const fetchPaymentSheetParams = async () => {
-    const token = await getToken() 
+    const token = await getToken();
     const response = await fetch(`${API_ROOT}/stripe/paymentIntent`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type' : 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        mode: 'cors'
+        mode: "cors",
       },
       body: JSON.stringify({
         amount: props.totalCartAmount,
         customer: props.user,
-        cart: cartStore
-      })
+        cart: cartStore,
+      }),
     });
-    const { paymentIntent, ephemeralKey, customer, order } = await response.json();
+    const { paymentIntent, ephemeralKey, customer, order } =
+      await response.json();
 
     return {
       paymentIntent,
       ephemeralKey,
       customer,
-      order
+      order,
     };
   };
 
   const initializePaymentSheet = async () => {
-    const {
-      paymentIntent,
-      ephemeralKey,
-      customer,
-      order
-    } = await fetchPaymentSheetParams();
+    const { paymentIntent, ephemeralKey, customer, order } =
+      await fetchPaymentSheetParams();
 
     const { error } = await initPaymentSheet({
       merchantDisplayName: "Meloko SAS",
@@ -81,49 +77,55 @@ export default function StripePaymentButton(props) {
       setLoading(true);
     }
 
-    return order
+    return order;
   };
 
   const openPaymentSheet = async () => {
     try {
-      setIsPaymentScreenLoading(true)
-      dispatch(updateUser({...userStore, firstname: props.user.firstname, lastname: props.user.lastname}))
+      setIsPaymentScreenLoading(true);
+      dispatch(
+        updateUser({
+          ...userStore,
+          firstname: props.user.firstname,
+          lastname: props.user.lastname,
+        }),
+      );
       const order = await initializePaymentSheet();
       const { error } = await presentPaymentSheet();
 
       if (error) {
         Alert.alert(`Error code: ${error.code}`, error.message);
-        setIsPaymentScreenLoading(false)
+        setIsPaymentScreenLoading(false);
       } else {
-        dispatch(emptyCart())
-        await fetchData()  
-        setIsPaymentScreenLoading(false)
+        dispatch(emptyCart());
+        await fetchData();
+        setIsPaymentScreenLoading(false);
 
-        props.navigation.navigate('TabNavigatorUser', { screen: 'OrderCustomer',
+        props.navigation.navigate("TabNavigatorUser", {
+          screen: "OrderCustomer",
           params: {
-            orderId: order._id
-          }
-         })
+            orderId: order._id,
+          },
+        });
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-
   };
 
   const fetchData = async () => {
     try {
       // store user's info in the store
-      const token = await getToken() 
-      const user = await userTools.getUserInfos(token)
+      const token = await getToken();
+      const user = await userTools.getUserInfos(token);
 
-      if(user) {
-        dispatch(updateUser(user))
+      if (user) {
+        dispatch(updateUser(user));
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
+  };
   // useEffect(() => {
   //   initializePaymentSheet();
   // }, []);
@@ -134,13 +136,13 @@ export default function StripePaymentButton(props) {
       merchantIdentifier="merchant.identifier" // required for Apple Pay
       urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
     >
-      <ButtonPrimaryEnd 
-        disabled={props.disabled || isPaymentScreenLoading} 
+      <ButtonPrimaryEnd
+        disabled={props.disabled || isPaymentScreenLoading}
         label={props.label}
         iconName={props.iconName}
-        onPressFn={() => openPaymentSheet()} 
+        onPressFn={() => openPaymentSheet()}
         isLoading={isPaymentScreenLoading}
-        extraClasses='mb-3'
+        extraClasses="mb-3"
       />
     </StripeProvider>
   );

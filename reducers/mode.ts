@@ -1,26 +1,26 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type ModeData = {
-    mode: string
-}
+  mode: string;
+};
 
 export type ModeState = {
-    value: ModeData
-}
+  value: ModeData;
+};
 
 const initialState: ModeState = {
-    value: { mode: "light"}
-}
+  value: { mode: "light" },
+};
 
 export const modeSlice = createSlice({
-    name: 'mode',
-    initialState,
-    reducers: {
-        changeMode: (state: ModeState, action: PayloadAction<ModeData>): void => {
-            state.value.mode = action.payload
-        }
-    }
-})
+  name: "mode",
+  initialState,
+  reducers: {
+    changeMode: (state: ModeState, action: PayloadAction<ModeData>): void => {
+      state.value.mode = action.payload;
+    },
+  },
+});
 
-export const { changeMode } = modeSlice.actions
-export default modeSlice.reducer
+export const { changeMode } = modeSlice.actions;
+export default modeSlice.reducer;

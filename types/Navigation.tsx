@@ -5,32 +5,28 @@ type RootStackParamList = {
   SignIn: undefined;
   SignUp: undefined;
   TabNavigatorUser: {
-    screen: 'Accueil' 
-    | 'Panier'
-    | 'Favoris'
-    | 'Profil'
-    | 'ShopUser'
-    | 'WithdrawModesUser'
-    | 'OrdersCustomer'
-    | 'PaymentCustomer'
-    | 'BookmarksCustomer'
-    | 'OrderCustomer'
+    screen:
+      | "Accueil"
+      | "Panier"
+      | "Favoris"
+      | "Profil"
+      | "ShopUser"
+      | "WithdrawModesUser"
+      | "OrdersCustomer"
+      | "PaymentCustomer"
+      | "BookmarksCustomer"
+      | "OrderCustomer";
   };
   TabNavigatorProducer: {
-    screen: 'Accueil' 
-    | 'Boutique'
-    | 'Business Center'
-    | 'ProducerProfile'
+    screen: "Accueil" | "Boutique" | "Business Center" | "ProducerProfile";
   };
   GestionDesStocks: undefined;
   ShopProducer: undefined;
   ProfilProducer: undefined;
   SearchCustomer: undefined;
-  MapCustomer: undefined; 
+  MapCustomer: undefined;
   ShopUser: undefined;
   OrderCustomer: undefined;
 };
 
-export type {
-  RootStackParamList
-}
+export type { RootStackParamList };

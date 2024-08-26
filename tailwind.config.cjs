@@ -17,17 +17,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'primary': '#98B66E',
-        'secondary': '#262E20',
-        'lightbg': '#FCFFF0',
-        'darkbg': '#262E20',
-        'tertiary': '#444C3D',
-        'danger': '#942911',
-        'warning': '#D16014',
-      }},
+        primary: "#98B66E",
+        secondary: "#262E20",
+        lightbg: "#FCFFF0",
+        darkbg: "#262E20",
+        tertiary: "#444C3D",
+        danger: "#942911",
+        warning: "#D16014",
+      },
+    },
   },
   plugins: [],
 };
-
-
-
