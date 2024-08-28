@@ -21,6 +21,7 @@ import SwitchInput from "../../components/utils/inputs/Switch";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import ButtonIcon from "../../components/utils/buttons/Icon";
 import TextBody1 from "../../components/utils/texts/Body1";
+import ButtonBack from "../../components/utils/buttons/Back";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
 const FontAwesome = _Fontawesome as React.ElementType;
 
@@ -102,8 +103,8 @@ export default function ShopProducteurScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg p-3">
-      <ScrollView className="w-full flex-1">
+    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
+      <ScrollView className="w-full flex-1 p-3">
         <TextHeading2 extraClasses="my-3">Boutique</TextHeading2>
 
         <View className="flex flex-row justify-between items-center">
@@ -279,23 +280,12 @@ export default function ShopProducteurScreen({ navigation }: Props) {
             setLogoModalVisible(!logoModalVisible);
           }}
         >
-          <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg p-3 items-center">
-            <TouchableOpacity
-              onPress={() => setLogoModalVisible(!logoModalVisible)}
-            >
-              <FontAwesome
-                name="arrow-left"
-                size={25}
-                color="#98B66E"
-                className="absolute"
-                style={{ right: 20 }}
-              />
-            </TouchableOpacity>
-
-            <View className="flex-1 justify-center">
-              <TextHeading3 centered extraClasses="mb-5">
+          <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg items-center">
+            <View className="flex-1 justify-start p-3 w-full">
+              <ButtonBack onPressFn={() => setLogoModalVisible(false)} />
+              <TextHeading2 centered extraClasses="mb-5">
                 Modifier le logo
-              </TextHeading3>
+              </TextHeading2>
               <Text
                 value={logoFile}
                 onChangeText={(value: string) => setLogoFile(value)}

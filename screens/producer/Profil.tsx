@@ -93,7 +93,7 @@ export default function ProfilProducerScreen({ navigation }: Props) {
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <View className="items-center w-full flex-1">
-        <ScrollView className="w-full p-5">
+        <ScrollView className="w-full p-3">
           <TextHeading2 extraClasses="my-3">Profil Producteur</TextHeading2>
 
           <Text
