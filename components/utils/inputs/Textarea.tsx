@@ -29,13 +29,13 @@ export default function InputTextarea(props: InputTextareaProps): JSX.Element {
     >
       <View className="flex w-4/6">
         <Text
-          className={`${props.size === "large" ? "text-lg" : "text-xs"} font-bold text-secondary/50 uppercase p-0`}
+          className={`${props.size === "large" ? "text-lg" : "text-xs"} font-bold text-secondary/50 uppercase p-0 dark:text-lightbg/50`}
         >
           {props.label}
         </Text>
         <TextInput
           value={props.value}
-          className={`${props.size === "large" ? "text-lg" : "text-xs"} ${props.iconName ? "w-80" : "w-full"}`}
+          className={`${props.size === "large" ? "text-lg" : "text-sm"} ${props.iconName ? "w-80" : "w-full"}`}
           placeholder={props.placeholder}
           onChangeText={(value) => props.onChangeText(value)}
           autoCapitalize={props.autoCapitalize ? "none" : props.autoCapitalize}
