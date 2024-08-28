@@ -36,9 +36,9 @@ const updateUser = async (token: string, values: string) => {
       },
       body: JSON.stringify(values),
     });
+    console.log(response);
 
     const data = await response.json();
-
     return data;
   } catch (error) {
     console.error(error);
