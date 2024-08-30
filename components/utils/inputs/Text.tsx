@@ -13,6 +13,7 @@ type InputTextProps = {
   textContentType?: string;
   autoComplete?: string;
   onChangeText: Function;
+  editable?: boolean;
   value?: string;
   size?: string;
   extraClasses?: string;
@@ -30,7 +31,7 @@ export default function InputText(props: InputTextProps): JSX.Element {
     >
       <View className={`flex ${props.iconName ? "w-4/6" : "w-full"}`}>
         <Text
-          className={`${props.size === "large" ? "text-lg" : "text-sm"} font-bold text-secondary/50 uppercase p-0 dark:text-lightbg/50`}
+          className={`${props.size === "large" ? "text-md" : "text-sm"} font-bold text-secondary/50 uppercase p-0 dark:text-lightbg/50`}
         >
           {props.label}
         </Text>
@@ -42,6 +43,7 @@ export default function InputText(props: InputTextProps): JSX.Element {
           onChangeText={(value) => props.onChangeText(value)}
           autoCapitalize={props.autoCapitalize ? "none" : props.autoCapitalize}
           secureTextEntry={props.secureTextEntry}
+          editable={props.editable}
         ></TextInput>
       </View>
 

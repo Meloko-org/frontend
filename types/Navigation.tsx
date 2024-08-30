@@ -27,10 +27,6 @@ type RootStackParamList = {
   MapCustomer: undefined;
   ShopUser: undefined;
   OrderCustomer: undefined;
-  PhotoShopProducer: undefined;
-  VideoShopProducer: undefined;
-  ClickCollectShopProducer: undefined;
-  MarketsShopProducer: undefined;
 };
 
 export type { RootStackParamList };

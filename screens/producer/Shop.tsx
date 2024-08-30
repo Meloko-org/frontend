@@ -2,6 +2,8 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
+import typesTools from "../../modules/typesTools";
+import { useAuth } from "@clerk/clerk-expo";
 
 /* Eléments graphiques */
 import {
@@ -11,8 +13,10 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
+  Platform,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
+// import { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import Text from "../../components/utils/inputs/Text";
@@ -23,6 +27,11 @@ import ButtonIcon from "../../components/utils/buttons/Icon";
 import TextBody1 from "../../components/utils/texts/Body1";
 import ButtonBack from "../../components/utils/buttons/Back";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
+import LogoModal from "../../components/modals/producer/logo";
+import PhotoModal from "../../components/modals/producer/Photo";
+import VideoModal from "../../components/modals/producer/Video";
+import ClickCollectModal from "../../components/modals/producer/ClickCollect";
+import MarketsModal from "../../components/modals/producer/Markets";
 const FontAwesome = _Fontawesome as React.ElementType;
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
@@ -49,36 +58,42 @@ export default function ShopProducteurScreen({ navigation }: Props) {
     country: "",
   });
 
+  const { getToken } = useAuth();
+
   const [isShopSaveLoading, setShopSaveLoading] = useState(false);
   const [isReopenDateVisible, setReopenDateVisible] = useState(false);
+  const [reopenDate, setReopenDate] = useState();
+  const [showPicker, setShowPicker] = useState(false);
   const [date, setDate] = useState(new Date());
 
-  const [logoModalVisible, setLogoModalVisible] = useState(false);
-  const [logoFile, setLogoFile] = useState();
+  /* Gestion de l'affichage des modals */
+  const [isLogoModalVisible, setLogoModalVisible] = useState(false);
+  const [isPhotoModalVisible, setPhotoModalVisible] = useState(false);
+  const [isVideoModalVisible, setVideoModalVisible] = useState(false);
+  const [isClickCollectModalVisible, setClickCollectModalVisible] =
+    useState(false);
+  const [isMarketsModalVisible, setMarketsModalVisible] = useState(false);
 
-  const fetchTypes = async () => {
-    const response = await fetch(`${API_ROOT}/types`);
-    const bddTypes = await response.json();
-
-    return bddTypes;
-  };
+  const [shopTypes, setShopTypes] = useState([]);
 
   let typesToDisplay = ["Maraîcher", "Fromager", "Viticulteur"];
 
-  /*useEffect(() => {
+  useEffect(() => {
     (async () => {
-      const typesFromBdd = await fetchTypes()
-      typesToDisplay = [...typesFromBdd]
-    })()
-    
-  }, [])*/
+      const token = await getToken();
+      const response = await typesTools.getTypes(token);
 
-  const typesList = typesToDisplay.map((item: String, i) => {
+      console.log(response);
+      setShopTypes(response);
+    })();
+  }, []);
+
+  const typesList = shopTypes.map((item, i) => {
     return (
       <SwitchInput
         key={i}
         thumbColor="#215487"
-        label={item}
+        label={item.name}
         value={false}
         onValueChange={() => handleSwitchType()}
         extraClasses="pl-5 mb-2"
@@ -88,18 +103,30 @@ export default function ShopProducteurScreen({ navigation }: Props) {
 
   const handleSwitchType = () => {};
 
-  const handleSelectFile = () => {};
-
-  const handleUploadFile = () => {
-    /* créer fonction d'upload du fichier */
-    setLogoModalVisible(!logoModalVisible);
-  };
-
   const handleShopUpdate = () => {};
 
-  const handleActiveShop = () => {
-    setReopenDateVisible(true);
-    console.log("openDate :", isReopenDateVisible);
+  const handleReopenDate = () => {
+    setReopenDateVisible(!isReopenDateVisible);
+    setReopenDate(undefined);
+  };
+
+  const handleDateChange = ({ type }, selectedDate) => {
+    if (type == "set") {
+      const currentDate = selectedDate;
+      setDate(currentDate);
+      toggleDatePicker();
+      setReopenDate(currentDate.toDateString());
+      // if (Platform.OS === "android") {
+      //   toggleDatePicker()
+      //   setReopenDate(currentDate.toDateString())
+      // }
+    } else {
+      toggleDatePicker();
+    }
+  };
+
+  const toggleDatePicker = () => {
+    setShowPicker(!showPicker);
   };
 
   return (
@@ -237,77 +264,85 @@ export default function ShopProducteurScreen({ navigation }: Props) {
           <ButtonIcon
             iconName="photo"
             extraClasses="p-4 mr-3 h-[50px]"
-            onPressFn={() => navigation.navigate("PhotoShopProducer")}
+            onPressFn={() => setPhotoModalVisible(true)}
           />
           <ButtonIcon
             iconName="video-camera"
             extraClasses="p-4 mr-3"
-            onPressFn={() => navigation.navigate("VideoShopProducer")}
+            onPressFn={() => setVideoModalVisible(true)}
           />
           <ButtonIcon
             iconName="shopping-bag"
             extraClasses="p-4 mr-3"
-            onPressFn={() => navigation.navigate("ClickCollectShopProducer")}
+            onPressFn={() => setClickCollectModalVisible(true)}
           />
           <ButtonIcon
             iconName="globe"
             extraClasses="p-4 mr-3"
-            onPressFn={() => navigation.navigate("MarketsShopProducer")}
+            onPressFn={() => setMarketsModalVisible(true)}
           />
         </View>
 
-        <View className="flex mt-5 pl-3 items-center">
+        <View className="flex my-5 pl-3 items-center">
           <SwitchInput
             thumbColor="#215487"
             label="Désactiver la boutique"
             value={false}
             extraClasses="pl-5 mb-2"
-            onPressFn={handleActiveShop}
+            onPressFn={handleReopenDate}
           />
           {isReopenDateVisible && (
             <View>
               <TextBody1>Sélectionner une date de réouverture</TextBody1>
-              <DateTimePicker mode="date" display="spinner" value={date} />
+              <Text
+                placeholder="Choisissez une date"
+                label="Date de réouverture"
+                editable={false}
+                onChangeText={(value: string) => setReopenDate(value)}
+                value={reopenDate}
+                iconName="calendar"
+                onIconPressFn={toggleDatePicker}
+                size="large"
+              />
+              {showPicker && (
+                <DateTimePicker
+                  mode="date"
+                  display="spinner"
+                  value={date}
+                  onChange={handleDateChange}
+                />
+              )}
             </View>
           )}
         </View>
 
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={logoModalVisible}
-          onRequestClose={() => {
-            setLogoModalVisible(!logoModalVisible);
-          }}
-        >
-          <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg items-center">
-            <View className="flex-1 justify-start p-3 w-full">
-              <ButtonBack onPressFn={() => setLogoModalVisible(false)} />
-              <TextHeading2 centered extraClasses="mb-5">
-                Modifier le logo
-              </TextHeading2>
-              <Text
-                value={logoFile}
-                onChangeText={(value: string) => setLogoFile(value)}
-                placeholder="Sélectionnez un fichier"
-                label="Logo de la boutique"
-                autoCapitalize="none"
-                extraClasses="w-full mb-5"
-                size="large"
-                iconName="search"
-                onIconPressFn={handleSelectFile}
-              />
-              <ButtonPrimaryEnd
-                label="Sauvegarder"
-                iconName="upload"
-                onPressFn={handleUploadFile}
-                isLoading={false}
-              />
-            </View>
-          </SafeAreaView>
-        </Modal>
+        <View className="h-[200px]"></View>
+
+        <LogoModal
+          isVisible={isLogoModalVisible}
+          onCloseFn={() => setLogoModalVisible(false)}
+        />
+
+        <PhotoModal
+          isVisible={isPhotoModalVisible}
+          onCloseFn={() => setPhotoModalVisible(false)}
+        />
+
+        <VideoModal
+          isVisible={isVideoModalVisible}
+          onCloseFn={() => setVideoModalVisible(false)}
+        />
+
+        <ClickCollectModal
+          isVisible={isClickCollectModalVisible}
+          onCloseFn={() => setClickCollectModalVisible(false)}
+        />
+
+        <MarketsModal
+          isVisible={isMarketsModalVisible}
+          onCloseFn={() => setMarketsModalVisible(false)}
+        />
       </ScrollView>
     </SafeAreaView>
-    // <Button title="Create my producer profile" onPress={() => navigation.navigate('ProfilProducer')}/>
   );
 }
