@@ -35,7 +35,7 @@ export default function InputTextarea(props: InputTextareaProps): JSX.Element {
         </Text>
         <TextInput
           value={props.value}
-          className={`${props.size === "large" ? "text-lg" : "text-sm"} ${props.iconName ? "w-80" : "w-full"}`}
+          className={`${props.size === "large" ? "text-lg" : "text-sm"} ${props.iconName ? "w-80" : "w-full"} dark:text-lightbg`}
           placeholder={props.placeholder}
           onChangeText={(value) => props.onChangeText(value)}
           autoCapitalize={props.autoCapitalize ? "none" : props.autoCapitalize}

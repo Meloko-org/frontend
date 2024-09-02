@@ -45,7 +45,8 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import user from "./reducers/user";
 import cart from "./reducers/cart";
 import mode from "./reducers/mode";
-const reducers = combineReducers({ user, cart, mode });
+import shop from "./reducers/shop";
+const reducers = combineReducers({ user, cart, mode, shop });
 const persistConfig = {
   key: "meloko",
   storage: AsyncStorage,

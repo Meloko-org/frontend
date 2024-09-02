@@ -58,12 +58,21 @@ type ShopData = {
   name: string;
   logo: string;
   description: string;
+  address: AddressData;
   markets: MarketData[];
   clickCollect: object;
   notes: { note: { $numberDecimal: string } | number | any }[];
   products?: StockData[];
   [key: string]: any;
 } | null;
+
+type AddressData = {
+  address1: string | null;
+  address2: String | null;
+  postalCode: Number | null;
+  city: String | null;
+  country: String | null;
+};
 
 type UserData = {
   email: string | null;
@@ -94,4 +103,5 @@ export type {
   MarketData,
   OrderData,
   ProducerData,
+  AddressData,
 };

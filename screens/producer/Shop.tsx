@@ -4,6 +4,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 import typesTools from "../../modules/typesTools";
 import { useAuth } from "@clerk/clerk-expo";
+import shopTools from "../../modules/shopTools";
+import { useDispatch, useSelector } from "react-redux";
+import { setShopData, ShopState } from "../../reducers/shop";
+import { UserState } from "../../reducers/user";
 
 /* Eléments graphiques */
 import {
@@ -27,11 +31,12 @@ import ButtonIcon from "../../components/utils/buttons/Icon";
 import TextBody1 from "../../components/utils/texts/Body1";
 import ButtonBack from "../../components/utils/buttons/Back";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
-import LogoModal from "../../components/modals/producer/logo";
+import LogoModal from "../../components/modals/producer/Logo";
 import PhotoModal from "../../components/modals/producer/Photo";
 import VideoModal from "../../components/modals/producer/Video";
 import ClickCollectModal from "../../components/modals/producer/ClickCollect";
 import MarketsModal from "../../components/modals/producer/Markets";
+
 const FontAwesome = _Fontawesome as React.ElementType;
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
@@ -46,9 +51,9 @@ type Props = {
 };
 
 export default function ShopProducteurScreen({ navigation }: Props) {
-  const [name, setName] = useState("");
-  const [desc, setDesc] = useState("");
-  const [siret, setSiret] = useState("");
+  const [name, setName] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [siret, setSiret] = useState<string>("");
   const [types, setTypes] = useState([]);
   const [address, setAddress] = useState({
     address1: "",
@@ -60,7 +65,17 @@ export default function ShopProducteurScreen({ navigation }: Props) {
 
   const { getToken } = useAuth();
 
+  const userStore = useSelector(
+    (state: { user: UserState }) => state.user.value,
+  );
+  const shopStore = useSelector(
+    (state: { shop: ShopState }) => state.shop.value,
+  );
+  const dispatch = useDispatch();
+
   const [isShopSaveLoading, setShopSaveLoading] = useState(false);
+
+  /* gestion du switch de désactivation de la boutique */
   const [isReopenDateVisible, setReopenDateVisible] = useState(false);
   const [reopenDate, setReopenDate] = useState();
   const [showPicker, setShowPicker] = useState(false);
@@ -80,11 +95,32 @@ export default function ShopProducteurScreen({ navigation }: Props) {
 
   useEffect(() => {
     (async () => {
+      /* retrieve types shop from bdd */
       const token = await getToken();
       const response = await typesTools.getTypes(token);
-
-      console.log(response);
       setShopTypes(response);
+
+      /* retrieve shop infos if exists */
+      if (shopStore === null) {
+        const shopInfos = await shopTools.getShopInfos(
+          token,
+          userStore.producer._id,
+        );
+
+        if (shopInfos) {
+          dispatch(setShopData(shopInfos));
+          setName(shopStore.name);
+          setDescription(shopStore.description);
+          setSiret(shopStore.siret);
+          setAddress({
+            address1: shopStore.address.address1,
+            address2: shopStore.address.address2,
+            postalCode: shopStore.address.postalCode,
+            city: shopStore.address.city,
+            country: shopStore.address.country,
+          });
+        }
+      }
     })();
   }, []);
 
@@ -103,7 +139,25 @@ export default function ShopProducteurScreen({ navigation }: Props) {
 
   const handleSwitchType = () => {};
 
-  const handleShopUpdate = () => {};
+  const handleSaveShop = async () => {
+    try {
+      setShopSaveLoading(true);
+      const token = await getToken();
+      const values = { name, description, siret, address };
+      const data = await shopTools.createNewShop(token, values);
+      if (data) {
+        Alert.alert(
+          "Mise à jour de votre profil",
+          "Votre profil à bien été mis à jour.",
+        );
+        dispatch(setShopData(data));
+      }
+      setShopSaveLoading(false);
+    } catch (error) {
+      console.log(error);
+      setShopSaveLoading(false);
+    }
+  };
 
   const handleReopenDate = () => {
     setReopenDateVisible(!isReopenDateVisible);
@@ -128,6 +182,8 @@ export default function ShopProducteurScreen({ navigation }: Props) {
   const toggleDatePicker = () => {
     setShowPicker(!showPicker);
   };
+
+  // console.log("SHOP -> shopStore: ", shopStore)
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -169,8 +225,8 @@ export default function ShopProducteurScreen({ navigation }: Props) {
         <InputTextarea
           label="Description"
           placeholder="Décrivez votre boutique"
-          value={desc}
-          onChangeText={(value: string) => setDesc(value)}
+          value={description}
+          onChangeText={(value: string) => setDescription(value)}
           extraClasses="mb-2 w-full"
         />
 
@@ -193,7 +249,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
         />
         <Text
           label="Adresse complément"
-          placeholder="Saisissez votre adresse"
+          placeholder="Complément d'adresse"
           value={address.address2}
           onChangeText={(value: string) =>
             setAddress({
@@ -253,10 +309,10 @@ export default function ShopProducteurScreen({ navigation }: Props) {
         />
         <ButtonPrimaryEnd
           label="Mettre à jour"
-          iconName="arrow-right"
+          iconName="refresh"
           disabled={isShopSaveLoading}
           extraClasses="my-5"
-          onPressFn={() => handleShopUpdate()}
+          onPressFn={() => handleSaveShop()}
           isLoading={isShopSaveLoading}
         />
 

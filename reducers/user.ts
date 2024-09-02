@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserData } from "../types/API";
+import { UserData, OrderData } from "../types/API";
 
 export type UserState = {
   value: UserData;
@@ -26,7 +26,7 @@ export const userSlice = createSlice({
     updateUser: (state: UserState, action: PayloadAction<UserData>): void => {
       state.value = action.payload;
     },
-    addOrder: (state: UserState, action: PayloadAction): void => {
+    addOrder: (state: UserState, action: PayloadAction<OrderData>): void => {
       state.value.orders.push(action.payload);
     },
     resetUser: (state: UserState): void => {
