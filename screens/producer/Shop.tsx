@@ -36,6 +36,7 @@ import PhotoModal from "../../components/modals/producer/Photo";
 import VideoModal from "../../components/modals/producer/Video";
 import ClickCollectModal from "../../components/modals/producer/ClickCollect";
 import MarketsModal from "../../components/modals/producer/Markets";
+import { ProducerState } from "../../reducers/producer";
 
 const FontAwesome = _Fontawesome as React.ElementType;
 
@@ -67,6 +68,9 @@ export default function ShopProducteurScreen({ navigation }: Props) {
 
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
+  );
+  const producerStore = useSelector(
+    (state: { producer: ProducerState }) => state.producer.value,
   );
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
@@ -102,27 +106,36 @@ export default function ShopProducteurScreen({ navigation }: Props) {
 
       /* retrieve shop infos if exists */
       if (shopStore === null) {
+        console.log("shopstore null");
         const shopInfos = await shopTools.getShopInfos(
           token,
-          userStore.producer._id,
+          producerStore.producer._id,
         );
 
         if (shopInfos) {
+          console.log("shop infos reçues");
           dispatch(setShopData(shopInfos));
-          setName(shopStore.name);
-          setDescription(shopStore.description);
-          setSiret(shopStore.siret);
-          setAddress({
-            address1: shopStore.address.address1,
-            address2: shopStore.address.address2,
-            postalCode: shopStore.address.postalCode,
-            city: shopStore.address.city,
-            country: shopStore.address.country,
-          });
+          //fillFields()
+          console.log("SHOP -> shopStore: ", shopStore);
         }
+      } else {
+        //fillFields()
       }
     })();
   }, []);
+
+  const fillFields = () => {
+    setName(shopStore.name);
+    setDescription(shopStore.description);
+    setSiret(shopStore.siret);
+    setAddress({
+      address1: shopStore.address.address1,
+      address2: shopStore.address.address2,
+      postalCode: shopStore.address.postalCode,
+      city: shopStore.address.city,
+      country: shopStore.address.country,
+    });
+  };
 
   const typesList = shopTypes.map((item, i) => {
     return (
@@ -182,8 +195,6 @@ export default function ShopProducteurScreen({ navigation }: Props) {
   const toggleDatePicker = () => {
     setShowPicker(!showPicker);
   };
-
-  // console.log("SHOP -> shopStore: ", shopStore)
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

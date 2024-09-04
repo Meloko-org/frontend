@@ -1,3 +1,5 @@
+import { ShopData } from "../types/API";
+
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
 const createNewShop = async (token: string, values: string) => {
@@ -19,7 +21,7 @@ const createNewShop = async (token: string, values: string) => {
   }
 };
 
-const getShopInfos = async (token: string, id: string) => {
+const getShopInfos = async (token: string, id: string): Promise<ShopData> => {
   try {
     console.log(`${API_ROOT}/shops/myshop/${id}`);
     const response = await fetch(`${API_ROOT}/shops/myshop/${id}`, {
@@ -31,10 +33,11 @@ const getShopInfos = async (token: string, id: string) => {
       },
     });
     const data = await response.json();
-
+    // console.log("getShopInfos: ", data)
     return data;
   } catch (error) {
     console.log(error);
+    return null;
   }
 };
 

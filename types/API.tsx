@@ -91,8 +91,8 @@ type ProducerData = {
   siren: number | null;
   owner: UserData;
   iban: string | null;
-  address: Object | null;
-};
+  address: AddressData;
+} | null;
 
 export type {
   ProductData,

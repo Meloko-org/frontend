@@ -17,8 +17,12 @@ import TextHeading1 from "../components/utils/texts/Heading1";
 import TextHeading2 from "../components/utils/texts/Heading2";
 import TextBody1 from "../components/utils/texts/Body1";
 import userTools from "../modules/userTools";
+import producerTools from "../modules/producerTools";
+import shopTools from "../modules/shopTools";
 import { useSelector, useDispatch } from "react-redux";
 import { UserState, updateUser, resetUser } from "../reducers/user";
+import { ProducerState, setProducerData } from "../reducers/producer";
+import { ShopState, setShopData } from "../reducers/shop";
 import { ModeState } from "../reducers/mode";
 import TextHeading4 from "../components/utils/texts/Heading4";
 import TextHeading3 from "../components/utils/texts/Heading3";
@@ -58,9 +62,9 @@ export default function HomeScreen({ navigation }: Props) {
       // store user's info in the store
       const token = await getToken();
       const user = await userTools.getUserInfos(token);
+      // console.log("HOME : user :", user)
       if (user) {
         dispatch(updateUser(user));
-        console.log("home -> store: ", userStore);
       }
     } catch (error) {
       console.error(error);
@@ -68,7 +72,7 @@ export default function HomeScreen({ navigation }: Props) {
   };
 
   useEffect(() => {
-    if (modeStore.mode === "dark") {
+    if (modeStore.mode === "dark" && colorScheme === "light") {
       toggleColorScheme();
     }
     if (isSignedIn) {
@@ -143,6 +147,8 @@ export default function HomeScreen({ navigation }: Props) {
   };
 
   const logo = colorScheme === "dark" ? LogoDark : LogoLight;
+
+  console.log("home screen");
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">

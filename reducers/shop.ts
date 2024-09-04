@@ -18,6 +18,7 @@ export const shopSlice = createSlice({
     },
     resetShopData: (state: ShopState): void => {
       state.value = null;
+      console.log("shop reset", state);
     },
     addProducts: (state: ShopState, action: PayloadAction<StockData>): void => {
       if (state.value && state.value.products) {

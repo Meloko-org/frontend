@@ -46,7 +46,8 @@ import user from "./reducers/user";
 import cart from "./reducers/cart";
 import mode from "./reducers/mode";
 import shop from "./reducers/shop";
-const reducers = combineReducers({ user, cart, mode, shop });
+import producer from "./reducers/producer";
+const reducers = combineReducers({ user, cart, mode, shop, producer });
 const persistConfig = {
   key: "meloko",
   storage: AsyncStorage,

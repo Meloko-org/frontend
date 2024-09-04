@@ -19,9 +19,12 @@ import InputText from "../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import ButtonBack from "../components/utils/buttons/Back";
 import { useDispatch, useSelector } from "react-redux";
-import { updateUser } from "../reducers/user";
-import { UserState } from "../reducers/user";
+import { UserState, updateUser } from "../reducers/user";
+import { ProducerState, setProducerData } from "../reducers/producer";
+import { ShopState, setShopData } from "../reducers/shop";
 import userTools from "../modules/userTools";
+import producerTools from "../modules/producerTools";
+import shopTools from "../modules/shopTools";
 import { useAuth } from "@clerk/clerk-expo";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
@@ -103,15 +106,14 @@ export default function SignInScreen(props) {
 
   const fetchData = async () => {
     try {
-      // store user's info in the store
+      // store user info in the store
       const token = await getToken();
-      console.log("token: ", token);
+      // console.log("token: ", token);
       const user = await userTools.getUserInfos(token);
-
       if (user) {
         dispatch(updateUser(user));
-        handleCloseModal();
       }
+      handleCloseModal();
     } catch (error) {
       console.error(error);
     }

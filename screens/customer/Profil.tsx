@@ -10,6 +10,12 @@ import { useAuth } from "@clerk/clerk-expo";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { UserState, updateUser, resetUser } from "../../reducers/user";
+import {
+  ProducerState,
+  setProducerData,
+  resetProducerData,
+} from "../../reducers/producer";
+import { ShopState, setShopData, resetShopData } from "../../reducers/shop";
 import { ModeState, changeMode } from "../../reducers/mode";
 import { emptyCart } from "../../reducers/cart";
 
@@ -18,6 +24,7 @@ import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextBody1 from "../../components/utils/texts/Body1";
 import TextBody2 from "../../components/utils/texts/Body2";
 import userTools from "../../modules/userTools";
+import producerTools from "../../modules/producerTools";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
 const FontAwesome = _Fontawesome as React.ElementType;
 
@@ -25,6 +32,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import { ScrollView } from "react-native-gesture-handler";
+import shopTools from "../../modules/shopTools";
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Home"
@@ -39,9 +47,18 @@ export default function ProfilScreen({ navigation }: Props) {
   const { signOut, isSignedIn, getToken } = useAuth();
 
   const dispatch = useDispatch();
-  const user = useSelector((state: { user: UserState }) => state.user.value);
+  const userStore = useSelector(
+    (state: { user: UserState }) => state.user.value,
+  );
   const modeStore = useSelector(
     (state: { mode: ModeState }) => state.mode.value,
+  );
+
+  const producerStore = useSelector(
+    (state: { producer: ProducerState }) => state.producer.value,
+  );
+  const shopStore = useSelector(
+    (state: { shop: ShopState }) => state.shop.value,
   );
 
   const [isSigninModalVisible, setIsSigninModalVisible] =
@@ -57,11 +74,36 @@ export default function ProfilScreen({ navigation }: Props) {
     if (!isSignedIn) {
       setIsSigninModalVisible(true);
     } else {
-      setFirstname(user.firstname);
-      setLastname(user.lastname);
-      setEmail(user.email);
+      fetchData();
+      setFirstname(userStore.firstname);
+      setLastname(userStore.lastname);
+      setEmail(userStore.email);
+      console.log("customer : PRODUCER STORE: ", producerStore);
+      console.log("customer : SHOP STORE: ", shopStore);
     }
-  }, [user, isSignedIn]);
+  }, [userStore, isSignedIn, dispatch]);
+
+  const fetchData = async () => {
+    try {
+      const token = await getToken();
+      // console.log("token: ", token);
+      // store producer info in the store
+      const producerInfos = await producerTools.getProducerInfos(token);
+      if (producerInfos) {
+        dispatch(setProducerData(producerInfos));
+        // store shop infos to the store
+        const shopInfos = await shopTools.getShopInfos(
+          token,
+          producerInfos.producer._id,
+        );
+        if (shopInfos) {
+          dispatch(setShopData(shopInfos));
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleSaveUser = async () => {
     try {
@@ -92,6 +134,8 @@ export default function ProfilScreen({ navigation }: Props) {
       await signOut();
       dispatch(resetUser());
       dispatch(emptyCart());
+      dispatch(resetProducerData());
+      dispatch(resetShopData());
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
     }
@@ -115,9 +159,6 @@ export default function ProfilScreen({ navigation }: Props) {
     dispatch(changeMode(displayMode));
   };
 
-  // console.log("Profil User -> store: ", user)
-  // console.log("display mode: ", modeStore)
-
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <View className="p-3">
@@ -126,7 +167,7 @@ export default function ProfilScreen({ navigation }: Props) {
             <TextHeading2 extraClasses="mb-5">Profil</TextHeading2>
             <ScrollView>
               <View className="w-full">
-                {user.clerkPasswordEnabled === true ? (
+                {userStore.clerkPasswordEnabled === true ? (
                   <>
                     <Text
                       placeholder="Changez votre email"
@@ -157,7 +198,7 @@ export default function ProfilScreen({ navigation }: Props) {
                         EMAIL
                       </TextBody2>
                       <TextHeading4 extraClasses="mb-5">
-                        {user.email}
+                        {userStore.email}
                       </TextHeading4>
                     </View>
                   </>

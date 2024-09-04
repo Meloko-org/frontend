@@ -15,6 +15,7 @@ import TextHeading3 from "../../components/utils/texts/Heading3";
 import Text from "../../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import Custom from "../../components/utils/buttons/Custom";
+import { ProducerData, ShopData } from "../../types/API";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -32,6 +33,12 @@ export default function ProfilProducerScreen({ navigation }: Props) {
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
   );
+  const producerStore = useSelector(
+    (state: { producer: ProducerData }) => state.producer.value,
+  );
+  const shopStore = useSelector(
+    (state: { shop: ShopData }) => state.shop.value,
+  );
   const dispatch = useDispatch();
 
   const [socialReason, setSocialReason] = useState<string>("");
@@ -47,21 +54,23 @@ export default function ProfilProducerScreen({ navigation }: Props) {
   });
 
   useEffect(() => {
-    console.log("PROFIL PROd -> userStore.prod: ", userStore.producer);
+    console.log("userStore.prod: ", userStore);
+    console.log("producer : PRODUCER STORE: ", producerStore);
+    console.log("producer : SHOP STORE: ", shopStore);
     if (userStore.producer !== null) {
-      setSocialReason(userStore.producer.socialReason);
-      setSiren(userStore.producer.siren);
-      setIban(userStore.producer.iban);
-      setBic(userStore.producer.bic);
+      setSocialReason(producerStore.producer.socialReason);
+      setSiren(producerStore.producer.siren);
+      setIban(producerStore.producer.iban);
+      setBic(producerStore.producer.bic);
       setAddress({
-        address1: userStore.producer.address.address1,
-        address2: userStore.producer.address.address2,
-        postalCode: userStore.producer.address.postalCode,
-        city: userStore.producer.address.city,
-        country: userStore.producer.address.country,
+        address1: producerStore.producer.address.address1,
+        address2: producerStore.producer.address.address2,
+        postalCode: producerStore.producer.address.postalCode,
+        city: producerStore.producer.address.city,
+        country: producerStore.producer.address.country,
       });
     }
-  }, [userStore]);
+  }, [producerStore]);
 
   const handleProducerUpdate = async () => {
     try {
