@@ -72,6 +72,8 @@ type AddressData = {
   postalCode: Number | null;
   city: String | null;
   country: String | null;
+  latitude: Number | null;
+  longitude: Number | null;
 };
 
 type UserData = {

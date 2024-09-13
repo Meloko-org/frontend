@@ -108,7 +108,7 @@ export default function SignInScreen(props) {
     try {
       // store user info in the store
       const token = await getToken();
-      // console.log("token: ", token);
+      console.log("token: ", token);
       const user = await userTools.getUserInfos(token);
       if (user) {
         dispatch(updateUser(user));

@@ -59,10 +59,12 @@ export default function HomeScreen({ navigation }: Props) {
 
   const fetchData = async () => {
     try {
+      console.log("fetchData");
       // store user's info in the store
       const token = await getToken();
+      // console.log(token);
       const user = await userTools.getUserInfos(token);
-      // console.log("HOME : user :", user)
+      console.log("HOME : user :", user);
       if (user) {
         dispatch(updateUser(user));
       }

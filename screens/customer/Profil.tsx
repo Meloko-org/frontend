@@ -91,10 +91,11 @@ export default function ProfilScreen({ navigation }: Props) {
       const producerInfos = await producerTools.getProducerInfos(token);
       if (producerInfos) {
         dispatch(setProducerData(producerInfos));
+        console.log(producerInfos);
         // store shop infos to the store
         const shopInfos = await shopTools.getShopInfos(
           token,
-          producerInfos.producer._id,
+          producerInfos._id,
         );
         if (shopInfos) {
           dispatch(setShopData(shopInfos));
