@@ -55,7 +55,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [siret, setSiret] = useState<string>("");
-  const [types, setTypes] = useState([]);
+  const [types, setTypes] = useState<string[]>([]);
   const [address, setAddress] = useState({
     address1: "",
     address2: "",
@@ -93,9 +93,8 @@ export default function ShopProducteurScreen({ navigation }: Props) {
     useState(false);
   const [isMarketsModalVisible, setMarketsModalVisible] = useState(false);
 
+  // Contient les différents types de shop
   const [shopTypes, setShopTypes] = useState([]);
-
-  let typesToDisplay = ["Maraîcher", "Fromager", "Viticulteur"];
 
   useEffect(() => {
     (async () => {
@@ -105,58 +104,57 @@ export default function ShopProducteurScreen({ navigation }: Props) {
       setShopTypes(response);
 
       /* retrieve shop infos if exists */
-      if (shopStore === null) {
-        console.log("shopstore null");
-        const shopInfos = await shopTools.getShopInfos(
-          token,
-          producerStore.producer._id,
-        );
-
-        if (shopInfos) {
-          console.log("shop infos reçues");
-          dispatch(setShopData(shopInfos));
-          //fillFields()
-          console.log("SHOP -> shopStore: ", shopStore);
-        }
-      } else {
-        //fillFields()
+      if (shopStore !== null) {
+        setName(shopStore.name);
+        setDescription(shopStore.description);
+        setSiret(shopStore.siret);
+        setAddress({
+          address1: shopStore.address.address1,
+          address2: shopStore.address.address2,
+          postalCode: shopStore.address.postalCode,
+          city: shopStore.address.city,
+          country: shopStore.address.country,
+        });
       }
     })();
   }, []);
 
-  const fillFields = () => {
-    setName(shopStore.name);
-    setDescription(shopStore.description);
-    setSiret(shopStore.siret);
-    setAddress({
-      address1: shopStore.address.address1,
-      address2: shopStore.address.address2,
-      postalCode: shopStore.address.postalCode,
-      city: shopStore.address.city,
-      country: shopStore.address.country,
+  /**
+   * Permet d'ajouter ou supprimer les id des types de shop en fonction des clics sur les switch
+   * @param typeId string
+   * @param isSelected boolean
+   */
+  const handleSwitchType = (typeId: string, isSelected: boolean) => {
+    setTypes((prevSelectedTypes) => {
+      if (isSelected) {
+        return [...prevSelectedTypes, typeId];
+      } else {
+        return prevSelectedTypes.filter((id) => id !== typeId);
+      }
     });
   };
 
-  const typesList = shopTypes.map((item, i) => {
+  // Créer des switch en fonction des types de shop
+  const typesList = shopTypes.map((item) => {
+    const isSelected = types.includes(item._id);
+    console.log(`${item._id} est ${isSelected}`);
     return (
       <SwitchInput
-        key={i}
+        key={item._id}
         thumbColor="#215487"
         label={item.name}
-        value={false}
-        onValueChange={() => handleSwitchType()}
+        value={isSelected}
+        onValueChange={(isSelected) => handleSwitchType(item._id, isSelected)}
         extraClasses="pl-5 mb-2"
       />
     );
   });
 
-  const handleSwitchType = () => {};
-
   const handleSaveShop = async () => {
     try {
       setShopSaveLoading(true);
       const token = await getToken();
-      const values = { name, description, siret, address };
+      const values = { name, description, siret, address, types };
       const data = await shopTools.createNewShop(token, values);
       if (data) {
         Alert.alert(
@@ -354,9 +352,9 @@ export default function ShopProducteurScreen({ navigation }: Props) {
           <SwitchInput
             thumbColor="#215487"
             label="Désactiver la boutique"
-            value={false}
+            value={isReopenDateVisible}
             extraClasses="pl-5 mb-2"
-            onPressFn={handleReopenDate}
+            onValueChange={handleReopenDate}
           />
           {isReopenDateVisible && (
             <View>

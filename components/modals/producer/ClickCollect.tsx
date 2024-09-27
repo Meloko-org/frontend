@@ -3,6 +3,7 @@ import { SafeAreaView, View, Modal, StyleSheet } from "react-native";
 import TextHeading2 from "../../utils/texts/Heading2";
 import ButtonBack from "../../utils/buttons/Back";
 import InputText from "../../utils/inputs/Text";
+import TextBody1 from "../../utils/texts/Body1";
 import ButtonPrimaryEnd from "../../utils/buttons/PrimaryEnd";
 import { useColorScheme } from "nativewind";
 
@@ -41,6 +42,11 @@ export default function ClickCollectModal(
           <TextHeading2 centered extraClasses="my-5">
             Paramètres du Click & Collect
           </TextHeading2>
+        </View>
+        <View>
+          <TextBody1 centered={true}>
+            Définissez ici les jours et les horaires d'ouverture
+          </TextBody1>
         </View>
       </SafeAreaView>
     </Modal>

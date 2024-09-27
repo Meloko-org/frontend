@@ -54,23 +54,25 @@ export default function ProfilProducerScreen({ navigation }: Props) {
   });
 
   useEffect(() => {
-    console.log("userStore.prod: ", userStore);
-    console.log("producer : PRODUCER STORE: ", producerStore);
-    console.log("producer : SHOP STORE: ", shopStore);
-    if (userStore.producer !== null) {
-      setSocialReason(producerStore.producer.socialReason);
-      setSiren(producerStore.producer.siren);
-      setIban(producerStore.producer.iban);
-      setBic(producerStore.producer.bic);
+    console.log("----- PRODUCER -----------------------------");
+
+    console.log("userStore -> ", userStore);
+    console.log("producerStore -> ", producerStore);
+    console.log("shopstore -> ", shopStore);
+    if (producerStore !== null) {
+      setSocialReason(producerStore.socialReason);
+      setSiren(producerStore.siren);
+      setIban(producerStore.iban);
+      setBic(producerStore.bic);
       setAddress({
-        address1: producerStore.producer.address.address1,
-        address2: producerStore.producer.address.address2,
-        postalCode: producerStore.producer.address.postalCode,
-        city: producerStore.producer.address.city,
-        country: producerStore.producer.address.country,
+        address1: producerStore.address.address1,
+        address2: producerStore.address.address2,
+        postalCode: producerStore.address.postalCode,
+        city: producerStore.address.city,
+        country: producerStore.address.country,
       });
     }
-  }, [producerStore]);
+  }, []);
 
   const handleProducerUpdate = async () => {
     try {
