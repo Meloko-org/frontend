@@ -66,7 +66,6 @@ export default function HomeScreen({ navigation }: Props) {
       const user = await userTools.getUserInfos(token);
       if (user) {
         dispatch(updateUser(user));
-        console.log("userStore -> ", userStore);
       }
     } catch (error) {
       console.error(error);
@@ -74,8 +73,6 @@ export default function HomeScreen({ navigation }: Props) {
   };
 
   useEffect(() => {
-    console.log("----- HOME -----------------------------");
-
     if (modeStore.mode === "dark" && colorScheme === "light") {
       toggleColorScheme();
     }
@@ -152,7 +149,11 @@ export default function HomeScreen({ navigation }: Props) {
 
   const logo = colorScheme === "dark" ? LogoDark : LogoLight;
 
-  // console.log("home screen");
+  console.log(
+    "------------------------- HOME --------------------------------------------------------------------",
+  );
+  console.log("USERSTORE -> ", userStore);
+  console.log("");
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">

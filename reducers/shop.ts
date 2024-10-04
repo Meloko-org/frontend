@@ -1,5 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ShopData, MarketData, StockData } from "../types/API";
+import {
+  ShopData,
+  MarketData,
+  StockData,
+  ClickCollectData,
+} from "../types/API";
 
 export type ShopState = {
   value: ShopData;
@@ -19,6 +24,14 @@ export const shopSlice = createSlice({
     resetShopData: (state: ShopState): void => {
       state.value = null;
       console.log("shop reset", state);
+    },
+    setClickCollect: (
+      state: ShopState,
+      action: PayloadAction<ClickCollectData>,
+    ): void => {
+      if (state.value) {
+        state.value.clickCollect = action.payload;
+      }
     },
     addProducts: (state: ShopState, action: PayloadAction<StockData>): void => {
       if (state.value && state.value.products) {
@@ -45,6 +58,12 @@ export const shopSlice = createSlice({
   },
 });
 
-export const { setShopData, resetShopData, addProducts, addNote, addMarket } =
-  shopSlice.actions;
+export const {
+  setShopData,
+  resetShopData,
+  addProducts,
+  addNote,
+  addMarket,
+  setClickCollect,
+} = shopSlice.actions;
 export default shopSlice.reducer;

@@ -2,10 +2,29 @@ import { ShopData } from "../types/API";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
-const createNewShop = async (token: string, values: string) => {
+const createOrUpdateShop = async (token: string, values: string) => {
   try {
     const response = await fetch(`${API_ROOT}/shops/`, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        mode: "cors",
+      },
+      body: JSON.stringify(values),
+    });
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const updateClickCollect = async (token: string, values: string) => {
+  try {
+    const response = await fetch(`${API_ROOT}/shops/clickCollect`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -33,7 +52,7 @@ const getShopInfos = async (token: string, id: string): Promise<ShopData> => {
       },
     });
     const data = await response.json();
-    // console.log("getShopInfos: ", data)
+    console.log("getShopInfos: ", data);
     return data;
   } catch (error) {
     console.log(error);
@@ -42,6 +61,7 @@ const getShopInfos = async (token: string, id: string): Promise<ShopData> => {
 };
 
 export default {
-  createNewShop,
+  createOrUpdateShop,
   getShopInfos,
+  updateClickCollect,
 };

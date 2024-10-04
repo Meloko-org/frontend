@@ -71,7 +71,6 @@ export default function ProfilScreen({ navigation }: Props) {
   const [isUserSaveLoading, setUserSaveLoading] = useState(false);
 
   useEffect(() => {
-    console.log("----- CUSTOMER -----------------------------");
     if (!isSignedIn) {
       setIsSigninModalVisible(true);
     } else {
@@ -79,23 +78,17 @@ export default function ProfilScreen({ navigation }: Props) {
       setFirstname(userStore.firstname);
       setLastname(userStore.lastname);
       setEmail(userStore.email);
-      console.log("userStore -> ", userStore);
-      console.log("producerStore -> ", producerStore);
-      console.log("shopStore -> ", shopStore);
     }
   }, [userStore, isSignedIn, dispatch]);
 
   const fetchData = async () => {
     try {
       const token = await getToken();
-      // console.log("token: ", token);
       // store producer info in the store
       const producerInfos = await producerTools.getProducerInfos(token);
-      console.log("getProducerInfos executed");
+
       if (producerInfos) {
         dispatch(setProducerData(producerInfos));
-        console.log("getProducerInfos -> ", producerInfos);
-        console.log("id producer :", producerInfos._id);
         // store shop infos to the store
         const shopInfos = await shopTools.getShopInfos(
           token,
@@ -163,6 +156,14 @@ export default function ProfilScreen({ navigation }: Props) {
     const displayMode = modeStore.mode === "light" ? "dark" : "light";
     dispatch(changeMode(displayMode));
   };
+
+  console.log(
+    "------------------------------- CUSTOMER --------------------------------------------------------------------",
+  );
+  console.log("USERSTORE -> ", userStore);
+  console.log("PRODUCERSTORE -> ", producerStore);
+  console.log("SHOPSTORE -> ", shopStore);
+  console.log("");
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

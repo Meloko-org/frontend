@@ -60,11 +60,26 @@ type ShopData = {
   description: string;
   address: AddressData;
   markets: MarketData[];
-  clickCollect: object;
+  clickCollect: ClickCollectData;
   notes: { note: { $numberDecimal: string } | number | any }[];
   products?: StockData[];
   [key: string]: any;
 } | null;
+
+type ClickCollectData = {
+  instructions: string;
+  openingHours: OpeningHoursData[];
+};
+
+type OpeningHoursData = {
+  day: number;
+  periods: PeriodData[];
+};
+
+type PeriodData = {
+  openingTime: string;
+  closingTime: string;
+};
 
 type AddressData = {
   address1: string | null;
@@ -106,4 +121,7 @@ export type {
   OrderData,
   ProducerData,
   AddressData,
+  ClickCollectData,
+  OpeningHoursData,
+  PeriodData,
 };

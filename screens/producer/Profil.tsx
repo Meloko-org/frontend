@@ -54,11 +54,6 @@ export default function ProfilProducerScreen({ navigation }: Props) {
   });
 
   useEffect(() => {
-    console.log("----- PRODUCER -----------------------------");
-
-    console.log("userStore -> ", userStore);
-    console.log("producerStore -> ", producerStore);
-    console.log("shopstore -> ", shopStore);
     if (producerStore !== null) {
       setSocialReason(producerStore.socialReason);
       setSiren(producerStore.siren);
@@ -100,6 +95,14 @@ export default function ProfilProducerScreen({ navigation }: Props) {
       screen: "Profil",
     });
   };
+
+  console.log(
+    "---------------------------------- PRODUCER --------------------------------------------------------------------",
+  );
+  console.log("USERSTORE -> ", userStore);
+  console.log("PRODUCERSTORE -> ", producerStore);
+  console.log("SHOPSTORE -> ", shopStore);
+  console.log("");
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

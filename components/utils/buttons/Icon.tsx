@@ -13,7 +13,7 @@ type ButtonIconProps = {
 export default function ButtonIcon(props: ButtonIconProps): JSX.Element {
   return (
     <TouchableOpacity
-      className={`${props.extraClasses} flex flex-row rounded-lg shadow-sm bg-primary py-1 justify-center items-center`}
+      className={`${props.extraClasses} flex flex-row rounded-lg shadow-sm py-1 justify-center items-center`}
       onPress={props.onPressFn}
     >
       <FontAwesome name={props.iconName} size={25} color="#FFFFFF" />

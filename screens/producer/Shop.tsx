@@ -40,8 +40,6 @@ import { ProducerState } from "../../reducers/producer";
 
 const FontAwesome = _Fontawesome as React.ElementType;
 
-const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
-
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "ShopProducer"
@@ -78,6 +76,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
   const dispatch = useDispatch();
 
   const [isShopSaveLoading, setShopSaveLoading] = useState(false);
+  const [buttonLabel, setButtonLabel] = useState("Créer le shop");
 
   /* gestion du switch de désactivation de la boutique */
   const [isReopenDateVisible, setReopenDateVisible] = useState(false);
@@ -102,48 +101,49 @@ export default function ShopProducteurScreen({ navigation }: Props) {
       const token = await getToken();
       const response = await typesTools.getTypes(token);
       setShopTypes(response);
-
-      /* retrieve shop infos if exists */
-      if (shopStore !== null) {
-        setName(shopStore.name);
-        setDescription(shopStore.description);
-        setSiret(shopStore.siret);
-        setAddress({
-          address1: shopStore.address.address1,
-          address2: shopStore.address.address2,
-          postalCode: shopStore.address.postalCode,
-          city: shopStore.address.city,
-          country: shopStore.address.country,
-        });
-      }
     })();
+
+    /* retrieve shop infos if exists */
+    if (shopStore !== null) {
+      setName(shopStore.name);
+      setDescription(shopStore.description);
+      setSiret(shopStore.siret);
+      setAddress({
+        address1: shopStore.address.address1,
+        address2: shopStore.address.address2,
+        postalCode: shopStore.address.postalCode,
+        city: shopStore.address.city,
+        country: shopStore.address.country,
+      });
+      setTypes(shopStore.types.map((type) => type._id));
+      if (shopStore.reopenDate !== null) {
+        setReopenDate(shopStore.reopen);
+        setReopenDateVisible(true);
+      }
+      setButtonLabel("Mettre à jour");
+    }
   }, []);
 
   /**
    * Permet d'ajouter ou supprimer les id des types de shop en fonction des clics sur les switch
    * @param typeId string
-   * @param isSelected boolean
    */
-  const handleSwitchType = (typeId: string, isSelected: boolean) => {
-    setTypes((prevSelectedTypes) => {
-      if (isSelected) {
-        return [...prevSelectedTypes, typeId];
-      } else {
-        return prevSelectedTypes.filter((id) => id !== typeId);
-      }
-    });
+  const handleSwitchType = (typeId: string) => {
+    setTypes((prevSelectedTypes) =>
+      prevSelectedTypes.includes(typeId)
+        ? prevSelectedTypes.filter((id) => id !== typeId)
+        : [...prevSelectedTypes, typeId],
+    );
   };
 
   // Créer des switch en fonction des types de shop
   const typesList = shopTypes.map((item) => {
-    const isSelected = types.includes(item._id);
-    console.log(`${item._id} est ${isSelected}`);
     return (
       <SwitchInput
         key={item._id}
         thumbColor="#215487"
         label={item.name}
-        value={isSelected}
+        value={types.includes(item._id)}
         onValueChange={(isSelected) => handleSwitchType(item._id, isSelected)}
         extraClasses="pl-5 mb-2"
       />
@@ -154,14 +154,37 @@ export default function ShopProducteurScreen({ navigation }: Props) {
     try {
       setShopSaveLoading(true);
       const token = await getToken();
-      const values = { name, description, siret, address, types };
-      const data = await shopTools.createNewShop(token, values);
-      if (data) {
+      const values = reopenDate
+        ? {
+            name,
+            description,
+            siret,
+            address,
+            types,
+            reopenDate,
+            isOpen: false,
+          }
+        : {
+            name,
+            description,
+            siret,
+            address,
+            types,
+            isOpen: true,
+            reopenDate: null,
+          };
+      const data = await shopTools.createOrUpdateShop(token, values);
+      console.log("data de retour :", data);
+
+      if (data.error) {
+        Alert.alert("Profil non mis à jour", data.error);
+      } else {
         Alert.alert(
           "Mise à jour de votre profil",
           "Votre profil à bien été mis à jour.",
         );
         dispatch(setShopData(data));
+        setButtonLabel("Mettre à jour");
       }
       setShopSaveLoading(false);
     } catch (error) {
@@ -193,6 +216,16 @@ export default function ShopProducteurScreen({ navigation }: Props) {
   const toggleDatePicker = () => {
     setShowPicker(!showPicker);
   };
+
+  console.log(
+    "------------------------------- SHOP --------------------------------------------------------------------",
+  );
+  console.log("USERSTORE -> ", userStore);
+  console.log("PRODUCERSTORE -> ", producerStore);
+  console.log("SHOPSTORE -> ", shopStore);
+  console.log("");
+  console.log("types :", types);
+  console.log("buttonLabel :", buttonLabel);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -316,70 +349,76 @@ export default function ShopProducteurScreen({ navigation }: Props) {
           }
           extraClasses="mb-2"
         />
+
+        {buttonLabel === "Mettre à jour" && (
+          <>
+            <View className="flex flex-row my-5 justify-center">
+              <ButtonIcon
+                iconName="photo"
+                extraClasses="bg-primary p-4 mr-3 h-[50px]"
+                onPressFn={() => setPhotoModalVisible(true)}
+              />
+              <ButtonIcon
+                iconName="video-camera"
+                extraClasses="bg-primary p-4 mr-3"
+                onPressFn={() => setVideoModalVisible(true)}
+              />
+              <ButtonIcon
+                iconName="shopping-bag"
+                extraClasses="bg-primary p-4 mr-3"
+                onPressFn={() => setClickCollectModalVisible(true)}
+              />
+              <ButtonIcon
+                iconName="globe"
+                extraClasses="bg-primary p-4 mr-3"
+                onPressFn={() => setMarketsModalVisible(true)}
+              />
+            </View>
+
+            <View className="flex my-5 pl-3 items-center">
+              <SwitchInput
+                thumbColor="#215487"
+                label="Désactiver la boutique"
+                value={isReopenDateVisible}
+                extraClasses="pl-5 mb-2"
+                onValueChange={handleReopenDate}
+              />
+              {isReopenDateVisible && (
+                <View>
+                  <TextBody1>Sélectionner une date de réouverture</TextBody1>
+                  <Text
+                    placeholder="Choisissez une date"
+                    label="Date de réouverture"
+                    editable={false}
+                    onChangeText={(value: string) => setReopenDate(value)}
+                    value={reopenDate}
+                    iconName="calendar"
+                    onIconPressFn={toggleDatePicker}
+                    size="large"
+                  />
+
+                  {showPicker && (
+                    <DateTimePicker
+                      mode="date"
+                      display="spinner"
+                      value={date}
+                      onChange={handleDateChange}
+                    />
+                  )}
+                </View>
+              )}
+            </View>
+          </>
+        )}
+
         <ButtonPrimaryEnd
-          label="Mettre à jour"
+          label={buttonLabel}
           iconName="refresh"
           disabled={isShopSaveLoading}
           extraClasses="my-5"
           onPressFn={() => handleSaveShop()}
           isLoading={isShopSaveLoading}
         />
-
-        <View className="flex flex-row my-5 justify-center">
-          <ButtonIcon
-            iconName="photo"
-            extraClasses="p-4 mr-3 h-[50px]"
-            onPressFn={() => setPhotoModalVisible(true)}
-          />
-          <ButtonIcon
-            iconName="video-camera"
-            extraClasses="p-4 mr-3"
-            onPressFn={() => setVideoModalVisible(true)}
-          />
-          <ButtonIcon
-            iconName="shopping-bag"
-            extraClasses="p-4 mr-3"
-            onPressFn={() => setClickCollectModalVisible(true)}
-          />
-          <ButtonIcon
-            iconName="globe"
-            extraClasses="p-4 mr-3"
-            onPressFn={() => setMarketsModalVisible(true)}
-          />
-        </View>
-
-        <View className="flex my-5 pl-3 items-center">
-          <SwitchInput
-            thumbColor="#215487"
-            label="Désactiver la boutique"
-            value={isReopenDateVisible}
-            extraClasses="pl-5 mb-2"
-            onValueChange={handleReopenDate}
-          />
-          {isReopenDateVisible && (
-            <View>
-              <TextBody1>Sélectionner une date de réouverture</TextBody1>
-              <Text
-                placeholder="Choisissez une date"
-                label="Date de réouverture"
-                editable={false}
-                onChangeText={(value: string) => setReopenDate(value)}
-                value={reopenDate}
-                iconName="calendar"
-                onIconPressFn={toggleDatePicker}
-                size="large"
-              />
-              {showPicker && (
-                <DateTimePicker
-                  mode="date"
-                  display="spinner"
-                  value={date}
-                  onChange={handleDateChange}
-                />
-              )}
-            </View>
-          )}
-        </View>
 
         <View className="h-[200px]"></View>
 
