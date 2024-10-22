@@ -1,8 +1,8 @@
 import React from "react";
 import { TouchableOpacity } from "react-native";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
-const FontAwesome = _Fontawesome as React.ElementType;
 import { GestureResponderEvent } from "react-native";
+const FontAwesome = _Fontawesome as React.ElementType;
 
 type ButtonIconProps = {
   iconName: string;

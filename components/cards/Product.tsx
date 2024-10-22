@@ -15,6 +15,7 @@ import {
   addProductToCart,
   increaseCartQuantity,
   decreaseCartQuantity,
+  CartState,
 } from "../../reducers/cart";
 import { ProductData } from "../../types/API";
 
@@ -31,7 +32,9 @@ type CardProductProps = {
 
 export default function CardProduct(props: CardProductProps): JSX.Element {
   const dispatch = useDispatch();
-  const cartStore = useSelector((state: { cart }) => state.cart.value);
+  const cartStore = useSelector(
+    (state: { cart: CartState }) => state.cart.value,
+  );
   const handleAddCartPress = async (): Promise<void> => {
     dispatch(
       addProductToCart({

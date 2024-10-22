@@ -20,7 +20,6 @@ import {
   Platform,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-// import { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import Text from "../../components/utils/inputs/Text";

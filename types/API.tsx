@@ -30,8 +30,13 @@ type MarketData = {
   image: string;
   description: string;
   address: object;
-  openingHours: object[];
 };
+
+type MarketsData = {
+  market: MarketData;
+  isActive: boolean;
+  openingHours: OpeningHoursData[];
+}[];
 
 type StockData = {
   _id: string;
@@ -59,7 +64,7 @@ type ShopData = {
   logo: string;
   description: string;
   address: AddressData;
-  markets: MarketData[];
+  markets: MarketsData[];
   clickCollect: ClickCollectData;
   notes: { note: { $numberDecimal: string } | number | any }[];
   products?: StockData[];
@@ -74,7 +79,7 @@ type ClickCollectData = {
 type OpeningHoursData = {
   day: number;
   periods: PeriodData[];
-};
+}[];
 
 type PeriodData = {
   openingTime: string;
@@ -118,6 +123,7 @@ export type {
   StockData,
   CartData,
   MarketData,
+  MarketsData,
   OrderData,
   ProducerData,
   AddressData,

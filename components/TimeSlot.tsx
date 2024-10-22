@@ -26,7 +26,7 @@ export default function TimeSlot(props: TimeSlotProps): JSX.Element {
   return (
     <View className={`${props.extraClasses}`}>
       <View className="flex flex-row">
-        <View className="px-2">
+        <View className="px-1">
           <View>
             <TextBody2 centered={true} extraClasses="my-1">
               Ouverture
@@ -65,7 +65,7 @@ export default function TimeSlot(props: TimeSlotProps): JSX.Element {
             />
           </View>
         </View>
-        <View className="px-2">
+        <View className="px-1">
           <View>
             <TextBody2 centered={true} extraClasses="my-1">
               Fermeture
@@ -104,12 +104,7 @@ export default function TimeSlot(props: TimeSlotProps): JSX.Element {
             />
           </View>
         </View>
-        <View className="flex justify-end h-20 px-2">
-          <ButtonIcon
-            iconName="plus"
-            extraClasses="w-10 mb-1 bg-primary"
-            onPressFn={props.onPressPlus}
-          />
+        <View className="flex flew-row flex-grow justify-end px-1 mb-1">
           {trash && (
             <ButtonIcon
               iconName="trash"
@@ -118,6 +113,13 @@ export default function TimeSlot(props: TimeSlotProps): JSX.Element {
             />
           )}
         </View>
+        <View className="flex flew-row justify-end px-1">
+          <ButtonIcon
+            iconName="plus"
+            extraClasses="w-10 mb-1 bg-primary"
+            onPressFn={props.onPressPlus}
+          />
+        </View>
       </View>
     </View>
   );
@@ -125,8 +127,8 @@ export default function TimeSlot(props: TimeSlotProps): JSX.Element {
 
 const styles = StyleSheet.create({
   dropdownButtonStyle: {
-    width: 130,
-    height: 50,
+    width: 100,
+    height: 40,
     backgroundColor: "#E9ECEF",
     borderRadius: 12,
     flexDirection: "row",

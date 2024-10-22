@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
+import { StyleSheet, View, SafeAreaView } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 import { Region } from "react-native-maps";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, {
+  BottomSheetView,
+  BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import CardProducer from "../../components/cards/ProducerSearchResult";
 import MapSearchBox from "../../components/map/MapSearchBox";
@@ -68,15 +72,15 @@ export default function MapCustomerScreen({
           navigation.navigate("TabNavigatorUser", {
             screen: "ShopUser",
             params: {
-              shopId: sr._id,
-              distance: sr.searchData.distance,
-              relevantProducts: sr.searchData.relevantProducts
-                ? sr.searchData.relevantProducts
+              shopId: sr?._id,
+              distance: sr?.searchData.distance,
+              relevantProducts: sr?.searchData.relevantProducts
+                ? sr?.searchData.relevantProducts
                 : [],
             },
           });
         }}
-        key={sr._id}
+        key={sr?._id}
         extraClasses="mb-1"
         displayMode="bottomSheet"
       />
@@ -89,8 +93,8 @@ export default function MapCustomerScreen({
         <Marker
           key={i}
           coordinate={{
-            latitude: Number(data.address.latitude.$numberDecimal),
-            longitude: Number(data.address.longitude.$numberDecimal),
+            latitude: Number(data?.address.latitude?.$numberDecimal),
+            longitude: Number(data?.address.longitude?.$numberDecimal),
           }}
         >
           <Callout
@@ -99,9 +103,9 @@ export default function MapCustomerScreen({
               navigation.navigate("TabNavigatorUser", {
                 screen: "ShopUser",
                 params: {
-                  shopId: data._id,
-                  distance: data.searchData.distance,
-                  relevantProducts: data.searchData.relevantProducts
+                  shopId: data?._id,
+                  distance: data?.searchData.distance,
+                  relevantProducts: data?.searchData.relevantProducts
                     ? data.searchData.relevantProducts
                     : [],
                 },
@@ -119,6 +123,11 @@ export default function MapCustomerScreen({
     });
 
   const handleSheetChanges = useCallback((index: number) => {}, []);
+
+  console.log(
+    "------------------------------- MAP --------------------------------------------------------------------",
+  );
+  console.log("SEARCHRESULT -> ", JSON.stringify(searchResults, null, 2));
 
   return (
     <View style={styles.container}>
@@ -151,7 +160,7 @@ export default function MapCustomerScreen({
       {searchResults.length > 0 && (
         <BottomSheet
           ref={bottomSheetRef}
-          snapPoints={["25%", "50%"]}
+          snapPoints={["25%", "75%"]}
           handleStyle={{
             backgroundColor: colorScheme === "dark" ? "#444C3D" : "#FFF",
           }}
@@ -176,7 +185,7 @@ export default function MapCustomerScreen({
 
             <ScrollView
               showsVerticalScrollIndicator={false}
-              style={{ flex: 1, width: "100%" }}
+              style={{ flex: 0.3, width: "100%" }}
               className="px-3"
             >
               {producersList}

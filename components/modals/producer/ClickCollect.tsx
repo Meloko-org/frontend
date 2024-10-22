@@ -2,26 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 import shopTools from "../../../modules/shopTools";
 
-import {
-  SafeAreaView,
-  View,
-  Modal,
-  StyleSheet,
-  Text,
-  Alert,
-} from "react-native";
+import { SafeAreaView, View, Modal, StyleSheet, Alert } from "react-native";
 import { useColorScheme } from "nativewind";
 import { ScrollView } from "react-native-gesture-handler";
-import SelectDropdown from "react-native-select-dropdown";
 import { useDispatch, useSelector } from "react-redux";
 import { ShopState, setClickCollect } from "../../../reducers/shop";
 
 import TextHeading2 from "../../utils/texts/Heading2";
 import ButtonBack from "../../utils/buttons/Back";
-import InputText from "../../utils/inputs/Text";
 import TextBody1 from "../../utils/texts/Body1";
-import TextBody2 from "../../utils/texts/Body2";
-import TextHeading4 from "../../utils/texts/Heading4";
 import ButtonPrimaryEnd from "../../utils/buttons/PrimaryEnd";
 import InputTextarea from "../../utils/inputs/Textarea";
 import BadgeGrey from "../../utils/badges/Grey";
@@ -92,7 +81,7 @@ export default function ClickCollectModal(
     { day: 7, periods: [{ openingTime: null, closingTime: null }] },
   ]);
 
-  const days = {
+  const days: { [key: string]: number } = {
     monday: 1,
     tuesday: 2,
     wednesday: 3,
@@ -101,6 +90,11 @@ export default function ClickCollectModal(
     saturday: 6,
     sunday: 7,
   };
+
+  type ClickCollectValues = {
+    instructions: string | undefined;
+    openingHours: OpeningHour[];
+  } | null;
 
   useEffect(() => {
     if (shopStore?.clickCollect) {
@@ -228,8 +222,11 @@ export default function ClickCollectModal(
         }))
         .filter((dayObject) => dayObject.periods.length > 0);
 
-      const token = await getToken();
-      const values = { instructions, openingHours: formattedOpeningHours };
+      const token: string | null = await getToken();
+      const values: ClickCollectValues = {
+        instructions,
+        openingHours: formattedOpeningHours,
+      };
 
       const data = await shopTools.updateClickCollect(token, values);
 
@@ -255,10 +252,10 @@ export default function ClickCollectModal(
   console.log(
     "------------------------------- CLICKCOLLECT --------------------------------------------------------------------",
   );
-  console.log("SHOPSTORE -> ", JSON.stringify(shopStore, null, 2));
-  console.log("activeDays :", JSON.stringify(activeDays, null, 2));
+  // console.log("SHOPSTORE -> ", JSON.stringify(shopStore, null, 2));
+  // console.log("activeDays :", JSON.stringify(activeDays, null, 2));
   // console.log("")
-  console.log("openingHours :", JSON.stringify(openingHours, null, 2));
+  // console.log("openingHours :", JSON.stringify(openingHours, null, 2));
 
   return (
     <Modal
@@ -271,15 +268,18 @@ export default function ClickCollectModal(
     >
       <SafeAreaView style={bgStyle}>
         <View>
-          <ButtonBack onPressFn={() => props.onCloseFn(false)} />
+          <ButtonBack
+            extraClasses="mb-2"
+            onPressFn={() => props.onCloseFn(false)}
+          />
         </View>
         <ScrollView style={styles.scrollContainer}>
           <View>
-            <TextHeading2 centered extraClasses="mb-3">
-              {`Paramètres du\nClick & Collect`}
+            <TextHeading2 centered extraClasses="">
+              {`Click & Collect`}
             </TextHeading2>
             <TextBody1 centered={true} extraClasses="mb-5">
-              {`Définissez ici les jours\net les horaires d'ouverture`}
+              {`Définissez ici les jours, les horaires\nd'ouverture et les conditions du click & collect`}
             </TextBody1>
           </View>
           <View>

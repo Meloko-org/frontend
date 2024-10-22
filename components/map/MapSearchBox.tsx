@@ -88,6 +88,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
         searchOptions.userPosition.longitude !== 0 &&
         performSearch
       ) {
+        setIsSearchLoading(true);
         const response = await fetch(`${API_ROOT}/shops/search`, {
           method: "POST",
           headers: {
@@ -169,7 +170,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
 
   const onSearchPress = async (): Promise<void> => {
     try {
-      setIsSearchLoading(true);
+      // setIsSearchLoading(true);
       if (
         searchOptions.address !== "Ma Position" &&
         searchOptions.address !== ""
@@ -177,9 +178,9 @@ export default function MapSearchBox(props: Props): JSX.Element {
         await searchAddress();
       }
       setPerformSearch(true);
-      setIsSearchLoading(false);
+      // setIsSearchLoading(false);
     } catch (err) {
-      setIsSearchLoading(false);
+      // setIsSearchLoading(false);
       console.error(err);
     }
   };

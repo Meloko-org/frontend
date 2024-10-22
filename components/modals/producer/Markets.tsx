@@ -1,10 +1,20 @@
 import React, { useState } from "react";
-import { SafeAreaView, View, Modal, StyleSheet } from "react-native";
+import {
+  SafeAreaView,
+  View,
+  Modal,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 import TextHeading2 from "../../utils/texts/Heading2";
 import ButtonBack from "../../utils/buttons/Back";
+import TextBody1 from "../../utils/texts/Body1";
+import TextBody2 from "../../utils/texts/Body2";
 import InputText from "../../utils/inputs/Text";
 import ButtonPrimaryEnd from "../../utils/buttons/PrimaryEnd";
 import { useColorScheme } from "nativewind";
+import SearchMarketsModal from "./SearchMarkets";
+import ManageMarketsModal from "./ManageMarkets";
 
 type MarketsModalProps = {
   isVisible: boolean;
@@ -12,17 +22,14 @@ type MarketsModalProps = {
 };
 
 export default function MarketsModal(props: MarketsModalProps): JSX.Element {
-  const [logoFile, setLogoFile] = useState();
   const { colorScheme, toggleColorScheme } = useColorScheme();
 
   const bgStyle = colorScheme === "light" ? styles.light : styles.dark;
 
-  const handleSelectFile = () => {};
+  const [isSearchModalVisible, setSearchModalVisible] = useState(false);
+  const [isManageModalVisible, setManageModalVisible] = useState(false);
 
-  const handleUploadFile = () => {
-    /* créer fonction d'upload du fichier */
-    props.onCloseFn(!props.isVisible);
-  };
+  const onSearchPress = async () => {};
 
   return (
     <Modal
@@ -33,13 +40,52 @@ export default function MarketsModal(props: MarketsModalProps): JSX.Element {
         props.onCloseFn(!props.isVisible);
       }}
     >
-      <SafeAreaView style={bgStyle} className="flex-1 bg-lightbg items-center">
-        <View className="flex-1 bg-warning justify-start w-full p-5 h-full">
+      <SafeAreaView style={bgStyle}>
+        <View>
           <ButtonBack onPressFn={() => props.onCloseFn(false)} />
-          <TextHeading2 centered extraClasses="my-5">
-            Paramètres des places de marché
-          </TextHeading2>
         </View>
+        <ScrollView style={styles.scrollContainer}>
+          <View>
+            <TextHeading2 centered extraClasses="mb-5">
+              Places de marché
+            </TextHeading2>
+            <TextBody1 centered={true} extraClasses="mb-5">
+              {`Gérez ici les places de marché\nsur lesquelles vous vendez.`}
+            </TextBody1>
+
+            <TextBody1 centered={true} extraClasses="mb-1">
+              {`Vous pouvez rechercher et ajouter\ndes places de marché.`}
+            </TextBody1>
+
+            <ButtonPrimaryEnd
+              label="Rechercher"
+              iconName="search"
+              extraClasses="my-5"
+              onPressFn={() => setSearchModalVisible(true)}
+            />
+
+            <TextBody1 centered={true} extraClasses="mb-1">
+              {`Ensuite vous pouvez gérer les jours et les horaires pour chaque place de marché`}
+            </TextBody1>
+
+            <ButtonPrimaryEnd
+              label="Gérer mes places"
+              iconName="calendar"
+              extraClasses="my-5"
+              onPressFn={() => setManageModalVisible(true)}
+            />
+          </View>
+
+          <SearchMarketsModal
+            isVisible={isSearchModalVisible}
+            onCloseFn={() => setSearchModalVisible(false)}
+          />
+
+          <ManageMarketsModal
+            isVisible={isManageModalVisible}
+            onCloseFn={() => setManageModalVisible(false)}
+          />
+        </ScrollView>
       </SafeAreaView>
     </Modal>
   );
@@ -58,5 +104,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FCFFF0",
     padding: 10,
+  },
+  scrollContainer: {
+    height: "80%",
   },
 });

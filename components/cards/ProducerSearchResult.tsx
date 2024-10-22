@@ -31,12 +31,12 @@ export default function CardProducerSearchResult(
             <View className="flex flex-row items-center rounded-lg w-24 h-full">
               <Image
                 source={
-                  props.shopData.logo
+                  props.shopData?.logo
                     ? { uri: props.shopData.logo }
                     : require("../../assets/icon.png")
                 }
                 className="rounded-full border border-primary w-24 h-24"
-                alt={`logo de la boutique ${props.shopData.name}`}
+                alt={`logo de la boutique ${props.shopData?.name}`}
                 resizeMode="cover"
                 width={96}
                 height={64}
@@ -47,9 +47,9 @@ export default function CardProducerSearchResult(
           <View className="h-full pl-2 items-start">
             <View className="flex flex-row items-center">
               <Text className="text-lg font-bold text-darkbg dark:text-lightbg">
-                {props.shopData.name}
+                {props.shopData?.name}
               </Text>
-              {props.shopData.searchData &&
+              {props.shopData?.searchData &&
                 props.shopData.searchData.distance && (
                   <Text className="text-xs text-darkbg dark:text-lightbg">
                     {" "}
@@ -62,7 +62,7 @@ export default function CardProducerSearchResult(
               shopData={props.shopData}
               extraClasses="pb-1"
             />
-            {props.shopData.searchData &&
+            {props.shopData?.searchData &&
               props.shopData.searchData.relevantProducts && (
                 <BadgeSecondary>{`${props.shopData.searchData.relevantProducts.length} produit que vous recherchez`}</BadgeSecondary>
               )}

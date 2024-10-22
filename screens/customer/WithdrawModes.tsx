@@ -12,7 +12,7 @@ import InputRadioGroup from "../../components/utils/inputs/radioGroup";
 import ButtonBack from "../../components/utils/buttons/Back";
 import Market from "../../components/cards/Market";
 import SignInScreen from "../Signin";
-import { updateWithdrawMode } from "../../reducers/cart";
+import { CartState, updateWithdrawMode } from "../../reducers/cart";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import ButtonSecondaryStart from "../../components/utils/buttons/SecondaryStart";
 type SelectedMarkets = {};
@@ -21,7 +21,9 @@ export default function WithdrawModesScreen({ navigation }) {
   // Import the Clerk Auth functions
   const { isSignedIn, getToken } = useAuth();
   const dispatch = useDispatch();
-  const cartStore = useSelector((state: { cart }) => state.cart.value);
+  const cartStore = useSelector(
+    (state: { cart: CartState }) => state.cart.value,
+  );
   const [cartTotal, setCartTotal] = useState<number>(0);
   const [isMarketSelectModalVisible, setIsMarketSelectModalVisible] =
     useState<boolean>(false);
@@ -166,6 +168,11 @@ export default function WithdrawModesScreen({ navigation }) {
         />
       );
     });
+
+  console.log(
+    "------------------------------- WITHDRAWMODES --------------------------------------------------------------------",
+  );
+  console.log("CARTSTORE -> ", JSON.stringify(cartStore, null, 2));
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

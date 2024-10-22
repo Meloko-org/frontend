@@ -12,7 +12,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 import { ShopData, ProductData, StockData } from "../../types/API";
 import { useDispatch, useSelector } from "react-redux";
-import { updateUser } from "../../reducers/user";
+import { updateUser, UserState } from "../../reducers/user";
 import { useAuth } from "@clerk/clerk-expo";
 
 import StarsNotation from "../../components/utils/StarsNotation";
@@ -51,7 +51,9 @@ type Route = {
 
 export default function ShopUserScreen({ route, navigation }: Props) {
   const dispatch = useDispatch();
-  const userStore = useSelector((state: { user }) => state.user.value);
+  const userStore = useSelector(
+    (state: { user: UserState }) => state.user.value,
+  );
   const { signOut, isSignedIn, getToken } = useAuth();
 
   const [shopData, setShopData] = useState<ShopData>(null);
@@ -102,7 +104,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
     try {
       const token = await getToken();
       const response = await fetch(
-        `${API_ROOT}/users/bookmarks/${shopData._id}`,
+        `${API_ROOT}/users/bookmarks/${shopData?._id}`,
         {
           method: "POST",
           headers: {
@@ -124,7 +126,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
     try {
       const token = await getToken();
       const response = await fetch(
-        `${API_ROOT}/users/bookmarks/${shopData._id}`,
+        `${API_ROOT}/users/bookmarks/${shopData?._id}`,
         {
           method: "DELETE",
           headers: {
@@ -210,6 +212,11 @@ export default function ShopUserScreen({ route, navigation }: Props) {
       />
     );
   });
+
+  console.log(
+    "------------------------------- SHOPUSER --------------------------------------------------------------------",
+  );
+  console.log("USERSTORE -> ", userStore);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

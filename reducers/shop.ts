@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   ShopData,
-  MarketData,
+  MarketsData,
   StockData,
   ClickCollectData,
 } from "../types/API";
@@ -50,9 +50,24 @@ export const shopSlice = createSlice({
         state.value.notes.push(action.payload);
       }
     },
-    addMarket: (state: ShopState, action: PayloadAction<MarketData>): void => {
+    // permet d'ajouter des marketS en vérifiant leur non présence
+    addMarket: (
+      state: ShopState,
+      action: PayloadAction<MarketsData[]>,
+    ): void => {
       if (state.value) {
-        state.value.markets = [action.payload];
+        const existingMarketIds = state.value.markets.map(
+          (market: MarketsData) => market.market._id,
+        );
+        const newMarkets = action.payload.filter(
+          (newMarket) => !existingMarketIds.includes(newMarket.market._id),
+        );
+        state.value.markets = [...state.value.markets, ...newMarkets];
+      }
+    },
+    resetMarkets: (state: ShopState): void => {
+      if (state.value) {
+        state.value.markets = [];
       }
     },
   },
@@ -65,5 +80,6 @@ export const {
   addNote,
   addMarket,
   setClickCollect,
+  resetMarkets,
 } = shopSlice.actions;
 export default shopSlice.reducer;
