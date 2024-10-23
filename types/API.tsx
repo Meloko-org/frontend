@@ -71,15 +71,24 @@ type ShopData = {
   [key: string]: any;
 } | null;
 
-type ClickCollectData = {
-  instructions: string;
-  openingHours: OpeningHoursData[];
-};
+type ClickCollectData =
+  | {
+      instructions: string;
+      openingHours: OpeningHourData[];
+    }
+  | undefined;
 
 type OpeningHoursData = {
   day: number;
   periods: PeriodData[];
 }[];
+
+type OpeningHourData =
+  | {
+      day: number;
+      periods: PeriodData[];
+    }
+  | [];
 
 type PeriodData = {
   openingTime: string;

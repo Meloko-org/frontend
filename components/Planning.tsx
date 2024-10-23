@@ -24,10 +24,11 @@ type OpeningHourData = {
 type PlanningProps = {
   openingHoursValues: OpeningHourData[] | undefined;
   onOpeningHoursChange: (newOpeningHours: OpeningHourData[]) => void;
+  open?: boolean | undefined;
 };
 
 export default function Planning(props: PlanningProps): JSX.Element {
-  const [isOpen, setOpen] = useState(false);
+  const [isOpen, setOpen] = useState(props.open ? props.open : false);
 
   const toggleAccordion = () => {
     setOpen(!isOpen);

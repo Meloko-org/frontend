@@ -98,10 +98,6 @@ export default function Market(props: CardMarketProps): JSX.Element {
     // gestion du highlight en local: impossible d'highlighter sans periodes définies
     let hasDefinedPeriod;
     let canHighlight = false;
-    console.log(
-      "in handlehighlight :",
-      JSON.stringify(marketInfos.openingHours, null, 2),
-    );
     marketInfos.openingHours.forEach((openingHour) => {
       hasDefinedPeriod = openingHour.periods.some(
         (period) => period.openingTime !== null,
@@ -110,8 +106,6 @@ export default function Market(props: CardMarketProps): JSX.Element {
         canHighlight = true;
       }
     });
-
-    console.log("definedPeriod :", hasDefinedPeriod);
 
     if (!canHighlight) {
       Alert.alert(

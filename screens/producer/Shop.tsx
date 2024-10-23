@@ -437,6 +437,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
         />
 
         <ClickCollectModal
+          data={shopStore?.clickCollect}
           isVisible={isClickCollectModalVisible}
           onCloseFn={() => setClickCollectModalVisible(false)}
         />
