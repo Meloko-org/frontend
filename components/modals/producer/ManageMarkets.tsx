@@ -2,15 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useSelector, UseDispatch, useDispatch } from "react-redux";
 import { addMarket, resetMarkets, ShopState } from "../../../reducers/shop";
 
-import {
-  SafeAreaView,
-  View,
-  Modal,
-  StyleSheet,
-  ScrollView,
-  Text,
-  Alert,
-} from "react-native";
+import { View, Modal, StyleSheet, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-gesture-handler";
 import TextHeading2 from "../../utils/texts/Heading2";
 import ButtonBack from "../../utils/buttons/Back";
 import TextBody1 from "../../utils/texts/Body1";
@@ -168,7 +162,7 @@ export default function ManageMarketsModal(
             onPressFn={() => props.onCloseFn(false)}
           />
         </View>
-        <ScrollView style={styles.scrollContainer}>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View>
             <TextHeading4 centered={true} extraClasses="mb-5">
               {`Gestion des places de marché`}
@@ -207,8 +201,5 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FCFFF0",
     padding: 10,
-  },
-  scrollContainer: {
-    height: "80%",
   },
 });

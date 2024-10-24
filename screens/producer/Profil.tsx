@@ -9,7 +9,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 
 /* Eléments graphiques */
-import { View, SafeAreaView, ScrollView, Alert } from "react-native";
+import { View, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-gesture-handler";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import Text from "../../components/utils/inputs/Text";
@@ -107,8 +109,13 @@ export default function ProfilProducerScreen({ navigation }: Props) {
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <View className="items-center w-full flex-1">
-        <ScrollView className="w-full p-3">
-          <TextHeading2 extraClasses="my-3">Profil Producteur</TextHeading2>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          className="flex h-full w-full p-3"
+        >
+          <TextHeading2 extraClasses="my-3" centered>
+            Profil Producteur
+          </TextHeading2>
 
           <Text
             label="Raison sociale"
@@ -221,6 +228,7 @@ export default function ProfilProducerScreen({ navigation }: Props) {
             disabled={isProducerSaveLoading}
             onPressFn={() => handleProducerUpdate()}
             isLoading={isProducerSaveLoading}
+            extraClasses="mb-5"
           />
         </ScrollView>
 

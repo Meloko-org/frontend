@@ -1,4 +1,6 @@
-import { SafeAreaView, View, Modal, ScrollView } from "react-native";
+import { View, Modal } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 import { MarketData, ShopData } from "../../types/API";
@@ -178,7 +180,9 @@ export default function WithdrawModesScreen({ navigation }) {
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <View className="p-3 flex-1">
         <View>
-          <TextHeading2 extraClasses="mb-4">Vos modes de retrait</TextHeading2>
+          <TextHeading2 extraClasses="mb-4" centered>
+            Vos modes de retrait
+          </TextHeading2>
         </View>
         <ScrollView showsVerticalScrollIndicator={false}>
           {products}

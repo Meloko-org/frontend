@@ -1,4 +1,6 @@
-import { SafeAreaView, View, ScrollView } from "react-native";
+import { View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from "react";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
@@ -68,7 +70,9 @@ export default function CartScreen({ navigation }) {
       <View className="p-3 flex flex-column h-full">
         {products.length > 0 ? (
           <>
-            <TextHeading2 extraClasses="mb-4">Votre panier</TextHeading2>
+            <TextHeading2 extraClasses="mb-4" centered>
+              Votre panier
+            </TextHeading2>
             <ScrollView>
               {products}
               <TextHeading3 extraClasses="py-3 text-right">{`TOTAL: ${cartTotal.toFixed(2)}€`}</TextHeading3>

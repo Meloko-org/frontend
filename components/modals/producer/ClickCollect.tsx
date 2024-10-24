@@ -3,8 +3,9 @@ import { useAuth } from "@clerk/clerk-expo";
 import shopTools from "../../../modules/shopTools";
 import { ClickCollectData, OpeningHoursData } from "../../../types/API";
 
-import { SafeAreaView, View, Modal, StyleSheet, Alert } from "react-native";
+import { View, Modal, StyleSheet, Alert } from "react-native";
 import { useColorScheme } from "nativewind";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
 import { ShopState, setClickCollect } from "../../../reducers/shop";
@@ -161,7 +162,7 @@ export default function ClickCollectModal(
             onPressFn={() => props.onCloseFn(false)}
           />
         </View>
-        <ScrollView style={styles.scrollContainer}>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View>
             <TextHeading2 centered extraClasses="">
               {`Click & Collect`}
@@ -213,67 +214,5 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FCFFF0",
     padding: 10,
-  },
-  scrollContainer: {
-    height: "80%",
-  },
-  badgeContainer: {
-    // backgroundColor: "#111111",
-    marginHorizontal: 16, // Equivalent to mx-4 in Tailwind
-    marginBottom: 16,
-  },
-  dayrow: {
-    // height: 50,
-    flexDirection: "row", // Equivalent to flex-row
-    alignItems: "center",
-    width: "100%",
-  },
-  row: {
-    flexDirection: "row", // Equivalent to flex-row
-    justifyContent: "space-between",
-    marginHorizontal: 16, // Equivalent to mx-4 in Tailwind
-  },
-  column: {
-    width: "50%", // Equivalent to w-1/2 in Tailwind
-    paddingHorizontal: 8, // Spacing between the columns
-  },
-  dropdownButtonStyle: {
-    width: 130,
-    height: 50,
-    backgroundColor: "#E9ECEF",
-    borderRadius: 12,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 12,
-  },
-  dropdownButtonTxtStyle: {
-    flex: 1,
-    fontSize: 18,
-    fontWeight: "500",
-    color: "#151E26",
-    textAlign: "center",
-  },
-  dropdownMenuStyle: {
-    backgroundColor: "#E9ECEF",
-    borderRadius: 8,
-    height: 150,
-  },
-  dropdownItemStyle: {
-    width: "100%",
-    flexDirection: "row",
-    paddingHorizontal: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#B1BDC8",
-  },
-  dropdownItemTxtStyle: {
-    flex: 1,
-    fontSize: 18,
-    fontWeight: "500",
-    color: "#151E26",
-    textAlign: "center",
   },
 });

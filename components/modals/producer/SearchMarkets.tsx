@@ -6,14 +6,9 @@ import { addMarket } from "../../../reducers/shop";
 
 import shopTools from "../../../modules/shopTools";
 
-import {
-  SafeAreaView,
-  View,
-  Modal,
-  StyleSheet,
-  ScrollView,
-  Alert,
-} from "react-native";
+import { View, Modal, StyleSheet, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-gesture-handler";
 import TextHeading2 from "../../utils/texts/Heading2";
 import ButtonBack from "../../utils/buttons/Back";
 import TextHeading4 from "../../utils/texts/Heading4";
@@ -49,12 +44,6 @@ export default function SearchMarketsModal(
 
   const [marketSelected, setMarketSelected] = useState<string[]>([]);
   const [isAddMarketLoading, setAddMarketLoading] = useState(false);
-
-  // reset les state marketSelected et marketsList pour ne pas conserver les éventuelles recherches précédentes
-  /*useEffect(() => {
-		setMarketSelected([])
-		setMarketsList([])
-	}, [])*/
 
   const handleSwitch = (marketId: string, isEnabled: boolean) => {
     setMarketSelected((prevSelected) => {
@@ -177,7 +166,10 @@ export default function SearchMarketsModal(
         </View>
 
         {marketsList && marketsList.length > 0 && (
-          <ScrollView style={styles.scrollContainer}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={styles.scrollContainer}
+          >
             <View>
               <TextHeading4 centered={true} extraClasses="mb-1">
                 Place marché trouvées

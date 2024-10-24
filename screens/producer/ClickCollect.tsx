@@ -4,14 +4,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 
 /* Eléments graphiques */
-import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  TouchableOpacity,
-  Modal,
-  Alert,
-} from "react-native";
+import { View, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import Text from "../../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";

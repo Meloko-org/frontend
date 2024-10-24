@@ -1,4 +1,5 @@
-import { View, SafeAreaView, Alert } from "react-native";
+import { View, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React from "react";
 import { useColorScheme } from "nativewind";
 
@@ -170,7 +171,9 @@ export default function ProfilScreen({ navigation }: Props) {
       <View className="p-3">
         {isSignedIn ? (
           <View className="h-full relative flex items-center">
-            <TextHeading2 extraClasses="mb-5">Profil</TextHeading2>
+            <TextHeading2 extraClasses="mb-5" centered>
+              Profil
+            </TextHeading2>
             <ScrollView>
               <View className="w-full">
                 {userStore.clerkPasswordEnabled === true ? (

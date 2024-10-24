@@ -98,7 +98,7 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
     <ButtonIcon
       iconName="cart-plus"
       onPressFn={() => handleAddCartPress()}
-      extraClasses="h-20 w-full"
+      extraClasses="h-20 w-full bg-primary"
     />
   );
 

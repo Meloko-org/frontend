@@ -1,14 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import * as Location from "expo-location";
-import {
-  Animated,
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  SafeAreaView,
-} from "react-native";
-import TextInput from "../utils/inputs/Text";
+import { Animated, View, Text, Pressable, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import InputText from "../utils/inputs/Text";
 import ButtonPrimaryEnd from "../utils/buttons/PrimaryEnd";
 import ButtonIcon from "../utils/buttons/Icon";
 import { Slider } from "@miblanchard/react-native-slider";
@@ -193,7 +187,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
             style={{ height: size, overflow: "hidden" }}
           >
             <View className="w-full flex flex-row justify-between">
-              <TextInput
+              <InputText
                 value={searchOptions.query}
                 onChangeText={(newQuery: string) =>
                   setSearchOptions((prevState) => ({
@@ -224,7 +218,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
             </TextHeading3>
             <View className="w-full flex flex-row justify-between">
               <View className="w-3/4">
-                <TextInput
+                <InputText
                   value={searchOptions.address}
                   onChangeText={(newAddress: string) =>
                     setSearchOptions((prevState) => ({
@@ -241,7 +235,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
               <View className="w-1/4 flex flex-row justify-end">
                 <ButtonIcon
                   iconName="map-marker"
-                  extraClasses="w-20"
+                  extraClasses="w-20 bg-secondary dark:bg-primary"
                   onPressFn={useMyPosition}
                 />
               </View>
@@ -280,7 +274,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
         <SafeAreaView style={{ flex: 1 }} className="bg-lightbg dark:bg-darkbg">
           <View className="p-3 flex-1 w-full">
             <TextHeading2 extraClasses="mb-6">Que cherchez-vous ?</TextHeading2>
-            <TextInput
+            <InputText
               value={searchOptions.query}
               onChangeText={(newQuery: string) =>
                 setSearchOptions((prevState) => ({
@@ -298,7 +292,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
               Localisation
             </TextHeading3>
             <View className="w-full flex flex-row justify-between">
-              <TextInput
+              <InputText
                 value={searchOptions.address}
                 onChangeText={(newAddress: string) =>
                   setSearchOptions((prevState) => ({
@@ -313,7 +307,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
               />
               <ButtonIcon
                 iconName="map-marker"
-                extraClasses="w-20"
+                extraClasses="w-20 bg-secondary dark:bg-primary"
                 onPressFn={useMyPosition}
               />
             </View>

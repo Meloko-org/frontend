@@ -10,15 +10,9 @@ import { setShopData, ShopState } from "../../reducers/shop";
 import { UserState } from "../../reducers/user";
 
 /* Eléments graphiques */
-import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  TouchableOpacity,
-  Modal,
-  Alert,
-  Platform,
-} from "react-native";
+import { View, TouchableOpacity, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
@@ -228,8 +222,13 @@ export default function ShopProducteurScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <ScrollView className="w-full flex-1 p-3">
-        <TextHeading2 extraClasses="my-3">Boutique</TextHeading2>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        className="w-full flex-1 p-3"
+      >
+        <TextHeading2 extraClasses="my-1" centered>
+          Boutique
+        </TextHeading2>
 
         <View className="flex flex-row justify-between items-center">
           <View className="flex flex-row justify-center items-center w-2/6">
@@ -419,7 +418,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
           isLoading={isShopSaveLoading}
         />
 
-        <View className="h-[200px]"></View>
+        {/* <View className="h-[200px]"></View> */}
 
         <LogoModal
           isVisible={isLogoModalVisible}

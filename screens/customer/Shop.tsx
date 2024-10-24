@@ -1,12 +1,6 @@
-import {
-  Text,
-  Image,
-  View,
-  TouchableOpacity,
-  ScrollView,
-  Modal,
-  SafeAreaView,
-} from "react-native";
+import { Image, View, Modal } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
@@ -225,7 +219,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
           {shopData && (
             <View className="flex-1">
               <View>
-                <TextHeading2>{shopData.name}</TextHeading2>
+                <TextHeading2 centered>{shopData.name}</TextHeading2>
                 <StarsNotation
                   iconNames={["star", "star-half", "star-o"]}
                   shopData={shopData}
