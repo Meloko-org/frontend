@@ -95,7 +95,7 @@ export default function ClickCollectModal(
   };
 
   const handlePlanningChange = (newOpeningHours: OpeningHourData[]) => {
-    console.log("new :", JSON.stringify(newOpeningHours));
+    // console.log("new :", JSON.stringify(newOpeningHours));
     const updatedOpeningHours = updateOpeningHours(newOpeningHours);
     setClickCollectHours(updatedOpeningHours);
   };
@@ -134,14 +134,14 @@ export default function ClickCollectModal(
   console.log(
     "------------------------------- CLICKCOLLECT --------------------------------------------------------------------",
   );
-  console.log(
-    "SHOPSTORE openingHours -> ",
-    JSON.stringify(shopStore?.clickCollect?.openingHours, null, 2),
-  );
-  console.log(
-    "clickCollectHours :",
-    JSON.stringify(clickCollectHours, null, 2),
-  );
+  // console.log(
+  //   "SHOPSTORE openingHours -> ",
+  //   JSON.stringify(shopStore?.clickCollect?.openingHours, null, 2),
+  // );
+  // console.log(
+  //   "clickCollectHours :",
+  //   JSON.stringify(clickCollectHours, null, 2),
+  // );
   // console.log("activeDays :", JSON.stringify(activeDays, null, 2));
   // console.log("")
   // console.log("openingHours :", JSON.stringify(openingHours, null, 2));

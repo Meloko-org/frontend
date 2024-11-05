@@ -13,6 +13,7 @@ type InputTextProps = {
   textContentType?: string;
   autoComplete?: string;
   onChangeText: Function;
+  onBlur?: Function;
   editable?: boolean;
   value?: string;
   size?: string;

@@ -1,16 +1,34 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, UseSelector } from "react-redux";
+import { ShopState } from "../reducers/shop";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../types/Navigation";
+import { useAuth } from "@clerk/clerk-expo";
+
+import { StockData } from "../types/API";
+import stocksTools from "../modules/stocksTools";
+
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-gesture-handler";
 import {
   View,
   Text,
   TextInput,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Alert,
+  Image,
 } from "react-native";
+import TextHeading3 from "../components/utils/texts/Heading3";
+import TextHeading4 from "../components/utils/texts/Heading4";
+import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
+import InputText from "../components/utils/inputs/Text";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types/Navigation";
-import { useAuth } from "@clerk/clerk-expo";
+import categoriesTools from "../modules/categoriesTools";
+import ButtonIcon from "../components/utils/buttons/Icon";
+import TextBody1 from "../components/utils/texts/Body1";
+import TextBody2 from "../components/utils/texts/Body2";
+
 //import Product from '../components/cards/Products';
 
 const FontAwesome = _Fontawesome as React.ElementType;
@@ -25,307 +43,294 @@ type Props = {
   navigation: StocksScreenNavigationProp;
 };
 
-// Stock interface
-interface Stock {
-  _id: string;
-  product: {
-    _id: string;
-    name: string;
-  };
-  shop: string;
-  stock: number;
-  price: number;
-  tags: string[];
-}
 export default function StocksScreen({ navigation }: Props) {
-  const [stocks, setStocks] = useState<Stock[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [shopId, setShopId] = useState<string>("66b339729a76167d3a93df3b");
+  const shopStore = useSelector(
+    (state: { shop: ShopState }) => state.shop.value,
+  );
   const { getToken } = useAuth();
-  const API_ROOT = process.env.EXPO_PUBLIC_API_ROOT!;
 
-  const fetchStocks = async () => {
-    fetch(`${API_ROOT}/stocks/${shopId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (!data.stocks) {
-          throw new Error("Failed to fetch stocks");
-        }
-        console.log("Stocks fetched from API:", data.stocks);
-        setStocks(data.stocks);
-      })
-      .catch((error) => console.error("Error fetching stock:", error));
-  };
+  const [isStockSaveLoading, setStockSaveLoading] = useState<Boolean>(false);
+  const [isLoadingStocks, setIsLoadingStocks] = useState<Boolean>(true);
+  const [shouldSave, setShouldSave] = useState<Boolean>(false);
+  const [stocks, setStocks] = useState<StockData[]>([]);
+  const [tempPrices, setTempPrices] = useState<{ [key: string]: string }>({});
+  const [categories, setCategories] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const [isOpen, setIsOpen] = useState({});
+
+  const [shopId, setShopId] = useState<string>("66b339729a76167d3a93df3b");
+  // const [shopId, setShopId] = useState<string | undefined>(shopStore?._id);
 
   useEffect(() => {
-    fetchStocks();
-  }, [shopId]);
-
-  const handleQuantityChange = async (id: string, change: number) => {
-    const stockToUpdate = stocks.find((stock) => stock._id === id);
-    if (!stockToUpdate) return;
-
-    const newStock = stockToUpdate.stock + change;
-    console.log("Attempting to update stock:", { id, change, newStock });
-
-    try {
-      const token = await getToken();
-      const response = await fetch(`${API_ROOT}/stocks/update`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          product: stockToUpdate.product._id,
-          shop: stockToUpdate.shop,
-          stock: newStock,
-          price: stockToUpdate.price,
-          tags: stockToUpdate.tags,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update stock");
+    (async () => {
+      const data = await stocksTools.getStocksByShop(shopId);
+      if (data) {
+        const formattedData = data.map((item: StockData) => ({
+          _id: item?._id,
+          price: parseFloat(item.price.$numberDecimal),
+          stock: parseInt(item.stock.$numberDecimal, 10),
+          shop: item?.shop, // en supposant que shop est déjà formaté selon ShopData
+          product: item?.product, // en supposant que product est formaté selon ProductData
+          tags: item?.tags, // en supposant que les tags correspondent déjà à TagData[]
+        }));
+        setStocks(formattedData);
+        setIsLoadingStocks(false);
       }
+    })();
+  }, []);
 
-      setStocks((prevStocks) =>
-        prevStocks.map((stock) =>
-          stock._id === id ? { ...stock, stock: newStock } : stock,
+  useEffect(() => {
+    if (!isLoadingStocks && stocks.length > 0) {
+      const categoriesList: string[] = Array.from(
+        new Set(stocks?.map((stock) => stock?.product.family.category.name)),
+      );
+      setCategories(categoriesList);
+    }
+  }, [isLoadingStocks]);
+
+  useEffect(() => {
+    if (categories.length > 1) {
+      setIsOpen(
+        categories.reduce(
+          (acc, category) => ({ ...acc, [category]: false }),
+          {},
         ),
       );
-    } catch (error) {
-      console.error("Error updating stock:", error);
     }
+  }, [categories]);
+
+  useEffect(() => {
+    (async () => {
+      if (shouldSave) {
+        console.log("data à envoyer :", stocks);
+        // envoi des données au serveur
+        const token = await getToken();
+
+        const data = await stocksTools.updateStocks(token, stocks);
+
+        if (data.error) {
+          Alert.alert("Message", data.error);
+          setStockSaveLoading(false);
+        }
+        if (data) {
+          console.log("les datas:", data);
+          Alert.alert("Message", "Mise à jour des stocks réussie");
+          setStockSaveLoading(false);
+        }
+        setShouldSave(false);
+      }
+    })();
+  }, [shouldSave]);
+
+  const toggleOpenList = (category: string) => {
+    setIsOpen((prevState: string[]) => ({
+      ...prevState,
+      [category]: !prevState[category],
+    }));
   };
 
-  const totalProducts = stocks.length;
+  const handleChangePrice = (id: string | undefined, price: string) => {
+    setTempPrices((prevPrices) => ({
+      ...prevPrices,
+      [id || ""]: price,
+    }));
+  };
 
-  const filteredStocks = stocks.filter((stock) =>
-    stock.product.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const handleQuantityChange = async (id: string, change: number) => {
+    const stockToUpdate = stocks?.find((stock) => stock._id === id);
+    if (!stockToUpdate) return;
 
-  const categories = Array.from(new Set(stocks.map((stock) => stock.shop)));
+    const newStock = Number(stockToUpdate.stock) + change;
+
+    setStocks((prevStocks) =>
+      prevStocks?.map((stock: StockData) =>
+        stock?._id === id ? { ...stock, stock: newStock } : stock,
+      ),
+    );
+  };
+
+  const handlePrepareSaveStock = async () => {
+    // mise à jour des prix en fonction de tempPrices
+    setStockSaveLoading(true);
+    setStocks((prevStocks) =>
+      prevStocks.map((stock) => ({
+        ...stock,
+        price: tempPrices[stock._id] ?? stock.price,
+      })),
+    );
+    setShouldSave(true);
+  };
+
+  const totalProducts = stocks?.length.toString();
+
+  console.log(stocks);
+  console.log(tempPrices);
+  // console.log(filteredStocks.map((stock) => ({
+  // 	stock: stock?.stock,
+  // 	price: stock?.price
+  // })))
+  console.log("categories :", categories);
+  console.log("isOpen :", isOpen);
 
   return (
-    <View style={styles.container}>
-      {/* Back Button */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <FontAwesome name="arrow-left" style={styles.backIcon} />
-      </TouchableOpacity>
+    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
+      <View className="mt-5 ml-5">
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("TabNavigatorProducer", {
+              screen: "Boutique",
+            })
+          }
+          className="flex-none"
+        >
+          <FontAwesome name="arrow-left" size={25} color="#98B66E" />
+        </TouchableOpacity>
+      </View>
 
-      <Text style={styles.title}>Mes Stocks</Text>
-
-      {/* "Tous mes produits" Section */}
-      <View style={styles.allProductsSection}>
-        <FontAwesome name="square" style={styles.allProductsIcon} />
-        <Text style={styles.allProductsText}>
-          TOUS MES PRODUITS ({totalProducts})
-        </Text>
+      <View>
+        <TextHeading3 centered extraClasses="mb-5">
+          Mes Stocks ({totalProducts})
+        </TextHeading3>
       </View>
 
       {/* Global Search Bar */}
-      <TextInput
-        placeholder="Rechercher un produit..."
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-        style={styles.globalSearchInput}
-      />
+      {/*<TextInput
+          placeholder="Rechercher un produit..."
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+          style={styles.globalSearchInput}
+        />*/}
 
-      <ScrollView style={styles.scrollContainer}>
-        {categories.map((category) => (
-          <View key={category} style={styles.categorySection}>
-            <View style={styles.categoryHeader}>
-              <FontAwesome name="square" style={styles.categoryIcon} />
-              <Text style={styles.categoryTitle}>
-                {category.toUpperCase()} (
-                {stocks.filter((s) => s.shop === category).length})
-              </Text>
-            </View>
-            {filteredStocks
-              .filter((stock) => stock.shop === category)
-              .map((stock) => (
-                <View key={stock._id} style={styles.productRow}>
-                  <View style={styles.productInfo}>
-                    <View style={styles.productDetails}>
-                      <Text style={styles.productName}>
-                        {stock.product.name}
-                      </Text>
-                      <Text style={styles.productPrice}>
-                        {stock.price} € / 100g
-                      </Text>
-                    </View>
-                    <View style={styles.productQuantityContainer}>
-                      <TouchableOpacity
-                        onPress={() => handleQuantityChange(stock._id, -1)}
-                        style={styles.quantityButton}
-                      >
-                        <FontAwesome name="minus" style={styles.quantityIcon} />
-                      </TouchableOpacity>
-                      <Text style={styles.productQuantity}>{stock.stock}</Text>
-                      <TouchableOpacity
-                        onPress={() => handleQuantityChange(stock._id, 1)}
-                        style={styles.quantityButton}
-                      >
-                        <FontAwesome name="plus" style={styles.quantityIcon} />
-                      </TouchableOpacity>
-                    </View>
+      <View className="flex-1">
+        <ScrollView showsVerticalScrollIndicator={false} className="p-3">
+          <View>
+            {stocks.length === 0 ? (
+              <TextBody1>Aucun stock trouvé pour ce magasin.</TextBody1>
+            ) : (
+              Array.isArray(categories) &&
+              categories.map((category: string) => (
+                <View key={category}>
+                  <View className="flex-row items-center mb-3">
+                    <FontAwesome
+                      name="square"
+                      className="text-secondary dark:text-primary text-lg mr-2"
+                    />
+                    <TextHeading4 extraClasses="flex-shrink">
+                      {category.toUpperCase()} (
+                      {
+                        stocks?.filter(
+                          (s) => s.product.family.category.name === category,
+                        ).length
+                      }
+                      )
+                    </TextHeading4>
+                    <ButtonIcon
+                      iconName="arrow-down"
+                      extraClasses="p-3 bg-primary"
+                      onPressFn={() => toggleOpenList(category)}
+                      animated={true}
+                    />
                   </View>
-                  <TouchableOpacity
-                    onPress={() => {
-                      /* View details */
-                    }}
-                    style={styles.viewButton}
-                  >
-                    <FontAwesome name="eye" style={styles.viewIcon} />
-                  </TouchableOpacity>
+                  {isOpen[category] &&
+                    Array.isArray(stocks) &&
+                    stocks
+                      .filter(
+                        (stock: StockData) =>
+                          stock?.product.family.category.name === category,
+                      )
+                      .map((stock: StockData) => (
+                        <View
+                          key={stock?._id}
+                          className="rounded-lg bg-lightbg dark:bg-tertiary p-3 mb-3 "
+                        >
+                          <View className="flex flex-row items-center">
+                            <View className="rounded-lg">
+                              <Image
+                                source={
+                                  stock?.product.image
+                                    ? { uri: stock.product.image }
+                                    : require("../assets/icon.png")
+                                }
+                                className="rounded-xl w-20 h-20 mr-3"
+                                alt={`Illustration du produit ${stock?.product.name}`}
+                                resizeMode="stretch"
+                                width={96}
+                                height={64}
+                              />
+                            </View>
+                            <View>
+                              <TextBody1 extraClasses="font-bold mb-1">
+                                {stock?.product.family.name}{" "}
+                                {stock?.product.name}
+                              </TextBody1>
+
+                              <View className="flex flex-row items-center my-1">
+                                <TextBody1>Prix</TextBody1>
+                                <TextInput
+                                  value={
+                                    tempPrices[stock?._id || ""] ??
+                                    stock?.price?.toString() ??
+                                    ""
+                                  }
+                                  onChangeText={(price) =>
+                                    handleChangePrice(stock?._id, price)
+                                  }
+                                  keyboardType={"numeric"}
+                                  className="rounded-sm bg-white text-black mx-3 px-4 font-bold text-lg"
+                                />
+                                <TextBody1>
+                                  euros
+                                  {stock.product.weight.unit === "gr"
+                                    ? "/kg"
+                                    : " à la pièce"}
+                                </TextBody1>
+                              </View>
+
+                              <View className="flex flex-row items-center mt-1">
+                                <TextBody1>Quantité</TextBody1>
+                                <ButtonIcon
+                                  iconName="minus"
+                                  extraClasses="bg-primary px-2 ml-2"
+                                  size={20}
+                                  onPressFn={() =>
+                                    handleQuantityChange(stock?._id, -1)
+                                  }
+                                />
+                                <View>
+                                  <TextHeading4 extraClasses="mx-2">
+                                    {stock.stock ? stock.stock : 0}
+                                  </TextHeading4>
+                                </View>
+                                <ButtonIcon
+                                  iconName="plus"
+                                  extraClasses="bg-primary px-2"
+                                  size={20}
+                                  onPressFn={() =>
+                                    handleQuantityChange(stock?._id, +1)
+                                  }
+                                />
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                      ))}
                 </View>
-              ))}
+              ))
+            )}
+            {stocks.length > 0 && (
+              <ButtonPrimaryEnd
+                label="Sauvegarder"
+                iconName="refresh"
+                disabled={isStockSaveLoading}
+                extraClasses="my-3"
+                onPressFn={() => handlePrepareSaveStock()}
+                isLoading={isStockSaveLoading}
+              />
+            )}
           </View>
-        ))}
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  scrollContainer: {
-    flex: 1,
-    paddingHorizontal: 15,
-  },
-  backButton: {
-    padding: 10,
-    position: "absolute",
-    top: 20,
-    left: 20,
-    zIndex: 1,
-  },
-  backIcon: {
-    fontSize: 24,
-    color: "#333",
-  },
-  title: {
-    fontSize: 20,
-    textAlign: "center",
-    marginVertical: 10,
-    fontWeight: "bold",
-  },
-  allProductsSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    backgroundColor: "#F0F0F0",
-    marginHorizontal: 20,
-    borderRadius: 5,
-    marginVertical: 10,
-  },
-  allProductsIcon: {
-    fontSize: 20,
-    color: "#D4E157",
-    marginRight: 10,
-  },
-  allProductsText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  globalSearchInput: {
-    backgroundColor: "#F0F0F0",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginVertical: 10,
-    marginHorizontal: 20,
-  },
-  categorySection: {
-    marginBottom: 20,
-  },
-  categoryHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  categoryIcon: {
-    fontSize: 20,
-    color: "#D4E157",
-    marginRight: 10,
-  },
-  categoryTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  productRow: {
-    backgroundColor: "#FFF",
-    borderRadius: 5,
-    padding: 15,
-    marginVertical: 5,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ccc",
-  },
-  productInfo: {
-    flex: 1,
-  },
-  productDetails: {
-    marginBottom: 10,
-  },
-  productName: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  productPrice: {
-    fontSize: 12,
-    color: "#666",
-  },
-  productQuantityContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  quantityButton: {
-    backgroundColor: "#D4E157",
-    padding: 5,
-    borderRadius: 3,
-  },
-  quantityIcon: {
-    fontSize: 16,
-    color: "#333",
-  },
-  productQuantity: {
-    marginHorizontal: 10,
-    fontSize: 16,
-    color: "#333",
-  },
-  viewButton: {
-    backgroundColor: "#D4E157",
-    padding: 10,
-    borderRadius: 5,
-  },
-  viewIcon: {
-    fontSize: 20,
-    color: "#333",
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-    backgroundColor: "#FCFFF0",
-  },
-  footerIcon: {
-    fontSize: 24,
-    color: "#333",
-  },
-});

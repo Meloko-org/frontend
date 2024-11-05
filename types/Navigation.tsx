@@ -18,7 +18,12 @@ type RootStackParamList = {
       | "OrderCustomer";
   };
   TabNavigatorProducer: {
-    screen: "Accueil" | "Boutique" | "Business Center" | "ProducerProfile";
+    screen:
+      | "Accueil"
+      | "Boutique"
+      | "Business Center"
+      | "ProducerProfile"
+      | "Stocks";
   };
   GestionDesStocks: undefined;
   ShopProducer: undefined;

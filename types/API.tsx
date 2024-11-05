@@ -44,6 +44,14 @@ type StockData = {
   stock: { $numberDecimal: string };
   shop: ShopData;
   product: ProductData;
+  tags: TagData[];
+};
+
+type TagData = {
+  _id: string;
+  name: string;
+  description: string;
+  color: string;
 };
 
 type CartData = {

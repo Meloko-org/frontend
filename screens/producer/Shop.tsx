@@ -23,7 +23,7 @@ import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import ButtonIcon from "../../components/utils/buttons/Icon";
 import TextBody1 from "../../components/utils/texts/Body1";
 import ButtonBack from "../../components/utils/buttons/Back";
-import _Fontawesome from "react-native-vector-icons/FontAwesome";
+
 import LogoModal from "../../components/modals/producer/Logo";
 import PhotoModal from "../../components/modals/producer/Photo";
 import VideoModal from "../../components/modals/producer/Video";
@@ -31,6 +31,7 @@ import ClickCollectModal from "../../components/modals/producer/ClickCollect";
 import MarketsModal from "../../components/modals/producer/Markets";
 import { ProducerState } from "../../reducers/producer";
 
+import _Fontawesome from "react-native-vector-icons/FontAwesome";
 const FontAwesome = _Fontawesome as React.ElementType;
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
@@ -43,6 +44,8 @@ type Props = {
 };
 
 export default function ShopProducteurScreen({ navigation }: Props) {
+  const [isOpenAddress, setOpenAddress] = useState(false);
+
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [siret, setSiret] = useState<string>("");
@@ -116,6 +119,10 @@ export default function ShopProducteurScreen({ navigation }: Props) {
       setButtonLabel("Mettre à jour");
     }
   }, []);
+
+  const toggleOpenAddress = () => {
+    setOpenAddress(!isOpenAddress);
+  };
 
   /**
    * Permet d'ajouter ou supprimer les id des types de shop en fonction des clics sur les switch
@@ -270,87 +277,122 @@ export default function ShopProducteurScreen({ navigation }: Props) {
           extraClasses="mb-2 w-full"
         />
 
-        <View className="p-5">{typesList}</View>
-        <TextHeading3 centered={true}>Adresse</TextHeading3>
-        <Text
-          label="Adresse"
-          placeholder="Saisissez votre adresse"
-          value={address.address1}
-          onChangeText={(value: string) =>
-            setAddress({
-              address1: value,
-              address2: address.address2,
-              postalCode: address.postalCode,
-              city: address.city,
-              country: address.country,
-            })
-          }
-          extraClasses="mb-2"
+        <View className="flex flex-row justify-stretch mb-1">
+          <View className="flex flex-grow">
+            <TextHeading3 centered>Adresse</TextHeading3>
+          </View>
+          <ButtonIcon
+            iconName="arrow-down"
+            extraClasses="p-3 bg-tertiary"
+            onPressFn={toggleOpenAddress}
+            animated={true}
+          />
+        </View>
+        {isOpenAddress && (
+          <>
+            <Text
+              label="Adresse"
+              placeholder="Saisissez votre adresse"
+              value={address.address1}
+              onChangeText={(value: string) =>
+                setAddress({
+                  address1: value,
+                  address2: address.address2,
+                  postalCode: address.postalCode,
+                  city: address.city,
+                  country: address.country,
+                })
+              }
+              extraClasses="mb-2"
+            />
+            <Text
+              label="Adresse complément"
+              placeholder="Complément d'adresse"
+              value={address.address2}
+              onChangeText={(value: string) =>
+                setAddress({
+                  address1: address.address1,
+                  address2: value,
+                  postalCode: address.postalCode,
+                  city: address.city,
+                  country: address.country,
+                })
+              }
+              extraClasses="mb-2"
+            />
+            <Text
+              label="Code Postal"
+              placeholder="Saisissez le code postal"
+              value={address.postalCode}
+              onChangeText={(value: string) =>
+                setAddress({
+                  address1: address.address1,
+                  address2: address.address2,
+                  postalCode: value,
+                  city: address.city,
+                  country: address.country,
+                })
+              }
+              extraClasses="mb-2"
+            />
+            <Text
+              label="Ville"
+              placeholder="Saisissez la ville"
+              value={address.city}
+              onChangeText={(value: string) =>
+                setAddress({
+                  address1: address.address1,
+                  address2: address.address2,
+                  postalCode: address.postalCode,
+                  city: value,
+                  country: address.country,
+                })
+              }
+              extraClasses="mb-2"
+            />
+            <Text
+              label="Pays"
+              placeholder="Saisissez le pays"
+              value={address.country}
+              onChangeText={(value: string) =>
+                setAddress({
+                  address1: address.address1,
+                  address2: address.address2,
+                  postalCode: address.postalCode,
+                  city: address.city,
+                  country: value,
+                })
+              }
+              extraClasses="mb-1"
+            />
+          </>
+        )}
+
+        <View className="py-3">{typesList}</View>
+
+        <ButtonPrimaryEnd
+          label={buttonLabel}
+          iconName="refresh"
+          disabled={isShopSaveLoading}
+          extraClasses="mb-3"
+          onPressFn={() => handleSaveShop()}
+          isLoading={isShopSaveLoading}
         />
-        <Text
-          label="Adresse complément"
-          placeholder="Complément d'adresse"
-          value={address.address2}
-          onChangeText={(value: string) =>
-            setAddress({
-              address1: address.address1,
-              address2: value,
-              postalCode: address.postalCode,
-              city: address.city,
-              country: address.country,
+
+        <ButtonPrimaryEnd
+          label="Gestion des stocks"
+          iconName="refresh"
+          extraClasses="my-3"
+          onPressFn={() =>
+            navigation.navigate("TabNavigatorProducer", {
+              screen: "Stocks",
             })
           }
-          extraClasses="mb-2"
-        />
-        <Text
-          label="Code Postal"
-          placeholder="Saisissez le code postal"
-          value={address.postalCode}
-          onChangeText={(value: string) =>
-            setAddress({
-              address1: address.address1,
-              address2: address.address2,
-              postalCode: value,
-              city: address.city,
-              country: address.country,
-            })
-          }
-          extraClasses="mb-2"
-        />
-        <Text
-          label="Ville"
-          placeholder="Saisissez la ville"
-          value={address.city}
-          onChangeText={(value: string) =>
-            setAddress({
-              address1: address.address1,
-              address2: address.address2,
-              postalCode: address.postalCode,
-              city: value,
-              country: address.country,
-            })
-          }
-          extraClasses="mb-2"
-        />
-        <Text
-          label="Pays"
-          placeholder="Saisissez le pays"
-          value={address.country}
-          onChangeText={(value: string) =>
-            setAddress({
-              address1: address.address1,
-              address2: address.address2,
-              postalCode: address.postalCode,
-              city: address.city,
-              country: value,
-            })
-          }
-          extraClasses="mb-2"
         />
 
         {buttonLabel === "Mettre à jour" && (
           <>
-            <View className="flex flex-row my-5 justify-center">
+            <View className="flex flex-row my-3 justify-center">
               <ButtonIcon
                 iconName="photo"
                 extraClasses="bg-primary p-4 mr-3 h-[50px]"
@@ -408,15 +450,6 @@ export default function ShopProducteurScreen({ navigation }: Props) {
             </View>
           </>
         )}
-
-        <ButtonPrimaryEnd
-          label={buttonLabel}
-          iconName="refresh"
-          disabled={isShopSaveLoading}
-          extraClasses="my-5"
-          onPressFn={() => handleSaveShop()}
-          isLoading={isShopSaveLoading}
-        />
 
         {/* <View className="h-[200px]"></View> */}
 
