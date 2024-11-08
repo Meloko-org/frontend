@@ -43,7 +43,10 @@ export default function AddProductModal(
     try {
       const token = await getToken();
       console.log(token);
-      const data = await productsTools.getAvailableProductsForAShop(token);
+      const data = await productsTools.getAvailableProductsForAShop(
+        token,
+        searchTerm,
+      );
       if (data) {
         if ("message" in data) {
           Alert.alert("Informations", data.message);
@@ -82,6 +85,7 @@ export default function AddProductModal(
 
   console.log(availableProducts);
   console.log("toAdd: ", productsToAdd);
+  console.log("searchTerm:", searchTerm);
 
   return (
     <Modal

@@ -1,14 +1,18 @@
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
-const getAvailableProductsForAShop = async (token: string) => {
+const getAvailableProductsForAShop = async (
+  token: string,
+  searchTerm: string,
+) => {
   try {
     const response = await fetch(`${API_ROOT}/shops/available-products`, {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
         mode: "cors",
       },
+      body: JSON.stringify({ searchTerm }),
     });
     const data = await response.json();
     return data;

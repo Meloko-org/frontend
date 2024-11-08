@@ -54,7 +54,6 @@ export default function StocksScreen({ navigation }: Props) {
   const [stocks, setStocks] = useState<StockData[]>([]);
   const [tempPrices, setTempPrices] = useState<{ [key: string]: string }>({});
   const [categories, setCategories] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
 
   const [isAddProductModalVisible, setAddProductModalVisible] =
     useState<boolean>(false);
