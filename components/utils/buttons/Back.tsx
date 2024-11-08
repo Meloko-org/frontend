@@ -12,7 +12,7 @@ type ButtonBackProps = {
 export default function ButtonBack(props: ButtonBackProps): JSX.Element {
   return (
     <View
-      className={`${props.extraClasses} w-full flex flex-row justify-start items-center pl-4`}
+      className={`${props.extraClasses} w-2/12 flex flex-row justify-start items-center pl-4`}
     >
       <TouchableOpacity
         onPress={props.onPressFn}

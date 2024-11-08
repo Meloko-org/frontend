@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector, UseSelector } from "react-redux";
 import { ShopState } from "../reducers/shop";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -28,8 +28,7 @@ import categoriesTools from "../modules/categoriesTools";
 import ButtonIcon from "../components/utils/buttons/Icon";
 import TextBody1 from "../components/utils/texts/Body1";
 import TextBody2 from "../components/utils/texts/Body2";
-
-//import Product from '../components/cards/Products';
+import AddProductModal from "../components/modals/producer/AddProduct";
 
 const FontAwesome = _Fontawesome as React.ElementType;
 
@@ -57,28 +56,39 @@ export default function StocksScreen({ navigation }: Props) {
   const [categories, setCategories] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
+  const [isAddProductModalVisible, setAddProductModalVisible] =
+    useState<boolean>(false);
+
   const [isOpen, setIsOpen] = useState({});
 
-  const [shopId, setShopId] = useState<string>("66b339729a76167d3a93df3b");
-  // const [shopId, setShopId] = useState<string | undefined>(shopStore?._id);
+  // const [shopId, setShopId] = useState<string>("66b339729a76167d3a93df3b");
+  const [shopId, setShopId] = useState<string | undefined>(shopStore?._id);
 
   useEffect(() => {
-    (async () => {
-      const data = await stocksTools.getStocksByShop(shopId);
-      if (data) {
-        const formattedData = data.map((item: StockData) => ({
-          _id: item?._id,
-          price: parseFloat(item.price.$numberDecimal),
-          stock: parseInt(item.stock.$numberDecimal, 10),
-          shop: item?.shop, // en supposant que shop est déjà formaté selon ShopData
-          product: item?.product, // en supposant que product est formaté selon ProductData
-          tags: item?.tags, // en supposant que les tags correspondent déjà à TagData[]
-        }));
-        setStocks(formattedData);
-        setIsLoadingStocks(false);
-      }
-    })();
+    getStocksByShop();
   }, []);
+
+  const getStocksByShop = async () => {
+    const data = await stocksTools.getStocksByShop(shopId);
+    if (data) {
+      const formattedData = data.map((item: StockData) => ({
+        _id: item?._id,
+        price: parseFloat(item.price.$numberDecimal),
+        stock: parseInt(item.stock.$numberDecimal, 10),
+        shop: item?.shop, // en supposant que shop est déjà formaté selon ShopData
+        product: item?.product, // en supposant que product est formaté selon ProductData
+        tags: item?.tags, // en supposant que les tags correspondent déjà à TagData[]
+      }));
+      setStocks(formattedData);
+      setIsLoadingStocks(false);
+    }
+  };
+
+  const refreshStocks = async () => {
+    setAddProductModalVisible(false);
+    getStocksByShop();
+    setIsOpen({});
+  };
 
   useEffect(() => {
     if (!isLoadingStocks && stocks.length > 0) {
@@ -194,17 +204,9 @@ export default function StocksScreen({ navigation }: Props) {
         </TextHeading3>
       </View>
 
-      {/* Global Search Bar */}
-      {/*<TextInput
-          placeholder="Rechercher un produit..."
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-          style={styles.globalSearchInput}
-        />*/}
-
       <View className="flex-1">
         <ScrollView showsVerticalScrollIndicator={false} className="p-3">
-          <View>
+          <View className="">
             {stocks.length === 0 ? (
               <TextBody1>Aucun stock trouvé pour ce magasin.</TextBody1>
             ) : (
@@ -328,9 +330,21 @@ export default function StocksScreen({ navigation }: Props) {
                 isLoading={isStockSaveLoading}
               />
             )}
+            <ButtonPrimaryEnd
+              label="Ajouter des produits"
+              iconName="plus"
+              extraClasses="mt-5"
+              onPressFn={() => setAddProductModalVisible(true)}
+            />
           </View>
         </ScrollView>
       </View>
+
+      <AddProductModal
+        isVisible={isAddProductModalVisible}
+        onCloseFn={() => setAddProductModalVisible(false)}
+        afterAddProducts={refreshStocks}
+      />
     </SafeAreaView>
   );
 }

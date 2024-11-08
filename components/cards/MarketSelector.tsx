@@ -21,7 +21,7 @@ export default function MarketSelector(
 ): JSX.Element {
   return (
     <View className={`${props.extraClasses} flex flex-row`}>
-      <View className="w-[80%]">
+      <View className="w-10/12 pr-5">
         <BadgeGrey extraClasses="mb-2 mx-5">{props.market.name}</BadgeGrey>
         <TextBody2 extraClasses="px-5">
           {props.market.address.address1}
@@ -38,7 +38,7 @@ export default function MarketSelector(
           <TextBody1>{props.market.address.city}</TextBody1>
         </View>
       </View>
-      <View className="flex flex-row items-start w-[20%]">
+      <View className="flex flex-row items-start w-2/12">
         <SwitchInput
           thumbColor="#215487"
           label=""
