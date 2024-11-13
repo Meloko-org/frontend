@@ -6,10 +6,10 @@ import {
   Button,
   View,
   Modal,
-  SafeAreaView,
   TouchableOpacity,
   Text,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useCallback, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
@@ -26,6 +26,7 @@ import userTools from "../modules/userTools";
 import producerTools from "../modules/producerTools";
 import shopTools from "../modules/shopTools";
 import { useAuth } from "@clerk/clerk-expo";
+import { ScrollView } from "react-native-gesture-handler";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -77,6 +78,7 @@ export default function SignInScreen(props) {
   const [password, setPassword] = useState<string>("");
   const [newEmailAddress, setNewEmailAddress] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [performedSignedIn, setPerformedSignedIn] = useState(false);
   const [performedSignedUp, setPerformedSignedUp] = useState(false);
   const [isConnectionLoading, setConnectionLoading] = useState(false);
@@ -176,12 +178,12 @@ export default function SignInScreen(props) {
 
     try {
       // Try to verify the email with the provided code
-      const completeSignUp = await signUp.attemptEmailAddressVerification({
+      const completeSignUp = await signUp?.attemptEmailAddressVerification({
         code,
       });
 
       // If the verification event is sucessfull
-      if (completeSignUp.status === "complete") {
+      if (completeSignUp?.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
         setPerformedSignedUp(true);
       } else {
@@ -239,92 +241,95 @@ export default function SignInScreen(props) {
       <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
         <View className="p-3 flex items-center">
           <ButtonBack onPressFn={handleCloseModal} />
-          <TextHeading2 extraClasses="mb-3">Se connecter</TextHeading2>
-          <ButtonPrimaryEnd
-            label="Google"
-            iconName="google"
-            onPressFn={onGoogleAuthPress}
-            extraClasses="w-full mb-5"
-          />
-          <InputText
-            value={emailAddress}
-            onChangeText={(newEmail: string) => setEmailAddress(newEmail)}
-            placeholder="example@gmail.com"
-            label="Email"
-            autoCapitalize="none"
-            extraClasses="w-full mb-2"
-          />
-          <InputText
-            value={password}
-            onChangeText={(newPassword: string) => setPassword(newPassword)}
-            placeholder="Mot de passe"
-            label="Mot de passe"
-            autoCapitalize="none"
-            extraClasses="w-full mb-2"
-            secureTextEntry={true}
-          />
-          <ButtonPrimaryEnd
-            label="Connexion"
-            iconName="sign-in"
-            onPressFn={onSignInPress}
-            isLoading={isConnectionLoading}
-            extraClasses="w-full mb-5"
-          />
+          <ScrollView>
+            <TextHeading2 extraClasses="mb-3">Se connecter</TextHeading2>
+            <ButtonPrimaryEnd
+              label="Google"
+              iconName="google"
+              onPressFn={onGoogleAuthPress}
+              extraClasses="w-full mb-5"
+            />
+            <InputText
+              value={emailAddress}
+              onChangeText={(newEmail: string) => setEmailAddress(newEmail)}
+              placeholder="example@gmail.com"
+              label="Email"
+              autoCapitalize="none"
+              extraClasses="w-full mb-2"
+            />
+            <InputText
+              value={password}
+              onChangeText={(newPassword: string) => setPassword(newPassword)}
+              placeholder="Mot de passe"
+              label="Mot de passe"
+              autoCapitalize="none"
+              extraClasses="w-full mb-2"
+              secureTextEntry={true}
+            />
+            <ButtonPrimaryEnd
+              label="Connexion"
+              iconName="sign-in"
+              onPressFn={onSignInPress}
+              isLoading={isConnectionLoading}
+              extraClasses="w-full mb-5"
+            />
 
-          <TextHeading2 extraClasses="mb-2">Créer un compte</TextHeading2>
+            <TextHeading2 extraClasses="mb-2">Créer un compte</TextHeading2>
 
-          {!pendingVerification ? (
-            <>
-              <InputText
-                value={newEmailAddress}
-                onChangeText={(newEmail: string) =>
-                  setNewEmailAddress(newEmail)
-                }
-                placeholder="example@gmail.com"
-                label="Email"
-                autoCapitalize="none"
-                extraClasses="w-full mb-2"
-              />
-              <InputText
-                value={newPassword}
-                onChangeText={(newPassword: string) =>
-                  setNewPassword(newPassword)
-                }
-                placeholder="Mot de passe"
-                label="Mot de passe"
-                autoCapitalize="none"
-                extraClasses="w-full mb-2"
-                secureTextEntry={true}
-              />
-              <InputText
-                value={newPassword}
-                onChangeText={(newPassword: string) =>
-                  setNewPassword(newPassword)
-                }
-                placeholder="Confirmer mot de passe"
-                label="Confirmer mot de passe"
-                autoCapitalize="none"
-                extraClasses="w-full mb-2"
-                secureTextEntry={true}
-              />
-              <ButtonPrimaryEnd
-                label="Inscription"
-                iconName="arrow-right"
-                onPressFn={onSignUpPress}
-                isLoading={isConnectionLoading}
-                extraClasses="w-full mb-5"
-              />
-            </>
-          ) : (
-            <>
-              <TextInput
-                value={code}
-                placeholder="Code..."
-                onChangeText={(code) => setCode(code)}
-              />
-              <Button title="Verify Email" onPress={onPressVerify} />
-            </>
-          )}
+            {!pendingVerification ? (
+              <>
+                <InputText
+                  value={newEmailAddress}
+                  onChangeText={(newEmail: string) =>
+                    setNewEmailAddress(newEmail)
+                  }
+                  placeholder="example@gmail.com"
+                  label="Email"
+                  autoCapitalize="none"
+                  extraClasses="w-full mb-2"
+                />
+                <InputText
+                  value={newPassword}
+                  onChangeText={(newPassword: string) =>
+                    setNewPassword(newPassword)
+                  }
+                  placeholder="Mot de passe"
+                  label="Mot de passe"
+                  autoCapitalize="none"
+                  extraClasses="w-full mb-2"
+                  secureTextEntry={true}
+                />
+                <InputText
+                  value={confirmPassword}
+                  onChangeText={(confirmPassword: string) =>
+                    setConfirmPassword(confirmPassword)
+                  }
+                  placeholder="Confirmer mot de passe"
+                  label="Confirmer mot de passe"
+                  autoCapitalize="none"
+                  extraClasses="w-full mb-2"
+                  secureTextEntry={true}
+                />
+                <ButtonPrimaryEnd
+                  label="Inscription"
+                  iconName="arrow-right"
+                  onPressFn={onSignUpPress}
+                  isLoading={isConnectionLoading}
+                  extraClasses="w-full mb-5"
+                />
+              </>
+            ) : (
+              <>
+                <InputText
+                  label="Code de validation"
+                  value={code}
+                  placeholder="Code..."
+                  onChangeText={(code: string) => setCode(code)}
+                />
+                <Button title="Verify Email" onPress={onPressVerify} />
+              </>
+            )}
+          </ScrollView>
         </View>
       </SafeAreaView>
     </Modal>

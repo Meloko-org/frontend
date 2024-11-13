@@ -89,14 +89,20 @@ export default function ProfilScreen({ navigation }: Props) {
       const producerInfos = await producerTools.getProducerInfos(token);
 
       if (producerInfos) {
-        dispatch(setProducerData(producerInfos));
-        // store shop infos to the store
-        const shopInfos = await shopTools.getShopInfos(
-          token,
-          producerInfos._id,
-        );
-        if (shopInfos) {
-          dispatch(setShopData(shopInfos));
+        if (!("message" in producerInfos)) {
+          // si on n'a pas une réponse {message: "Producer ot found."}
+          dispatch(setProducerData(producerInfos));
+          // store shop infos to the store
+          const shopInfos = await shopTools.getShopInfos(
+            token,
+            producerInfos._id,
+          );
+          if (shopInfos) {
+            if (!("message" in shopInfos)) {
+              // si on n'a pas une réponse {message: "Shop not found."}
+              dispatch(setShopData(shopInfos));
+            }
+          }
         }
       }
     } catch (error) {

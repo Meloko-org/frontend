@@ -42,6 +42,8 @@ const updateProducer = async (token: string, values: string) => {
   }
 };
 
+const getAllOrders = async (token: string) => {};
+
 export default {
   updateProducer,
   getProducerInfos,
