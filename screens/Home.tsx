@@ -1,34 +1,38 @@
 import React, { useEffect, useState } from "react";
+import { useAuth } from "@clerk/clerk-expo";
+import { useColorScheme } from "nativewind";
+
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../types/Navigation";
+
 import {
   StyleSheet,
   Button,
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   Image,
 } from "react-native";
-import { useAuth } from "@clerk/clerk-expo";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types/Navigation";
+import { SafeAreaView } from "react-native-safe-area-context";
 import SignInScreen from "./Signin";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import TextHeading1 from "../components/utils/texts/Heading1";
 import TextHeading2 from "../components/utils/texts/Heading2";
 import TextBody1 from "../components/utils/texts/Body1";
+import TextHeading4 from "../components/utils/texts/Heading4";
+import TextHeading3 from "../components/utils/texts/Heading3";
+import LogoDark from "../assets/images/logo_meloko-dark.png";
+import LogoLight from "../assets/images/logo_meloko-light.png";
+
 import userTools from "../modules/userTools";
 import producerTools from "../modules/producerTools";
 import shopTools from "../modules/shopTools";
+
 import { useSelector, useDispatch } from "react-redux";
 import { UserState, updateUser, resetUser } from "../reducers/user";
 import { ProducerState, setProducerData } from "../reducers/producer";
 import { ShopState, setShopData } from "../reducers/shop";
 import { ModeState } from "../reducers/mode";
-import TextHeading4 from "../components/utils/texts/Heading4";
-import TextHeading3 from "../components/utils/texts/Heading3";
-import { useColorScheme } from "nativewind";
-import LogoDark from "../assets/images/logo_meloko-dark.png";
-import LogoLight from "../assets/images/logo_meloko-light.png";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -57,6 +61,13 @@ export default function HomeScreen({ navigation }: Props) {
     (state: { mode: ModeState }) => state.mode.value,
   );
 
+  const producerStore = useSelector(
+    (state: { producer: ProducerState }) => state.producer.value,
+  );
+  const shopStore = useSelector(
+    (state: { shop: ShopState }) => state.shop.value,
+  );
+
   const fetchData = async () => {
     try {
       // console.log("fetchData");
@@ -66,6 +77,25 @@ export default function HomeScreen({ navigation }: Props) {
       const user = await userTools.getUserInfos(token);
       if (user) {
         dispatch(updateUser(user));
+        const producerInfos = await producerTools.getProducerInfos(token);
+
+        if (producerInfos) {
+          if (!("message" in producerInfos)) {
+            // si on n'a pas une réponse {message: "Producer ot found."}
+            dispatch(setProducerData(producerInfos));
+            // store shop infos to the store
+            const shopInfos = await shopTools.getShopInfos(
+              token,
+              producerInfos._id,
+            );
+            if (shopInfos) {
+              if (!("message" in shopInfos)) {
+                // si on n'a pas une réponse {message: "Shop not found."}
+                dispatch(setShopData(shopInfos));
+              }
+            }
+          }
+        }
       }
     } catch (error) {
       console.error(error);
@@ -131,18 +161,22 @@ export default function HomeScreen({ navigation }: Props) {
   const handleProducer = () => {
     if (!isSignedIn) {
       setIsSigninModalVisible(true);
+    } else {
+      redirectProducer();
     }
-    redirectProducer();
   };
 
   const redirectProducer = () => {
+    // si le compte producer n'est pas encore renseigné
     if (userStore.producer === null) {
+      // redirection vers le producerProfile pour saisir les infos
       navigation.navigate("TabNavigatorProducer", {
         screen: "ProducerProfile",
       });
     } else {
+      // redirection vers le business center
       navigation.navigate("TabNavigatorProducer", {
-        screen: "Accueil",
+        screen: "Business Center",
       });
     }
   };
