@@ -56,6 +56,10 @@ export default function ManageMarketsModal(
 
   // permet d'afficher la liste des markets du shop
   useEffect(() => {
+    console.log(
+      "shopstore.markets:",
+      JSON.stringify(shopStore.markets, null, 2),
+    );
     if (shopStore?.markets) {
       const markets = shopStore?.markets.map(
         ({ market, openingHours, isActive }) => (

@@ -42,9 +42,26 @@ const updateProducer = async (token: string, values: string) => {
   }
 };
 
-const getAllOrders = async (token: string) => {};
+const getAllOrders = async (token: string) => {
+  try {
+    const response = await fetch(`${API_ROOT}/business/all`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        mode: "cors",
+      },
+    });
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export default {
   updateProducer,
   getProducerInfos,
+  getAllOrders,
 };

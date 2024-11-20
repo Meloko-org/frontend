@@ -5,6 +5,13 @@ export type CartState = {
   value: CartData[] | [];
 };
 
+type CartPayload = {
+  shopId: string;
+  stockId: string;
+  increment?: number;
+  decrement?: number;
+};
+
 const initialState: CartState = {
   value: [],
 };
@@ -20,7 +27,7 @@ export const cartSlice = createSlice({
       if (shop) {
         shop.products.push({
           stockData: action.payload.stockData,
-          quantity: 1,
+          quantity: action.payload.quantity,
         });
       } else {
         state.value.push({
@@ -28,38 +35,55 @@ export const cartSlice = createSlice({
           products: [
             {
               stockData: action.payload.stockData,
-              quantity: 1,
+              quantity: action.payload.quantity,
             },
           ],
           withdrawMode: null,
         });
       }
     },
-    increaseCartQuantity: (state: CartState, action: PayloadAction) => {
-      const shop = state.value.find(
-        (c) => c.shop._id === action.payload.shopId,
-      );
-      const product = shop.products.find(
-        (p) => p.stockData._id === action.payload.stockId,
-      );
-      product.quantity++;
+    increaseCartQuantity: (
+      state: CartState,
+      action: PayloadAction<CartPayload>,
+    ) => {
+      const { shopId, stockId, increment = 1 } = action.payload;
+
+      const shop = state.value.find((c) => c.shop?._id === shopId);
+
+      if (shop) {
+        const product = shop.products.find((p) => p.stockData._id === stockId);
+
+        if (product) {
+          product.quantity += increment;
+        }
+      }
     },
-    decreaseCartQuantity: (state: CartState, action: PayloadAction) => {
-      const shop = state.value.find(
-        (c) => c.shop._id === action.payload.shopId,
-      );
-      const product = shop.products.find(
-        (p) => p.stockData._id === action.payload.stockId,
-      );
-      product.quantity > 1
-        ? product.quantity--
-        : (shop.products = shop.products.filter(
-            (p) => p.stockData._id !== action.payload.stockId,
-          ));
-      if (shop.products.length === 0)
-        state.value = state.value.filter(
-          (c) => c.shop._id !== action.payload.shopId,
-        );
+    decreaseCartQuantity: (
+      state: CartState,
+      action: PayloadAction<CartPayload>,
+    ) => {
+      const { shopId, stockId, decrement = 1 } = action.payload;
+
+      const shop = state.value.find((c) => c.shop._id === shopId);
+
+      if (shop) {
+        const product = shop.products.find((p) => p.stockData._id === stockId);
+
+        if (product) {
+          product.quantity -= decrement;
+          // on supprime le produit si la quantité tombe à 0
+          if (product.quantity <= 0) {
+            shop.products = shop.products.filter(
+              (p) => p.stockData._id !== stockId,
+            );
+          }
+        }
+
+        // on supprime le shop si tous les produits du shop sont retirés
+        if (shop.products.length === 0) {
+          state.value = state.value.filter((c) => c.shop._id !== shopId);
+        }
+      }
     },
     updateWithdrawMode: (state: CartState, action: PayloadAction) => {
       const shop = state.value.find(

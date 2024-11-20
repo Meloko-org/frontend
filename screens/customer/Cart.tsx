@@ -9,13 +9,17 @@ import {
   addProductToCart,
   increaseCartQuantity,
   decreaseCartQuantity,
+  CartState,
 } from "../../reducers/cart";
 import CardProduct from "../../components/cards/Product";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import ButtonPrimaryStart from "../../components/utils/buttons/PrimaryStart";
 import ButtonSecondaryStart from "../../components/utils/buttons/SecondaryStart";
+
 export default function CartScreen({ navigation }) {
-  const cartStore = useSelector((state: { cart }) => state.cart.value);
+  const cartStore = useSelector(
+    (state: { cart: CartState }) => state.cart.value,
+  );
   const [cartTotal, setCartTotal] = useState<number>(0);
 
   useEffect(() => {
@@ -23,9 +27,13 @@ export default function CartScreen({ navigation }) {
       let allShopsCost = 0;
       cartStore.forEach((c) => {
         const cartTotalCost = c.products.reduce((accumulator, currentValue) => {
+          const quantity =
+            currentValue.stockData.product.weight.unit === "gr"
+              ? currentValue.quantity / 1000
+              : currentValue.quantity;
+
           return (
-            currentValue.quantity *
-              Number(currentValue.stockData.price.$numberDecimal) +
+            quantity * Number(currentValue.stockData.price.$numberDecimal) +
             accumulator
           );
         }, 0);
@@ -87,6 +95,8 @@ export default function CartScreen({ navigation }) {
               <ButtonSecondaryStart
                 label="Continuer vos achats"
                 iconName="arrow-left"
+                disabled={false}
+                isLoading={false}
                 onPressFn={() =>
                   navigation.navigate("TabNavigatorUser", {
                     screen: "Accueil",
@@ -105,6 +115,7 @@ export default function CartScreen({ navigation }) {
             </TextHeading2>
             <ButtonPrimaryStart
               label="Continuer vos achats"
+              disabled={false}
               iconName="arrow-left"
               onPressFn={() => navigation.goBack()}
               extraClasses="w-full"

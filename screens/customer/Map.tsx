@@ -127,7 +127,7 @@ export default function MapCustomerScreen({
   console.log(
     "------------------------------- MAP --------------------------------------------------------------------",
   );
-  console.log("SEARCHRESULT -> ", JSON.stringify(searchResults, null, 2));
+  // console.log("SEARCHRESULT -> ", JSON.stringify(searchResults, null, 2));
 
   return (
     <View style={styles.container}>

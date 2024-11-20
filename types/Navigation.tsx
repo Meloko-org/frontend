@@ -32,6 +32,7 @@ type RootStackParamList = {
   MapCustomer: undefined;
   ShopUser: undefined;
   OrderCustomer: undefined;
+  MarketsShopProducer: undefined;
 };
 
 export type { RootStackParamList };

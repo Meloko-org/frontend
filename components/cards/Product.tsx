@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import BadgeSecondary from "../utils/badges/Secondary";
 import StarsNotation from "../utils/StarsNotation";
@@ -35,20 +35,33 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
   const cartStore = useSelector(
     (state: { cart: CartState }) => state.cart.value,
   );
+
+  const formatQuantity = (quantity: number, unit: string) => {
+    if (unit === "gr") {
+      if (quantity < 1000) {
+        return `${quantity} gr`;
+      } else {
+        return `${(quantity / 1000).toFixed(1)} kg`;
+      }
+    }
+    return `${quantity}`;
+  };
+
   const handleAddCartPress = async (): Promise<void> => {
     dispatch(
       addProductToCart({
         shop: props.stockData.shop,
         stockData: props.stockData,
+        quantity: props.stockData.product.weight.unit === "gr" ? 100 : 1,
       }),
     );
   };
 
   const isInCart = () => {
     return (
-      cartStore.find((c) => c.shop._id === props.stockData.shop._id) &&
+      cartStore.find((c) => c.shop?._id === props.stockData.shop?._id) &&
       cartStore
-        .find((c) => c.shop._id == props.stockData.shop._id)
+        .find((c) => c.shop?._id == props.stockData.shop?._id)
         .products.find((p) => p.stockData._id === props.stockData._id)
     );
   };
@@ -57,36 +70,41 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
     <>
       {props.quantityControllable && (
         <TouchableOpacity
-          onPress={() =>
+          onPress={() => {
             dispatch(
               increaseCartQuantity({
                 shopId: props.stockData.shop._id,
                 stockId: props.stockData._id,
+                increment:
+                  props.stockData.product.weight.unit === "gr" ? 100 : 1,
               }),
-            )
-          }
+            );
+          }}
         >
           <Text className="text-3xl dark:text-lightbg">+</Text>
         </TouchableOpacity>
       )}
-      <BadgeGrey>
-        {
+      <BadgeGrey extraClasses="px-2">
+        {formatQuantity(
           cartStore
             .find((c) => c.shop._id == props.stockData.shop._id)
             .products.find((p) => p.stockData._id === props.stockData._id)
-            .quantity
-        }
+            .quantity || 0,
+          props.stockData.product.weight.unit,
+        )}
       </BadgeGrey>
       {props.quantityControllable && (
         <TouchableOpacity
-          onPress={() =>
+          onPress={() => {
             dispatch(
               decreaseCartQuantity({
                 shopId: props.stockData.shop._id,
                 stockId: props.stockData._id,
+                decrement:
+                  props.stockData.product.weight.unit === "gr" ? 100 : 1,
               }),
-            )
-          }
+            );
+          }}
         >
           <Text className="text-3xl dark:text-lightbg">-</Text>
         </TouchableOpacity>
@@ -115,6 +133,11 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
       );
     });
   // console.log(props.stockData)
+
+  const unit = props.stockData.product.weight.unit === "gr" ? "kg" : "la pièce";
+
+  console.log("cartStore: ", JSON.stringify(cartStore, null, 2));
+
   return (
     <View
       className={`${props.extraClasses} rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary flex flex-row w-full`}
@@ -140,8 +163,9 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
         <View
           className={`${props.showImage ? "w-3/5" : "w-4/5"} h-full px-2 items-start`}
         >
-          <TextHeading4>{`${props.stockData.product.family.name} ${props.stockData.product.name}`}</TextHeading4>
-          <PricePer>{`${props.stockData.price.$numberDecimal}€ / ${props.stockData.product.weight.measurement.$numberDecimal}${props.stockData.product.weight.unit}`}</PricePer>
+          <TextHeading4 extraClasses="mb-1">{`${props.stockData.product.family.name} ${props.stockData.product.name}`}</TextHeading4>
+          {/* <PricePer>{`${props.stockData.price.$numberDecimal} € / ${props.stockData.product.weight.measurement.$numberDecimal}${props.stockData.product.weight.unit}`}</PricePer> */}
+          <PricePer>{`${props.stockData.price.$numberDecimal} € / ${unit}`}</PricePer>
           <View className="flex flex-row justify-start items-center">
             {tags}
           </View>

@@ -40,9 +40,13 @@ export default function WithdrawModesScreen({ navigation }) {
       let allShopsCost = 0;
       cartStore.forEach((c) => {
         const cartTotalCost = c.products.reduce((accumulator, currentValue) => {
+          const quantity =
+            currentValue.stockData.product.weight.unit === "gr"
+              ? currentValue.quantity / 1000
+              : currentValue.quantity;
+
           return (
-            currentValue.quantity *
-              Number(currentValue.stockData.price.$numberDecimal) +
+            quantity * Number(currentValue.stockData.price.$numberDecimal) +
             accumulator
           );
         }, 0);
