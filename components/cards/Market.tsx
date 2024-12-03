@@ -28,6 +28,9 @@ type CardMarketProps = {
   goto?: boolean;
   highlightEnable?: boolean;
   highlightFn?: Function;
+  radioButtonMode?: boolean;
+  isRadioButtonActive?: boolean;
+  onRadioButtonPress?: () => void;
   planning?: boolean;
   onMarketDataChange?: (newMarketData: {
     market: MarketData;
@@ -48,6 +51,7 @@ type PeriodData = {
 
 export default function Market(props: CardMarketProps): JSX.Element {
   const [isHighlighted, setHighlighted] = useState(false);
+  // const [isRadioHighlighted, setRadioHighlighted] = useState<boolean>(false)
 
   const [marketInfos, setMarketInfos] = useState<{
     market: MarketData;
@@ -95,28 +99,32 @@ export default function Market(props: CardMarketProps): JSX.Element {
   };
 
   const handleHighlight = () => {
-    // gestion du highlight en local: impossible d'highlighter sans periodes définies
-    let hasDefinedPeriod;
-    let canHighlight = false;
-    marketInfos.openingHours.forEach((openingHour) => {
-      hasDefinedPeriod = openingHour.periods.some(
-        (period) => period.openingTime !== null,
-      );
-      if (hasDefinedPeriod) {
-        canHighlight = true;
-      }
-    });
-
-    if (!canHighlight) {
-      Alert.alert(
-        "Erreur",
-        "Vous ne pouvez pas activer une place de marché si vous n'avez pas défini d'horaires.",
-      );
+    /* si Market est utilisé en mode withdraw */
+    if (props.radioButtonMode) {
+      props.onRadioButtonPress && props.onRadioButtonPress();
     } else {
-      setHighlighted(!isHighlighted);
-      // si une fonction highlight est passée depuis le parent
-      if (props.highlightFn) {
-        props.highlightFn();
+      /* si Market est utilisé pour paramétrer le shop */
+      // gestion du highlight en local: impossible d'highlighter sans periodes définies
+      let hasDefinedPeriod;
+      let canHighlight = false;
+      marketInfos.openingHours.forEach((openingHour) => {
+        hasDefinedPeriod = openingHour.periods.some(
+          (period) => period.openingTime !== null,
+        );
+        if (hasDefinedPeriod) {
+          canHighlight = true;
+        }
+      });
+
+      if (!canHighlight) {
+        Alert.alert(
+          "Erreur",
+          "Vous ne pouvez pas activer une place de marché si vous n'avez pas défini d'horaires.",
+        );
+      } else {
+        setHighlighted(!isHighlighted);
+        // si une fonction highlight est passée depuis le parent
+        props.highlightFn && props.highlightFn();
       }
     }
   };
@@ -138,7 +146,7 @@ export default function Market(props: CardMarketProps): JSX.Element {
       }
     >
       <View
-        className={`${props.extraClasses} flex rounded-lg p-2 shadow-lg w-full ${isHighlighted ? "bg-primary" : "bg-white dark:bg-tertiary"} `}
+        className={`${props.extraClasses} flex rounded-lg p-2 shadow-lg w-full ${isHighlighted || props.isRadioButtonActive ? "bg-primary" : "bg-white dark:bg-tertiary"} `}
       >
         <View className="flex flex-row w-full mb-2 items-center">
           <View className="flex-none justify-center rounded-lg h-full h-16 mr-1">

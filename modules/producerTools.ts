@@ -2,7 +2,9 @@ import { ProducerData } from "../types/API";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
-const getProducerInfos = async (token: string): Promise<ProducerData> => {
+const getProducerInfos = async (
+  token: string | null,
+): Promise<ProducerData> => {
   try {
     const response = await fetch(`${API_ROOT}/producers/logged`, {
       method: "GET",

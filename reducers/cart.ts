@@ -89,8 +89,26 @@ export const cartSlice = createSlice({
       const shop = state.value.find(
         (c) => c.shop._id === action.payload.shopId,
       );
-      shop.withdrawMode = action.payload.withdrawMode;
-      if (action.payload.market) shop.market = action.payload.market;
+      if (shop) {
+        shop.withdrawMode = action.payload.withdrawMode;
+        if (!action.payload.withdrawMarket) shop.withdrawMarket = null;
+        if (!action.payload.withdrawDay) shop.withdrawDay = null;
+      }
+      // if (action.payload.market) {
+      //   shop.market = action.payload.market;
+      //   if(action.payload.daySelected) shop.market.day = action.payload.daySelected
+      // }
+    },
+    setWithdrawMarket: (state: CartState, action: PayloadAction) => {
+      const shop = state.value.find(
+        (c) => c.shop?._id === action.payload.shopId,
+      );
+      if (shop) {
+        if (shop.withdrawMode === "market") {
+          shop.withdrawMarket = action.payload.withdrawMarket;
+          shop.withdrawDay = action.payload.withdrawDay;
+        }
+      }
     },
     emptyCart: (state: CartState) => {
       state.value = [];
@@ -103,6 +121,7 @@ export const {
   increaseCartQuantity,
   decreaseCartQuantity,
   updateWithdrawMode,
+  setWithdrawMarket,
   emptyCart,
 } = cartSlice.actions;
 export default cartSlice.reducer;

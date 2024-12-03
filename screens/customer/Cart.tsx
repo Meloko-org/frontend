@@ -15,15 +15,18 @@ import CardProduct from "../../components/cards/Product";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import ButtonPrimaryStart from "../../components/utils/buttons/PrimaryStart";
 import ButtonSecondaryStart from "../../components/utils/buttons/SecondaryStart";
+import CartTools from "../../modules/CartTools";
 
 export default function CartScreen({ navigation }) {
   const cartStore = useSelector(
     (state: { cart: CartState }) => state.cart.value,
   );
-  const [cartTotal, setCartTotal] = useState<number>(0);
+  const [cartTotal, setCartTotal] = useState<number | undefined>(0);
 
   useEffect(() => {
     if (cartStore.length > 0) {
+      let allShopsCost = CartTools.getTotalCost(cartStore);
+      /*
       let allShopsCost = 0;
       cartStore.forEach((c) => {
         const cartTotalCost = c.products.reduce((accumulator, currentValue) => {
@@ -38,7 +41,7 @@ export default function CartScreen({ navigation }) {
           );
         }, 0);
         allShopsCost += cartTotalCost;
-      });
+      });*/
       setCartTotal(allShopsCost);
     }
   }, [cartStore]);
@@ -72,6 +75,9 @@ export default function CartScreen({ navigation }) {
       screen: "WithdrawModesUser",
     });
   };
+
+  console.log("------------- CARTSCREEN ----------------------------");
+  console.log("cartStore: ", cartStore);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

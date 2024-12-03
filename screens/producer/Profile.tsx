@@ -21,14 +21,14 @@ import { ProducerData, ShopData } from "../../types/API";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "ProfilProducer"
+  "ProducerProfile"
 >;
 
 type Props = {
   navigation: ProfileScreenNavigationProp;
 };
 
-export default function ProfilProducerScreen({ navigation }: Props) {
+export default function ProducerProfileScreen({ navigation }: Props) {
   // Import the Clerk Auth functions
   const { getToken } = useAuth();
   const [isProducerSaveLoading, setProducerSaveLoading] = useState(false);
@@ -94,7 +94,7 @@ export default function ProfilProducerScreen({ navigation }: Props) {
 
   const switchUser = () => {
     navigation.navigate("TabNavigatorUser", {
-      screen: "Profil",
+      screen: "UserProfile",
     });
   };
 

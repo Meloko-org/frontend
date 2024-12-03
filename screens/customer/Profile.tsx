@@ -20,6 +20,7 @@ import { ShopState, setShopData, resetShopData } from "../../reducers/shop";
 import { ModeState, changeMode } from "../../reducers/mode";
 import { emptyCart } from "../../reducers/cart";
 
+// import SignInScreen from "../Signin";
 import SignInScreen from "../Signin";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextBody1 from "../../components/utils/texts/Body1";
@@ -34,15 +35,16 @@ import { RootStackParamList } from "../../types/Navigation";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import { ScrollView } from "react-native-gesture-handler";
 import shopTools from "../../modules/shopTools";
+
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "Home"
+  "UserProfile"
 >;
 type Props = {
   navigation: ProfileScreenNavigationProp;
 };
 
-export default function ProfilScreen({ navigation }: Props) {
+export default function UserProfileScreen({ navigation }: Props) {
   const { colorScheme, toggleColorScheme } = useColorScheme();
   // Import the Clerk Auth functions
   const { signOut, isSignedIn, getToken } = useAuth();
@@ -270,7 +272,7 @@ export default function ProfilScreen({ navigation }: Props) {
                   extraClasses="mb-3"
                 />
                 <ButtonSecondaryEnd
-                  label="Déconnection"
+                  label="Déconnexion"
                   iconName="arrow-right"
                   onPressFn={onSignoutPress}
                   extraClasses="mb-3"

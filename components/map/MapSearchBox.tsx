@@ -103,7 +103,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
 
         if (props.navigation) {
           props.navigation.navigate("TabNavigatorUser", {
-            screen: "Accueil",
+            screen: "Home",
             params: {
               search: {
                 address: searchOptions.address,
@@ -248,7 +248,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
               <Slider
                 containerStyle={{ width: "80%" }}
                 value={searchOptions.radius ? searchOptions.radius.value : [20]}
-                step={20}
+                step={5}
                 minimumValue={0}
                 maximumValue={100}
                 onValueChange={(newRadius) => {
@@ -320,7 +320,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
               <Slider
                 containerStyle={{ width: "80%" }}
                 value={searchOptions.radius.value}
-                step={20}
+                step={5}
                 minimumValue={0}
                 maximumValue={100}
                 onValueChange={(newRadius) => {

@@ -3,18 +3,32 @@ import React, { useState, useEffect } from "react";
 import { Alert } from "react-native";
 import ButtonPrimaryEnd from "./PrimaryEnd";
 import { useDispatch, useSelector } from "react-redux";
-import { updateUser } from "../../../reducers/user";
-import { emptyCart } from "../../../reducers/cart";
+import { updateUser, UserState } from "../../../reducers/user";
+import { CartState, emptyCart } from "../../../reducers/cart";
 import { useAuth } from "@clerk/clerk-expo";
 import userTools from "../../../modules/userTools";
+import { UserData } from "../../../types/API";
 
-export default function StripePaymentButton(props) {
+type StripPaymentButtonProps = {
+  label: string;
+  iconName: string;
+  user: {};
+  totalCartAmount: number | undefined;
+  navigation: {};
+  disabled: boolean;
+};
+
+export default function StripePaymentButton(props: StripPaymentButtonProps) {
   const dispatch = useDispatch();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [loading, setLoading] = useState(false);
-  const [publishableKey, setPublishableKey] = useState("");
-  const userStore = useSelector((state: { user }) => state.user.value);
-  const cartStore = useSelector((state: { cart }) => state.cart.value);
+  const [publishableKey, setPublishableKey] = useState<string | undefined>("");
+  const userStore = useSelector(
+    (state: { user: UserState }) => state.user.value,
+  );
+  const cartStore = useSelector(
+    (state: { cart: CartState }) => state.cart.value,
+  );
   const [isPaymentScreenLoading, setIsPaymentScreenLoading] = useState(false);
 
   // Import the public api root address
@@ -98,8 +112,11 @@ export default function StripePaymentButton(props) {
         setIsPaymentScreenLoading(false);
       } else {
         dispatch(emptyCart());
+        console.log("avant fetchData");
         await fetchData();
         setIsPaymentScreenLoading(false);
+
+        console.log("juste avant redirection vers orderCostumerScreen");
 
         props.navigation.navigate("TabNavigatorUser", {
           screen: "OrderCustomer",
@@ -121,6 +138,7 @@ export default function StripePaymentButton(props) {
 
       if (user) {
         dispatch(updateUser(user));
+        console.log("dispatch updateUser done");
       }
     } catch (error) {
       console.error(error);

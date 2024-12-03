@@ -18,6 +18,7 @@ import {
   CartState,
 } from "../../reducers/cart";
 import { ProductData } from "../../types/API";
+import PriceBadge from "../utils/badges/Price";
 
 const FontAwesome = _Fontawesome as React.ElementType;
 
@@ -25,7 +26,7 @@ type CardProductProps = {
   stockData: StockData;
   onPressFn?: ((event: GestureResponderEvent) => void) | undefined;
   extraClasses?: string;
-  displayMode: "cart" | "shop";
+  displayMode: "cart" | "shop" | "withdraw";
   quantityControllable?: boolean;
   showImage?: boolean;
 };
@@ -111,7 +112,12 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
       )}
     </>
   ) : props.stockData.quantity ? (
-    <BadgeGrey>{props.stockData.quantity}</BadgeGrey>
+    <BadgeGrey extraClasses="px-1">
+      {formatQuantity(
+        props.stockData.quantity,
+        props.stockData.product.weight.unit,
+      )}
+    </BadgeGrey>
   ) : (
     <ButtonIcon
       iconName="cart-plus"
@@ -136,7 +142,7 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 
   const unit = props.stockData.product.weight.unit === "gr" ? "kg" : "la pièce";
 
-  console.log("cartStore: ", JSON.stringify(cartStore, null, 2));
+  // console.log("cartStore: ", JSON.stringify(cartStore, null, 2));
 
   return (
     <View

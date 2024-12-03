@@ -1,11 +1,21 @@
 import React from "react";
 import { Text, View } from "react-native";
 
-export default function Price(): JSX.Element {
+type PriceBadgeProps = {
+  colour: string;
+  extraClasses?: string;
+  value: string;
+};
+
+export default function PriceBadge({
+  colour,
+  extraClasses,
+  value,
+}: PriceBadgeProps): JSX.Element {
   return (
-    <View className="rounded-lg w-24 px-2 bg-darkbg dark:bg-lightbg">
+    <View className={`${extraClasses} ${colour} rounded-lg w-24`}>
       <Text className="text-lightbg dark:text-darkbg text-center text-xs">
-        3.80 €
+        {value} €
       </Text>
     </View>
   );

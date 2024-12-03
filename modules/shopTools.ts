@@ -101,7 +101,10 @@ const updateShopMarkets = async (values: UpdateShopMarketsData) => {
   }
 };
 
-const getShopInfos = async (token: string, id: string): Promise<ShopData> => {
+const getShopInfos = async (
+  token: string | null,
+  id: string,
+): Promise<ShopData> => {
   try {
     console.log(`${API_ROOT}/shops/myshop/${id}`);
     const response = await fetch(`${API_ROOT}/shops/myshop/${id}`, {
@@ -139,6 +142,23 @@ const getMarkets = async (city: string, radius: number[]) => {
   }
 };
 
+const getMarketById = async (marketId: string): Promise<MarketData> => {
+  try {
+    const response = await fetch(`${API_ROOT}/shops/markets/${marketId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        mode: "cors",
+      },
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+    // return null
+  }
+};
+
 export default {
   createOrUpdateShop,
   getShopInfos,
@@ -146,4 +166,5 @@ export default {
   getMarkets,
   addShopMarkets,
   updateShopMarkets,
+  getMarketById,
 };

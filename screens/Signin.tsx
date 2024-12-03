@@ -1,41 +1,40 @@
+import React, { useState, useCallback, useEffect } from "react";
 import { useSignIn, useSignUp, useOAuth } from "@clerk/clerk-expo";
+import { useAuth } from "@clerk/clerk-expo";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
-import {
-  TextInput,
-  Button,
-  View,
-  Modal,
-  TouchableOpacity,
-  Text,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState, useCallback, useEffect } from "react";
+
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
+
+import { Button, View, Modal } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-gesture-handler";
 import TextHeading2 from "../components/utils/texts/Heading2";
 import TextHeading3 from "../components/utils/texts/Heading3";
 import InputText from "../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import ButtonBack from "../components/utils/buttons/Back";
+
 import { useDispatch, useSelector } from "react-redux";
 import { UserState, updateUser } from "../reducers/user";
 import { ProducerState, setProducerData } from "../reducers/producer";
 import { ShopState, setShopData } from "../reducers/shop";
+
 import userTools from "../modules/userTools";
 import producerTools from "../modules/producerTools";
 import shopTools from "../modules/shopTools";
-import { useAuth } from "@clerk/clerk-expo";
-import { ScrollView } from "react-native-gesture-handler";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "SignIn"
 >;
 
-type Props = {
-  navigation: ProfileScreenNavigationProp;
-};
+/*type SignInProps = {
+  navigation?: ProfileScreenNavigationProp;
+  showModal: boolean;
+  onCloseFn: () => void;
+};*/
 
 // Warm up the android browser to improve UX
 // https://docs.expo.dev/guides/authentication/#improving-user-experience
@@ -110,7 +109,6 @@ export default function SignInScreen(props) {
     try {
       // store user info in the store
       const token = await getToken();
-      console.log("token: ", token);
       const user = await userTools.getUserInfos(token);
       if (user) {
         dispatch(updateUser(user));

@@ -6,10 +6,10 @@ type RootStackParamList = {
   SignUp: undefined;
   TabNavigatorUser: {
     screen:
-      | "Accueil"
-      | "Panier"
+      | "Search"
+      | "Cart"
       | "Favoris"
-      | "Profil"
+      | "UserProfile"
       | "ShopUser"
       | "WithdrawModesUser"
       | "OrdersCustomer"
@@ -20,16 +20,18 @@ type RootStackParamList = {
   TabNavigatorProducer: {
     screen:
       | "Accueil"
-      | "Boutique"
-      | "Business Center"
+      | "shop"
+      | "BusinessCenter"
       | "ProducerProfile"
       | "Stocks";
   };
   GestionDesStocks: undefined;
   ShopProducer: undefined;
-  ProfilProducer: undefined;
+  UserProfile: undefined;
+  ProducerProfile: undefined;
   SearchCustomer: undefined;
   MapCustomer: undefined;
+  PaymentCustomer: undefined;
   ShopUser: undefined;
   OrderCustomer: undefined;
   MarketsShopProducer: undefined;

@@ -11,6 +11,7 @@ import TextHeading3 from "../../components/utils/texts/Heading3";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import CardProduct from "../../components/cards/Product";
 import BadgeWithdrawStatus from "../../components/utils/badges/WithdrawStatus";
+import { UserState } from "../../reducers/user";
 
 type OrdersScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -149,6 +150,12 @@ export default function OrdersCustomerScreen({
         <TextHeading2>Vous n'avez pas de commande :(</TextHeading2>
       </>
     );
+
+  console.log(
+    "------------------------------- ORDERS --------------------------------------------------------------------",
+  );
+  console.log("userStore: ", userStore);
+  console.log("selectedOrder: ", selectedOrder);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

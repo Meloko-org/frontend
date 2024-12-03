@@ -1,22 +1,29 @@
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@clerk/clerk-expo";
+
+import { useDispatch, useSelector } from "react-redux";
+import { CartState, updateWithdrawMode } from "../../reducers/cart";
+
+import { MarketData, ShopData } from "../../types/API";
+
 import { View, Modal } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState, useEffect } from "react";
-import { useAuth } from "@clerk/clerk-expo";
-import { MarketData, ShopData } from "../../types/API";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
-import { useDispatch, useSelector } from "react-redux";
 import CardProduct from "../../components/cards/Product";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import StripePaymentButton from "../../components/utils/buttons/StripePayment";
 import InputRadioGroup from "../../components/utils/inputs/radioGroup";
 import ButtonBack from "../../components/utils/buttons/Back";
 import Market from "../../components/cards/Market";
-import SignInScreen from "../Signin";
-import { CartState, updateWithdrawMode } from "../../reducers/cart";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import ButtonSecondaryStart from "../../components/utils/buttons/SecondaryStart";
+
+import SignInScreen from "../Signin";
+import SelectMarketModal from "../../components/modals/user/SelectMarket";
+import TextBody1 from "../../components/utils/texts/Body1";
+
 type SelectedMarkets = {};
 
 export default function WithdrawModesScreen({ navigation }) {
@@ -27,8 +34,12 @@ export default function WithdrawModesScreen({ navigation }) {
     (state: { cart: CartState }) => state.cart.value,
   );
   const [cartTotal, setCartTotal] = useState<number>(0);
-  const [isMarketSelectModalVisible, setIsMarketSelectModalVisible] =
+
+  const [isSelectMarketModalVisible, setSelectMarketModalVisible] =
     useState<boolean>(false);
+
+  // const [isMarketSelectModalVisible, setIsMarketSelectModalVisible] =
+  // useState<boolean>(false);
   const [isSigninModalVisible, setIsSigninModalVisible] =
     useState<boolean>(false);
   const [selectedShop, setSelectedShop] = useState<ShopData | null>(null);
@@ -70,26 +81,39 @@ export default function WithdrawModesScreen({ navigation }) {
     }
   }, [cartStore]);
 
-  const handleSelectedModePress = (shopName, value, market = null) => {
-    const selectedShop = cartStore.find((c) => c.shop.name === shopName);
-    console.log("select", selectedShop);
-    dispatch(
+  const handleSelectedModePress = (
+    shopName: string | undefined,
+    value: string,
+    market = null,
+  ) => {
+    const selectedShop = cartStore.find((c) => c.shop?.name === shopName);
+
+    /*dispatch(
       updateWithdrawMode({
         shopId: selectedShop.shop._id,
         withdrawMode: value,
-        market: null,
+        // market: null,
       }),
-    );
+    );*/
 
     if (value === "market") {
+      dispatch(
+        updateWithdrawMode({
+          shopId: selectedShop.shop._id,
+          withdrawMode: value,
+          // market: null,
+        }),
+      );
       setSelectedShop(selectedShop.shop);
-      setIsMarketSelectModalVisible(true);
+      setSelectMarketModalVisible(true);
     } else {
       dispatch(
         updateWithdrawMode({
           shopId: selectedShop.shop._id,
           withdrawMode: value,
-          market: null,
+          withdrawMarket: null,
+          withdrawDay: null,
+          // market: null,
         }),
       );
       // setSelectedMarket(null)
@@ -111,14 +135,14 @@ export default function WithdrawModesScreen({ navigation }) {
 
       const withdrawModeButtonData = [];
 
-      cart.shop.markets.length > 0 &&
+      cart.shop?.markets.length > 0 &&
         withdrawModeButtonData.push({
           label: "Marchés locaux",
           value: "market",
           selected: cart.withdrawMode === "market" ? true : false,
         });
 
-      cart.shop.clickCollect &&
+      cart.shop?.clickCollect &&
         withdrawModeButtonData.push({
           label: "Click & Collect",
           value: "clickCollect",
@@ -127,15 +151,21 @@ export default function WithdrawModesScreen({ navigation }) {
 
       return (
         <View className="mb-3" key={cart.shop._id}>
-          <TextHeading3 centered extraClasses="mb-1">
-            {cart.shop.name}
-          </TextHeading3>
+          <View className="flex-row justify-center items-center mb-1">
+            <View className="flex flex-row w-3/12 justify-end items-end h-full">
+              <TextBody1 extraClasses="">Vendeur: </TextBody1>
+            </View>
+            <View className="w-9/12">
+              <TextHeading3>{cart.shop?.name}</TextHeading3>
+            </View>
+          </View>
+
           <View className="flex">
             <InputRadioGroup
               data={withdrawModeButtonData}
               size="base"
               onPressFn={(value) =>
-                handleSelectedModePress(cart.shop.name, value)
+                handleSelectedModePress(cart.shop?.name, value)
               }
             />
             {cart.withdrawMode === "market" && cart.market && (
@@ -165,7 +195,7 @@ export default function WithdrawModesScreen({ navigation }) {
               updateWithdrawMode({
                 shopId: selectedShop._id,
                 withdrawMode: "market",
-                market,
+                // market,
               }),
             );
             // setSelectedMarket(market)
@@ -178,7 +208,7 @@ export default function WithdrawModesScreen({ navigation }) {
   console.log(
     "------------------------------- WITHDRAWMODES --------------------------------------------------------------------",
   );
-  console.log("CARTSTORE -> ", JSON.stringify(cartStore, null, 2));
+  console.log("CARTSTORE -> ", cartStore);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -208,6 +238,8 @@ export default function WithdrawModesScreen({ navigation }) {
           <ButtonSecondaryStart
             label="Retour au panier"
             iconName="arrow-left"
+            disabled={false}
+            isLoading={false}
             onPressFn={() =>
               navigation.navigate("TabNavigatorUser", { screen: "Panier" })
             }
@@ -216,7 +248,7 @@ export default function WithdrawModesScreen({ navigation }) {
         </ScrollView>
       </View>
 
-      <Modal
+      {/* <Modal
         visible={isMarketSelectModalVisible}
         animationType="slide"
         onRequestClose={() => setIsMarketSelectModalVisible(false)}
@@ -233,7 +265,13 @@ export default function WithdrawModesScreen({ navigation }) {
             {markets}
           </View>
         </SafeAreaView>
-      </Modal>
+      </Modal> */}
+
+      <SelectMarketModal
+        isVisible={isSelectMarketModalVisible}
+        shop={selectedShop}
+        onCloseFn={() => setSelectMarketModalVisible(false)}
+      />
 
       <SignInScreen
         showModal={isSigninModalVisible}

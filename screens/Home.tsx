@@ -14,7 +14,6 @@ import {
   Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import SignInScreen from "./Signin";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import TextHeading1 from "../components/utils/texts/Heading1";
 import TextHeading2 from "../components/utils/texts/Heading2";
@@ -33,6 +32,7 @@ import { UserState, updateUser, resetUser } from "../reducers/user";
 import { ProducerState, setProducerData } from "../reducers/producer";
 import { ShopState, setShopData } from "../reducers/shop";
 import { ModeState } from "../reducers/mode";
+import SignInScreen from "./Signin";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -50,6 +50,7 @@ export default function HomeScreen({ navigation }: Props) {
   const [isSigninModalVisible, setIsSigninModalVisible] = useState(false);
   const [isSigninCustomerModalVisible, setIsSigninCustomerModalVisible] =
     useState(false);
+  const [logger, setLogger] = useState<string | null>(null);
   // Import the public api root address
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -70,10 +71,8 @@ export default function HomeScreen({ navigation }: Props) {
 
   const fetchData = async () => {
     try {
-      // console.log("fetchData");
       // store user's info in the store
       const token = await getToken();
-      // console.log(token);
       const user = await userTools.getUserInfos(token);
       if (user) {
         dispatch(updateUser(user));
@@ -159,11 +158,28 @@ export default function HomeScreen({ navigation }: Props) {
    * - si le user est signIn et qu'il a un compte pro, redirection vers la page 'accueil' du producer
    */
   const handleProducer = () => {
-    if (!isSignedIn) {
+    if (isSignedIn && producerStore && shopStore) {
+      navigation.navigate("TabNavigatorProducer", {
+        screen: "BusinessCenter",
+      });
+    } else if (isSignedIn && producerStore) {
+      navigation.navigate("TabNavigatorProducer", {
+        screen: "Shop",
+      });
+    } else if (isSignedIn) {
+      navigation.navigate("TabNavigatorProducer", {
+        screen: "ProducerProfile",
+      });
+    } else {
+      setLogger("producer");
+      setIsSigninModalVisible(true);
+    }
+
+    /*if (!isSignedIn) {
       setIsSigninModalVisible(true);
     } else {
       redirectProducer();
-    }
+    }*/
   };
 
   const redirectProducer = () => {
@@ -187,6 +203,8 @@ export default function HomeScreen({ navigation }: Props) {
     "------------------------- HOME --------------------------------------------------------------------",
   );
   console.log("USERSTORE -> ", userStore);
+  console.log("PRODUCERSTORE:", producerStore);
+  console.log("SHOPSTORE :", shopStore);
   console.log("");
 
   return (
@@ -227,7 +245,7 @@ export default function HomeScreen({ navigation }: Props) {
                   iconName="user-circle"
                   onPressFn={() =>
                     navigation.navigate("TabNavigatorUser", {
-                      screen: "Profil",
+                      screen: "UserProfile",
                     })
                   }
                   extraClasses="mb-3"
@@ -238,7 +256,7 @@ export default function HomeScreen({ navigation }: Props) {
                 <ButtonPrimaryEnd
                   label="Connexion"
                   iconName="sign-in"
-                  onPressFn={() => setIsSigninCustomerModalVisible(true)}
+                  onPressFn={() => setIsSigninModalVisible(true)}
                   extraClasses="mb-3"
                 />
               </>
@@ -263,12 +281,8 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
 
         <SignInScreen
-          showModal={isSigninModalVisible || isSigninCustomerModalVisible}
-          onCloseFn={() => {
-            isSigninModalVisible && redirectProducer();
-            setIsSigninModalVisible(false);
-            setIsSigninCustomerModalVisible(false);
-          }}
+          showModal={isSigninModalVisible} // || isSigninCustomerModalVisible
+          onCloseFn={() => setIsSigninModalVisible(false)}
         />
       </SafeAreaView>
     </View>

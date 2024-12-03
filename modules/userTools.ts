@@ -6,7 +6,7 @@ const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
  * @param token  the clerk token needed to fetch
  * @returns {object} Get only email, firstname, lastname, avatar, favSearch and bookmarks
  */
-const getUserInfos = async (token: string) => {
+const getUserInfos = async (token: string | null) => {
   try {
     const response = await fetch(`${API_ROOT}/users/logged`, {
       method: "GET",

@@ -23,10 +23,10 @@ import SignUpScreen from "./screens/Signup";
 import SignInScreen from "./screens/Signin";
 import CartScreen from "./screens/customer/Cart";
 import BookmarksScreen from "./screens/customer/Bookmarks";
-import ProfilScreen from "./screens/customer/Profil";
+import UserProfileScreen from "./screens/customer/Profile";
 import ShopProducerScreen from "./screens/producer/Shop";
 import BusinessScreen from "./screens/Business";
-import ProfilProducerScreen from "./screens/producer/Profil";
+import ProducerProfileScreen from "./screens/producer/Profile";
 import StocksScreen from "./screens/Stocks";
 import SearchCustomerScreen from "./screens/customer/Search";
 import ComponentsScreen from "./screens/Components";
@@ -115,13 +115,13 @@ const TabNavigatorUser: React.FC = () => {
         tabBarIcon: ({ color, size }) => {
           let iconName: string = "";
 
-          if (route.name === "Accueil") {
-            iconName = "home";
-          } else if (route.name === "Panier") {
+          if (route.name === "Search") {
+            iconName = "search";
+          } else if (route.name === "Cart") {
             iconName = "shopping-basket";
           } else if (route.name === "BookmarksCustomer") {
             iconName = "heart";
-          } else if (route.name === "Profil") {
+          } else if (route.name === "UserProfile") {
             iconName = "user-circle";
           }
 
@@ -139,14 +139,14 @@ const TabNavigatorUser: React.FC = () => {
         },
       })}
     >
-      <Tab.Screen name="Accueil" component={MapCustomerScreen} />
-      <Tab.Screen name="Panier" component={CartScreen} />
+      <Tab.Screen name="Search" component={MapCustomerScreen} />
+      <Tab.Screen name="Cart" component={CartScreen} />
       <Tab.Screen
         name="BookmarksCustomer"
         component={BookmarksScreen}
         options={{ title: "Favoris" }}
       />
-      <Tab.Screen name="Profil" component={ProfilScreen} />
+      <Tab.Screen name="UserProfile" component={UserProfileScreen} />
       <Tab.Screen
         name="ShopUser"
         component={ShopUserScreen}
@@ -186,11 +186,11 @@ const TabNavigatorProducer: React.FC = () => {
         tabBarIcon: ({ color, size }) => {
           let iconName: string = "";
 
-          if (route.name === "Accueil") {
+          if (route.name === "Home") {
             iconName = "home";
-          } else if (route.name === "Boutique") {
+          } else if (route.name === "Shop") {
             iconName = "store";
-          } else if (route.name === "Business Center") {
+          } else if (route.name === "BusinessCenter") {
             iconName = "file-invoice-dollar";
           } else if (route.name === "ProducerProfile") {
             iconName = "user-circle";
@@ -212,10 +212,10 @@ const TabNavigatorProducer: React.FC = () => {
         },
       })}
     >
-      <Tab.Screen name="Accueil" component={HomeScreen} />
-      <Tab.Screen name="Boutique" component={ShopProducerScreen} />
-      <Tab.Screen name="Business Center" component={BusinessScreen} />
-      <Tab.Screen name="ProducerProfile" component={ProfilProducerScreen} />
+      <Tab.Screen name="home" component={HomeScreen} />
+      <Tab.Screen name="Shop" component={ShopProducerScreen} />
+      <Tab.Screen name="BusinessCenter" component={BusinessScreen} />
+      <Tab.Screen name="ProducerProfile" component={ProducerProfileScreen} />
       <Tab.Screen
         name="Stocks"
         component={StocksScreen}
