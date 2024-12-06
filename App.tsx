@@ -35,6 +35,7 @@ import WithdrawModesUserScreen from "./screens/customer/WithdrawModes";
 import OrderCustomerScreen from "./screens/customer/Order";
 import PaymentCustomerScreen from "./screens/customer/Payment";
 import OrdersCustomerScreen from "./screens/customer/Orders";
+import SalesScreen from "./screens/Sales";
 
 import { Provider } from "react-redux";
 import { persistStore, persistReducer } from "redux-persist";
@@ -47,6 +48,7 @@ import cart from "./reducers/cart";
 import mode from "./reducers/mode";
 import shop from "./reducers/shop";
 import producer from "./reducers/producer";
+import OrderDetailsScreen from "./screens/OrderDetails";
 const reducers = combineReducers({ user, cart, mode, shop, producer });
 const persistConfig = {
   key: "meloko",
@@ -194,9 +196,9 @@ const TabNavigatorProducer: React.FC = () => {
             iconName = "file-invoice-dollar";
           } else if (route.name === "ProducerProfile") {
             iconName = "user-circle";
-          } else if (route.name === "GestionDesStocks") {
-            iconName = "boxes";
-          }
+          } // else if (route.name === "Stocks") {
+          //   iconName = "boxes";
+          // }
 
           return (
             <FontAwesome name={iconName} size={size} color={color} solid />
@@ -212,13 +214,24 @@ const TabNavigatorProducer: React.FC = () => {
         },
       })}
     >
-      <Tab.Screen name="home" component={HomeScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Shop" component={ShopProducerScreen} />
       <Tab.Screen name="BusinessCenter" component={BusinessScreen} />
       <Tab.Screen name="ProducerProfile" component={ProducerProfileScreen} />
+
+      <Tab.Screen
+        name="Sales"
+        component={SalesScreen}
+        options={{ tabBarButton: () => null }}
+      />
       <Tab.Screen
         name="Stocks"
         component={StocksScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="OrderDetails"
+        component={OrderDetailsScreen}
         options={{ tabBarButton: () => null }}
       />
     </Tab.Navigator>

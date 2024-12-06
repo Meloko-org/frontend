@@ -24,6 +24,7 @@ module.exports = {
         tertiary: "#444C3D",
         danger: "#942911",
         warning: "#D16014",
+        success: "#5b21b6",
       },
     },
   },

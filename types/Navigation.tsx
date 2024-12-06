@@ -19,16 +19,20 @@ type RootStackParamList = {
   };
   TabNavigatorProducer: {
     screen:
-      | "Accueil"
+      | "Homme"
       | "shop"
       | "BusinessCenter"
       | "ProducerProfile"
-      | "Stocks";
+      | "Stocks"
+      | "OrderDetails"
+      | "Sales";
   };
   GestionDesStocks: undefined;
   ShopProducer: undefined;
   UserProfile: undefined;
   ProducerProfile: undefined;
+  BusinessCenter: undefined;
+  Sales: undefined;
   SearchCustomer: undefined;
   MapCustomer: undefined;
   PaymentCustomer: undefined;

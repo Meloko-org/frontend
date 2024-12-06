@@ -23,10 +23,10 @@ import PriceBadge from "../utils/badges/Price";
 const FontAwesome = _Fontawesome as React.ElementType;
 
 type CardProductProps = {
-  stockData: StockData;
+  stockData?: StockData;
   onPressFn?: ((event: GestureResponderEvent) => void) | undefined;
   extraClasses?: string;
-  displayMode: "cart" | "shop" | "withdraw";
+  displayMode: "cart" | "shop" | "withdraw" | "validation";
   quantityControllable?: boolean;
   showImage?: boolean;
 };
@@ -140,7 +140,8 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
     });
   // console.log(props.stockData)
 
-  const unit = props.stockData.product.weight.unit === "gr" ? "kg" : "la pièce";
+  const unit =
+    props.stockData?.product.weight.unit === "gr" ? "kg" : "la pièce";
 
   // console.log("cartStore: ", JSON.stringify(cartStore, null, 2));
 
