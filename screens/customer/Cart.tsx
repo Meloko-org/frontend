@@ -77,7 +77,7 @@ export default function CartScreen({ navigation }) {
   };
 
   console.log("------------- CARTSCREEN ----------------------------");
-  console.log("cartStore: ", cartStore);
+  console.log("cartStore: ", JSON.stringify(cartStore, null, 2));
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

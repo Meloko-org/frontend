@@ -55,9 +55,23 @@ export default function BusinessScreen({ navigation }: Props) {
     })();
   }, []);
 
+  const handlePressCard = (order: OrderData) => {
+    navigation.navigate("TabNavigatorProducer", {
+      screen: "OrderDetails",
+      params: {
+        orderId: order._id,
+      },
+    });
+  };
+
   const ordersCards = orders.map((order) => {
     return (
-      <OrderStatus key={order._id} orderData={order} extraClasses="mb-3" />
+      <OrderStatus
+        key={order._id}
+        orderData={order}
+        extraClasses="mb-3"
+        onPressFn={() => handlePressCard(order)}
+      />
     );
   });
 

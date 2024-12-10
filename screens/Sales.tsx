@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "@clerk/clerk-expo";
 import { useColorScheme } from "nativewind";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
+
+import { OrderData } from "../types/API";
 
 import { Text, StyleSheet, View, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -11,7 +14,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import TextHeading2 from "../components/utils/texts/Heading2";
 import producerTools from "../modules/producerTools";
 import OrderStatus from "../components/cards/OrderStatus";
-import { OrderData } from "../types/API";
+import TextBody1 from "../components/utils/texts/Body1";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -24,11 +27,12 @@ type Props = {
 export default function SalesScreen({ navigation }: Props) {
   const { colorScheme, toggleColorScheme } = useColorScheme();
   const { getToken } = useAuth();
-  const [orders, setOrders] = useState<string[]>([]);
-  const [orderCards, setOrderCards] = useState([]);
+  const [orders, setOrders] = useState<OrderData[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    (async () => {
+  const fetchOrders = async () => {
+    try {
+      setIsLoading(true);
       const token = await getToken();
       const response = await producerTools.getAllOrders(token);
 
@@ -38,8 +42,18 @@ export default function SalesScreen({ navigation }: Props) {
       } else {
         setOrders(response);
       }
-    })();
-  }, []);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des commandes.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchOrders();
+    }, []),
+  );
 
   const handlePressCard = (order: OrderData) => {
     navigation.navigate("TabNavigatorProducer", {
@@ -50,19 +64,19 @@ export default function SalesScreen({ navigation }: Props) {
     });
   };
 
-  useEffect(() => {
-    const ordersForCard = orders.map((order: OrderData) => {
-      return (
-        <OrderStatus
-          key={order._id}
-          orderData={order}
-          extraClasses="mb-3"
-          onPressFn={() => handlePressCard(order)}
-        />
-      );
-    });
-    setOrderCards(ordersForCard);
-  }, [orders]);
+  const orderCards = orders.map((order) => {
+    return (
+      <OrderStatus
+        key={order._id}
+        orderData={order}
+        extraClasses="mb-3"
+        onPressFn={() => {
+          console.log("clicked order: ", order._id);
+          handlePressCard(order);
+        }}
+      />
+    );
+  });
 
   const nbrOrders = orders ? orders.length.toString() : 0;
 
@@ -79,7 +93,11 @@ export default function SalesScreen({ navigation }: Props) {
           Ventes en cours ({nbrOrders})
         </TextHeading2>
 
-        {orderCards}
+        {isLoading ? (
+          <TextBody1 centered>Chargement des commandes...</TextBody1>
+        ) : (
+          orderCards
+        )}
       </ScrollView>
     </SafeAreaView>
   );

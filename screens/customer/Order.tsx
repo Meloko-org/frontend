@@ -107,11 +107,20 @@ export default function OrderCustomerScreen({
               <TextHeading3>ClickAndCollect</TextHeading3>
             </View>
           </View>
+          <View className="flex flex-row justify-around rounded-lg p-1 bg-white dark:bg-tertiary">
+            <View className="px-2">
+              <TextBody1>Montant:</TextBody1>
+            </View>
+            <View>
+              <TextHeading4>{cco.shopTotalPrice.$numberDecimal} €</TextHeading4>
+            </View>
+          </View>
         </View>
       );
     });
 
     marketOrdersDisplay = marketOrders.map((mo) => {
+      console.log("marketOrder: ", JSON.stringify(mo, null, 2));
       const productList = mo.products.map((p) => {
         return (
           <CardProduct
@@ -147,8 +156,8 @@ export default function OrderCustomerScreen({
             }}
           />
           {productList}
-          <View className="flex flex-row rounded-lg p-1 bg-white dark:bg-tertiary">
-            <View className="px-2">
+          <View className="flex flex-row mb-2 rounded-lg p-1 bg-white dark:bg-tertiary">
+            <View className="px-4">
               <TextBody1>Retrait:</TextBody1>
             </View>
             <View>
@@ -158,6 +167,14 @@ export default function OrderCustomerScreen({
               <View>
                 <TextHeading4> {weekDays[mo.withdrawDay]}</TextHeading4>
               </View>
+            </View>
+          </View>
+          <View className="flex flex-row justify-around rounded-lg p-1 bg-white dark:bg-tertiary">
+            <View className="px-2">
+              <TextBody1>Montant:</TextBody1>
+            </View>
+            <View>
+              <TextHeading4>{mo.shopTotalPrice.$numberDecimal} €</TextHeading4>
             </View>
           </View>
         </View>
@@ -183,6 +200,9 @@ export default function OrderCustomerScreen({
           centered
           extraClasses="mb-4"
         >{`Commande n° ${route.params.orderId.slice(0, 7)}`}</TextHeading4>
+        <TextHeading4
+          centered
+        >{`Montant total: ${newOrderDetails?.totalPrice.$numberDecimal}`}</TextHeading4>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View className="p-3 mb-5">
             {clickCollectOrdersDisplay}

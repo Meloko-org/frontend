@@ -251,16 +251,16 @@ export default function App(): JSX.Element {
               <NavigationContainer>
                 <Stack.Navigator screenOptions={options}>
                   <Stack.Screen name="Home" component={HomeScreen} />
-                  <Stack.Screen name="SignUp" component={SignUpScreen} />
+                  {/* <Stack.Screen name="SignUp" component={SignUpScreen} /> */}
                   <Stack.Screen name="SignIn" component={SignInScreen} />
                   <Stack.Screen
                     name="SearchCustomer"
                     component={SearchCustomerScreen}
                   />
-                  <Stack.Screen
+                  {/* <Stack.Screen
                     name="Components"
                     component={ComponentsScreen}
-                  />
+                  /> */}
                   <Stack.Screen
                     name="TabNavigatorUser"
                     component={TabNavigatorUser}

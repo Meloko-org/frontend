@@ -3,13 +3,25 @@ type OrderData = {
   user: UserData;
   details: [
     {
-      products: [StockData];
+      products: [
+        {
+          product: [StockData];
+          quantity: number;
+          isConfirmed: boolean;
+        },
+      ];
       withdrawMode: string;
+      withdrawMarket: string;
+      withdrawDay: string;
+      market: MarketData;
       shop: ShopData;
+      shopTotalPrice: number;
+      status: string;
     },
   ];
   isWithdraw: boolean;
   isPaid: boolean;
+  totalPrice: number;
 };
 
 type ProductData = {

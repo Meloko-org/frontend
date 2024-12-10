@@ -25,7 +25,7 @@ export default function OrderStatusBadge(
   };
   return (
     <View
-      className={`${props.extraClasses} flex flex-row justify-center items-center rounded-lg py-1 px-2 ${backgroundColor()}`}
+      className={`${props.extraClasses} flex flex-row justify-center items-center rounded-lg ${backgroundColor()}`}
     >
       <TextBody2 extraClasses="text-lightbg font-bold uppercase">
         {props.status === "pending" && `en attente`}

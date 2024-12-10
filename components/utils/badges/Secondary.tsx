@@ -5,6 +5,7 @@ type BadgeSecondaryProps = {
   children: string;
   uppercase?: boolean;
   extraClasses?: string;
+  textClasses?: string;
 };
 
 export default function BadgeSecondary(
@@ -12,10 +13,10 @@ export default function BadgeSecondary(
 ): JSX.Element {
   return (
     <View
-      className={`${props.extraClasses} rounded-lg border w-fit bg-lightbg border-primary p-1 dark:bg-tertiary `}
+      className={`${props.extraClasses} flex justify-center rounded-lg border w-fit bg-lightbg border-primary dark:bg-tertiary `}
     >
       <Text
-        className={`${props.uppercase && "uppercase"} text-[11px] text-darkbg dark:text-lightbg text-center w-fit`}
+        className={`${props.uppercase && "uppercase"} ${props.textClasses} text-darkbg dark:text-lightbg text-center w-fit`}
       >
         {props.children}
       </Text>

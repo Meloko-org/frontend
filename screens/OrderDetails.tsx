@@ -21,6 +21,7 @@ import orderTools from "../modules/orderTools";
 import OrderProductCard from "../components/cards/OrderProductCard";
 import Custom from "../components/utils/buttons/Custom";
 import { ShopState } from "../reducers/shop";
+import TextBody2 from "../components/utils/texts/Body2";
 
 type OrderDetailsProps = {
   route: Route;
@@ -41,20 +42,36 @@ export default function OrderDetailsScreen({ route }: OrderDetailsProps) {
   );
   const navigation = useNavigation();
   const orderId = route.params.orderId;
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { getToken } = useAuth();
 
   const [order, setOrder] = useState<OrderData | undefined>();
   const [products, setProducts] = useState<string[]>([]);
   const [subOrderId, setSubOrderId] = useState<string | undefined>();
+  const [withdrawMarket, setWithdrawMarket] = useState<string>();
+  const [withdrawDay, setWithdrawDay] = useState<string>();
+
+  const weekDays = [
+    "Lundi",
+    "Mardi",
+    "Mercredi",
+    "Jeudi",
+    "Vendredi",
+    "Samedi",
+    "Dimanche",
+  ];
 
   const fetchOrder = async () => {
     try {
+      setIsLoading(true);
       const token = await getToken();
       const orderPromise = await orderTools.getOrderDetailsById(token, orderId);
       setOrder(orderPromise);
     } catch (error) {
       console.error("Failed to fetch order", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -65,6 +82,11 @@ export default function OrderDetailsScreen({ route }: OrderDetailsProps) {
       console.warn(`no details found for shop ID: ${shopId}`);
       setProducts([]);
       return;
+    }
+
+    if (shopDetails.withdrawMode === "market") {
+      setWithdrawMarket(shopDetails.withdrawMarket);
+      setWithdrawDay(weekDays[shopDetails.withdrawDay]);
     }
 
     const orderProductsCards = shopDetails.products.map((product) => (
@@ -82,13 +104,13 @@ export default function OrderDetailsScreen({ route }: OrderDetailsProps) {
   };
 
   useEffect(() => {
-    console.log("youpi1");
+    setOrder(undefined);
+    setProducts([]);
     fetchOrder();
-  }, []);
+  }, [orderId]);
 
   useEffect(() => {
     if (order && shopStore) {
-      console.log("youpip2");
       getProductsFromOrder(order, shopStore._id);
     }
   }, [order, shopStore]);
@@ -96,9 +118,10 @@ export default function OrderDetailsScreen({ route }: OrderDetailsProps) {
   const handleCancelOrder = async () => {};
 
   console.log("OrderDetailsScreen rendered");
-  console.log("orderId :", route.params.orderId);
-  console.log("subOrderId :", subOrderId);
-  console.log("order: ", JSON.stringify(order, null, 2));
+  // console.log("route orderId :", route.params.orderId);
+  // console.log("subOrderId :", subOrderId);
+  // console.log("order: ", JSON.stringify(order, null, 2));
+  // console.log("withdrawMarket: ", withdrawMarket)
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -108,34 +131,66 @@ export default function OrderDetailsScreen({ route }: OrderDetailsProps) {
       >
         <View className="flex flex-row mb-5 mt-5">
           <View className="px-5">
-            <ButtonBack onPressFn={() => navigation.goBack()} />
+            <ButtonBack
+              onPressFn={() =>
+                navigation.navigate("TabNavigatorProducer", { screen: "Sales" })
+              }
+            />
           </View>
           <View className="flex-grow">
             <TextHeading3 centered>Détail commande</TextHeading3>
           </View>
         </View>
 
-        {order && <OrderStatus orderData={order} />}
+        {isLoading ? (
+          <TextBody1 centered>Chargement de la commande...</TextBody1>
+        ) : (
+          order && (
+            <View>
+              <OrderStatus orderData={order} />
 
-        <View className="mt-5">
-          <TextBody1 centered>Détail</TextBody1>
-        </View>
+              {withdrawMarket && withdrawDay && (
+                <View className="rounded-lg border bg-white dark:bg-tertiary p-2">
+                  <View className="flex flex-row w-full items-center">
+                    <View className="w-2/6">
+                      <TextBody2>Place de marché :</TextBody2>
+                    </View>
+                    <View className="w-4/6">
+                      <TextBody1>{withdrawMarket}</TextBody1>
+                    </View>
+                  </View>
+                  <View className="flex flex-row w-full items-center">
+                    <View className="w-2/6">
+                      <TextBody2>Jour de retrait :</TextBody2>
+                    </View>
+                    <View className="w-4/6">
+                      <TextBody1>{withdrawDay}</TextBody1>
+                    </View>
+                  </View>
+                </View>
+              )}
 
-        {products}
-
-        <View className="flex-row justify-between items-center mt-5">
-          <Custom
-            label="Annuler"
-            extraClasses="bg-danger flex-1 mx-1 rounded-lg p-2"
-            textClasses="text-lightbg font-bold text-lg"
-            onPressFn={handleCancelOrder}
-          />
-          <Custom
-            label="Valider"
-            extraClasses="bg-primary flex-1 mx-1 rounded-lg p-2"
-            textClasses="text-lightbg font-bold text-lg"
-          />
-        </View>
+              <View className="mt-5">
+                <TextBody1 centered>Détail</TextBody1>
+              </View>
+              {products}
+              <View className="flex-row justify-between items-center mt-5">
+                <Custom
+                  label={`TOUT\nANNULER`}
+                  extraClasses="bg-danger flex-1 mx-1 rounded-lg p-2"
+                  textClasses="text-lightbg font-bold text-lg"
+                  onPressFn={handleCancelOrder}
+                />
+                <Custom
+                  label={`TOUT\nVALIDER`}
+                  extraClasses="bg-primary flex-1 mx-1 rounded-lg p-2"
+                  textClasses="text-lightbg font-bold text-lg"
+                  onPressFn={() => {}}
+                />
+              </View>
+            </View>
+          )
+        )}
       </ScrollView>
     </SafeAreaView>
   );

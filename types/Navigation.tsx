@@ -3,12 +3,12 @@
 type RootStackParamList = {
   Home: undefined;
   SignIn: undefined;
-  SignUp: undefined;
+  // SignUp: undefined;
   TabNavigatorUser: {
     screen:
       | "Search"
       | "Cart"
-      | "Favoris"
+      | "Bookmarks"
       | "UserProfile"
       | "ShopUser"
       | "WithdrawModesUser"
@@ -19,7 +19,7 @@ type RootStackParamList = {
   };
   TabNavigatorProducer: {
     screen:
-      | "Homme"
+      | "Home"
       | "shop"
       | "BusinessCenter"
       | "ProducerProfile"
@@ -27,18 +27,18 @@ type RootStackParamList = {
       | "OrderDetails"
       | "Sales";
   };
-  GestionDesStocks: undefined;
-  ShopProducer: undefined;
-  UserProfile: undefined;
-  ProducerProfile: undefined;
-  BusinessCenter: undefined;
-  Sales: undefined;
   SearchCustomer: undefined;
-  MapCustomer: undefined;
-  PaymentCustomer: undefined;
-  ShopUser: undefined;
-  OrderCustomer: undefined;
-  MarketsShopProducer: undefined;
+  // GestionDesStocks: undefined;
+  // ShopProducer: undefined;
+  // UserProfile: undefined;
+  // ProducerProfile: undefined;
+  // BusinessCenter: undefined;
+  // Sales: undefined;
+  // MapCustomer: undefined;
+  // PaymentCustomer: undefined;
+  // ShopUser: undefined;
+  // OrderCustomer: undefined;
+  // MarketsShopProducer: undefined;
 };
 
 export type { RootStackParamList };

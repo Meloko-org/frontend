@@ -20,6 +20,7 @@ import {
 import { ProductData } from "../../types/API";
 import PriceBadge from "../utils/badges/Price";
 import TextBody2 from "../utils/texts/Body2";
+import Custom from "../utils/buttons/Custom";
 
 const FontAwesome = _Fontawesome as React.ElementType;
 
@@ -73,10 +74,19 @@ export default function OrderProductCard(
 
   return (
     <View
-      className={`${props.extraClasses} rounded-lg border shadow-sm bg-white p-2 dark:bg-tertiary flex flex-row w-full`}
+      className={`${props.extraClasses} rounded-lg border shadow-sm bg-white p-2 dark:bg-tertiary w-full`}
     >
       <View className="flex flex-row items-center w-full">
-        <View className="flex flex-row items-center rounded-lg w-auto h-full">
+        <View className="flex-grow">
+          <TextHeading4
+            centered
+            extraClasses="mb-1"
+          >{`${props.orderProductData?.product.product.family.name} ${props.orderProductData?.product.product.name}`}</TextHeading4>
+        </View>
+      </View>
+
+      <View className="flex flex-row items-center w-full">
+        <View className="flex flex-row items-center rounded-lg w-1/5">
           <Image
             source={
               props.orderProductData?.product.product.image
@@ -91,39 +101,53 @@ export default function OrderProductCard(
           />
         </View>
 
-        <View className="w-4/5 h-full px-2 items-start">
-          <TextHeading4 extraClasses="mb-1">
-            {`${props.orderProductData?.product.product.family.name} ${props.orderProductData?.product.product.name}`}
-          </TextHeading4>
-          <PricePer>{`${props.orderProductData?.product.price.$numberDecimal} € / ${unit}`}</PricePer>
-          <View className="flex flex-row justify-between items-center w-full pr-3">
-            <View className="flex flex-row items-center">
-              <View>
-                <TextBody2>Quantité : </TextBody2>
-              </View>
-              <View>
-                <TextBody1>
-                  {formatQuantity(
-                    props.orderProductData?.quantity,
-                    props.orderProductData?.product.product.weight.unit,
-                  )}
-                </TextBody1>
-              </View>
+        <View className="w-2/5 px-5 items-start">
+          <View>
+            <PricePer>{`${props.orderProductData?.product.price.$numberDecimal} € / ${unit}`}</PricePer>
+          </View>
+          <View className="flex flex-row items-center">
+            <View>
+              <TextBody2>Quantité : </TextBody2>
             </View>
-            <View className="flex flex-row items-center">
-              <View>
-                <TextBody2>Prix : </TextBody2>
-              </View>
-              <View>
-                <TextBody1>
-                  {getPrice(
-                    props.orderProductData.product.price.$numberDecimal,
-                    props.orderProductData.quantity,
-                  )}{" "}
-                  €
-                </TextBody1>
-              </View>
+            <View>
+              <TextBody1>
+                {formatQuantity(
+                  props.orderProductData?.quantity,
+                  props.orderProductData?.product.product.weight.unit,
+                )}
+              </TextBody1>
             </View>
+          </View>
+          <View className="flex flex-row items-center">
+            <View>
+              <TextBody2>Prix : </TextBody2>
+            </View>
+            <View>
+              <TextBody1>
+                {getPrice(
+                  props.orderProductData.product.price.$numberDecimal,
+                  props.orderProductData.quantity,
+                )}{" "}
+                €
+              </TextBody1>
+            </View>
+          </View>
+        </View>
+
+        <View className="w-2/5 flex justify-center">
+          <View>
+            <Custom
+              label="Valider"
+              extraClasses="bg-primary flex-1 mx-1 rounded-lg p-2"
+              textClasses="text-lightbg font-bold"
+            />
+          </View>
+          <View className="mt-2">
+            <Custom
+              label="Annuler"
+              extraClasses="bg-danger flex-1 mx-1 rounded-lg p-2"
+              textClasses="text-lightbg font-bold"
+            />
           </View>
         </View>
       </View>
