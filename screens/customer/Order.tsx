@@ -79,7 +79,7 @@ export default function OrderCustomerScreen({
       });
 
       return (
-        <View key={cco._id} className="my-2 flex items-center">
+        <View key={cco._id} className="mb-5 flex items-center">
           <CardProducer
             shopData={cco.shop}
             withdrawData={cco.products}
@@ -99,15 +99,15 @@ export default function OrderCustomerScreen({
             }}
           />
           {productList}
-          <View className="flex flex-row rounded-lg p-1 bg-white dark:bg-tertiary">
+          <View className="flex flex-row items-center rounded-lg py-1 px-4 bg-white dark:bg-tertiary w-full mb-2">
             <View>
               <TextBody1>Retrait:</TextBody1>
             </View>
-            <View>
-              <TextHeading3>ClickAndCollect</TextHeading3>
+            <View className="pl-3">
+              <TextHeading4>ClickAndCollect</TextHeading4>
             </View>
           </View>
-          <View className="flex flex-row justify-around rounded-lg p-1 bg-white dark:bg-tertiary">
+          <View className="flex flex-row justify-around rounded-lg p-1 bg-succes dark:bg-success  w-full">
             <View className="px-2">
               <TextBody1>Montant:</TextBody1>
             </View>
@@ -156,7 +156,7 @@ export default function OrderCustomerScreen({
             }}
           />
           {productList}
-          <View className="flex flex-row mb-2 rounded-lg p-1 bg-white dark:bg-tertiary">
+          <View className="flex flex-row mb-2 rounded-lg p-1 bg-white dark:bg-tertiary  w-full">
             <View className="px-4">
               <TextBody1>Retrait:</TextBody1>
             </View>
@@ -169,7 +169,7 @@ export default function OrderCustomerScreen({
               </View>
             </View>
           </View>
-          <View className="flex flex-row justify-around rounded-lg p-1 bg-white dark:bg-tertiary">
+          <View className="flex flex-row justify-around rounded-lg p-1 bg-succes dark:bg-success w-full">
             <View className="px-2">
               <TextBody1>Montant:</TextBody1>
             </View>
@@ -188,7 +188,7 @@ export default function OrderCustomerScreen({
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <View className="p-3">
+      <View className="p-3 flex-1">
         <TextHeading2 extraClasses="mb-3" centered>
           Commande payée
         </TextHeading2>
@@ -200,10 +200,14 @@ export default function OrderCustomerScreen({
           centered
           extraClasses="mb-4"
         >{`Commande n° ${route.params.orderId.slice(0, 7)}`}</TextHeading4>
-        <TextHeading4
-          centered
-        >{`Montant total: ${newOrderDetails?.totalPrice.$numberDecimal}`}</TextHeading4>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <View className="rounded-lg bg-danger p-3 mb-3">
+          <Text className="font-bold text-white text-center text-[20px]">{`Montant total: ${newOrderDetails?.totalPrice.$numberDecimal}`}</Text>
+        </View>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          className="w-full flex"
+        >
           <View className="p-3 mb-5">
             {clickCollectOrdersDisplay}
             {marketOrdersDisplay}

@@ -146,7 +146,7 @@ export default function BusinessScreen({ navigation }: Props) {
           </View>
         </View>
 
-        <View className="flex flex-row items-center justify-center">
+        <View className="flex flex-row items-center justify-center mb-3">
           <View>
             <FontAwesome
               name="clock-o"

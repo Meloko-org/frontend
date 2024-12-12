@@ -15,6 +15,7 @@ import TextHeading2 from "../components/utils/texts/Heading2";
 import producerTools from "../modules/producerTools";
 import OrderStatus from "../components/cards/OrderStatus";
 import TextBody1 from "../components/utils/texts/Body1";
+import Spinner from "../components/utils/Spinner";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -87,17 +88,13 @@ export default function SalesScreen({ navigation }: Props) {
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <ScrollView
         showsVerticalScrollIndicator={false}
-        className="w-full flex-1 px-3 pb-5"
+        className="w-full px-3 pb-5"
       >
         <TextHeading2 extraClasses="mt-2 mb-5" centered>
           Ventes en cours ({nbrOrders})
         </TextHeading2>
 
-        {isLoading ? (
-          <TextBody1 centered>Chargement des commandes...</TextBody1>
-        ) : (
-          orderCards
-        )}
+        {isLoading ? <Spinner /> : orderCards}
       </ScrollView>
     </SafeAreaView>
   );

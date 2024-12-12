@@ -17,6 +17,7 @@ import BlackBadge from "../utils/badges/Black";
 
 type OrderStatusProps = {
   orderData: OrderData | undefined;
+  status?: "pending" | "validated" | "withdrawn" | "canceled";
   onPressFn?: () => void;
   extraClasses?: string;
 };
@@ -32,6 +33,7 @@ export default function OrderStatus(props: OrderStatusProps): JSX.Element {
     (detail) => detail?.shop === shopStore?._id,
   );
 
+  console.log("      --> ORDERSTATUS - subId : ", shopDetails._id);
   // console.log("orderData :", props.orderData);
   // console.log("shopId :", shopStore?._id);
   // console.log("details :", shopDetails);
@@ -74,7 +76,7 @@ export default function OrderStatus(props: OrderStatusProps): JSX.Element {
             <OrderStatusBadge
               extraClasses="ml-2 py-1 px-1"
               // a revoir
-              status={shopDetails?.status}
+              status={props.status ? props.status : shopDetails?.status}
             />
           </View>
         </View>

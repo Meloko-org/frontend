@@ -16,7 +16,7 @@ export default function OrderStatusBadge(
       case props.status === "pending":
         return "bg-warning";
       case props.status === "validated":
-        return "bg-secondary";
+        return "bg-success";
       case props.status === "withdrawn":
         return "bg-primary";
       case props.status === "canceled":

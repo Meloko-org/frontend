@@ -103,7 +103,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
 
         if (props.navigation) {
           props.navigation.navigate("TabNavigatorUser", {
-            screen: "Home",
+            screen: "Search",
             params: {
               search: {
                 address: searchOptions.address,

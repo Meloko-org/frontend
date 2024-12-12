@@ -13,7 +13,7 @@ export default function BlackBadge({
   children,
 }: BlackBadgesProps): JSX.Element {
   return (
-    <View className={`${extraClasses} rounded-lg bg-darkbg`}>
+    <View className={`${extraClasses} rounded-lg bg-night`}>
       <Text className={`${textClasses} text-lightbg text-center`}>
         {children}
       </Text>

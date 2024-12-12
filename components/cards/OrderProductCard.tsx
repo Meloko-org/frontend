@@ -1,39 +1,35 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import BadgeSecondary from "../utils/badges/Secondary";
-import StarsNotation from "../utils/StarsNotation";
 import _Fontawesome from "react-native-vector-icons/FontAwesome6";
-import { GestureResponderEvent } from "react-native";
-import { StockData } from "../../types/API";
 import TextBody1 from "../utils/texts/Body1";
 import PricePer from "../utils/badges/Dark";
-import ButtonIcon from "../utils/buttons/Icon";
-import BadgeGrey from "../utils/badges/Grey";
 import TextHeading4 from "../utils/texts/Heading4";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addProductToCart,
-  increaseCartQuantity,
-  decreaseCartQuantity,
-  CartState,
-} from "../../reducers/cart";
-import { ProductData } from "../../types/API";
-import PriceBadge from "../utils/badges/Price";
 import TextBody2 from "../utils/texts/Body2";
-import Custom from "../utils/buttons/Custom";
 
 const FontAwesome = _Fontawesome as React.ElementType;
 
 type OrderProductCardProps = {
   orderProductData?: string;
-  onPressFn?: () => void;
+  onPressFn?: (id: string) => void;
   extraClasses?: string;
   showImage?: boolean;
+  status?: string;
 };
 
 export default function OrderProductCard(
   props: OrderProductCardProps,
 ): JSX.Element {
+  const [isCanceled, setIsCanceled] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsCanceled(props.status === "canceled");
+  }, [props.status]);
+
+  const toggleCancel = () => {
+    setIsCanceled((prev) => !prev);
+  };
+
   const formatQuantity = (quantity: number, unit: string) => {
     if (unit === "gr") {
       if (quantity < 1000) {
@@ -49,108 +45,114 @@ export default function OrderProductCard(
     return ((quantity / 1000) * price).toFixed(2);
   };
 
-  /*const tags =
-    props.stockData.tags &&
-    props.stockData.tags.map((s) => {
+  const tags =
+    props.orderProductData?.product.tags &&
+    props.orderProductData?.product.tags.map((tag) => {
       // console.log("s", s)
       return (
         <BadgeSecondary
-          key={s._id}
+          key={tag._id}
           uppercase
           extraClasses="mt-1"
-        >{`${s.name}`}</BadgeSecondary>
+        >{`${tag.name}`}</BadgeSecondary>
       );
-    });*/
-  // console.log(props.stockData)
+    });
 
   const unit =
     props.orderProductData?.product.product.weight.unit === "gr"
       ? "kg"
       : "la pièce";
 
-  // console.log("cartStore: ", JSON.stringify(props.orderProductData, null, 2));
-  // console.log("quantity :", props.orderProductData.quantity)
-  // console.log("price :", props.orderProductData.product.price.$numberDecimal)
+  console.log("      --> ORDERPRODUCTCARDS");
+  console.log("      -->  canceled: ", isCanceled);
+  console.log("      -->  props status: ", props.status);
 
   return (
-    <View
-      className={`${props.extraClasses} rounded-lg border shadow-sm bg-white p-2 dark:bg-tertiary w-full`}
+    <TouchableOpacity
+      onPress={() => {
+        if (props.onPressFn) {
+          props.onPressFn(props.orderProductData?.product.product._id);
+        }
+        if (props.status !== "canceled") {
+          toggleCancel();
+        }
+      }}
     >
-      <View className="flex flex-row items-center w-full">
-        <View className="flex-grow">
-          <TextHeading4
-            centered
-            extraClasses="mb-1"
-          >{`${props.orderProductData?.product.product.family.name} ${props.orderProductData?.product.product.name}`}</TextHeading4>
+      <View className={`${props.extraClasses} relative`}>
+        <View className="rounded-lg border shadow-sm bg-white p-2 dark:bg-tertiary w-full">
+          <View className="flex flex-row items-center w-full">
+            <View className="flex flex-row items-center rounded-lg w-1/5">
+              <Image
+                source={
+                  props.orderProductData?.product.product.image
+                    ? { uri: props.orderProductData?.product.product.image }
+                    : require("../../assets/icon.png")
+                }
+                className="rounded-full w-20 h-20"
+                alt={`Illustration du produit ${props.orderProductData?.product.product.name}`}
+                resizeMode="cover"
+                width={96}
+                height={64}
+              />
+            </View>
+
+            <View className="w-4/5 px-5 items-start">
+              <View className="">
+                <TextHeading4
+                  centered
+                  extraClasses="mb-1"
+                >{`${props.orderProductData?.product.product.family.name} ${props.orderProductData?.product.product.name}`}</TextHeading4>
+              </View>
+              <View className="flex flex-row">
+                <PricePer>{`${props.orderProductData?.product.price.$numberDecimal} € / ${unit}`}</PricePer>
+                {tags}
+              </View>
+              <View className="flex flex-row w-full justify-between mt-2">
+                <View className="flex flex-row items-center">
+                  <View>
+                    <TextBody2>Quantité : </TextBody2>
+                  </View>
+                  <View>
+                    <TextBody1>
+                      {formatQuantity(
+                        props.orderProductData?.quantity,
+                        props.orderProductData?.product.product.weight.unit,
+                      )}
+                    </TextBody1>
+                  </View>
+                </View>
+                <View className="flex flex-row items-center">
+                  <View>
+                    <TextBody2>Prix : </TextBody2>
+                  </View>
+                  <View>
+                    <TextBody1>
+                      {getPrice(
+                        props.orderProductData.product.price.$numberDecimal,
+                        props.orderProductData.quantity,
+                      )}{" "}
+                      €
+                    </TextBody1>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
         </View>
+
+        {isCanceled && (
+          <View className="absolute w-full h-full inset-0">
+            <View className="absolute inset-0 opacity-70 w-full h-full bg-black rounded-lg" />
+            {props.status !== "canceled" && (
+              <View className="absolute inset-0 flex items-center justify-center h-full w-full">
+                <Text className="text-danger font-bold text-lg rounded-lg bg-lightbg p-1">
+                  Produit annulé
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
       </View>
-
-      <View className="flex flex-row items-center w-full">
-        <View className="flex flex-row items-center rounded-lg w-1/5">
-          <Image
-            source={
-              props.orderProductData?.product.product.image
-                ? { uri: props.orderProductData?.product.product.image }
-                : require("../../assets/icon.png")
-            }
-            className="rounded-full w-20 h-20"
-            alt={`Illustration du produit ${props.orderProductData?.product.product.name}`}
-            resizeMode="cover"
-            width={96}
-            height={64}
-          />
-        </View>
-
-        <View className="w-2/5 px-5 items-start">
-          <View>
-            <PricePer>{`${props.orderProductData?.product.price.$numberDecimal} € / ${unit}`}</PricePer>
-          </View>
-          <View className="flex flex-row items-center">
-            <View>
-              <TextBody2>Quantité : </TextBody2>
-            </View>
-            <View>
-              <TextBody1>
-                {formatQuantity(
-                  props.orderProductData?.quantity,
-                  props.orderProductData?.product.product.weight.unit,
-                )}
-              </TextBody1>
-            </View>
-          </View>
-          <View className="flex flex-row items-center">
-            <View>
-              <TextBody2>Prix : </TextBody2>
-            </View>
-            <View>
-              <TextBody1>
-                {getPrice(
-                  props.orderProductData.product.price.$numberDecimal,
-                  props.orderProductData.quantity,
-                )}{" "}
-                €
-              </TextBody1>
-            </View>
-          </View>
-        </View>
-
-        <View className="w-2/5 flex justify-center">
-          <View>
-            <Custom
-              label="Valider"
-              extraClasses="bg-primary flex-1 mx-1 rounded-lg p-2"
-              textClasses="text-lightbg font-bold"
-            />
-          </View>
-          <View className="mt-2">
-            <Custom
-              label="Annuler"
-              extraClasses="bg-danger flex-1 mx-1 rounded-lg p-2"
-              textClasses="text-lightbg font-bold"
-            />
-          </View>
-        </View>
-      </View>
-    </View>
+    </TouchableOpacity>
   );
 }
