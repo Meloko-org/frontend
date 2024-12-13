@@ -20,6 +20,7 @@ import CardProduct from "../../components/cards/Product";
 import ButtonBack from "../../components/utils/buttons/Back";
 import ProductCategory from "../../components/cards/ProductCategory";
 import CardNote from "../../components/cards/Note";
+import BackLabelButton from "../../components/utils/buttons/BackLabel";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -215,13 +216,13 @@ export default function ShopUserScreen({ route, navigation }: Props) {
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <View className="flex flex-row mb-2 mt-5">
-        <View className="px-5">
-          <ButtonBack onPressFn={() => navigation.goBack()} />
-        </View>
-        <View className="flex-grow">
-          <TextHeading4>Retour aux résultats</TextHeading4>
-        </View>
+      <View className="flex flex-row mb-5 mt-3">
+        <BackLabelButton
+          onPressFn={() => navigation.goBack()}
+          extraClasses="ml-5 p-1"
+        >
+          Retour aux Résultats
+        </BackLabelButton>
       </View>
       <View className="flex-1">
         <ScrollView showsVerticalScrollIndicator={false} className="px-3">
