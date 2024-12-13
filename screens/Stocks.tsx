@@ -22,6 +22,7 @@ import {
 import TextHeading3 from "../components/utils/texts/Heading3";
 import TextHeading4 from "../components/utils/texts/Heading4";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
+import BackLabelButton from "../components/utils/buttons/BackLabel";
 import InputText from "../components/utils/inputs/Text";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
 import categoriesTools from "../modules/categoriesTools";
@@ -184,7 +185,19 @@ export default function StocksScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <View className="mt-5 ml-5">
+      <View className="flex flex-row mb-5 mt-3">
+        <BackLabelButton
+          onPressFn={() =>
+            navigation.navigate("TabNavigatorProducer", {
+              screen: "Shop",
+            })
+          }
+          extraClasses="ml-5 p-1"
+        >
+          Retour à la boutique
+        </BackLabelButton>
+      </View>
+      {/* <View className="mt-5 ml-5">
         <TouchableOpacity
           onPress={() =>
             navigation.navigate("TabNavigatorProducer", {
@@ -195,7 +208,7 @@ export default function StocksScreen({ navigation }: Props) {
         >
           <FontAwesome name="arrow-left" size={25} color="#98B66E" />
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <View>
         <TextHeading3 centered extraClasses="mb-5">

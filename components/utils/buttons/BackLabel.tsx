@@ -18,13 +18,13 @@ export default function BackLabelButton(
   return (
     <TouchableOpacity onPress={props.onPressFn}>
       <View
-        className={`${props.extraClasses} flex flex-row w-auto items-center rounded-lg bg-darkbg/25 dark:bg-lightbg/25`}
+        className={`${props.extraClasses} flex flex-row w-auto px-2 py-1 items-center rounded-lg bg-darkbg/25 dark:bg-lightbg/25`}
       >
-        <View className="pl-2">
+        <View className="">
           <FontAwesome name="arrow-left" size={30} color="#98B66E" />
         </View>
         <View className="flex-grow">
-          <TextBody1 extraClasses="px-2">{props.children}</TextBody1>
+          <TextBody1 extraClasses="pl-2">{props.children}</TextBody1>
         </View>
       </View>
     </TouchableOpacity>

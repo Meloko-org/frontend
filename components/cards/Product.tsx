@@ -134,7 +134,7 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
         <BadgeSecondary
           key={s._id}
           uppercase
-          extraClasses="mt-1"
+          extraClasses="mt-1 p-1 mr-1"
         >{`${s.name}`}</BadgeSecondary>
       );
     });
@@ -150,34 +150,37 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
       className={`${props.extraClasses} rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary flex flex-row w-full`}
     >
       <View className="flex flex-row items-center w-full">
-        {props.showImage && (
-          <View className="flex flex-row items-center rounded-lg w-auto h-full">
-            <Image
-              source={
-                props.stockData.product.image
-                  ? { uri: props.stockData.product.image }
-                  : require("../../assets/icon.png")
-              }
-              className="rounded-full w-20 h-20"
-              alt={`Illustration du produit ${props.stockData.product.name}`}
-              resizeMode="cover"
-              width={96}
-              height={64}
-            />
-          </View>
-        )}
+        <View className="flex flex-row w-4/5">
+          {props.showImage && (
+            <View className="flex flex-row items-center rounded-lg w-auto h-full">
+              <Image
+                source={
+                  props.stockData.product.image
+                    ? { uri: props.stockData.product.image }
+                    : require("../../assets/icon.png")
+                }
+                className="rounded-full w-20 h-20"
+                alt={`Illustration du produit ${props.stockData.product.name}`}
+                resizeMode="cover"
+                width={72}
+                height={48}
+              />
+            </View>
+          )}
 
-        <View
-          className={`${props.showImage ? "w-3/5" : "w-4/5"} h-full px-2 items-start`}
-        >
-          <TextHeading4 extraClasses="mb-1">{`${props.stockData.product.family.name} ${props.stockData.product.name}`}</TextHeading4>
-          {/* <PricePer>{`${props.stockData.price.$numberDecimal} € / ${props.stockData.product.weight.measurement.$numberDecimal}${props.stockData.product.weight.unit}`}</PricePer> */}
-          <PricePer>{`${props.stockData.price.$numberDecimal} € / ${unit}`}</PricePer>
-          <View className="flex flex-row justify-start items-center">
-            {tags}
+          <View
+            className={`${props.showImage ? "w-3/5" : "w-4/5"} h-full px-2 items-start`}
+          >
+            <TextBody1 extraClasses="mb-1">{`${props.stockData.product.family.name} ${props.stockData.product.name}`}</TextBody1>
+            {/* <PricePer>{`${props.stockData.price.$numberDecimal} € / ${props.stockData.product.weight.measurement.$numberDecimal}${props.stockData.product.weight.unit}`}</PricePer> */}
+            <PricePer>{`${props.stockData.price.$numberDecimal} € / ${unit}`}</PricePer>
+            <View className="flex flex-row justify-start items-center">
+              {tags}
+            </View>
           </View>
         </View>
-        <View className="w-1/5 pr-1 flex flex-column justify-center items-center">
+
+        <View className="w-1/5 flex flex-column justify-center items-center">
           {cartButton}
         </View>
       </View>

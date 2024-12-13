@@ -23,6 +23,7 @@ import Custom from "../components/utils/buttons/Custom";
 import { ShopState } from "../reducers/shop";
 import TextBody2 from "../components/utils/texts/Body2";
 import Spinner from "../components/utils/Spinner";
+import BackLabelButton from "../components/utils/buttons/BackLabel";
 
 type OrderDetailsProps = {
   route: Route;
@@ -296,26 +297,28 @@ export default function OrderDetailsScreen({ route }: OrderDetailsProps) {
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <ScrollView
         showsVerticalScrollIndicator={false}
-        className="w-full flex-1 px-3 pb-5"
+        className="w-full flex-1 pb-5"
       >
-        <View className="flex flex-row mb-5 mt-5">
-          <View className="px-5">
-            <ButtonBack
-              onPressFn={() =>
-                navigation.navigate("TabNavigatorProducer", { screen: "Sales" })
-              }
-            />
-          </View>
-          <View className="flex-grow">
-            <TextHeading3 centered>Détail commande</TextHeading3>
-          </View>
+        <View className="flex flex-row mb-5 mt-3">
+          <BackLabelButton
+            onPressFn={() =>
+              navigation.navigate("TabNavigatorProducer", { screen: "Sales" })
+            }
+            extraClasses="ml-5"
+          >
+            Retour aux commandes
+          </BackLabelButton>
+        </View>
+
+        <View className="mb-3">
+          <TextHeading3 centered>Détail commande</TextHeading3>
         </View>
 
         {isLoading ? (
           <Spinner />
         ) : (
           order && (
-            <View>
+            <View className="px-3">
               <OrderStatus orderData={order} status={status} />
 
               {withdrawMarket && withdrawDay && (

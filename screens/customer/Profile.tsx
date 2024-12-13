@@ -38,8 +38,9 @@ import shopTools from "../../modules/shopTools";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "UserProfile"
+  "TabNavigatorUser"
 >;
+
 type Props = {
   navigation: ProfileScreenNavigationProp;
 };

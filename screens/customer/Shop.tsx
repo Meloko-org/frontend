@@ -26,7 +26,7 @@ const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
 type StocksScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "ShopUser"
+  "TabNavigatorUser"
 >;
 
 type Props = {
@@ -336,12 +336,18 @@ export default function ShopUserScreen({ route, navigation }: Props) {
             onRequestClose={() => setIsModalVisible(false)}
           >
             <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-              <View className="p-3">
-                <ButtonBack onPressFn={() => setIsModalVisible(false)} />
-
-                <TextHeading2 extraClasses="mb-4">
-                  Tous les produits
-                </TextHeading2>
+              <View className="flex flex-row mb-5 mt-3">
+                <BackLabelButton
+                  onPressFn={() => setIsModalVisible(false)}
+                  extraClasses="ml-5 p-1"
+                >
+                  Retour à la boutique
+                </BackLabelButton>
+              </View>
+              <TextHeading4 centered extraClasses="mb-1">
+                Tous les produits
+              </TextHeading4>
+              <View className="flex-1 p-3">
                 <ScrollView
                   showsVerticalScrollIndicator={false}
                   className="w-full"
@@ -351,6 +357,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
               </View>
             </SafeAreaView>
           </Modal>
+
           {searchProduct.length > 0 && (
             <Modal
               visible={isSearchResultsModalVisible}
