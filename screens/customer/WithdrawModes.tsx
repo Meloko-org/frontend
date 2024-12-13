@@ -241,31 +241,12 @@ export default function WithdrawModesScreen({ navigation }) {
             disabled={false}
             isLoading={false}
             onPressFn={() =>
-              navigation.navigate("TabNavigatorUser", { screen: "Panier" })
+              navigation.navigate("TabNavigatorUser", { screen: "Cart" })
             }
             extraClasses="mb-3"
           />
         </ScrollView>
       </View>
-
-      {/* <Modal
-        visible={isMarketSelectModalVisible}
-        animationType="slide"
-        onRequestClose={() => setIsMarketSelectModalVisible(false)}
-        className=""
-      >
-        <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-          <View className="p-3">
-            <ButtonBack
-              onPressFn={() => setIsMarketSelectModalVisible(false)}
-            />
-            <TextHeading2 extraClasses="mb-4">
-              Choisissez un marché
-            </TextHeading2>
-            {markets}
-          </View>
-        </SafeAreaView>
-      </Modal> */}
 
       <SelectMarketModal
         isVisible={isSelectMarketModalVisible}

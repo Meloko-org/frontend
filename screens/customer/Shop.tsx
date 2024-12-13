@@ -11,6 +11,7 @@ import { useAuth } from "@clerk/clerk-expo";
 
 import StarsNotation from "../../components/utils/StarsNotation";
 import TextHeading2 from "../../components/utils/texts/Heading2";
+import TextHeading4 from "../../components/utils/texts/Heading4";
 import TextBody1 from "../../components/utils/texts/Body1";
 import BadgeSecondary from "../../components/utils/badges/Secondary";
 import ButtonIcon from "../../components/utils/buttons/Icon";
@@ -214,8 +215,16 @@ export default function ShopUserScreen({ route, navigation }: Props) {
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
+      <View className="flex flex-row mb-2 mt-5">
+        <View className="px-5">
+          <ButtonBack onPressFn={() => navigation.goBack()} />
+        </View>
+        <View className="flex-grow">
+          <TextHeading4>Retour aux résultats</TextHeading4>
+        </View>
+      </View>
       <View className="flex-1">
-        <ScrollView showsVerticalScrollIndicator={false} className="p-3">
+        <ScrollView showsVerticalScrollIndicator={false} className="px-3">
           {shopData && (
             <View className="flex-1">
               <View>
@@ -265,13 +274,17 @@ export default function ShopUserScreen({ route, navigation }: Props) {
 
               <View className="flex flex-row w-full justify-evenly mb-3">
                 {shopData.clickCollect && (
-                  <BadgeSecondary uppercase>Click & collect</BadgeSecondary>
+                  <BadgeSecondary extraClasses="p-1" uppercase>
+                    Click & collect
+                  </BadgeSecondary>
                 )}
                 {shopData.markets.length > 0 && (
-                  <BadgeSecondary uppercase>Marché local</BadgeSecondary>
+                  <BadgeSecondary extraClasses="p-1" uppercase>
+                    Marché local
+                  </BadgeSecondary>
                 )}
                 {shopDistance && (
-                  <BadgeSecondary>{`${shopDistance}km`}</BadgeSecondary>
+                  <BadgeSecondary extraClasses="p-1">{`${shopDistance}km`}</BadgeSecondary>
                 )}
               </View>
             </View>

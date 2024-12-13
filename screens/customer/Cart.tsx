@@ -123,7 +123,9 @@ export default function CartScreen({ navigation }) {
               label="Continuer vos achats"
               disabled={false}
               iconName="arrow-left"
-              onPressFn={() => navigation.goBack()}
+              onPressFn={() =>
+                navigation.navigate("TabNavigatorUser", { screen: "ShopUser" })
+              }
               extraClasses="w-full"
             />
           </View>
