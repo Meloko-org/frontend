@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, View, SafeAreaView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  SafeAreaView,
+  TouchableOpacity,
+  Text,
+  Image,
+} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
@@ -12,9 +19,12 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import CardProducer from "../../components/cards/ProducerSearchResult";
+import ShopMarkerCard from "../../components/cards/ShopMarkerCard";
 import MapSearchBox from "../../components/map/MapSearchBox";
 import { ShopData } from "../../types/API";
 import { useColorScheme } from "nativewind";
+import BadgeSecondary from "../../components/utils/badges/Secondary";
+import { Svg, Image as ImageSvg } from "react-native-svg";
 
 type userPosition = {
   latitude: number;
@@ -111,12 +121,8 @@ export default function MapCustomerScreen({
                 },
               });
             }}
-            style={{
-              backgroundColor: colorScheme === "dark" ? "#262E20" : "#FCFFF0",
-              borderRadius: 10,
-            }}
           >
-            <CardProducer shopData={data} key={data._id} />
+            <ShopMarkerCard key={data?._id} shopData={data} />
           </Callout>
         </Marker>
       );

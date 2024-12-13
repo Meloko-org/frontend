@@ -21,6 +21,8 @@ type CardProducerSearchResultProps = {
 export default function CardProducerSearchResult(
   props: CardProducerSearchResultProps,
 ): JSX.Element {
+  console.log("mode :", props.displayMode);
+  console.log("shopData :", props.shopData);
   return (
     <TouchableOpacity onPress={props.onPressFn}>
       <View
@@ -28,14 +30,14 @@ export default function CardProducerSearchResult(
       >
         <View className="flex flex-row items-center w-4/5">
           {props.displayMode !== "order" && (
-            <View className="flex flex-row items-center rounded-lg w-24 h-full">
+            <View className="flex flex-row items-center rounded-sm w-24 h-full">
               <Image
                 source={
                   props.shopData?.logo
                     ? { uri: props.shopData.logo }
                     : require("../../assets/icon.png")
                 }
-                className="rounded-full border border-primary w-24 h-24"
+                className="rounded-lg border border-primary w-24 h-24"
                 alt={`logo de la boutique ${props.shopData?.name}`}
                 resizeMode="cover"
                 width={96}
@@ -53,7 +55,7 @@ export default function CardProducerSearchResult(
                 props.shopData.searchData.distance && (
                   <Text className="text-xs text-darkbg dark:text-lightbg">
                     {" "}
-                    - {props.shopData.searchData.distance.toFixed(2)}km
+                    - {props.shopData.searchData.distance.toFixed(2)} km
                   </Text>
                 )}
             </View>
@@ -69,6 +71,10 @@ export default function CardProducerSearchResult(
             {props.displayMode === "order" && (
               <BadgeSecondary>{`${props.withdrawData.length} produit${props.withdrawData.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
             )}
+            {props.displayMode === "mapCallout" ||
+              (props.displayMode === "bottomSheet" && (
+                <BadgeSecondary extraClasses="px-1">{`${props.shopData?.stocks.length} produit${props.shopData?.stocks.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
+              ))}
           </View>
         </View>
         {props.showDirectionButton && (
