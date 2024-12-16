@@ -20,6 +20,7 @@ import InputText from "../../utils/inputs/Text";
 import ButtonPrimaryEnd from "../../utils/buttons/PrimaryEnd";
 import MarketSelector from "../../cards/MarketSelector";
 import { useColorScheme } from "nativewind";
+import BackLabelButton from "../../utils/buttons/BackLabel";
 
 type SearchMarketsModalProps = {
   isVisible: boolean;
@@ -120,8 +121,13 @@ export default function SearchMarketsModal(
       }}
     >
       <SafeAreaView style={bgStyle}>
-        <View>
-          <ButtonBack onPressFn={() => props.onCloseFn(false)} />
+        <View className="mb-5 mt-3 w-24" style={styles.backButton}>
+          <BackLabelButton
+            onPressFn={() => props.onCloseFn(false)}
+            extraClasses="ml-2 p-1"
+          >
+            Retour
+          </BackLabelButton>
         </View>
 
         <View>
@@ -247,5 +253,8 @@ const styles = StyleSheet.create({
   },
   distanceKm: {
     width: "15%",
+  },
+  backButton: {
+    width: 120,
   },
 });

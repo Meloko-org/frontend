@@ -14,6 +14,7 @@ import { useColorScheme } from "nativewind";
 import Market from "../../cards/Market";
 import { MarketData } from "../../../types/API";
 import shopTools from "../../../modules/shopTools";
+import BackLabelButton from "../../utils/buttons/BackLabel";
 
 type ManageMarketsModalProps = {
   isVisible: boolean;
@@ -46,13 +47,6 @@ export default function ManageMarketsModal(
   const [marketsDataToSave, setMarketsDataToSave] = useState<
     { market: MarketData; openingHours: OpeningHourData[]; isActive: boolean }[]
   >([]);
-
-  console.log();
-  console.log();
-  console.log();
-  console.log(
-    "------------------------------- MANAGEMARKETS --------------------------------------------------------------------",
-  );
 
   // permet d'afficher la liste des markets du shop
   useEffect(() => {
@@ -142,14 +136,6 @@ export default function ManageMarketsModal(
     }
   };
 
-  // console.log("SHOPSTORE MARKETS -> ", JSON.stringify(shopStore?.markets, null, 2));
-  // console.log("SHOPSTORE MARKETS -> ", shopStore?.markets);
-  // console.log("useEffect market :", JSON.stringify(marketPlaces, null, 2))
-  // console.log("highlightedMarketData:", JSON.stringify(highlightedMarketData, null, 2))
-  // console.log("marketsDataToSave:", JSON.stringify(marketsDataToSave, null, 2))
-  // console.log("marketsDataToSave:", marketsDataToSave)
-  // console.log("marketPlaces :", JSON.stringify(marketPlaces, null, 2))
-
   return (
     <Modal
       animationType="slide"
@@ -160,15 +146,17 @@ export default function ManageMarketsModal(
       }}
     >
       <SafeAreaView style={bgStyle}>
-        <View>
-          <ButtonBack
-            extraClasses="mb-2"
+        <View className="mb-5 mt-3 w-24" style={styles.backButton}>
+          <BackLabelButton
             onPressFn={() => props.onCloseFn(false)}
-          />
+            extraClasses="ml-2 p-1"
+          >
+            Retour
+          </BackLabelButton>
         </View>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View>
-            <TextHeading4 centered={true} extraClasses="mb-5">
+            <TextHeading4 centered={true} extraClasses="mt-5 mb-5">
               {`Gestion des places de marché`}
             </TextHeading4>
             <TextBody1 centered={true} extraClasses="mb-5">
@@ -205,5 +193,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FCFFF0",
     padding: 10,
+  },
+  backButton: {
+    width: 120,
   },
 });

@@ -17,6 +17,7 @@ import ButtonPrimaryEnd from "../../utils/buttons/PrimaryEnd";
 import InputTextarea from "../../utils/inputs/Textarea";
 import BadgeGrey from "../../utils/badges/Grey";
 import Planning from "../../Planning";
+import BackLabelButton from "../../utils/buttons/BackLabel";
 
 type ClickCollectModalProps = {
   data: ClickCollectData;
@@ -131,21 +132,6 @@ export default function ClickCollectModal(
     }
   };
 
-  console.log(
-    "------------------------------- CLICKCOLLECT --------------------------------------------------------------------",
-  );
-  // console.log(
-  //   "SHOPSTORE openingHours -> ",
-  //   JSON.stringify(shopStore?.clickCollect?.openingHours, null, 2),
-  // );
-  // console.log(
-  //   "clickCollectHours :",
-  //   JSON.stringify(clickCollectHours, null, 2),
-  // );
-  // console.log("activeDays :", JSON.stringify(activeDays, null, 2));
-  // console.log("")
-  // console.log("openingHours :", JSON.stringify(openingHours, null, 2));
-
   return (
     <Modal
       animationType="slide"
@@ -156,13 +142,15 @@ export default function ClickCollectModal(
       }}
     >
       <SafeAreaView style={bgStyle}>
-        <View>
-          <ButtonBack
-            extraClasses="mb-2"
-            onPressFn={() => props.onCloseFn(false)}
-          />
-        </View>
         <ScrollView showsVerticalScrollIndicator={false}>
+          <View className="mb-5 mt-3 w-24" style={styles.backButton}>
+            <BackLabelButton
+              onPressFn={() => props.onCloseFn(false)}
+              extraClasses="ml-2 p-1"
+            >
+              Retour à la boutique
+            </BackLabelButton>
+          </View>
           <View>
             <TextHeading2 centered extraClasses="">
               {`Click & Collect`}
@@ -214,5 +202,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FCFFF0",
     padding: 10,
+  },
+  backButton: {
+    width: 220,
   },
 });

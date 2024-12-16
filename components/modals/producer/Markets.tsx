@@ -15,6 +15,7 @@ import ButtonPrimaryEnd from "../../utils/buttons/PrimaryEnd";
 import { useColorScheme } from "nativewind";
 import SearchMarketsModal from "./SearchMarkets";
 import ManageMarketsModal from "./ManageMarkets";
+import BackLabelButton from "../../utils/buttons/BackLabel";
 
 type MarketsModalProps = {
   isVisible: boolean;
@@ -41,12 +42,17 @@ export default function MarketsModal(props: MarketsModalProps): JSX.Element {
       }}
     >
       <SafeAreaView style={bgStyle}>
-        <View>
-          <ButtonBack onPressFn={() => props.onCloseFn(false)} />
+        <View className="mb-5 mt-3 w-24" style={styles.backButton}>
+          <BackLabelButton
+            onPressFn={() => props.onCloseFn(false)}
+            extraClasses="ml-2 p-1"
+          >
+            Retour à la boutique
+          </BackLabelButton>
         </View>
         <ScrollView style={styles.scrollContainer}>
           <View>
-            <TextHeading2 centered extraClasses="mb-5">
+            <TextHeading2 centered extraClasses="mt-5 mb-5">
               Places de marché
             </TextHeading2>
             <TextBody1 centered={true} extraClasses="mb-5">
@@ -107,5 +113,8 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     height: "80%",
+  },
+  backButton: {
+    width: 220,
   },
 });
