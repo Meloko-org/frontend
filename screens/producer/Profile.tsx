@@ -18,6 +18,7 @@ import Text from "../../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import Custom from "../../components/utils/buttons/Custom";
 import { ProducerData, ShopData } from "../../types/API";
+import ButtonIcon from "../../components/utils/buttons/Icon";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -29,6 +30,7 @@ type Props = {
 };
 
 export default function ProducerProfileScreen({ navigation }: Props) {
+  const [isOpenAddress, setOpenAddress] = useState(false);
   // Import the Clerk Auth functions
   const { getToken } = useAuth();
   const [isProducerSaveLoading, setProducerSaveLoading] = useState(false);
@@ -70,6 +72,10 @@ export default function ProducerProfileScreen({ navigation }: Props) {
       });
     }
   }, []);
+
+  const toggleOpenAddress = () => {
+    setOpenAddress(!isOpenAddress);
+  };
 
   const handleProducerUpdate = async () => {
     try {
@@ -145,82 +151,96 @@ export default function ProducerProfileScreen({ navigation }: Props) {
             onChangeText={(value: string) => setBic(value)}
             extraClasses="mb-2"
           />
-          <TextHeading3 centered={true}>Adresse</TextHeading3>
-          <Text
-            label="Adresse"
-            placeholder="Saisissez votre adresse"
-            value={address.address1}
-            onChangeText={(value: string) =>
-              setAddress({
-                address1: value,
-                address2: address.address2,
-                postalCode: address.postalCode,
-                city: address.city,
-                country: address.country,
-              })
-            }
-            extraClasses="mb-2"
-          />
-          <Text
-            label="Adresse complément"
-            placeholder="Saisissez votre adresse"
-            value={address.address2}
-            onChangeText={(value: string) =>
-              setAddress({
-                address1: address.address1,
-                address2: value,
-                postalCode: address.postalCode,
-                city: address.city,
-                country: address.country,
-              })
-            }
-            extraClasses="mb-2"
-          />
-          <Text
-            label="Code Postal"
-            placeholder="Saisissez le code postal"
-            value={address.postalCode}
-            onChangeText={(value: string) =>
-              setAddress({
-                address1: address.address1,
-                address2: address.address2,
-                postalCode: value,
-                city: address.city,
-                country: address.country,
-              })
-            }
-            extraClasses="mb-2"
-          />
-          <Text
-            label="Ville"
-            placeholder="Saisissez la ville"
-            value={address.city}
-            onChangeText={(value: string) =>
-              setAddress({
-                address1: address.address1,
-                address2: address.address2,
-                postalCode: address.postalCode,
-                city: value,
-                country: address.country,
-              })
-            }
-            extraClasses="mb-2"
-          />
-          <Text
-            label="Pays"
-            placeholder="Saisissez le pays"
-            value={address.country}
-            onChangeText={(value: string) =>
-              setAddress({
-                address1: address.address1,
-                address2: address.address2,
-                postalCode: address.postalCode,
-                city: address.city,
-                country: value,
-              })
-            }
-            extraClasses="mb-2"
-          />
+          <View className="flex flex-row justify-stretch mb-1">
+            <View className="flex flex-grow">
+              <TextHeading3 centered>Adresse</TextHeading3>
+            </View>
+            <ButtonIcon
+              iconName="arrow-down"
+              extraClasses="p-3 bg-tertiary"
+              onPressFn={toggleOpenAddress}
+              animated={true}
+            />
+          </View>
+          {isOpenAddress && (
+            <>
+              <Text
+                label="Adresse"
+                placeholder="Saisissez votre adresse"
+                value={address.address1}
+                onChangeText={(value: string) =>
+                  setAddress({
+                    address1: value,
+                    address2: address.address2,
+                    postalCode: address.postalCode,
+                    city: address.city,
+                    country: address.country,
+                  })
+                }
+                extraClasses="mb-2"
+              />
+              <Text
+                label="Adresse complément"
+                placeholder="Saisissez votre adresse"
+                value={address.address2}
+                onChangeText={(value: string) =>
+                  setAddress({
+                    address1: address.address1,
+                    address2: value,
+                    postalCode: address.postalCode,
+                    city: address.city,
+                    country: address.country,
+                  })
+                }
+                extraClasses="mb-2"
+              />
+              <Text
+                label="Code Postal"
+                placeholder="Saisissez le code postal"
+                value={address.postalCode}
+                onChangeText={(value: string) =>
+                  setAddress({
+                    address1: address.address1,
+                    address2: address.address2,
+                    postalCode: value,
+                    city: address.city,
+                    country: address.country,
+                  })
+                }
+                extraClasses="mb-2"
+              />
+              <Text
+                label="Ville"
+                placeholder="Saisissez la ville"
+                value={address.city}
+                onChangeText={(value: string) =>
+                  setAddress({
+                    address1: address.address1,
+                    address2: address.address2,
+                    postalCode: address.postalCode,
+                    city: value,
+                    country: address.country,
+                  })
+                }
+                extraClasses="mb-2"
+              />
+              <Text
+                label="Pays"
+                placeholder="Saisissez le pays"
+                value={address.country}
+                onChangeText={(value: string) =>
+                  setAddress({
+                    address1: address.address1,
+                    address2: address.address2,
+                    postalCode: address.postalCode,
+                    city: address.city,
+                    country: value,
+                  })
+                }
+                extraClasses="mb-2"
+              />
+            </>
+          )}
 
           <ButtonPrimaryEnd
             label="Mettre à jour"
@@ -228,7 +248,7 @@ export default function ProducerProfileScreen({ navigation }: Props) {
             disabled={isProducerSaveLoading}
             onPressFn={() => handleProducerUpdate()}
             isLoading={isProducerSaveLoading}
-            extraClasses="mb-5"
+            extraClasses="mt-5 mb-5"
           />
         </ScrollView>
 
