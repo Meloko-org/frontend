@@ -34,9 +34,6 @@ export default function OrderStatus(props: OrderStatusProps): JSX.Element {
   );
 
   // console.log("      --> ORDERSTATUS - subId : ", shopDetails._id);
-  // console.log("orderData :", props.orderData);
-  // console.log("shopId :", shopStore?._id);
-  // console.log("details :", shopDetails);
 
   return (
     <TouchableOpacity onPress={() => props.onPressFn && props.onPressFn()}>

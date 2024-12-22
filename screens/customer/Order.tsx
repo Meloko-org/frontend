@@ -18,7 +18,7 @@ import { UserState } from "../../reducers/user";
 
 type OrderScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "OrderCustomer"
+  "TabNavigatorUser"
 >;
 
 type Props = {

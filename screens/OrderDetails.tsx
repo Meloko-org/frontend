@@ -8,7 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Alert, View, ActivityIndicator } from "react-native";
 import TextHeading3 from "../components/utils/texts/Heading3";
 import ButtonBack from "../components/utils/buttons/Back";
-import { OrderData, ProductData } from "../types/API";
+import { OrderData, ProductData, ProductDetail } from "../types/API";
 
 import { useNavigation } from "@react-navigation/native";
 import TextHeading4 from "../components/utils/texts/Heading4";
@@ -132,146 +132,34 @@ export default function OrderDetailsScreen({ route }: OrderDetailsProps) {
     }
   }, [order, shopStore]);
 
-  const handleCancelOrder = async () => {
+  const handleUpdateOrder = async (
+    newStatus: "canceled" | "pending" | "validated" | "withdrawn",
+    callback?: (product: ProductDetail) => ProductDetail,
+  ) => {
     try {
       setIsLoading(true);
-      // mise à jour de details
-      const updatedDetails = order?.details.map((detail) => {
-        if (detail.shop === shopStore._id) {
-          return {
-            ...detail,
-            status: "canceled",
-          };
-        }
-        return detail;
+      const updatedOrder = orderTools.buildUpdatedOrder({
+        order,
+        shopId: shopStore?._id,
+        newStatus: newStatus,
+        updateProductCallback: callback,
       });
-      // mise à jour de l'order
-      const updatedOrder = {
-        ...order,
-        details: updatedDetails,
-      };
+
       setOrder(updatedOrder);
-      // envoyer order au backend
-      const values = { order: updatedOrder, status: "canceled" };
+
       const token = await getToken();
+      const values = { order: updatedOrder, status: newStatus };
       const response = await orderTools.validateOrder(token, values, orderId);
 
       Alert.alert("Status de la commande", response.message);
 
       if (response.result) {
-        setStatus("canceled");
-        setIsLoading(false);
-        // navigation.navigate("TabNavigatorProducer", {
-        //   screen: "Sales"
-        // })
-      } else {
-        setIsLoading(false);
+        setStatus(newStatus);
       }
     } catch (error) {
       console.log(error);
-    }
-  };
-
-  const handleValidateOrder = async () => {
-    try {
-      setIsLoading(true);
-      // ajouter la logique pour valider la commande en bdd
-      const shopDetails = order?.details.find(
-        (detail) => detail.shop === shopStore._id,
-      );
-      // mise à jour de chaque produit
-      const updatedProducts = shopDetails?.products.map((product) => {
-        if (!canceledProducts.includes(product.product._id)) {
-          return {
-            ...product,
-            isConfirmed: true,
-          };
-        } else {
-          return product;
-        }
-      });
-      // mise à jour de details
-      const updatedDetails = order?.details.map((detail) => {
-        if (detail.shop === shopStore._id) {
-          return {
-            ...detail,
-            products: updatedProducts,
-            status: "validated",
-          };
-        }
-        return detail;
-      });
-      // mise à jour de l'order
-      const updatedOrder = {
-        ...order,
-        details: updatedDetails,
-      };
-      setOrder(updatedOrder);
-      // envoyer order au backend
-      const values = { order: updatedOrder, status: "validated" };
-      const token = await getToken();
-      const response = await orderTools.validateOrder(token, values, orderId);
-
-      Alert.alert("Status de la commande", response.message);
-
-      if (response.result) {
-        setStatus("validated");
-        setIsLoading(false);
-        // navigation.navigate("TabNavigatorProducer", {
-        //   screen: "Sales"
-        // })
-      } else {
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleRestoreOrder = async () => {
-    try {
-      const shopDetails = order?.details.find(
-        (detail) => detail.shop === shopStore._id,
-      );
-
-      const updatedProducts = shopDetails?.products.map((product) => {
-        return {
-          ...product,
-          isConfirmed: false,
-        };
-      });
-
-      const updatedDetails = order?.details.map((detail) => {
-        if (detail.shop === shopStore._id) {
-          return {
-            ...detail,
-            products: updatedProducts,
-            status: "pending",
-          };
-        }
-        return detail;
-      });
-      // mise à jour de l'order
-      const updatedOrder = {
-        ...order,
-        details: updatedDetails,
-      };
-      setOrder(updatedOrder);
-      // envoyer order au backend
-      const values = { order: updatedOrder, status: "pending" };
-      const token = await getToken();
-      const response = await orderTools.validateOrder(token, values, orderId);
-
-      Alert.alert("Status de la commande", response.message);
-
-      if (response.result) {
-        setStatus("pending");
-        setIsLoading(false);
-      } else {
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -286,10 +174,85 @@ export default function OrderDetailsScreen({ route }: OrderDetailsProps) {
     });
   };
 
+  const renderButtons = () => {
+    switch (status) {
+      case "canceled":
+        return (
+          <Custom
+            label={`REMETTRE LA COMMANDE\nEN ATTENTE`}
+            extraClasses="border border-primary bg-lightbg/90 dark:bg-transparent flex-1 mt-5 mx-1 rounded-lg px-2 h-[60px]"
+            textClasses="text-lightbg font-bold text-sm"
+            onPressFn={() =>
+              handleUpdateOrder("pending", (product) => ({
+                ...product,
+                isConfirmed: false,
+              }))
+            }
+            isLoading={isLoading}
+          />
+        );
+      case "pending":
+        return (
+          <>
+            <Custom
+              label={`VALIDER`}
+              extraClasses="bg-primary flex-1 mb-5 mx-1 rounded-lg px-2 h-[80px]"
+              textClasses="text-lightbg font-bold text-lg"
+              onPressFn={() =>
+                handleUpdateOrder("validated", (product) => {
+                  if (!canceledProducts.includes(product.product._id)) {
+                    console.log("   -->  canceled :", canceledProducts);
+                    console.log("   -->  id :", product.product._id);
+                    return { ...product, isConfirmed: true };
+                  }
+                  return product;
+                })
+              }
+              isLoading={isLoading}
+            />
+            <Custom
+              label={`ANNULER LA COMMANDE`}
+              extraClasses="bg-danger flex-1 mt-5 mx-1 rounded-lg px-2 h-[60px]"
+              textClasses="text-lightbg font-bold text-sm"
+              onPressFn={() =>
+                handleUpdateOrder("canceled", (product) => ({
+                  ...product,
+                  isConfirmed: false,
+                }))
+              }
+              isLoading={isLoading}
+            />
+          </>
+        );
+      case "validated":
+        return (
+          <>
+            <Custom
+              label={`VALIDER LE RETRAIT`}
+              extraClasses="bg-primary flex-1 mx-1 mb-5 rounded-lg px-2 h-[80px]"
+              textClasses="text-lightbg font-bold text-lg"
+              onPressFn={() => handleUpdateOrder("withdrawn")}
+              isLoading={isLoading}
+            />
+            {/* <Custom
+              label={`REMETTRE LA COMMANDE\nEN ATTENTE`}
+              extraClasses="border border-primary bg-lightbg/90 dark:bg-transparent flex-1 mt-5 mx-1 rounded-lg px-2 h-[60px]"
+              textClasses="text-lightbg font-bold text-sm"
+              onPressFn={() => handleUpdateOrder("pending", (product) => ({...product,isConfirmed: false}))}
+              isLoading={isLoading}
+            /> */}
+          </>
+        );
+      case "withdrawn":
+        return null;
+
+      default:
+        return null;
+    }
+  };
+
   console.log("   --> ORDERDETAILS");
-  console.log("   -->  OrderDetailsScreen rendered");
-  console.log("   -->  subOrderId :", subOrderId);
-  console.log("   -->  status :", status);
+  console.log("   -->  canceled :", canceledProducts);
 
   console.log("-----------------------------------------------------------");
 
@@ -350,34 +313,7 @@ export default function OrderDetailsScreen({ route }: OrderDetailsProps) {
               </View>
               {products}
 
-              <View className="flex-row justify-between items-center mt-5 mb-4">
-                {status === "canceled" || status == "validated" ? (
-                  <Custom
-                    label={`METTRE LA COMMANDE EN ATTENTE`}
-                    extraClasses="bg-primary flex-1 mx-1 rounded-lg px-2 h-[80px]"
-                    textClasses="text-lightbg font-bold text-lg"
-                    onPressFn={handleRestoreOrder}
-                    isLoading={isLoading}
-                  />
-                ) : (
-                  <>
-                    <Custom
-                      label={`ANNULER LA\nCOMMANDE`}
-                      extraClasses="bg-danger flex-1 mx-1 rounded-lg px-2 h-[80px]"
-                      textClasses="text-lightbg font-bold text-lg"
-                      onPressFn={handleCancelOrder}
-                      isLoading={isLoading}
-                    />
-                    <Custom
-                      label={`VALIDER`}
-                      extraClasses="bg-primary flex-1 mx-1 rounded-lg px-2 h-[80px]"
-                      textClasses="text-lightbg font-bold text-lg"
-                      onPressFn={handleValidateOrder}
-                      isLoading={isLoading}
-                    />
-                  </>
-                )}
-              </View>
+              <View className="mt-5 mb-4">{renderButtons()}</View>
             </View>
           )
         )}

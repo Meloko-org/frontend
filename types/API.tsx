@@ -145,6 +145,12 @@ type ProducerData = {
   address: AddressData;
 } | null;
 
+type ProductDetail = {
+  product: string | StockData;
+  quantity: number;
+  isConfirmed: boolean | null;
+};
+
 export type {
   ProductData,
   ShopData,
@@ -159,4 +165,5 @@ export type {
   ClickCollectData,
   OpeningHoursData,
   PeriodData,
+  ProductDetail,
 };

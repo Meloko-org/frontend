@@ -1,42 +1,33 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, UseSelector } from "react-redux";
+import { useFocusEffect } from "@react-navigation/native";
+import { useAuth } from "@clerk/clerk-expo";
 import { ShopState } from "../reducers/shop";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
-import { useAuth } from "@clerk/clerk-expo";
 
 import { StockData } from "../types/API";
 import stocksTools from "../modules/stocksTools";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  Image,
-} from "react-native";
+import { View, TextInput, Alert, Image } from "react-native";
 import TextHeading3 from "../components/utils/texts/Heading3";
 import TextHeading4 from "../components/utils/texts/Heading4";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import BackLabelButton from "../components/utils/buttons/BackLabel";
-import InputText from "../components/utils/inputs/Text";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
-import categoriesTools from "../modules/categoriesTools";
 import ButtonIcon from "../components/utils/buttons/Icon";
 import TextBody1 from "../components/utils/texts/Body1";
-import TextBody2 from "../components/utils/texts/Body2";
 import AddProductModal from "../components/modals/producer/AddProduct";
+import Spinner from "../components/utils/Spinner";
 
 const FontAwesome = _Fontawesome as React.ElementType;
 
 // Navigation type
 type StocksScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "GestionDesStocks"
+  "TabNavigatorProducer"
 >;
 
 type Props = {
@@ -49,8 +40,8 @@ export default function StocksScreen({ navigation }: Props) {
   );
   const { getToken } = useAuth();
 
-  const [isStockSaveLoading, setStockSaveLoading] = useState<Boolean>(false);
-  const [isLoadingStocks, setIsLoadingStocks] = useState<Boolean>(true);
+  const [isSaveLoading, setSaveLoading] = useState<Boolean>(false);
+  const [isFetchLoading, setIsFetchLoading] = useState<boolean>(true);
   const [shouldSave, setShouldSave] = useState<Boolean>(false);
   const [stocks, setStocks] = useState<StockData[]>([]);
   const [tempPrices, setTempPrices] = useState<{ [key: string]: string }>({});
@@ -61,14 +52,15 @@ export default function StocksScreen({ navigation }: Props) {
 
   const [isOpen, setIsOpen] = useState({});
 
-  // const [shopId, setShopId] = useState<string>("66b339729a76167d3a93df3b");
   const [shopId, setShopId] = useState<string | undefined>(shopStore?._id);
 
-  useEffect(() => {
-    getStocksByShop();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchStocks();
+    }, []),
+  );
 
-  const getStocksByShop = async () => {
+  const fetchStocks = async () => {
     const data = await stocksTools.getStocksByShop(shopId);
     if (data) {
       const formattedData = data.map((item: StockData) => ({
@@ -80,24 +72,24 @@ export default function StocksScreen({ navigation }: Props) {
         tags: item?.tags, // en supposant que les tags correspondent déjà à TagData[]
       }));
       setStocks(formattedData);
-      setIsLoadingStocks(false);
+      setIsFetchLoading(false);
     }
   };
 
   const refreshStocks = async () => {
     setAddProductModalVisible(false);
-    getStocksByShop();
+    fetchStocks();
     setIsOpen({});
   };
 
   useEffect(() => {
-    if (!isLoadingStocks && stocks.length > 0) {
+    if (!isFetchLoading && stocks.length > 0) {
       const categoriesList: string[] = Array.from(
         new Set(stocks?.map((stock) => stock?.product.family.category.name)),
       );
       setCategories(categoriesList);
     }
-  }, [isLoadingStocks]);
+  }, [isFetchLoading]);
 
   useEffect(() => {
     if (categories.length > 1) {
@@ -119,14 +111,13 @@ export default function StocksScreen({ navigation }: Props) {
 
         const data = await stocksTools.updateStocks(token, stocks);
 
-        if (data.error) {
-          Alert.alert("Message", data.error);
-          setStockSaveLoading(false);
-        }
-        if (data) {
+        if ("message" in data) {
+          Alert.alert("Echec de la mise à jour", data.message);
+          setSaveLoading(false);
+        } else {
           console.log("les datas:", data);
           Alert.alert("Message", "Mise à jour des stocks réussie");
-          setStockSaveLoading(false);
+          setSaveLoading(false);
         }
         setShouldSave(false);
       }
@@ -162,7 +153,7 @@ export default function StocksScreen({ navigation }: Props) {
 
   const handlePrepareSaveStock = async () => {
     // mise à jour des prix en fonction de tempPrices
-    setStockSaveLoading(true);
+    setSaveLoading(true);
     setStocks((prevStocks) =>
       prevStocks.map((stock) => ({
         ...stock,
@@ -173,15 +164,6 @@ export default function StocksScreen({ navigation }: Props) {
   };
 
   const totalProducts = stocks?.length.toString();
-
-  console.log(stocks);
-  console.log(tempPrices);
-  // console.log(filteredStocks.map((stock) => ({
-  // 	stock: stock?.stock,
-  // 	price: stock?.price
-  // })))
-  console.log("categories :", categories);
-  console.log("isOpen :", isOpen);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -197,18 +179,6 @@ export default function StocksScreen({ navigation }: Props) {
           Retour à la boutique
         </BackLabelButton>
       </View>
-      {/* <View className="mt-5 ml-5">
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("TabNavigatorProducer", {
-              screen: "Boutique",
-            })
-          }
-          className="flex-none"
-        >
-          <FontAwesome name="arrow-left" size={25} color="#98B66E" />
-        </TouchableOpacity>
-      </View> */}
 
       <View>
         <TextHeading3 centered extraClasses="mb-5">
@@ -216,141 +186,145 @@ export default function StocksScreen({ navigation }: Props) {
         </TextHeading3>
       </View>
 
-      <View className="flex-1">
-        <ScrollView showsVerticalScrollIndicator={false} className="p-3">
-          <View className="">
-            {stocks.length === 0 ? (
-              <TextBody1>Aucun stock trouvé pour ce magasin.</TextBody1>
-            ) : (
-              Array.isArray(categories) &&
-              categories.map((category: string) => (
-                <View key={category}>
-                  <View className="flex-row items-center mb-3">
-                    <FontAwesome
-                      name="square"
-                      className="text-secondary dark:text-primary text-lg mr-2"
-                    />
-                    <TextHeading4 extraClasses="flex-shrink">
-                      {category.toUpperCase()} (
-                      {
-                        stocks?.filter(
-                          (s) => s.product.family.category.name === category,
-                        ).length
-                      }
-                      )
-                    </TextHeading4>
-                    <ButtonIcon
-                      iconName="arrow-down"
-                      extraClasses="p-3 bg-primary"
-                      onPressFn={() => toggleOpenList(category)}
-                      animated={true}
-                    />
-                  </View>
-                  {isOpen[category] &&
-                    Array.isArray(stocks) &&
-                    stocks
-                      .filter(
-                        (stock: StockData) =>
-                          stock?.product.family.category.name === category,
-                      )
-                      .map((stock: StockData) => (
-                        <View
-                          key={stock?._id}
-                          className="rounded-lg bg-lightbg dark:bg-tertiary p-3 mb-3 "
-                        >
-                          <View className="flex flex-row items-center">
-                            <View className="rounded-lg">
-                              <Image
-                                source={
-                                  stock?.product.image
-                                    ? { uri: stock.product.image }
-                                    : require("../assets/icon.png")
-                                }
-                                className="rounded-xl w-20 h-20 mr-3"
-                                alt={`Illustration du produit ${stock?.product.name}`}
-                                resizeMode="stretch"
-                                width={96}
-                                height={64}
-                              />
-                            </View>
-                            <View>
-                              <TextBody1 extraClasses="font-bold mb-1">
-                                {stock?.product.family.name}{" "}
-                                {stock?.product.name}
-                              </TextBody1>
-
-                              <View className="flex flex-row items-center my-1">
-                                <TextBody1>Prix</TextBody1>
-                                <TextInput
-                                  value={
-                                    tempPrices[stock?._id || ""] ??
-                                    stock?.price?.toString() ??
-                                    ""
+      {isFetchLoading ? (
+        <Spinner />
+      ) : (
+        <View className="flex-1">
+          <ScrollView showsVerticalScrollIndicator={false} className="p-3">
+            <View className="">
+              {stocks.length === 0 ? (
+                <TextBody1>Aucun stock trouvé pour ce magasin.</TextBody1>
+              ) : (
+                Array.isArray(categories) &&
+                categories.map((category: string) => (
+                  <View key={category}>
+                    <View className="flex-row items-center mb-3">
+                      <FontAwesome
+                        name="square"
+                        className="text-secondary dark:text-primary text-lg mr-2"
+                      />
+                      <TextHeading4 extraClasses="flex-shrink">
+                        {category.toUpperCase()} (
+                        {
+                          stocks?.filter(
+                            (s) => s.product.family.category.name === category,
+                          ).length
+                        }
+                        )
+                      </TextHeading4>
+                      <ButtonIcon
+                        iconName="arrow-down"
+                        extraClasses="p-3 bg-primary"
+                        onPressFn={() => toggleOpenList(category)}
+                        animated={true}
+                      />
+                    </View>
+                    {isOpen[category] &&
+                      Array.isArray(stocks) &&
+                      stocks
+                        .filter(
+                          (stock: StockData) =>
+                            stock?.product.family.category.name === category,
+                        )
+                        .map((stock: StockData) => (
+                          <View
+                            key={stock?._id}
+                            className="rounded-lg bg-lightbg dark:bg-tertiary p-3 mb-3 "
+                          >
+                            <View className="flex flex-row items-center">
+                              <View className="rounded-lg">
+                                <Image
+                                  source={
+                                    stock?.product.image
+                                      ? { uri: stock.product.image }
+                                      : require("../assets/icon.png")
                                   }
-                                  onChangeText={(price) =>
-                                    handleChangePrice(stock?._id, price)
-                                  }
-                                  keyboardType={"numeric"}
-                                  className="rounded-sm bg-white text-black mx-3 px-4 font-bold text-lg"
+                                  className="rounded-xl w-20 h-20 mr-3"
+                                  alt={`Illustration du produit ${stock?.product.name}`}
+                                  resizeMode="stretch"
+                                  width={96}
+                                  height={64}
                                 />
-                                <TextBody1>
-                                  euros
-                                  {stock.product.weight.unit === "gr"
-                                    ? "/kg"
-                                    : " à la pièce"}
-                                </TextBody1>
                               </View>
+                              <View>
+                                <TextBody1 extraClasses="font-bold mb-1">
+                                  {stock?.product.family.name}{" "}
+                                  {stock?.product.name}
+                                </TextBody1>
 
-                              <View className="flex flex-row items-center mt-1">
-                                <TextBody1>Quantité</TextBody1>
-                                <ButtonIcon
-                                  iconName="minus"
-                                  extraClasses="bg-primary px-2 ml-2"
-                                  size={20}
-                                  onPressFn={() =>
-                                    handleQuantityChange(stock?._id, -1)
-                                  }
-                                />
-                                <View>
-                                  <TextHeading4 extraClasses="mx-2">
-                                    {stock.stock ? stock.stock : 0}
-                                  </TextHeading4>
+                                <View className="flex flex-row items-center my-1">
+                                  <TextBody1>Prix</TextBody1>
+                                  <TextInput
+                                    value={
+                                      tempPrices[stock?._id || ""] ??
+                                      stock?.price?.toString() ??
+                                      ""
+                                    }
+                                    onChangeText={(price) =>
+                                      handleChangePrice(stock?._id, price)
+                                    }
+                                    keyboardType={"numeric"}
+                                    className="rounded-sm bg-white text-black mx-3 px-4 font-bold text-lg"
+                                  />
+                                  <TextBody1>
+                                    euros
+                                    {stock.product.weight.unit === "gr"
+                                      ? "/kg"
+                                      : "la pièce"}
+                                  </TextBody1>
                                 </View>
-                                <ButtonIcon
-                                  iconName="plus"
-                                  extraClasses="bg-primary px-2"
-                                  size={20}
-                                  onPressFn={() =>
-                                    handleQuantityChange(stock?._id, +1)
-                                  }
-                                />
+
+                                <View className="flex flex-row items-center mt-1">
+                                  <TextBody1>Quantité</TextBody1>
+                                  <ButtonIcon
+                                    iconName="minus"
+                                    extraClasses="bg-primary px-2 ml-2"
+                                    size={20}
+                                    onPressFn={() =>
+                                      handleQuantityChange(stock?._id, -1)
+                                    }
+                                  />
+                                  <View>
+                                    <TextHeading4 extraClasses="mx-2">
+                                      {stock.stock ? stock.stock : 0}
+                                    </TextHeading4>
+                                  </View>
+                                  <ButtonIcon
+                                    iconName="plus"
+                                    extraClasses="bg-primary px-2"
+                                    size={20}
+                                    onPressFn={() =>
+                                      handleQuantityChange(stock?._id, +1)
+                                    }
+                                  />
+                                </View>
                               </View>
                             </View>
                           </View>
-                        </View>
-                      ))}
-                </View>
-              ))
-            )}
-            {stocks.length > 0 && (
+                        ))}
+                  </View>
+                ))
+              )}
+              {stocks.length > 0 && (
+                <ButtonPrimaryEnd
+                  label="Sauvegarder"
+                  iconName="refresh"
+                  disabled={isSaveLoading}
+                  extraClasses="my-3"
+                  onPressFn={() => handlePrepareSaveStock()}
+                  isLoading={isSaveLoading}
+                />
+              )}
               <ButtonPrimaryEnd
-                label="Sauvegarder"
-                iconName="refresh"
-                disabled={isStockSaveLoading}
-                extraClasses="my-3"
-                onPressFn={() => handlePrepareSaveStock()}
-                isLoading={isStockSaveLoading}
+                label="Ajouter des produits"
+                iconName="plus"
+                extraClasses="mt-5 mb-5"
+                onPressFn={() => setAddProductModalVisible(true)}
               />
-            )}
-            <ButtonPrimaryEnd
-              label="Ajouter des produits"
-              iconName="plus"
-              extraClasses="mt-5"
-              onPressFn={() => setAddProductModalVisible(true)}
-            />
-          </View>
-        </ScrollView>
-      </View>
+            </View>
+          </ScrollView>
+        </View>
+      )}
 
       <AddProductModal
         isVisible={isAddProductModalVisible}

@@ -23,7 +23,14 @@ export default function OrderProductCard(
   const [isCanceled, setIsCanceled] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsCanceled(props.status === "canceled");
+    if (props.status === "validated" || props.status === "withdrawn") {
+      if (props.orderProductData?.isConfirmed === false) {
+        setIsCanceled(true);
+      }
+    }
+    if (props.status === "canceled") {
+      setIsCanceled(true);
+    }
   }, [props.status]);
 
   const toggleCancel = () => {
@@ -61,19 +68,18 @@ export default function OrderProductCard(
   const unit =
     props.orderProductData?.product.product.weight.unit === "gr"
       ? "kg"
-      : "la pièce";
+      : "pièce";
 
   console.log("      --> ORDERPRODUCTCARDS");
   console.log("      -->  canceled: ", isCanceled);
   console.log("      -->  props status: ", props.status);
+  // console.log("      -->  props orderProductData: ", props.orderProductData);
 
   return (
     <TouchableOpacity
       onPress={() => {
-        if (props.onPressFn) {
-          props.onPressFn(props.orderProductData?.product.product._id);
-        }
-        if (props.status !== "canceled") {
+        if (props.onPressFn && props.status === "pending") {
+          props.onPressFn(props.orderProductData?.product._id);
           toggleCancel();
         }
       }}

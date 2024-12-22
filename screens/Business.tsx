@@ -16,11 +16,13 @@ import TextBody2 from "../components/utils/texts/Body2";
 import TextBody1 from "../components/utils/texts/Body1";
 
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
+import { useFocusEffect } from "@react-navigation/native";
+import { OrderData } from "../types/API";
 const FontAwesome = _Fontawesome as React.ElementType;
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "BusinessCenter"
+  "TabNavigatorProducer"
 >;
 type Props = {
   navigation: ProfileScreenNavigationProp;
@@ -32,28 +34,32 @@ export default function BusinessScreen({ navigation }: Props) {
   const [orders, setOrders] = useState<string[]>([]);
   const [nbrOrders, setNbrOrders] = useState<string | undefined>();
 
-  useEffect(() => {
-    (async () => {
-      const token = await getToken();
+  const fetchOrders = async () => {
+    const token = await getToken();
 
-      const responseAll = await producerTools.getAllOrders(token);
+    const responseAll = await producerTools.getAllOrders(token);
 
-      if ("message" in responseAll) {
-        Alert.alert("Erreur", responseAll.message);
-      } else {
-        setNbrOrders(responseAll.length);
-      }
+    if ("message" in responseAll) {
+      Alert.alert("Erreur", responseAll.message);
+    } else {
+      setNbrOrders(responseAll.length);
+    }
 
-      const response = await producerTools.getLastThreeOrders(token);
+    const response = await producerTools.getLastThreeOrders(token);
 
-      if ("message" in response) {
-        Alert.alert("Erreur", response.message);
-        console.log(response.message);
-      } else {
-        setOrders(response);
-      }
-    })();
-  }, []);
+    if ("message" in response) {
+      Alert.alert("Erreur", response.message);
+      console.log(response.message);
+    } else {
+      setOrders(response);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchOrders();
+    }, []),
+  );
 
   const handlePressCard = (order: OrderData) => {
     navigation.navigate("TabNavigatorProducer", {

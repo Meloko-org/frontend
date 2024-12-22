@@ -19,7 +19,7 @@ import Spinner from "../components/utils/Spinner";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "Sales"
+  "TabNavigatorProducer"
 >;
 type Props = {
   navigation: ProfileScreenNavigationProp;
@@ -29,11 +29,10 @@ export default function SalesScreen({ navigation }: Props) {
   const { colorScheme, toggleColorScheme } = useColorScheme();
   const { getToken } = useAuth();
   const [orders, setOrders] = useState<OrderData[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isFetchLoading, setIsFetchLoading] = useState<boolean>(true);
 
   const fetchOrders = async () => {
     try {
-      setIsLoading(true);
       const token = await getToken();
       const response = await producerTools.getAllOrders(token);
 
@@ -46,7 +45,7 @@ export default function SalesScreen({ navigation }: Props) {
     } catch (error) {
       console.error("Erreur lors de la récupération des commandes.");
     } finally {
-      setIsLoading(false);
+      setIsFetchLoading(false);
     }
   };
 
@@ -82,7 +81,7 @@ export default function SalesScreen({ navigation }: Props) {
   const nbrOrders = orders ? orders.length.toString() : 0;
 
   // console.log(JSON.stringify(orders, null, 2));
-  console.log(orderCards);
+  // console.log(orderCards);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -94,7 +93,7 @@ export default function SalesScreen({ navigation }: Props) {
           Ventes en cours ({nbrOrders})
         </TextHeading2>
 
-        {isLoading ? <Spinner /> : orderCards}
+        {isFetchLoading ? <Spinner /> : orderCards}
       </ScrollView>
     </SafeAreaView>
   );

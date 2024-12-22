@@ -1,21 +1,34 @@
-import React, { useState } from "react";
-import { SafeAreaView, ScrollView, View, Modal, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "@clerk/clerk-expo";
+import { useSelector } from "react-redux";
+import { useFocusEffect } from "@react-navigation/native";
+
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
-import TextHeading2 from "../../components/utils/texts/Heading2";
-import { useSelector } from "react-redux";
+
+import { UserState } from "../../reducers/user";
+import { OrderData } from "../../types/API";
+
+import orderTools from "../../modules/orderTools";
+
+import { View, Modal, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-gesture-handler";
+
 import CardOrder from "../../components/cards/Order";
-import ButtonBack from "../../components/utils/buttons/Back";
+import CardProduct from "../../components/cards/Product";
 import CardProducer from "../../components/cards/ProducerSearchResult";
+import ButtonBack from "../../components/utils/buttons/Back";
+import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
-import CardProduct from "../../components/cards/Product";
 import BadgeWithdrawStatus from "../../components/utils/badges/WithdrawStatus";
-import { UserState } from "../../reducers/user";
+import BackLabelButton from "../../components/utils/buttons/BackLabel";
+import Spinner from "../../components/utils/Spinner";
 
 type OrdersScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "OrdersCustomer"
+  "TabNavigatorUser"
 >;
 
 type Props = {
@@ -25,12 +38,52 @@ type Props = {
 export default function OrdersCustomerScreen({
   navigation,
 }: Props): JSX.Element {
+  const { getToken } = useAuth();
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
   );
   const [isOrderDetailModalVisible, setIsOrderDetailModalVisible] =
-    useState(false);
+    useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [fetchedOrders, setFetchedOrders] = useState();
+
+  const fetchOrders = async () => {
+    try {
+      const token = await getToken();
+      const ordersPromise = await orderTools.getOrdersByUser(
+        token,
+        userStore._id,
+      );
+      const orderCards = ordersPromise.map((o: OrderData) => {
+        return (
+          <CardOrder
+            key={o._id}
+            orderData={o}
+            extraClasses="mb-2"
+            onPressFn={() => handleOrderDetailPress(o)}
+          />
+        );
+      });
+      setFetchedOrders(orderCards);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des commandes.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOrderDetailPress = (order: OrderData) => {
+    // console.log("click :", order)
+    setIsOrderDetailModalVisible(true);
+    setSelectedOrder(order);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchOrders();
+    }, []),
+  );
 
   let clickCollectOrdersDisplay = <></>;
   let marketOrdersDisplay = <></>;
@@ -43,8 +96,13 @@ export default function OrdersCustomerScreen({
       (d) => d.withdrawMode === "market",
     );
 
+    console.log("clickcollectOrders :", clickCollectOrders.length);
+    console.log("marketOrders :", marketOrders.length);
+
     clickCollectOrdersDisplay = clickCollectOrders.map((cco) => {
+      console.log("cco :", cco);
       const productList = cco.products.map((p) => {
+        console.log("p :", p);
         return (
           <CardProduct
             stockData={{
@@ -86,6 +144,7 @@ export default function OrdersCustomerScreen({
     });
 
     marketOrdersDisplay = marketOrders.map((mo) => {
+      console.log("mo :", mo);
       const productList = mo.products.map((p) => {
         return (
           <CardProduct
@@ -127,11 +186,6 @@ export default function OrdersCustomerScreen({
     });
   }
 
-  const handleOrderDetailPress = (order) => {
-    setIsOrderDetailModalVisible(true);
-    setSelectedOrder(order);
-  };
-
   const orders =
     userStore.orders && userStore.orders.length > 0 ? (
       userStore.orders.map((o) => {
@@ -151,19 +205,21 @@ export default function OrdersCustomerScreen({
       </>
     );
 
-  console.log(
-    "------------------------------- ORDERS --------------------------------------------------------------------",
-  );
-  console.log("userStore: ", userStore);
-  console.log("selectedOrder: ", selectedOrder);
+  console.log("orders :", JSON.stringify(fetchedOrders, null, 2));
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <View className="flex-1">
-        <TextHeading2 extraClasses="mb-5">Mes commandes</TextHeading2>
+        <TextHeading2 centered extraClasses="mt-2 mb-2">
+          Mes commandes
+        </TextHeading2>
 
         <ScrollView className="flex-1">
-          <View className="p-3">{orders}</View>
+          <View className="p-3">
+            {isLoading ? <Spinner /> : fetchedOrders}
+
+            {/* {orders} */}
+          </View>
         </ScrollView>
 
         <Modal
@@ -173,10 +229,15 @@ export default function OrdersCustomerScreen({
           className="p-3"
         >
           <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-            <View className="p-3 justify-center items-center">
-              <ButtonBack
+            <View className="flex flex-row mb-5 mt-3">
+              <BackLabelButton
                 onPressFn={() => setIsOrderDetailModalVisible(false)}
-              />
+                extraClasses="ml-5"
+              >
+                Retour aux commandes
+              </BackLabelButton>
+            </View>
+            <View className="flex-1 p-3 justify-center items-center">
               {selectedOrder && (
                 <>
                   <TextHeading2 extraClasses="mb-1">{`Commande n° ${selectedOrder._id.slice(0, 7)}`}</TextHeading2>

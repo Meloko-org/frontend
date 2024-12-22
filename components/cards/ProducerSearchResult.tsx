@@ -23,6 +23,9 @@ export default function CardProducerSearchResult(
 ): JSX.Element {
   console.log("mode :", props.displayMode);
   console.log("shopData :", props.shopData);
+  // console.log("withdrawData :", props.withdrawData.length)
+  // console.log("relevants: ", props.shopData.searchData.relevantProducts.length)
+
   return (
     <TouchableOpacity onPress={props.onPressFn}>
       <View
