@@ -7,6 +7,18 @@ const formatDateToFr = (isoDate: Date) => {
   }).format(date);
 };
 
+const formatQuantity = (quantity: number, unit: string) => {
+  if (unit === "gr") {
+    if (quantity < 1000) {
+      return `${quantity} gr`;
+    } else {
+      return `${(quantity / 1000).toFixed(1)} kg`;
+    }
+  }
+  return `${quantity}`;
+};
+
 export default {
   formatDateToFr,
+  formatQuantity,
 };

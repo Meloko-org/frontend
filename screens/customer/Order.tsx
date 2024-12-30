@@ -73,7 +73,7 @@ export default function OrderCustomerScreen({
             }}
             key={p.product._id}
             extraClasses="mb-1"
-            displayMode="cart"
+            displayMode="detail"
           />
         );
       });
@@ -131,7 +131,7 @@ export default function OrderCustomerScreen({
             }}
             key={p.product._id}
             extraClasses="mb-1"
-            displayMode="cart"
+            displayMode="detail"
           />
         );
       });
@@ -165,7 +165,7 @@ export default function OrderCustomerScreen({
                 <TextHeading4>{mo.withdrawMarket}</TextHeading4>
               </View>
               <View>
-                <TextHeading4> {weekDays[mo.withdrawDay]}</TextHeading4>
+                <TextHeading4> {weekDays[mo.withdrawDay - 1]}</TextHeading4>
               </View>
             </View>
           </View>

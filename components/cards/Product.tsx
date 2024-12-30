@@ -7,6 +7,7 @@ import { GestureResponderEvent } from "react-native";
 import { StockData } from "../../types/API";
 import TextBody1 from "../utils/texts/Body1";
 import PricePer from "../utils/badges/Dark";
+import PriceBadge from "../utils/badges/Price";
 import ButtonIcon from "../utils/buttons/Icon";
 import BadgeGrey from "../utils/badges/Grey";
 import TextHeading4 from "../utils/texts/Heading4";
@@ -18,7 +19,7 @@ import {
   CartState,
 } from "../../reducers/cart";
 import { ProductData } from "../../types/API";
-import PriceBadge from "../utils/badges/Price";
+import orderTools from "../../modules/orderTools";
 
 const FontAwesome = _Fontawesome as React.ElementType;
 
@@ -26,7 +27,7 @@ type CardProductProps = {
   stockData?: StockData;
   onPressFn?: ((event: GestureResponderEvent) => void) | undefined;
   extraClasses?: string;
-  displayMode: "cart" | "shop" | "withdraw" | "validation";
+  displayMode: "cart" | "shop" | "withdraw" | "validation" | "detail";
   quantityControllable?: boolean;
   showImage?: boolean;
 };
@@ -173,10 +174,27 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
           >
             <TextBody1 extraClasses="mb-1">{`${props.stockData.product.family.name} ${props.stockData.product.name}`}</TextBody1>
             {/* <PricePer>{`${props.stockData.price.$numberDecimal} € / ${props.stockData.product.weight.measurement.$numberDecimal}${props.stockData.product.weight.unit}`}</PricePer> */}
-            <PricePer>{`${props.stockData.price.$numberDecimal} € / ${unit}`}</PricePer>
-            <View className="flex flex-row justify-start items-center">
+
+            {props.displayMode === "detail" ? (
+              <PriceBadge
+                colour="bg-white"
+                extraClasses="px-2"
+                textClasses="font-bold"
+              >
+                {orderTools
+                  .getProductCost(
+                    props.stockData?.price.$numberDecimal,
+                    props.stockData?.quantity,
+                    props.stockData?.product.weight.unit,
+                  )
+                  .toFixed(2)}
+              </PriceBadge>
+            ) : (
+              <PricePer>{`${props.stockData?.price.$numberDecimal} € / ${unit}`}</PricePer>
+            )}
+            {/* <View className="flex flex-row justify-start items-center">
               {tags}
-            </View>
+            </View> */}
           </View>
         </View>
 

@@ -148,10 +148,23 @@ function getOrderStatus(order: OrderData): GlobalOrderStatus {
   return "pending";
 }
 
+// calcule le prix du produit commandé
+const getProductCost = (
+  price: string | undefined,
+  quantity: number,
+  unit: string | undefined,
+) => {
+  if (unit === "gr") {
+    quantity /= 1000;
+  }
+  return Number(price) * quantity;
+};
+
 export default {
   getOrderDetailsById,
   validateOrder,
   getOrdersByUser,
   getOrderStatus,
   buildUpdatedOrder,
+  getProductCost,
 };

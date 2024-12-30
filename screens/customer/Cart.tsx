@@ -26,22 +26,7 @@ export default function CartScreen({ navigation }) {
   useEffect(() => {
     if (cartStore.length > 0) {
       let allShopsCost = CartTools.getTotalCost(cartStore);
-      /*
-      let allShopsCost = 0;
-      cartStore.forEach((c) => {
-        const cartTotalCost = c.products.reduce((accumulator, currentValue) => {
-          const quantity =
-            currentValue.stockData.product.weight.unit === "gr"
-              ? currentValue.quantity / 1000
-              : currentValue.quantity;
 
-          return (
-            quantity * Number(currentValue.stockData.price.$numberDecimal) +
-            accumulator
-          );
-        }, 0);
-        allShopsCost += cartTotalCost;
-      });*/
       setCartTotal(allShopsCost);
     }
   }, [cartStore]);
@@ -105,7 +90,7 @@ export default function CartScreen({ navigation }) {
                 isLoading={false}
                 onPressFn={() =>
                   navigation.navigate("TabNavigatorUser", {
-                    screen: "Accueil",
+                    screen: "Search",
                     params: {
                       search: {},
                     },

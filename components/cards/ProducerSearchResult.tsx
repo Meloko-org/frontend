@@ -69,10 +69,10 @@ export default function CardProducerSearchResult(
             />
             {props.shopData?.searchData &&
               props.shopData.searchData.relevantProducts && (
-                <BadgeSecondary>{`${props.shopData.searchData.relevantProducts.length} produit que vous recherchez`}</BadgeSecondary>
+                <BadgeSecondary extraClasses="px-2">{`${props.shopData.searchData.relevantProducts.length} produit que vous recherchez`}</BadgeSecondary>
               )}
             {props.displayMode === "order" && (
-              <BadgeSecondary>{`${props.withdrawData.length} produit${props.withdrawData.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
+              <BadgeSecondary extraClasses="px-2">{`${props.withdrawData.length} produit${props.withdrawData.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
             )}
             {props.displayMode === "mapCallout" ||
               (props.displayMode === "bottomSheet" && (
@@ -85,7 +85,7 @@ export default function CardProducerSearchResult(
             <ButtonIcon
               iconName="location-arrow"
               onPressFn={() => console.log("open google map")}
-              extraClasses="w-full h-full"
+              extraClasses="w-[50px] h-[50px] bg-success"
             />
           </View>
         )}

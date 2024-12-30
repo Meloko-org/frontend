@@ -10,8 +10,9 @@ import { UserState } from "../../reducers/user";
 import { OrderData } from "../../types/API";
 
 import orderTools from "../../modules/orderTools";
+import globalTools from "../../modules/globalTools";
 
-import { View, Modal, Alert } from "react-native";
+import { View, Modal, Alert, Text, TextBase } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 
@@ -21,10 +22,14 @@ import CardProducer from "../../components/cards/ProducerSearchResult";
 import ButtonBack from "../../components/utils/buttons/Back";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
+import TextHeading4 from "../../components/utils/texts/Heading4";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import BadgeWithdrawStatus from "../../components/utils/badges/WithdrawStatus";
 import BackLabelButton from "../../components/utils/buttons/BackLabel";
 import Spinner from "../../components/utils/Spinner";
+import OrderStatusBadge from "../../components/utils/badges/OrderStatus";
+import Custom from "../../components/utils/buttons/Custom";
+import TextBody1 from "../../components/utils/texts/Body1";
 
 type OrdersScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -56,6 +61,7 @@ export default function OrdersCustomerScreen({
         userStore._id,
       );
       const orderCards = ordersPromise.map((o: OrderData) => {
+        console.log("o :", JSON.stringify(o, null, 2));
         return (
           <CardOrder
             key={o._id}
@@ -74,7 +80,7 @@ export default function OrdersCustomerScreen({
   };
 
   const handleOrderDetailPress = (order: OrderData) => {
-    // console.log("click :", order)
+    console.log("click :", JSON.stringify(order, null, 2));
     setIsOrderDetailModalVisible(true);
     setSelectedOrder(order);
   };
@@ -100,25 +106,55 @@ export default function OrdersCustomerScreen({
     console.log("marketOrders :", marketOrders.length);
 
     clickCollectOrdersDisplay = clickCollectOrders.map((cco) => {
-      console.log("cco :", cco);
+      // const productList = cco.products.map((p) => {
+      //   return (
+      //     <CardProduct
+      //       stockData={{
+      //         ...p.product,
+      //         notes: cco.shop.notes,
+      //         quantity: p.quantity,
+      //       }}
+      //       key={p.product._id}
+      //       extraClasses="mb-1"
+      //       displayMode="detail"
+      //     />
+      //   );
+      // });
+
       const productList = cco.products.map((p) => {
-        console.log("p :", p);
         return (
-          <CardProduct
-            stockData={{
-              ...p.product,
-              notes: cco.shop.notes,
-              quantity: p.quantity,
-            }}
-            key={p.product._id}
-            extraClasses="mb-1"
-            displayMode="cart"
-          />
+          <View className="flex flex-row justify-between w-full px-2">
+            <View className="w-4/6">
+              <TextBody1>
+                {p.product.product.family.name} {p.product.product.name}
+              </TextBody1>
+            </View>
+            <View className="w-1/6">
+              <TextBody1 centered>
+                {globalTools.formatQuantity(
+                  p.quantity,
+                  p.product.product.weight.unit,
+                )}
+              </TextBody1>
+            </View>
+            <View className="w-1/6">
+              <TextBody1 centered>
+                {orderTools
+                  .getProductCost(
+                    p.product.price.$numberDecimal,
+                    p.quantity,
+                    p.product.product.weight.unit,
+                  )
+                  .toFixed(2)}{" "}
+                €
+              </TextBody1>
+            </View>
+          </View>
         );
       });
 
       return (
-        <View key={cco._id} className="my-2 flex items-center">
+        <View key={cco._id} className="mb-5 flex items-center">
           <CardProducer
             shopData={cco.shop}
             withdrawData={cco.products}
@@ -138,25 +174,91 @@ export default function OrdersCustomerScreen({
               });
             }}
           />
-          {productList}
+
+          <View className="w-full divide-y divide-dashed divide-black dark:divide-white mt-1">
+            <View className="mb-1">{productList}</View>
+
+            <View className="flex flex-row justify-between w-full px-1 pt-1">
+              <View>
+                <TextHeading4>Total :</TextHeading4>
+              </View>
+              <View className="pr-1">
+                <TextHeading3>
+                  {parseFloat(cco.shopTotalPrice.$numberDecimal).toFixed(2)} €
+                </TextHeading3>
+              </View>
+            </View>
+          </View>
+
+          <View className="flex flex-row w-full justify-between">
+            <View className="flex flex-row items-center rounded-lg bg-white dark:bg-tertiary py-2 px-5 mb-2">
+              <Text className="text-dark dark:text-white">Status : </Text>
+              <OrderStatusBadge
+                status={cco.status}
+                extraClasses="ml-2 px-2 py-1"
+              />
+            </View>
+            <View>
+              {cco.status === "validated" && (
+                <Custom
+                  extraClasses="rounded-lg p-2 h-[40px] bg-success"
+                  textClasses="text-white"
+                  label="Afficher QR code"
+                  onPressFn={() => {}}
+                />
+              )}
+            </View>
+          </View>
         </View>
       );
     });
 
     marketOrdersDisplay = marketOrders.map((mo) => {
       console.log("mo :", mo);
+      // const productList = mo.products.map((p) => {
+      //   return (
+      //     <CardProduct
+      //       stockData={{
+      //         ...p.product,
+      //         notes: mo.shop.notes,
+      //         quantity: p.quantity,
+      //       }}
+      //       key={p.product._id}
+      //       extraClasses="mb-1"
+      //       displayMode="detail"
+      //     />
+      //   );
+      // });
+
       const productList = mo.products.map((p) => {
         return (
-          <CardProduct
-            stockData={{
-              ...p.product,
-              notes: mo.shop.notes,
-              quantity: p.quantity,
-            }}
-            key={p.product._id}
-            extraClasses="mb-1"
-            displayMode="cart"
-          />
+          <View className="flex flex-row justify-between w-full px-2">
+            <View className="w-4/6">
+              <TextBody1>
+                {p.product.product.family.name} {p.product.product.name}
+              </TextBody1>
+            </View>
+            <View className="w-1/6">
+              <TextBody1 centered>
+                {globalTools.formatQuantity(
+                  p.quantity,
+                  p.product.product.weight.unit,
+                )}
+              </TextBody1>
+            </View>
+            <View className="w-1/6">
+              <TextBody1 centered>
+                {orderTools
+                  .getProductCost(
+                    p.product.price.$numberDecimal,
+                    p.quantity,
+                    p.product.product.weight.unit,
+                  )
+                  .toFixed(2)}{" "}
+                €
+              </TextBody1>
+            </View>
+          </View>
         );
       });
       return (
@@ -180,30 +282,44 @@ export default function OrdersCustomerScreen({
               });
             }}
           />
-          {productList}
+
+          <View className="w-full divide-y divide-dashed divide-black dark:divide-white mt-1">
+            <View className="mb-1">{productList}</View>
+            <View className="flex flex-row justify-between w-full px-1 pt-1">
+              <View>
+                <TextHeading4>Total :</TextHeading4>
+              </View>
+              <View className="pr-1">
+                <TextHeading3>
+                  {parseFloat(mo.shopTotalPrice.$numberDecimal)} €
+                </TextHeading3>
+              </View>
+            </View>
+          </View>
+
+          <View className="flex flex-row w-full justify-between">
+            <View className="flex flex-row items-center rounded-lg bg-white dark:bg-tertiary py-2 px-5 mb-2">
+              <Text className="text-dark dark:text-white">Status : </Text>
+              <OrderStatusBadge
+                status={mo.status}
+                extraClasses="ml-2 px-2 py-1"
+              />
+            </View>
+            <View>
+              {mo.status === "validated" && (
+                <Custom
+                  extraClasses="rounded-lg p-2 h-[40px] bg-success"
+                  textClasses="text-white"
+                  label="Afficher QR code"
+                  onPressFn={() => {}}
+                />
+              )}
+            </View>
+          </View>
         </View>
       );
     });
   }
-
-  const orders =
-    userStore.orders && userStore.orders.length > 0 ? (
-      userStore.orders.map((o) => {
-        return (
-          <View key={o._id}>
-            <CardOrder
-              orderData={o}
-              extraClasses="mb-2"
-              onPressFn={() => handleOrderDetailPress(o)}
-            />
-          </View>
-        );
-      })
-    ) : (
-      <>
-        <TextHeading2>Vous n'avez pas de commande :(</TextHeading2>
-      </>
-    );
 
   console.log("orders :", JSON.stringify(fetchedOrders, null, 2));
 
@@ -229,7 +345,7 @@ export default function OrdersCustomerScreen({
           className="p-3"
         >
           <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-            <View className="flex flex-row mb-5 mt-3">
+            <View className="flex flex-row mb-1 mt-3">
               <BackLabelButton
                 onPressFn={() => setIsOrderDetailModalVisible(false)}
                 extraClasses="ml-5"
@@ -240,21 +356,24 @@ export default function OrdersCustomerScreen({
             <View className="flex-1 p-3 justify-center items-center">
               {selectedOrder && (
                 <>
-                  <TextHeading2 extraClasses="mb-1">{`Commande n° ${selectedOrder._id.slice(0, 7)}`}</TextHeading2>
-                  <TextHeading3 extraClasses="mb-1" centered>
+                  <TextHeading3
+                    extraClasses="mb-1"
+                    centered
+                  >{`Commande n° ${selectedOrder._id.slice(0, 7)}`}</TextHeading3>
+                  <TextHeading4 extraClasses="mb-1" centered>
                     {new Date(selectedOrder.createdAt).toLocaleString()}
-                  </TextHeading3>
+                  </TextHeading4>
                   <BadgeWithdrawStatus
-                    type={selectedOrder.isWithdrawn ? "full" : "none"}
-                    extraClasses="w-[100px] mb-4"
+                    type={orderTools.getOrderStatus(selectedOrder)}
+                    extraClasses="mb-5"
                   />
                   <ScrollView showsVerticalScrollIndicator={false}>
                     <View className="items-center">
                       {clickCollectOrdersDisplay.length > 0 && (
                         <>
-                          <TextHeading2 centered extraClasses="mb-2">
-                            Click & Collect
-                          </TextHeading2>
+                          <TextHeading4 centered extraClasses="mb-2">
+                            Retrait en Click & Collect
+                          </TextHeading4>
                           <ButtonPrimaryEnd
                             label="Itinéraire optimal"
                             iconName="location-arrow"
@@ -264,10 +383,11 @@ export default function OrdersCustomerScreen({
                         </>
                       )}
                       {clickCollectOrdersDisplay}
+
                       {marketOrdersDisplay.length > 0 && (
-                        <TextHeading2 centered extraClasses="mb-2">
-                          Marchés locaux
-                        </TextHeading2>
+                        <TextHeading4 centered extraClasses="mb-2">
+                          Retrait sur Marchés locaux
+                        </TextHeading4>
                       )}
                       {marketOrdersDisplay}
                     </View>
