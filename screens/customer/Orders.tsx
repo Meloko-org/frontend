@@ -30,6 +30,7 @@ import Spinner from "../../components/utils/Spinner";
 import OrderStatusBadge from "../../components/utils/badges/OrderStatus";
 import Custom from "../../components/utils/buttons/Custom";
 import TextBody1 from "../../components/utils/texts/Body1";
+import QRCodeModal from "../../components/modals/user/QRCodeModal";
 
 type OrdersScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -50,8 +51,11 @@ export default function OrdersCustomerScreen({
   const [isOrderDetailModalVisible, setIsOrderDetailModalVisible] =
     useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedSubOrderId, setSelectedSubOrderId] = useState<string | null>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchedOrders, setFetchedOrders] = useState();
+  const [isQRCodeModalVisible, setQRCodeModalVisible] =
+    useState<boolean>(false);
 
   const fetchOrders = async () => {
     try {
@@ -91,6 +95,16 @@ export default function OrdersCustomerScreen({
     }, []),
   );
 
+  const handleQRCodePress = (id: string) => {
+    setSelectedSubOrderId(id);
+    setQRCodeModalVisible(true);
+  };
+
+  const closeQRCodeModal = () => {
+    setQRCodeModalVisible(false);
+    setSelectedSubOrderId(null);
+  };
+
   let clickCollectOrdersDisplay = <></>;
   let marketOrdersDisplay = <></>;
 
@@ -101,9 +115,6 @@ export default function OrdersCustomerScreen({
     const marketOrders = selectedOrder.details.filter(
       (d) => d.withdrawMode === "market",
     );
-
-    console.log("clickcollectOrders :", clickCollectOrders.length);
-    console.log("marketOrders :", marketOrders.length);
 
     clickCollectOrdersDisplay = clickCollectOrders.map((cco) => {
       // const productList = cco.products.map((p) => {
@@ -204,7 +215,7 @@ export default function OrdersCustomerScreen({
                   extraClasses="rounded-lg p-2 h-[40px] bg-success"
                   textClasses="text-white"
                   label="Afficher QR code"
-                  onPressFn={() => {}}
+                  onPressFn={() => handleQRCodePress(cco._id)}
                 />
               )}
             </View>
@@ -311,7 +322,7 @@ export default function OrdersCustomerScreen({
                   extraClasses="rounded-lg p-2 h-[40px] bg-success"
                   textClasses="text-white"
                   label="Afficher QR code"
-                  onPressFn={() => {}}
+                  onPressFn={() => handleQRCodePress(mo._id)}
                 />
               )}
             </View>
@@ -395,6 +406,12 @@ export default function OrdersCustomerScreen({
                 </>
               )}
             </View>
+
+            <QRCodeModal
+              visible={isQRCodeModalVisible}
+              onClose={closeQRCodeModal}
+              id={selectedSubOrderId}
+            />
           </SafeAreaView>
         </Modal>
       </View>
