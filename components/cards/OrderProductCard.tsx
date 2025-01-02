@@ -48,8 +48,10 @@ export default function OrderProductCard(
     return `${quantity}`;
   };
 
-  const getPrice = (price: number, quantity: number) => {
-    return ((quantity / 1000) * price).toFixed(2);
+  const getPrice = (price: number, quantity: number, unit: string) => {
+    return unit === "gr"
+      ? ((quantity / 1000) * price).toFixed(2)
+      : (quantity * price).toFixed(2);
   };
 
   const tags =
@@ -136,6 +138,7 @@ export default function OrderProductCard(
                       {getPrice(
                         props.orderProductData.product.price.$numberDecimal,
                         props.orderProductData.quantity,
+                        props.orderProductData?.product.product.weight.unit,
                       )}{" "}
                       €
                     </TextBody1>

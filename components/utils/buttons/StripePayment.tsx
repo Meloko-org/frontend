@@ -117,6 +117,7 @@ export default function StripePaymentButton(props: StripPaymentButtonProps) {
         setIsPaymentScreenLoading(false);
 
         console.log("juste avant redirection vers orderCostumerScreen");
+        console.log("order :", order);
 
         props.navigation.navigate("TabNavigatorUser", {
           screen: "OrderCustomer",

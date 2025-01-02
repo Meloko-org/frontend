@@ -18,6 +18,7 @@ import CardProduct from "../components/cards/Product";
 
 import productsTools from "../modules/productsTools";
 import orderTools from "../modules/orderTools";
+import globalTools from "../modules/globalTools";
 import OrderProductCard from "../components/cards/OrderProductCard";
 import Custom from "../components/utils/buttons/Custom";
 import { ShopState } from "../reducers/shop";
@@ -98,7 +99,7 @@ export default function OrderDetailsScreen({ route }: OrderDetailsProps) {
 
     if (shopDetails.withdrawMode === "market") {
       setWithdrawMarket(shopDetails.withdrawMarket);
-      setWithdrawDay(weekDays[shopDetails.withdrawDay]);
+      setWithdrawDay(globalTools.getWeekDayLabel[shopDetails.withdrawDay]);
     }
 
     console.log("      --> FONCTION getproduct");

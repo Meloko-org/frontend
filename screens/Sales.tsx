@@ -69,7 +69,7 @@ export default function SalesScreen({ navigation }: Props) {
       <OrderStatus
         key={order._id}
         orderData={order}
-        extraClasses="mb-3"
+        extraClasses="mb-2"
         onPressFn={() => {
           console.log("clicked order: ", order._id);
           handlePressCard(order);

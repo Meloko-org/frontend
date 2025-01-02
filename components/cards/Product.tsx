@@ -177,8 +177,8 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 
             {props.displayMode === "detail" ? (
               <PriceBadge
-                colour="bg-white"
-                extraClasses="px-2"
+                colour="bg-secondary"
+                extraClasses="px-2 py-1"
                 textClasses="font-bold"
               >
                 {orderTools

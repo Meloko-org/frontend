@@ -4,7 +4,7 @@ import { Text, View } from "react-native";
 type PriceBadgeProps = {
   colour: string;
   extraClasses?: string;
-  value: string;
+  value?: string;
   textClasses?: string;
   children: string;
 };
@@ -19,7 +19,7 @@ export default function PriceBadge({
   return (
     <View className={`${extraClasses} ${colour} rounded-lg`}>
       <Text
-        className={`${textClasses} text-lightbg dark:text-darkbg text-center`}
+        className={`${textClasses} text-darkbg dark:text-lightbg text-center`}
       >
         {children} €
       </Text>

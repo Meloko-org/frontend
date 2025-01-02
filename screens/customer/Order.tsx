@@ -201,7 +201,7 @@ export default function OrderCustomerScreen({
           extraClasses="mb-4"
         >{`Commande n° ${route.params.orderId.slice(0, 7)}`}</TextHeading4>
         <View className="rounded-lg bg-danger p-3 mb-3">
-          <Text className="font-bold text-white text-center text-[20px]">{`Montant total: ${newOrderDetails?.totalPrice.$numberDecimal}`}</Text>
+          <Text className="font-bold text-white text-center text-[20px]">{`Montant total: ${newOrderDetails?.totalPrice.$numberDecimal} €`}</Text>
         </View>
 
         <ScrollView

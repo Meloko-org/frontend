@@ -18,7 +18,22 @@ const formatQuantity = (quantity: number, unit: string) => {
   return `${quantity}`;
 };
 
+const weekDayLabels = [
+  "Lundi",
+  "Mardi",
+  "Mercredi",
+  "Jeudi",
+  "Vendredi",
+  "Samedi",
+  "Dimanche",
+];
+
+const getWeekDayLabel = (day: number): String => {
+  return weekDayLabels[day - 1];
+};
+
 export default {
   formatDateToFr,
   formatQuantity,
+  getWeekDayLabel,
 };

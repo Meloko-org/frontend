@@ -14,6 +14,7 @@ import TextBody1 from "../utils/texts/Body1";
 import OrderStatusBadge from "../utils/badges/OrderStatus";
 import BadgeSecondary from "../utils/badges/Secondary";
 import BlackBadge from "../utils/badges/Black";
+import TextBody2 from "../utils/texts/Body2";
 
 type OrderStatusProps = {
   orderData: OrderData | undefined;
@@ -46,27 +47,39 @@ export default function OrderStatus(props: OrderStatusProps): JSX.Element {
           </TextHeading4>
         </View>
 
+        <View className="flex flex-row items-center justify-between w-full mb-1">
+          <View>
+            <BlackBadge extraClasses="py-1 px-2">{`N°${props.orderData?._id.slice(0, 7)}`}</BlackBadge>
+          </View>
+          <View>
+            <TextBody1 extraClasses="pr-3">
+              {globalTools.formatDateToFr(props.orderData.createdAt)}
+            </TextBody1>
+          </View>
+          <View>
+            <BadgeSecondary
+              extraClasses="px-2"
+              textClasses="font-bold"
+            >{`${shopDetails?.shopTotalPrice.$numberDecimal} €`}</BadgeSecondary>
+          </View>
+        </View>
+
         <View className="flex flex-row justify-between items-center w-full">
           <View className="h-full items-start w-4/6">
-            <View className="flex flex-row w-full items-center justify-between mb-2">
-              <View>
-                <BlackBadge extraClasses="py-1 px-2">{`N°${props.orderData?._id.slice(0, 7)}`}</BlackBadge>
-              </View>
-              <View>
-                <TextBody1 extraClasses="pr-3">
-                  {globalTools.formatDateToFr(props.orderData.createdAt)}
-                </TextBody1>
-              </View>
-            </View>
-            <View className="flex flex-row justify-between w-full">
-              <BadgeSecondary
-                extraClasses="px-2"
-                textClasses="font-bold"
-              >{`${shopDetails?.shopTotalPrice.$numberDecimal} €`}</BadgeSecondary>
+            <View>
               <BadgeSecondary extraClasses="px-2 mr-3" textClasses="font-bold">
                 {shopDetails?.withdrawMode}
               </BadgeSecondary>
             </View>
+
+            {shopDetails?.withdrawMode === "market" && (
+              <View className="ml-2">
+                <TextBody1>{shopDetails?.withdrawMarket}</TextBody1>
+                <TextBody2>
+                  {globalTools.getWeekDayLabel(shopDetails?.withdrawDay)}
+                </TextBody2>
+              </View>
+            )}
           </View>
 
           <View className="w-2/6">

@@ -31,6 +31,8 @@ import OrderStatusBadge from "../../components/utils/badges/OrderStatus";
 import Custom from "../../components/utils/buttons/Custom";
 import TextBody1 from "../../components/utils/texts/Body1";
 import QRCodeModal from "../../components/modals/user/QRCodeModal";
+import TextBody2 from "../../components/utils/texts/Body2";
+import PriceBadge from "../../components/utils/badges/Price";
 
 type OrdersScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -134,19 +136,19 @@ export default function OrdersCustomerScreen({
 
       const productList = cco.products.map((p) => {
         return (
-          <View className="flex flex-row justify-between w-full px-2">
+          <View className="flex flex-row justify-between items-center w-full px-2">
             <View className="w-4/6">
               <TextBody1>
                 {p.product.product.family.name} {p.product.product.name}
               </TextBody1>
             </View>
             <View className="w-1/6">
-              <TextBody1 centered>
+              <TextBody2 centered>
                 {globalTools.formatQuantity(
                   p.quantity,
                   p.product.product.weight.unit,
                 )}
-              </TextBody1>
+              </TextBody2>
             </View>
             <View className="w-1/6">
               <TextBody1 centered>
@@ -201,7 +203,7 @@ export default function OrdersCustomerScreen({
             </View>
           </View>
 
-          <View className="flex flex-row w-full justify-between">
+          <View className="flex flex-row w-full justify-between mt-2">
             <View className="flex flex-row items-center rounded-lg bg-white dark:bg-tertiary py-2 px-5 mb-2">
               <Text className="text-dark dark:text-white">Status : </Text>
               <OrderStatusBadge
@@ -243,19 +245,19 @@ export default function OrdersCustomerScreen({
 
       const productList = mo.products.map((p) => {
         return (
-          <View className="flex flex-row justify-between w-full px-2">
+          <View className="flex flex-row justify-between items-center w-full px-2">
             <View className="w-4/6">
               <TextBody1>
                 {p.product.product.family.name} {p.product.product.name}
               </TextBody1>
             </View>
             <View className="w-1/6">
-              <TextBody1 centered>
+              <TextBody2 centered>
                 {globalTools.formatQuantity(
                   p.quantity,
                   p.product.product.weight.unit,
                 )}
-              </TextBody1>
+              </TextBody2>
             </View>
             <View className="w-1/6">
               <TextBody1 centered>
@@ -302,13 +304,13 @@ export default function OrdersCustomerScreen({
               </View>
               <View className="pr-1">
                 <TextHeading3>
-                  {parseFloat(mo.shopTotalPrice.$numberDecimal)} €
+                  {parseFloat(mo.shopTotalPrice.$numberDecimal).toFixed(2)} €
                 </TextHeading3>
               </View>
             </View>
           </View>
 
-          <View className="flex flex-row w-full justify-between">
+          <View className="flex flex-row w-full justify-between mb-2">
             <View className="flex flex-row items-center rounded-lg bg-white dark:bg-tertiary py-2 px-5 mb-2">
               <Text className="text-dark dark:text-white">Status : </Text>
               <OrderStatusBadge
@@ -371,9 +373,23 @@ export default function OrdersCustomerScreen({
                     extraClasses="mb-1"
                     centered
                   >{`Commande n° ${selectedOrder._id.slice(0, 7)}`}</TextHeading3>
-                  <TextHeading4 extraClasses="mb-1" centered>
-                    {new Date(selectedOrder.createdAt).toLocaleString()}
-                  </TextHeading4>
+                  <View className="flex flex-row w-full items-center justify-around">
+                    <View>
+                      <TextHeading4 extraClasses="mb-1" centered>
+                        {new Date(selectedOrder.createdAt).toLocaleString()}
+                      </TextHeading4>
+                    </View>
+                    <View>
+                      <PriceBadge
+                        colour="bg-tertiary"
+                        extraClasses="px-3 py-1"
+                        textClasses="font-bold text-lg"
+                      >
+                        {selectedOrder.totalPrice.$numberDecimal}
+                      </PriceBadge>
+                    </View>
+                  </View>
+
                   <BadgeWithdrawStatus
                     type={orderTools.getOrderStatus(selectedOrder)}
                     extraClasses="mb-5"
@@ -385,12 +401,12 @@ export default function OrdersCustomerScreen({
                           <TextHeading4 centered extraClasses="mb-2">
                             Retrait en Click & Collect
                           </TextHeading4>
-                          <ButtonPrimaryEnd
+                          {/* <ButtonPrimaryEnd
                             label="Itinéraire optimal"
                             iconName="location-arrow"
                             onPressFn={() => console.log("open google map")}
                             extraClasses="w-80 mb-3"
-                          />
+                          /> */}
                         </>
                       )}
                       {clickCollectOrdersDisplay}
@@ -401,6 +417,24 @@ export default function OrdersCustomerScreen({
                         </TextHeading4>
                       )}
                       {marketOrdersDisplay}
+                    </View>
+                    <View>
+                      {selectedOrder.details.length > 1 && (
+                        <View className="flex flex-row justify-center items-center w-full">
+                          <View className="p-2 rounded-lg border border-darkbg dark:border-lightbg">
+                            <TextBody1 extraClasses="px-3 mb-2">
+                              Optimisez vos trajets et calculez un itinéraire
+                              optimal pour récupérer tous vos achats.
+                            </TextBody1>
+                            <ButtonPrimaryEnd
+                              label="Itinéraire optimal"
+                              iconName="location-arrow"
+                              onPressFn={() => console.log("open google map")}
+                              extraClasses=""
+                            />
+                          </View>
+                        </View>
+                      )}
                     </View>
                   </ScrollView>
                 </>
