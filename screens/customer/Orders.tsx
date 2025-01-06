@@ -53,7 +53,7 @@ export default function OrdersCustomerScreen({
   const [isOrderDetailModalVisible, setIsOrderDetailModalVisible] =
     useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [selectedSubOrderId, setSelectedSubOrderId] = useState<string | null>();
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchedOrders, setFetchedOrders] = useState();
   const [isQRCodeModalVisible, setQRCodeModalVisible] =
@@ -98,13 +98,13 @@ export default function OrdersCustomerScreen({
   );
 
   const handleQRCodePress = (id: string) => {
-    setSelectedSubOrderId(id);
+    setSelectedOrderId(id);
     setQRCodeModalVisible(true);
   };
 
   const closeQRCodeModal = () => {
     setQRCodeModalVisible(false);
-    setSelectedSubOrderId(null);
+    setSelectedOrderId(null);
   };
 
   let clickCollectOrdersDisplay = <></>;
@@ -217,7 +217,7 @@ export default function OrdersCustomerScreen({
                   extraClasses="rounded-lg p-2 h-[40px] bg-success"
                   textClasses="text-white"
                   label="Afficher QR code"
-                  onPressFn={() => handleQRCodePress(cco._id)}
+                  onPressFn={() => handleQRCodePress(selectedOrder._id)}
                 />
               )}
             </View>
@@ -324,7 +324,7 @@ export default function OrdersCustomerScreen({
                   extraClasses="rounded-lg p-2 h-[40px] bg-success"
                   textClasses="text-white"
                   label="Afficher QR code"
-                  onPressFn={() => handleQRCodePress(mo._id)}
+                  onPressFn={() => handleQRCodePress(selectedOrder._id)}
                 />
               )}
             </View>
@@ -444,7 +444,7 @@ export default function OrdersCustomerScreen({
             <QRCodeModal
               visible={isQRCodeModalVisible}
               onClose={closeQRCodeModal}
-              id={selectedSubOrderId}
+              id={selectedOrderId}
             />
           </SafeAreaView>
         </Modal>

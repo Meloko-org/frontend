@@ -31,6 +31,7 @@
     "eas-cli": "^10.2.4",
     "expo": "~51.0.24",
     "expo-auth-session": "^5.5.2",
+    "expo-camera": "~15.0.16",
     "expo-dev-client": "~4.0.25",
     "expo-linking": "^6.3.1",
     "expo-local-authentication": "^14.0.1",

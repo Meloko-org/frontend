@@ -16,6 +16,9 @@ import producerTools from "../modules/producerTools";
 import OrderStatus from "../components/cards/OrderStatus";
 import TextBody1 from "../components/utils/texts/Body1";
 import Spinner from "../components/utils/Spinner";
+import TextHeading3 from "../components/utils/texts/Heading3";
+import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
+import QRCodeScannerModal from "../components/modals/producer/QRCodeScannerModal";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -30,6 +33,7 @@ export default function SalesScreen({ navigation }: Props) {
   const { getToken } = useAuth();
   const [orders, setOrders] = useState<OrderData[]>([]);
   const [isFetchLoading, setIsFetchLoading] = useState<boolean>(true);
+  const [isScannerVisible, setScannerVisible] = useState<boolean>(false);
 
   const fetchOrders = async () => {
     try {
@@ -80,8 +84,18 @@ export default function SalesScreen({ navigation }: Props) {
 
   const nbrOrders = orders ? orders.length.toString() : 0;
 
+  const handleScan = (orderId: string) => {
+    console.log("orderId : ", orderId);
+    setScannerVisible(false);
+    navigation.navigate("TabNavigatorProducer", {
+      screen: "OrderDetails",
+      params: { orderId },
+    });
+  };
+
   // console.log(JSON.stringify(orders, null, 2));
   // console.log(orderCards);
+  console.log("isScannerVisible : ", isScannerVisible);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -93,8 +107,23 @@ export default function SalesScreen({ navigation }: Props) {
           Ventes en cours ({nbrOrders})
         </TextHeading2>
 
+        <View className="">
+          <ButtonPrimaryEnd
+            label="Scanner un QR Code"
+            iconName="qrcode"
+            onPressFn={() => setScannerVisible(true)}
+            extraClasses="mb-3"
+          />
+        </View>
+
         {isFetchLoading ? <Spinner /> : orderCards}
       </ScrollView>
+
+      <QRCodeScannerModal
+        isVisible={isScannerVisible}
+        onClose={() => setScannerVisible(false)}
+        onScan={handleScan}
+      />
     </SafeAreaView>
   );
 }
