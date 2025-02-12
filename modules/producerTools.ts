@@ -44,6 +44,26 @@ const updateProducer = async (token: string, values: string) => {
   }
 };
 
+const createProducer = async (token: string, values: string) => {
+  try {
+    const response = await fetch(`${API_ROOT}/producers/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        mode: "cors",
+      },
+      body: JSON.stringify(values),
+    });
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const getAllOrders = async (token: string) => {
   try {
     const response = await fetch(`${API_ROOT}/business/all`, {
@@ -81,6 +101,7 @@ const getLastThreeOrders = async (token: string) => {
 };
 
 export default {
+  createProducer,
   updateProducer,
   getProducerInfos,
   getAllOrders,

@@ -195,7 +195,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
                     query: newQuery,
                   }))
                 }
-                placeholder="ex: Fruits moches, légume bio, pomme, banane..."
+                placeholder="ex: tomates, oignons..."
                 label="Votre recherche"
                 autoCapitalize="none"
                 extraClasses="w-full"
@@ -250,7 +250,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
                 value={searchOptions.radius ? searchOptions.radius.value : [20]}
                 step={5}
                 minimumValue={0}
-                maximumValue={100}
+                maximumValue={200}
                 onValueChange={(newRadius) => {
                   setSearchOptions((prevState) => ({
                     ...prevState,

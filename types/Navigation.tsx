@@ -20,7 +20,7 @@ type RootStackParamList = {
   TabNavigatorProducer: {
     screen:
       | "Home"
-      | "shop"
+      | "Shop"
       | "BusinessCenter"
       | "ProducerProfile"
       | "Stocks"

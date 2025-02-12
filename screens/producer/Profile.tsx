@@ -19,6 +19,7 @@ import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import Custom from "../../components/utils/buttons/Custom";
 import { ProducerData, ShopData } from "../../types/API";
 import ButtonIcon from "../../components/utils/buttons/Icon";
+import React from "react";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -82,7 +83,13 @@ export default function ProducerProfileScreen({ navigation }: Props) {
       setProducerSaveLoading(true);
       const token = await getToken();
       const values = { socialReason, siren, iban, bic, address };
-      const data = await producerTools.updateProducer(token, values);
+      let data;
+      if (producerStore === null) {
+        data = await producerTools.createProducer(token, values);
+      } else {
+        data = await producerTools.updateProducer(token, values);
+      }
+
       console.log(data);
       if (data) {
         dispatch(updateUser(data));

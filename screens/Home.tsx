@@ -5,20 +5,10 @@ import { useColorScheme } from "nativewind";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
 
-import {
-  StyleSheet,
-  Button,
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-} from "react-native";
+import { StyleSheet, View, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
-import TextHeading1 from "../components/utils/texts/Heading1";
-import TextHeading2 from "../components/utils/texts/Heading2";
 import TextBody1 from "../components/utils/texts/Body1";
-import TextHeading4 from "../components/utils/texts/Heading4";
 import TextHeading3 from "../components/utils/texts/Heading3";
 import LogoDark from "../assets/images/logo_meloko-dark.png";
 import LogoLight from "../assets/images/logo_meloko-light.png";
