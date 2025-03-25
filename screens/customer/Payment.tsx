@@ -1,0 +1,129 @@
+import React, { useState, useEffect } from "react";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../types/Navigation";
+
+import { useDispatch, useSelector } from "react-redux";
+
+import { View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import StripePaymentButton from "../../components/utils/buttons/StripePayment";
+import InputText from "../../components/utils/inputs/Text";
+import TextHeading2 from "../../components/utils/texts/Heading2";
+import TextHeading3 from "../../components/utils/texts/Heading3";
+import InputTextarea from "../../components/utils/inputs/Textarea";
+import ButtonSecondaryStart from "../../components/utils/buttons/SecondaryStart";
+import CartTools from "../../modules/CartTools";
+import { CartState } from "../../reducers/cart";
+import { UserState } from "../../reducers/user";
+
+type PaymentScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "PaymentCustomer"
+>;
+
+type Props = {
+  navigation: PaymentScreenNavigationProp;
+};
+
+export default function PaymentCustomerScreen({
+  navigation,
+}: Props): JSX.Element {
+  const cartStore = useSelector(
+    (state: { cart: CartState }) => state.cart.value,
+  );
+  const userStore = useSelector(
+    (state: { user: UserState }) => state.user.value,
+  );
+  const [cartTotal, setCartTotal] = useState<number | undefined>(0);
+  const [user, setUser] = useState({});
+
+  useEffect(() => {
+    setUser({ ...userStore });
+  }, []);
+
+  useEffect(() => {
+    let allShopsCost = CartTools.getTotalCost(cartStore);
+    setCartTotal(allShopsCost);
+  }, [cartStore]);
+
+  console.log("------------- PAYMENTSCREEN ------------------------------");
+  console.log("cartstore in payment: ", cartStore);
+  console.log("userStore in payment :", userStore);
+
+  return (
+    <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+      <View className="p-3">
+        <TextHeading2 extraClasses="mb-3">Facturation</TextHeading2>
+        <InputText
+          value={user.firstname}
+          onChangeText={(newFirstname: string) =>
+            setUser((prevState) => ({
+              ...prevState,
+              firstname: newFirstname,
+            }))
+          }
+          placeholder="Votre prénom"
+          label="Prénom"
+          autoCapitalize="none"
+          extraClasses="w-full mb-2"
+        />
+
+        <InputText
+          value={user.lastname}
+          onChangeText={(newLastname: string) =>
+            setUser((prevState) => ({
+              ...prevState,
+              lastname: newLastname,
+            }))
+          }
+          placeholder="Votre nom"
+          label="Nom"
+          autoCapitalize="none"
+          extraClasses="w-full mb-2"
+        />
+
+        <InputText
+          value={user.address}
+          onChangeText={(newAddress: string) =>
+            setUser((prevState) => ({
+              ...prevState,
+              address: newAddress,
+            }))
+          }
+          placeholder="Votre adresse"
+          label="Adresse"
+          autoCapitalize="none"
+          extraClasses="w-full mb-2"
+        />
+
+        {/* {cartTotal && ( */}
+        {/* <View className="flex flex-row items-center justify-between my-5">
+            <View><TextHeading3>Montant total: </TextHeading3></View>
+            <View><TextHeading2>{cartTotal.toFixed(2)} €</TextHeading2></View>
+          </View> */}
+        {/* )} */}
+
+        <StripePaymentButton
+          label="Payer"
+          iconName="credit-card"
+          user={user}
+          totalCartAmount={cartTotal}
+          navigation={navigation}
+          disabled={!user.firstname || !user.lastname}
+        />
+
+        <ButtonSecondaryStart
+          label="Modes de retrait"
+          iconName="arrow-left"
+          isLoading={false}
+          disabled={false}
+          onPressFn={() =>
+            navigation.navigate("TabNavigatorUser", {
+              screen: "WithdrawModesUser",
+            })
+          }
+        />
+      </View>
+    </SafeAreaView>
+  );
+}

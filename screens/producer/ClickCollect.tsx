@@ -1,0 +1,53 @@
+import React from "react";
+import { useState, useEffect } from "react";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../types/Navigation";
+
+/* Eléments graphiques */
+import { View, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import TextHeading3 from "../../components/utils/texts/Heading3";
+import Text from "../../components/utils/inputs/Text";
+import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
+import _Fontawesome from "react-native-vector-icons/FontAwesome";
+import BackLabelButton from "../../components/utils/buttons/BackLabel";
+const FontAwesome = _Fontawesome as React.ElementType;
+
+type ProfileScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "TabNavigatorProducer"
+>;
+
+type Props = {
+  navigation: ProfileScreenNavigationProp;
+};
+
+export default function ClickCollectShopProducerScreen({ navigation }: Props) {
+  return (
+    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg p-3 mt-5">
+      {/* <View className="mt-5 ml-5">
+        <TouchableOpacity
+          onPress={() => navigation.navigate("ShopProducer")}
+          className="flex-none"
+        >
+          <FontAwesome name="arrow-left" size={25} color="#98B66E" />
+        </TouchableOpacity>
+      </View> */}
+
+      <View className="flex flex-row mb-5 mt-3">
+        <BackLabelButton
+          onPressFn={() => navigation.navigate("ShopProducer")}
+          extraClasses="ml-5 p-1"
+        >
+          Retour à la boutique
+        </BackLabelButton>
+      </View>
+
+      <View className="flex-1 justify-center">
+        <TextHeading3 centered extraClasses="mb-5">
+          Paramétrer le Click & Collect
+        </TextHeading3>
+      </View>
+    </SafeAreaView>
+  );
+}

@@ -1,0 +1,219 @@
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../types/Navigation";
+
+import { View, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-gesture-handler";
+import TextHeading2 from "../../components/utils/texts/Heading2";
+import TextHeading3 from "../../components/utils/texts/Heading3";
+import TextHeading4 from "../../components/utils/texts/Heading4";
+import TextBody1 from "../../components/utils/texts/Body1";
+import CardProducer from "../../components/cards/ProducerSearchResult";
+import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
+import CardProduct from "../../components/cards/Product";
+import { UserState } from "../../reducers/user";
+
+type OrderScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "TabNavigatorUser"
+>;
+
+type Props = {
+  navigation: OrderScreenNavigationProp;
+};
+
+export default function OrderCustomerScreen({
+  route,
+  navigation,
+}: Props): JSX.Element {
+  const userStore = useSelector(
+    (state: { user: UserState }) => state.user.value,
+  );
+  const [newOrderDetails, setNewOrderDetails] = useState(null);
+
+  const weekDays = [
+    "Lundi",
+    "Mardi",
+    "Mercredi",
+    "Jeudi",
+    "Vendredi",
+    "Samedi",
+    "Dimanche",
+  ];
+
+  useEffect(() => {
+    const newOrder = userStore.orders.find(
+      (o) => o._id === route.params.orderId,
+    );
+    setNewOrderDetails(newOrder);
+  }, [route.params]);
+
+  let clickCollectOrdersDisplay = <></>;
+  let marketOrdersDisplay = <></>;
+
+  if (newOrderDetails) {
+    const clickCollectOrders = newOrderDetails.details.filter(
+      (d) => d.withdrawMode === "clickCollect",
+    );
+    const marketOrders = newOrderDetails.details.filter(
+      (d) => d.withdrawMode === "market",
+    );
+
+    clickCollectOrdersDisplay = clickCollectOrders.map((cco) => {
+      const productList = cco.products.map((p) => {
+        return (
+          <CardProduct
+            stockData={{
+              ...p.product,
+              notes: cco.shop.notes,
+              quantity: p.quantity,
+            }}
+            key={p.product._id}
+            extraClasses="mb-1"
+            displayMode="detail"
+          />
+        );
+      });
+
+      return (
+        <View key={cco._id} className="mb-5 flex items-center">
+          <CardProducer
+            shopData={cco.shop}
+            withdrawData={cco.products}
+            key={cco.shop._id}
+            extraClasses="mb-1"
+            displayMode="order"
+            showDirectionButton
+            onPressFn={() => {
+              navigation.navigate("TabNavigatorUser", {
+                screen: "ShopUser",
+                params: {
+                  shopId: cco.shop._id,
+                  distance: null,
+                  relevantProducts: [],
+                },
+              });
+            }}
+          />
+          {productList}
+          <View className="flex flex-row items-center rounded-lg py-1 px-4 bg-white dark:bg-tertiary w-full mb-2">
+            <View>
+              <TextBody1>Retrait:</TextBody1>
+            </View>
+            <View className="pl-3">
+              <TextHeading4>ClickAndCollect</TextHeading4>
+            </View>
+          </View>
+          <View className="flex flex-row justify-around rounded-lg p-1 bg-succes dark:bg-success  w-full">
+            <View className="px-2">
+              <TextBody1>Montant:</TextBody1>
+            </View>
+            <View>
+              <TextHeading4>{cco.shopTotalPrice.$numberDecimal} €</TextHeading4>
+            </View>
+          </View>
+        </View>
+      );
+    });
+
+    marketOrdersDisplay = marketOrders.map((mo) => {
+      console.log("marketOrder: ", JSON.stringify(mo, null, 2));
+      const productList = mo.products.map((p) => {
+        return (
+          <CardProduct
+            stockData={{
+              ...p.product,
+              notes: mo.shop.notes,
+              quantity: p.quantity,
+            }}
+            key={p.product._id}
+            extraClasses="mb-1"
+            displayMode="detail"
+          />
+        );
+      });
+      return (
+        <View key={mo._id} className="my-2">
+          <CardProducer
+            shopData={mo.shop}
+            withdrawData={mo.products}
+            key={mo.shop._id}
+            extraClasses="mb-1"
+            displayMode="order"
+            showDirectionButton
+            onPressFn={() => {
+              navigation.navigate("TabNavigatorUser", {
+                screen: "ShopUser",
+                params: {
+                  shopId: mo.shop._id,
+                  distance: null,
+                  relevantProducts: [],
+                },
+              });
+            }}
+          />
+          {productList}
+          <View className="flex flex-row mb-2 rounded-lg p-1 bg-white dark:bg-tertiary  w-full">
+            <View className="px-4">
+              <TextBody1>Retrait:</TextBody1>
+            </View>
+            <View>
+              <View>
+                <TextHeading4>{mo.withdrawMarket}</TextHeading4>
+              </View>
+              <View>
+                <TextHeading4> {weekDays[mo.withdrawDay - 1]}</TextHeading4>
+              </View>
+            </View>
+          </View>
+          <View className="flex flex-row justify-around rounded-lg p-1 bg-succes dark:bg-success w-full">
+            <View className="px-2">
+              <TextBody1>Montant:</TextBody1>
+            </View>
+            <View>
+              <TextHeading4>{mo.shopTotalPrice.$numberDecimal} €</TextHeading4>
+            </View>
+          </View>
+        </View>
+      );
+    });
+  }
+
+  console.log("----------- ORDERCUSTOMERSCREEN ---------------------------");
+  console.log("nexOrderDetails: ", newOrderDetails);
+  // console.log(route.params.orderId)
+
+  return (
+    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
+      <View className="p-3 flex-1">
+        <TextHeading2 extraClasses="mb-3" centered>
+          Commande payée
+        </TextHeading2>
+        <TextBody1 centered extraClasses="mb-2">
+          Votre commande est maintenant payée. Vous recevrez un e-mail
+          lorsqu'elle sera confirmée.
+        </TextBody1>
+        <TextHeading4
+          centered
+          extraClasses="mb-4"
+        >{`Commande n° ${route.params.orderId.slice(0, 7)}`}</TextHeading4>
+        <View className="rounded-lg bg-danger p-3 mb-3">
+          <Text className="font-bold text-white text-center text-[20px]">{`Montant total: ${newOrderDetails?.totalPrice.$numberDecimal} €`}</Text>
+        </View>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          className="w-full flex"
+        >
+          <View className="p-3 mb-5">
+            {clickCollectOrdersDisplay}
+            {marketOrdersDisplay}
+          </View>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
+  );
+}

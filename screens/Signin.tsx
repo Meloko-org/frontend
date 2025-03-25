@@ -1,0 +1,335 @@
+import React, { useState, useCallback, useEffect } from "react";
+import { useSignIn, useSignUp, useOAuth } from "@clerk/clerk-expo";
+import { useAuth } from "@clerk/clerk-expo";
+import * as WebBrowser from "expo-web-browser";
+import * as Linking from "expo-linking";
+
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../types/Navigation";
+
+import { Button, View, Modal } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-gesture-handler";
+import TextHeading2 from "../components/utils/texts/Heading2";
+import TextHeading3 from "../components/utils/texts/Heading3";
+import InputText from "../components/utils/inputs/Text";
+import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
+import ButtonBack from "../components/utils/buttons/Back";
+
+import { useDispatch, useSelector } from "react-redux";
+import { UserState, updateUser } from "../reducers/user";
+import { ProducerState, setProducerData } from "../reducers/producer";
+import { ShopState, setShopData } from "../reducers/shop";
+
+import userTools from "../modules/userTools";
+import producerTools from "../modules/producerTools";
+import shopTools from "../modules/shopTools";
+
+type ProfileScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "SignIn"
+>;
+
+/*type SignInProps = {
+  navigation?: ProfileScreenNavigationProp;
+  showModal: boolean;
+  onCloseFn: () => void;
+};*/
+
+// Warm up the android browser to improve UX
+// https://docs.expo.dev/guides/authentication/#improving-user-experience
+export const useWarmUpBrowser = () => {
+  useEffect(() => {
+    void WebBrowser.warmUpAsync();
+    return () => {
+      void WebBrowser.coolDownAsync();
+    };
+  }, []);
+};
+
+WebBrowser.maybeCompleteAuthSession();
+
+export default function SignInScreen(props) {
+  useWarmUpBrowser();
+  const [isSigninModalVisible, setIsSigninModalVisible] =
+    useState<boolean>(false);
+
+  // need to get the user infos
+  const { signOut, isSignedIn, getToken } = useAuth();
+  const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
+  // and store user infos in the store
+  const dispatch = useDispatch();
+  // Email verification status
+  const [pendingVerification, setPendingVerification] =
+    useState<boolean>(false);
+  // Email verification code
+  const [code, setCode] = useState<string>("");
+
+  // Import the Clerk Auth functions
+  const { signIn, setActive, isLoaded } = useSignIn();
+  const { signUp } = useSignUp();
+
+  // import the Clerk Google OAuth flow
+  const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
+
+  // Form fields
+  const [emailAddress, setEmailAddress] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [newEmailAddress, setNewEmailAddress] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [performedSignedIn, setPerformedSignedIn] = useState(false);
+  const [performedSignedUp, setPerformedSignedUp] = useState(false);
+  const [isConnectionLoading, setConnectionLoading] = useState(false);
+
+  useEffect(() => {
+    setIsSigninModalVisible(props.showModal ? true : false);
+  }, [props.showModal]);
+
+  useEffect(() => {
+    if (isSignedIn) {
+      if (performedSignedIn) {
+        fetchData();
+        setPerformedSignedIn(false);
+        setPerformedSignedUp(false);
+      }
+
+      if (performedSignedUp) {
+        setTimeout(() => {
+          fetchData();
+          setPerformedSignedIn(false);
+          setPerformedSignedUp(false);
+        }, 3000);
+      }
+    } else {
+    }
+  }, [isSignedIn, performedSignedIn, performedSignedUp]);
+
+  const fetchData = async () => {
+    try {
+      // store user info in the store
+      const token = await getToken();
+      const user = await userTools.getUserInfos(token);
+      if (user) {
+        dispatch(updateUser(user));
+      }
+      handleCloseModal();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Signin/up with Google
+  const onGoogleAuthPress = useCallback(async () => {
+    // If Clerk is not loaded
+    if (!isLoaded) {
+      return;
+    }
+
+    try {
+      // Try to start the Google OAuth flow
+      const { createdSessionId, setActive } = await startOAuthFlow({
+        redirectUrl: Linking.createURL("/home", { scheme: "Meloko" }), // Redirect path on successful signin
+      });
+
+      // If the signin event went well
+      if (createdSessionId) {
+        setActive!({ session: createdSessionId });
+        setPerformedSignedIn(true);
+      } else {
+      }
+    } catch (err: any) {
+      console.error(JSON.stringify(err, null, 2));
+    }
+  }, []);
+
+  const onSignUpPress = async () => {
+    // If Clerk is not loaded
+    if (!isLoaded) {
+      return;
+    }
+
+    try {
+      // Try to signup
+      await signUp.create({
+        emailAddress: newEmailAddress,
+        password: newPassword,
+      });
+
+      // Send the email verification code
+      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+
+      // Verification is pending
+      setPendingVerification(true);
+    } catch (err: any) {
+      // See https://clerk.com/docs/custom-flows/error-handling
+      // for more info on error handling
+      console.error(JSON.stringify(err, null, 2));
+    }
+  };
+
+  const onPressVerify = async () => {
+    // If Clerk is not loaded
+    if (!isLoaded) {
+      return;
+    }
+
+    try {
+      // Try to verify the email with the provided code
+      const completeSignUp = await signUp?.attemptEmailAddressVerification({
+        code,
+      });
+
+      // If the verification event is sucessfull
+      if (completeSignUp?.status === "complete") {
+        await setActive({ session: completeSignUp.createdSessionId });
+        setPerformedSignedUp(true);
+      } else {
+        console.error(JSON.stringify(completeSignUp, null, 2));
+      }
+    } catch (err: any) {
+      // See https://clerk.com/docs/custom-flows/error-handling
+      // for more info on error handling
+      console.error(JSON.stringify(err, null, 2));
+    }
+  };
+
+  // Signin the user with Clerk
+  const onSignInPress = useCallback(async () => {
+    // If Clerk is not loaded
+    if (!isLoaded) {
+      return;
+    }
+
+    try {
+      setConnectionLoading(true);
+      // Try to signin
+      const signInAttempt = await signIn.create({
+        identifier: emailAddress,
+        password,
+      });
+
+      // If the signing event went well
+      if (signInAttempt.status === "complete") {
+        await setActive({ session: signInAttempt.createdSessionId });
+        setPerformedSignedIn(true);
+      } else {
+        // See https://clerk.com/docs/custom-flows/error-handling
+        // for more info on error handling
+        console.error(JSON.stringify(signInAttempt, null, 2));
+      }
+      setConnectionLoading(false);
+    } catch (err: any) {
+      console.error(JSON.stringify(err, null, 2));
+      setConnectionLoading(false);
+    }
+  }, [isLoaded, emailAddress, password]);
+
+  const handleCloseModal = () => {
+    props.onCloseFn();
+    setIsSigninModalVisible(false);
+  };
+
+  return (
+    <Modal
+      visible={isSigninModalVisible}
+      animationType="slide"
+      onRequestClose={handleCloseModal}
+    >
+      <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+        <View className="p-3 flex items-center">
+          <ButtonBack onPressFn={handleCloseModal} />
+          <ScrollView>
+            <TextHeading2 extraClasses="mb-3">Se connecter</TextHeading2>
+            <ButtonPrimaryEnd
+              label="Google"
+              iconName="google"
+              onPressFn={onGoogleAuthPress}
+              extraClasses="w-full mb-5"
+            />
+            <InputText
+              value={emailAddress}
+              onChangeText={(newEmail: string) => setEmailAddress(newEmail)}
+              placeholder="example@gmail.com"
+              label="Email"
+              autoCapitalize="none"
+              extraClasses="w-full mb-2"
+            />
+            <InputText
+              value={password}
+              onChangeText={(newPassword: string) => setPassword(newPassword)}
+              placeholder="Mot de passe"
+              label="Mot de passe"
+              autoCapitalize="none"
+              extraClasses="w-full mb-2"
+              secureTextEntry={true}
+            />
+            <ButtonPrimaryEnd
+              label="Connexion"
+              iconName="sign-in"
+              onPressFn={onSignInPress}
+              isLoading={isConnectionLoading}
+              extraClasses="w-full mb-5"
+            />
+
+            <TextHeading2 extraClasses="mb-2">Créer un compte</TextHeading2>
+
+            {!pendingVerification ? (
+              <>
+                <InputText
+                  value={newEmailAddress}
+                  onChangeText={(newEmail: string) =>
+                    setNewEmailAddress(newEmail)
+                  }
+                  placeholder="example@gmail.com"
+                  label="Email"
+                  autoCapitalize="none"
+                  extraClasses="w-full mb-2"
+                />
+                <InputText
+                  value={newPassword}
+                  onChangeText={(newPassword: string) =>
+                    setNewPassword(newPassword)
+                  }
+                  placeholder="Mot de passe"
+                  label="Mot de passe"
+                  autoCapitalize="none"
+                  extraClasses="w-full mb-2"
+                  secureTextEntry={true}
+                />
+                <InputText
+                  value={confirmPassword}
+                  onChangeText={(confirmPassword: string) =>
+                    setConfirmPassword(confirmPassword)
+                  }
+                  placeholder="Confirmer mot de passe"
+                  label="Confirmer mot de passe"
+                  autoCapitalize="none"
+                  extraClasses="w-full mb-2"
+                  secureTextEntry={true}
+                />
+                <ButtonPrimaryEnd
+                  label="Inscription"
+                  iconName="arrow-right"
+                  onPressFn={onSignUpPress}
+                  isLoading={isConnectionLoading}
+                  extraClasses="w-full mb-5"
+                />
+              </>
+            ) : (
+              <>
+                <InputText
+                  label="Code de validation"
+                  value={code}
+                  placeholder="Code..."
+                  onChangeText={(code: string) => setCode(code)}
+                />
+                <Button title="Verify Email" onPress={onPressVerify} />
+              </>
+            )}
+          </ScrollView>
+        </View>
+      </SafeAreaView>
+    </Modal>
+  );
+}
