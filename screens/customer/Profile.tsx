@@ -144,6 +144,7 @@ export default function UserProfileScreen({ navigation }: Props) {
       dispatch(emptyCart());
       dispatch(resetProducerData());
       dispatch(resetShopData());
+      navigation.navigate("Home");
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
     }

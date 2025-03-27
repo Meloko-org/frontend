@@ -24,7 +24,7 @@ import ButtonIcon from "../../components/utils/buttons/Icon";
 import TextBody1 from "../../components/utils/texts/Body1";
 import ButtonBack from "../../components/utils/buttons/Back";
 
-import LogoModal from "../../components/modals/producer/logo";
+import LogoModal from "../../components/modals/producer/Logo";
 import PhotoModal from "../../components/modals/producer/Photo";
 import VideoModal from "../../components/modals/producer/Video";
 import ClickCollectModal from "../../components/modals/producer/ClickCollect";

@@ -15,6 +15,8 @@ import TextHeading3 from "../components/utils/texts/Heading3";
 import InputText from "../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import ButtonBack from "../components/utils/buttons/Back";
+import BackLabelButton from "../components/utils/buttons/BackLabel";
+import TopBar from "../components/TopBar";
 
 import { useDispatch, useSelector } from "react-redux";
 import { UserState, updateUser } from "../reducers/user";
@@ -24,17 +26,18 @@ import { ShopState, setShopData } from "../reducers/shop";
 import userTools from "../modules/userTools";
 import producerTools from "../modules/producerTools";
 import shopTools from "../modules/shopTools";
+import TextHeading4 from "../components/utils/texts/Heading4";
+import TextBody1 from "../components/utils/texts/Body1";
+import OpenScreenButton from "../components/utils/buttons/OpenScreen";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "SignIn"
 >;
 
-/*type SignInProps = {
-  navigation?: ProfileScreenNavigationProp;
-  showModal: boolean;
-  onCloseFn: () => void;
-};*/
+type Props = {
+  navigation: ProfileScreenNavigationProp;
+};
 
 // Warm up the android browser to improve UX
 // https://docs.expo.dev/guides/authentication/#improving-user-experience
@@ -49,10 +52,11 @@ export const useWarmUpBrowser = () => {
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function SignInScreen(props) {
+export default function SignInScreen({ navigation }: Props) {
   useWarmUpBrowser();
-  const [isSigninModalVisible, setIsSigninModalVisible] =
-    useState<boolean>(false);
+  const producerStore = useSelector(
+    (state: { producer: ProducerState }) => state.producer.value,
+  );
 
   // need to get the user infos
   const { signOut, isSignedIn, getToken } = useAuth();
@@ -67,7 +71,7 @@ export default function SignInScreen(props) {
 
   // Import the Clerk Auth functions
   const { signIn, setActive, isLoaded } = useSignIn();
-  const { signUp } = useSignUp();
+  //const { signUp } = useSignUp();
 
   // import the Clerk Google OAuth flow
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
@@ -75,23 +79,18 @@ export default function SignInScreen(props) {
   // Form fields
   const [emailAddress, setEmailAddress] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [newEmailAddress, setNewEmailAddress] = useState<string>("");
-  const [newPassword, setNewPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
+
   const [performedSignedIn, setPerformedSignedIn] = useState(false);
-  const [performedSignedUp, setPerformedSignedUp] = useState(false);
+  //const [performedSignedUp, setPerformedSignedUp] = useState(false);
   const [isConnectionLoading, setConnectionLoading] = useState(false);
 
-  useEffect(() => {
-    setIsSigninModalVisible(props.showModal ? true : false);
-  }, [props.showModal]);
-
+  /* 
   useEffect(() => {
     if (isSignedIn) {
       if (performedSignedIn) {
         fetchData();
         setPerformedSignedIn(false);
-        setPerformedSignedUp(false);
+        //setPerformedSignedUp(false);
       }
 
       if (performedSignedUp) {
@@ -103,7 +102,8 @@ export default function SignInScreen(props) {
       }
     } else {
     }
-  }, [isSignedIn, performedSignedIn, performedSignedUp]);
+  }, [isSignedIn, performedSignedIn, ]); //performedSignedUp
+*/
 
   const fetchData = async () => {
     try {
@@ -112,8 +112,22 @@ export default function SignInScreen(props) {
       const user = await userTools.getUserInfos(token);
       if (user) {
         dispatch(updateUser(user));
+        const producer = await producerTools.getProducerInfos(token);
+        if (producer) {
+          dispatch(setProducerData(producer));
+          const shop = await shopTools.getShopInfos(token, producer._id);
+          if (shop) {
+            dispatch(setShopData(shop));
+            navigation.navigate("TabNavigatorProducer", {
+              screen: "BusinessCenter",
+            });
+          } else {
+            navigation.navigate("TabNavigatorProducer", { screen: "Stocks" });
+          }
+        } else {
+          navigation.navigate("TabNavigatorUser", { screen: "Search" });
+        }
       }
-      handleCloseModal();
     } catch (error) {
       console.error(error);
     }
@@ -143,6 +157,7 @@ export default function SignInScreen(props) {
     }
   }, []);
 
+  /*
   const onSignUpPress = async () => {
     // If Clerk is not loaded
     if (!isLoaded) {
@@ -193,6 +208,7 @@ export default function SignInScreen(props) {
       console.error(JSON.stringify(err, null, 2));
     }
   };
+*/
 
   // Signin the user with Clerk
   const onSignInPress = useCallback(async () => {
@@ -213,6 +229,7 @@ export default function SignInScreen(props) {
       if (signInAttempt.status === "complete") {
         await setActive({ session: signInAttempt.createdSessionId });
         setPerformedSignedIn(true);
+        fetchData();
       } else {
         // See https://clerk.com/docs/custom-flows/error-handling
         // for more info on error handling
@@ -225,33 +242,57 @@ export default function SignInScreen(props) {
     }
   }, [isLoaded, emailAddress, password]);
 
-  const handleCloseModal = () => {
-    props.onCloseFn();
-    setIsSigninModalVisible(false);
-  };
+  console.log("producerStore: ", producerStore);
 
   return (
-    <Modal
-      visible={isSigninModalVisible}
-      animationType="slide"
-      onRequestClose={handleCloseModal}
-    >
+    <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
       <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-        <View className="p-3 flex items-center">
-          <ButtonBack onPressFn={handleCloseModal} />
-          <ScrollView>
-            <TextHeading2 extraClasses="mb-3">Se connecter</TextHeading2>
-            <ButtonPrimaryEnd
-              label="Google"
-              iconName="google"
-              onPressFn={onGoogleAuthPress}
-              extraClasses="w-full mb-5"
-            />
+        <TopBar
+          backLabel="Retour à l'accueil"
+          screen="Home"
+          label={`CONNEXION\nINSCRIPTION`}
+          extraClasses="mt-2"
+        />
+
+        <ScrollView>
+          <View className="flex flex-row justify-center mt-2 mb-3">
+            <View className="w-[70%]">
+              <View className="flex flex-row justify-center mb-3">
+                <TextBody1>Connexion avec votre compte</TextBody1>
+              </View>
+
+              <ButtonPrimaryEnd
+                label="Google"
+                iconName="google"
+                onPressFn={onGoogleAuthPress}
+                extraClasses="w-full mb-3"
+              />
+              <ButtonPrimaryEnd
+                label="Facebook"
+                iconName="facebook-f"
+                onPressFn={onGoogleAuthPress}
+                extraClasses="w-full mb-3"
+              />
+              <ButtonPrimaryEnd
+                label="Instagram"
+                iconName="instagram"
+                onPressFn={onGoogleAuthPress}
+                extraClasses="w-full"
+              />
+            </View>
+          </View>
+
+          <View className="px-5 mt-5 mb-3">
+            <View className="flex flex-row justify-center mb-3">
+              <TextBody1>Connexion par email</TextBody1>
+            </View>
+
             <InputText
               value={emailAddress}
               onChangeText={(newEmail: string) => setEmailAddress(newEmail)}
               placeholder="example@gmail.com"
               label="Email"
+              size="large"
               autoCapitalize="none"
               extraClasses="w-full mb-2"
             />
@@ -260,20 +301,32 @@ export default function SignInScreen(props) {
               onChangeText={(newPassword: string) => setPassword(newPassword)}
               placeholder="Mot de passe"
               label="Mot de passe"
+              size="large"
               autoCapitalize="none"
               extraClasses="w-full mb-2"
               secureTextEntry={true}
             />
-            <ButtonPrimaryEnd
-              label="Connexion"
-              iconName="sign-in"
-              onPressFn={onSignInPress}
-              isLoading={isConnectionLoading}
-              extraClasses="w-full mb-5"
-            />
+            <View className="flex flex-row justify-center">
+              <View className="w-[90%]">
+                <ButtonPrimaryEnd
+                  label="Connexion"
+                  iconName="sign-in-alt"
+                  onPressFn={onSignInPress}
+                  isLoading={isConnectionLoading}
+                  extraClasses="w-full h-14"
+                />
+              </View>
+            </View>
+          </View>
 
-            <TextHeading2 extraClasses="mb-2">Créer un compte</TextHeading2>
+          <View className="px-3 mt-5">
+            <View className="flex flex-row justify-center mb-3">
+              <TextBody1>Pas encore membre ?</TextBody1>
+            </View>
+            <OpenScreenButton label="Créer un compte" screen="SignUp" />
+          </View>
 
+          {/** 
             {!pendingVerification ? (
               <>
                 <InputText
@@ -327,9 +380,9 @@ export default function SignInScreen(props) {
                 <Button title="Verify Email" onPress={onPressVerify} />
               </>
             )}
-          </ScrollView>
-        </View>
+*/}
+        </ScrollView>
       </SafeAreaView>
-    </Modal>
+    </View>
   );
 }

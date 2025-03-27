@@ -5,13 +5,14 @@ import { useColorScheme } from "nativewind";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
 
-import { StyleSheet, View, Image } from "react-native";
+import { View, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import TextBody1 from "../components/utils/texts/Body1";
 import TextHeading3 from "../components/utils/texts/Heading3";
 import LogoDark from "../assets/images/logo_meloko-dark.png";
 import LogoLight from "../assets/images/logo_meloko-light.png";
+import LogoCoq from "../assets/images/logo_coq.png";
 
 import userTools from "../modules/userTools";
 import producerTools from "../modules/producerTools";
@@ -35,11 +36,10 @@ type Props = {
 
 export default function HomeScreen({ navigation }: Props) {
   const { colorScheme, toggleColorScheme } = useColorScheme();
+
   // Import the Clerk Auth functions
   const { signOut, isSignedIn, getToken } = useAuth();
-  const [isSigninModalVisible, setIsSigninModalVisible] = useState(false);
-  const [isSigninCustomerModalVisible, setIsSigninCustomerModalVisible] =
-    useState(false);
+
   const [logger, setLogger] = useState<string | null>(null);
   // Import the public api root address
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
@@ -51,7 +51,6 @@ export default function HomeScreen({ navigation }: Props) {
   const modeStore = useSelector(
     (state: { mode: ModeState }) => state.mode.value,
   );
-
   const producerStore = useSelector(
     (state: { producer: ProducerState }) => state.producer.value,
   );
@@ -102,23 +101,6 @@ export default function HomeScreen({ navigation }: Props) {
     }
   }, []);
 
-  const onTestPress = async () => {
-    try {
-      const token = await getToken();
-      const response = await fetch(`${API_ROOT}/auth/login`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          mode: "cors",
-        },
-      });
-      const data = await response.json();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   // Signout the user from Clerk
   const onSignoutPress = async () => {
     try {
@@ -128,66 +110,7 @@ export default function HomeScreen({ navigation }: Props) {
     }
   };
 
-  const onMapPress = async () => {
-    try {
-      navigation.navigate("TabNavigatorUser", {
-        screen: "Accueil",
-        params: {
-          searchResults: [],
-        },
-      });
-    } catch (err) {
-      console.error(JSON.stringify(err, null, 2));
-    }
-  };
-
-  /**
-   * au clic sur le bouton "Compte Pro"
-   * - si le user n'est pas signIn, on affiche la modale d'inscription
-   * - si le user est signIn mais qu'il n'a pas de compte pro, redirection vers la page producerProfil
-   * - si le user est signIn et qu'il a un compte pro, redirection vers la page 'accueil' du producer
-   */
-  const handleProducer = () => {
-    if (isSignedIn && producerStore && shopStore) {
-      navigation.navigate("TabNavigatorProducer", {
-        screen: "BusinessCenter",
-      });
-    } else if (isSignedIn && producerStore) {
-      navigation.navigate("TabNavigatorProducer", {
-        screen: "Shop",
-      });
-    } else if (isSignedIn) {
-      navigation.navigate("TabNavigatorProducer", {
-        screen: "ProducerProfile",
-      });
-    } else {
-      setLogger("producer");
-      setIsSigninModalVisible(true);
-    }
-
-    /*if (!isSignedIn) {
-      setIsSigninModalVisible(true);
-    } else {
-      redirectProducer();
-    }*/
-  };
-
-  const redirectProducer = () => {
-    // si le compte producer n'est pas encore renseigné
-    if (userStore.producer === null) {
-      // redirection vers le producerProfile pour saisir les infos
-      navigation.navigate("TabNavigatorProducer", {
-        screen: "ProducerProfile",
-      });
-    } else {
-      // redirection vers le business center
-      navigation.navigate("TabNavigatorProducer", {
-        screen: "Business Center",
-      });
-    }
-  };
-
-  const logo = colorScheme === "dark" ? LogoDark : LogoLight;
+  // const logo = colorScheme === "dark" ? LogoDark : LogoLight;
 
   console.log(
     "------------------------- HOME --------------------------------------------------------------------",
@@ -199,91 +122,105 @@ export default function HomeScreen({ navigation }: Props) {
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
-      <SafeAreaView>
-        <View className="flex justify-between p-3 w-full h-full">
-          <View>
-            <View className="w-full h-[300px] mb-7 mt-4">
-              <Image
-                source={logo}
-                alt={`Logo MELOKO`}
-                resizeMode="contain"
-                className="w-full h-full"
+      <SafeAreaView className="flex-1">
+        <View className="flex-1">
+          <View className="flex-[0.4] my-5">
+            <Image
+              source={LogoCoq}
+              alt={`Logo MELOKO`}
+              resizeMode="contain"
+              className="w-full h-full"
+            />
+          </View>
+
+          <View className="flex-[0.2] px-7 justify-center items-center">
+            <View className="w-full">
+              <ButtonPrimaryEnd
+                label="Recherche"
+                iconName="search"
+                disabled={false}
+                onPressFn={() =>
+                  navigation.navigate("TabNavigatorUser", { screen: "Search" })
+                }
+                extraClasses="mb-3 h-14"
+              />
+              <ButtonPrimaryEnd
+                label="Circuit touristique"
+                iconName="car-side"
+                disabled={false}
+                onPressFn={() => console.log("youpi")}
+                extraClasses="mb-3 h-14"
               />
             </View>
-
-            {/* <ButtonPrimaryEnd label="Tous les producteurs" iconName="map" onPressFn={onMapPress} extraClasses='mb-3' /> */}
-            <ButtonPrimaryEnd
-              label="Recherche"
-              iconName="search"
-              onPressFn={() => navigation.navigate("SearchCustomer")}
-              extraClasses="mb-3"
-            />
-            {isSignedIn ? (
-              <View>
-                <ButtonPrimaryEnd
-                  label={`Mes favoris (${userStore.bookmarks ? userStore.bookmarks.length : 0})`}
-                  iconName="heart"
-                  onPressFn={() =>
-                    navigation.navigate("TabNavigatorUser", {
-                      screen: "BookmarksCustomer",
-                    })
-                  }
-                  extraClasses="mb-3"
-                />
-                <ButtonPrimaryEnd
-                  label={`Mon profil`}
-                  iconName="user-circle"
-                  onPressFn={() =>
-                    navigation.navigate("TabNavigatorUser", {
-                      screen: "UserProfile",
-                    })
-                  }
-                  extraClasses="mb-3"
-                />
-              </View>
-            ) : (
-              <>
-                <ButtonPrimaryEnd
-                  label="Connexion"
-                  iconName="sign-in"
-                  onPressFn={() => setIsSigninModalVisible(true)}
-                  extraClasses="mb-3"
-                />
-              </>
-            )}
-            {/* <Button title="Test" onPress={onTestPress} />
-          <Button title="Test" onPress={() => navigation.navigate('TabNavigatorProducer', { screen: 'Stocks'})} />  */}
           </View>
 
-          <View className="flex-1 w-full justify-end items-center mb-5">
-            <TextHeading3 centered>Vous êtes un producteur ?</TextHeading3>
-            <TextBody1 extraClasses="px-5 mb-3 text-wrap w-full" centered>
-              Connectez-vous ou créez votre compte pro.
-            </TextBody1>
-            <ButtonPrimaryEnd
-              label="Compte Pro"
-              iconName="tags"
-              disabled={false}
-              onPressFn={() => handleProducer()}
-              extraClasses="w-full"
-            ></ButtonPrimaryEnd>
+          <View className="flex-[0.4] px-7">
+            <View className="flex-1 justify-end pb-10 items-center">
+              {isSignedIn ? (
+                <>
+                  {producerStore !== null ? (
+                    <>
+                      <ButtonPrimaryEnd
+                        label="Mon Activité"
+                        iconName="search"
+                        iconFamily="FontAwesomeIcon"
+                        disabled={false}
+                        onPressFn={() =>
+                          navigation.navigate("TabNavigatorUser", {
+                            screen: "Search",
+                          })
+                        }
+                        extraClasses="mb-3 h-14"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <View className="w-full">
+                        <ButtonPrimaryEnd
+                          label="Mon Compte"
+                          iconName="user"
+                          disabled={false}
+                          onPressFn={() =>
+                            navigation.navigate("TabNavigatorUser", {
+                              screen: "UserProfile",
+                            })
+                          }
+                          extraClasses="mb-3 h-14"
+                        />
+                      </View>
+                    </>
+                  )}
+                  <View className="w-full">
+                    <ButtonPrimaryEnd
+                      label="Déconnexion"
+                      iconName="sign-out-alt"
+                      disabled={false}
+                      onPressFn={onSignoutPress}
+                      extraClasses="mb-3 h-14"
+                    />
+                  </View>
+                </>
+              ) : (
+                <>
+                  <TextHeading3 centered>
+                    Producteur ou utilisateur ?
+                  </TextHeading3>
+                  <TextBody1 extraClasses="px-5 mb-3 text-wrap w-full" centered>
+                    Connectez-vous ou créez un compte.
+                  </TextBody1>
+                  <ButtonPrimaryEnd
+                    label={`Connexion\nInscription`}
+                    iconName="sign-in-alt"
+                    disabled={false}
+                    onPressFn={() => navigation.navigate("SignIn")}
+                    extraClasses="w-full h-20"
+                  />
+                </>
+              )}
+            </View>
           </View>
         </View>
-
-        <SignInScreen
-          showModal={isSigninModalVisible} // || isSigninCustomerModalVisible
-          onCloseFn={() => setIsSigninModalVisible(false)}
-        />
       </SafeAreaView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

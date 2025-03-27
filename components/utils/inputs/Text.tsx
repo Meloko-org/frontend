@@ -28,17 +28,17 @@ export default function InputText(props: InputTextProps): JSX.Element {
 
   return (
     <View
-      className={`${props.extraClasses} flex flex-row rounded-lg p-2 shadow-sm border border-secondary bg-white ${props.size === "large" ? "h-[70px]" : "text-xs"} dark:border-primary/20 dark:bg-tertiary`}
+      className={`${props.extraClasses} flex flex-row rounded-lg px-2 py-1 shadow-sm border border-secondary bg-white ${props.size === "large" ? "h-[70px]" : "text-xs"} dark:border-primary/20 dark:bg-tertiary`}
     >
       <View className={`flex ${props.iconName ? "w-4/6" : "w-full"}`}>
         <Text
-          className={`${props.size === "large" ? "text-md" : "text-sm"} font-bold text-secondary/50 uppercase p-0 dark:text-lightbg/50`}
+          className={`${props.size === "large" ? "text-md" : "text-sm"} font-bold text-secondary/50 uppercase p-0 dark:text-lightbg/50 h-5`}
         >
           {props.label}
         </Text>
         <TextInput
           value={props.value}
-          className={`${props.size === "large" ? "text-lg" : "text-base h-7"} ${props.iconName ? "w-80" : "w-full"} dark:text-lightbg`}
+          className={`${props.size === "large" ? "text-lg leading-5" : "text-base h-10"} ${props.iconName ? "w-80" : "w-full"} dark:text-lightbg`}
           placeholder={props.placeholder}
           placeholderTextColor={colorScheme === "dark" ? "#FCFFF0" : "#444C3D"}
           onChangeText={(value) => props.onChangeText(value)}

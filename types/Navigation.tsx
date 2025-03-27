@@ -3,6 +3,7 @@
 type RootStackParamList = {
   Home: undefined;
   SignIn: undefined;
+  SignUp: undefined;
   // SignUp: undefined;
   TabNavigatorUser: {
     screen:
