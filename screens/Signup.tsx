@@ -1,13 +1,15 @@
 import React, { useState } from "react";
+import { useAuth, useSignUp } from "@clerk/clerk-expo";
 
-import { useSignUp } from "@clerk/clerk-expo";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
+
+import producerTools from "../modules/producerTools";
 
 import TopBar from "../components/TopBar";
 import InputText from "../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
-import { StyleSheet, TextInput, Button, View } from "react-native";
+import { StyleSheet, TextInput, Button, View, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CheckBox from "../components/utils/inputs/CheckBox";
 
@@ -20,15 +22,17 @@ type Props = {
   navigation: ProfileScreenNavigationProp;
 };
 
-export default function SignUpScreen({ navigation: { goBack } }: Props) {
+export default function SignUpScreen({ navigation }: Props) {
   // Import the Clerk signup functions
   const { isLoaded, signUp, setActive } = useSignUp();
+  const { getToken } = useAuth();
 
   // Form fields
   const [newEmailAddress, setNewEmailAddress] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [isConnectionLoading, setConnectionLoading] = useState(false);
+  const [isVerifyLoading, setVerifyLoading] = useState(false);
   const [isProducer, setIsProducer] = useState<boolean>(false);
 
   // Email verification status
@@ -77,10 +81,24 @@ export default function SignUpScreen({ navigation: { goBack } }: Props) {
       // If the verification event is sucessfull
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
-        // redirection vers la page compte user pour saisie nom, prénom...
-        // -> enregistrement des nouvelles infos (nom, prénom) dans le store
-        // Go back to the previous screen
-        goBack();
+
+        // si c'est une création de compte producer,
+        // -> création d'un producer vierge dans la base
+        // -> redirection vers ProducerProfile
+        // sinon, redirection vers UserProfile
+        if (isProducer) {
+          const token = await getToken();
+          const producer = await producerTools.initialiseProducer(token);
+          if (producer) {
+            navigation.navigate("TabNavigatorProducer", {
+              screen: "ProducerProfile",
+            });
+          } else {
+            Alert.alert("impossible de créer le compte producteur");
+          }
+        } else {
+          navigation.navigate("TabNavigatorUser", { screen: "UserProfile" });
+        }
       } else {
         console.error(JSON.stringify(completeSignUp, null, 2));
       }
@@ -105,7 +123,23 @@ export default function SignUpScreen({ navigation: { goBack } }: Props) {
 
         <View className="flex-1 justify-center px-5">
           <View>
-            {!pendingVerification ? (
+            {pendingVerification ? (
+              <>
+                <InputText
+                  label="Code de validation"
+                  value={code}
+                  placeholder="Code..."
+                  onChangeText={(code: string) => setCode(code)}
+                />
+                <ButtonPrimaryEnd
+                  label="Vérifier email"
+                  iconName="arrow-right"
+                  onPressFn={onPressVerify}
+                  isLoading={isVerifyLoading}
+                  extraClasses="w-full h-14"
+                />
+              </>
+            ) : (
               <View>
                 <View className="mb-5">
                   <InputText
@@ -163,49 +197,9 @@ export default function SignUpScreen({ navigation: { goBack } }: Props) {
                   </View>
                 </View>
               </View>
-            ) : (
-              <>
-                <InputText
-                  label="Code de validation"
-                  value={code}
-                  placeholder="Code..."
-                  onChangeText={(code: string) => setCode(code)}
-                />
-                <Button title="Verify Email" onPress={onPressVerify} />
-              </>
             )}
           </View>
         </View>
-        {/** 
-          <View>
-            {!pendingVerification && (
-              <>
-                <TextInput
-                  autoCapitalize="none"
-                  value={emailAddress}
-                  placeholder="Email..."
-                  onChangeText={(email) => setEmailAddress(email)}
-                />
-                <TextInput
-                  value={password}
-                  placeholder="Password..."
-                  secureTextEntry={true}
-                  onChangeText={(password) => setPassword(password)}
-                />
-                <Button title="Sign Up" onPress={onSignUpPress} />
-              </>
-            )}
-            {pendingVerification && (
-              <>
-                <TextInput
-                  value={code}
-                  placeholder="Code..."
-                  onChangeText={(code) => setCode(code)}
-                />
-                <Button title="Verify Email" onPress={onPressVerify} />
-              </>
-            )}
-          </View>*/}
       </SafeAreaView>
     </View>
   );
