@@ -24,7 +24,7 @@ const getProducerInfos = async (
   }
 };
 
-const updateProducer = async (token: string, values: string) => {
+const updateProducer = async (token: string | null, values: {}) => {
   try {
     const response = await fetch(`${API_ROOT}/producers/update`, {
       method: "PUT",
@@ -57,11 +57,14 @@ const initialiseProducer = async (token: string | null) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log(error);
+    return {
+      success: false,
+      message: "Erreur serveur: veuillez réessayer plus tard.",
+    };
   }
 };
 
-const createProducer = async (token: string, values: string) => {
+const createProducer = async (token: string | null, values: {}) => {
   try {
     const response = await fetch(`${API_ROOT}/producers/create`, {
       method: "POST",

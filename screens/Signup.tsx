@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { useAuth, useSignUp } from "@clerk/clerk-expo";
+import { useDispatch } from "react-redux";
+import { updateUser } from "../reducers/user";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
 
+import userTools from "../modules/userTools";
 import producerTools from "../modules/producerTools";
 
 import TopBar from "../components/TopBar";
@@ -12,6 +15,8 @@ import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import { StyleSheet, TextInput, Button, View, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CheckBox from "../components/utils/inputs/CheckBox";
+import CodeInput from "../components/CodeInput";
+import TextHeading4 from "../components/utils/texts/Heading4";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -27,10 +32,16 @@ export default function SignUpScreen({ navigation }: Props) {
   const { isLoaded, signUp, setActive } = useSignUp();
   const { getToken } = useAuth();
 
+  // store
+  const dispatch = useDispatch();
+
   // Form fields
-  const [newEmailAddress, setNewEmailAddress] = useState<string>("");
-  const [newPassword, setNewPassword] = useState<string>("");
+  const [emailAddress, setEmailAddress] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [passwordInvisible, setPasswordInvisible] = useState<boolean>(true);
+  const [confirmPasswordInvisible, setConfirmPasswordInvisible] =
+    useState<boolean>(true);
   const [isConnectionLoading, setConnectionLoading] = useState(false);
   const [isVerifyLoading, setVerifyLoading] = useState(false);
   const [isProducer, setIsProducer] = useState<boolean>(false);
@@ -42,6 +53,12 @@ export default function SignUpScreen({ navigation }: Props) {
   const [code, setCode] = useState<string>("");
 
   const onSignUpPress = async () => {
+    // vérification des mots de passe
+    if (password !== confirmPassword) {
+      Alert.alert("Les deux mots de passe ne sont pas identiques.");
+      return;
+    }
+
     // If Clerk is not loaded
     if (!isLoaded) {
       return;
@@ -50,8 +67,8 @@ export default function SignUpScreen({ navigation }: Props) {
     try {
       // Try to signup
       await signUp.create({
-        emailAddress: newEmailAddress,
-        password: newPassword,
+        emailAddress,
+        password,
       });
 
       // Send the email verification code
@@ -63,6 +80,15 @@ export default function SignUpScreen({ navigation }: Props) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
+      Alert.alert(err.errors[0].message);
+    }
+  };
+
+  const handleVerifyCode = () => {
+    if (code.length === 6) {
+      onPressVerify();
+    } else {
+      Alert.alert("Veuillez entrer un code à 6 chiffres.");
     }
   };
 
@@ -82,22 +108,29 @@ export default function SignUpScreen({ navigation }: Props) {
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
 
-        // si c'est une création de compte producer,
-        // -> création d'un producer vierge dans la base
-        // -> redirection vers ProducerProfile
-        // sinon, redirection vers UserProfile
-        if (isProducer) {
-          const token = await getToken();
-          const producer = await producerTools.initialiseProducer(token);
-          if (producer) {
-            navigation.navigate("TabNavigatorProducer", {
-              screen: "ProducerProfile",
-            });
+        const token = await getToken();
+        const userResponse = await userTools.getUserInfos(token);
+
+        if (userResponse.success) {
+          console.log("user in Response :", userResponse.user);
+          // mise à jour du store
+          dispatch(updateUser(userResponse.user));
+          if (isProducer) {
+            const producerResponse =
+              await producerTools.initialiseProducer(token);
+            if (producerResponse.success) {
+              navigation.navigate("TabNavigatorProducer", {
+                screen: "ProducerProfile",
+              });
+            } else {
+              Alert.alert(producerResponse.message);
+            }
           } else {
-            Alert.alert("impossible de créer le compte producteur");
+            navigation.navigate("TabNavigatorUser", { screen: "UserProfile" });
           }
         } else {
-          navigation.navigate("TabNavigatorUser", { screen: "UserProfile" });
+          Alert.alert(userResponse.message);
+          setPendingVerification(false);
         }
       } else {
         console.error(JSON.stringify(completeSignUp, null, 2));
@@ -125,16 +158,18 @@ export default function SignUpScreen({ navigation }: Props) {
           <View>
             {pendingVerification ? (
               <>
-                <InputText
-                  label="Code de validation"
-                  value={code}
-                  placeholder="Code..."
-                  onChangeText={(code: string) => setCode(code)}
-                />
+                <View className="flex flex-row justify-center w-full mb-5">
+                  <View>
+                    <TextHeading4>Saisissez votre code</TextHeading4>
+                  </View>
+                </View>
+                <View className="flex flex-row justify-center mb-5">
+                  <CodeInput onCodeChange={setCode} />
+                </View>
                 <ButtonPrimaryEnd
                   label="Vérifier email"
                   iconName="arrow-right"
-                  onPressFn={onPressVerify}
+                  onPressFn={handleVerifyCode}
                   isLoading={isVerifyLoading}
                   extraClasses="w-full h-14"
                 />
@@ -143,9 +178,9 @@ export default function SignUpScreen({ navigation }: Props) {
               <View>
                 <View className="mb-5">
                   <InputText
-                    value={newEmailAddress}
+                    value={emailAddress}
                     onChangeText={(newEmail: string) =>
-                      setNewEmailAddress(newEmail)
+                      setEmailAddress(newEmail)
                     }
                     placeholder="example@gmail.com"
                     label="Email"
@@ -153,16 +188,20 @@ export default function SignUpScreen({ navigation }: Props) {
                     extraClasses="w-full mb-2"
                   />
                   <InputText
-                    value={newPassword}
+                    value={password}
                     onChangeText={(newPassword: string) =>
-                      setNewPassword(newPassword)
+                      setPassword(newPassword)
                     }
                     placeholder="Mot de passe"
                     label="Mot de passe"
                     autoCapitalize="none"
                     extraClasses="w-full mb-2"
-                    secureTextEntry={true}
+                    size="large"
+                    secureTextEntry={passwordInvisible}
+                    iconName="eye"
+                    onIconPressFn={() => setPasswordInvisible((prev) => !prev)}
                   />
+
                   <InputText
                     value={confirmPassword}
                     onChangeText={(confirmPassword: string) =>
@@ -172,7 +211,12 @@ export default function SignUpScreen({ navigation }: Props) {
                     label="Confirmer mot de passe"
                     autoCapitalize="none"
                     extraClasses="w-full mb-2"
-                    secureTextEntry={true}
+                    size="large"
+                    secureTextEntry={confirmPasswordInvisible}
+                    iconName="eye"
+                    onIconPressFn={() =>
+                      setConfirmPasswordInvisible((prev) => !prev)
+                    }
                   />
                 </View>
 

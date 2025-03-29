@@ -17,7 +17,6 @@ const getUserInfos = async (token: string | null) => {
       },
     });
     const data = await response.json();
-    // console.log("getUserInfos-> data: ", data)
 
     return data;
   } catch (error) {
