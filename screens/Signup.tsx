@@ -17,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CheckBox from "../components/utils/inputs/CheckBox";
 import CodeInput from "../components/CodeInput";
 import TextHeading4 from "../components/utils/texts/Heading4";
+import CustomAlert from "../components/modals/CustomAlert";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -28,6 +29,7 @@ type Props = {
 };
 
 export default function SignUpScreen({ navigation }: Props) {
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
   // Import the Clerk signup functions
   const { isLoaded, signUp, setActive } = useSignUp();
   const { getToken } = useAuth();
@@ -55,7 +57,7 @@ export default function SignUpScreen({ navigation }: Props) {
   const onSignUpPress = async () => {
     // vérification des mots de passe
     if (password !== confirmPassword) {
-      Alert.alert("Les deux mots de passe ne sont pas identiques.");
+      setAlertMessage("Les deux mots de passe ne sont pas identiques.");
       return;
     }
 
@@ -80,7 +82,7 @@ export default function SignUpScreen({ navigation }: Props) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
-      Alert.alert(err.errors[0].message);
+      setAlertMessage(err.errors[0].message);
     }
   };
 
@@ -123,7 +125,7 @@ export default function SignUpScreen({ navigation }: Props) {
                 screen: "ProducerProfile",
               });
             } else {
-              Alert.alert(producerResponse.message);
+              setAlertMessage(producerResponse.message);
             }
           } else {
             navigation.navigate("TabNavigatorUser", { screen: "UserProfile" });
@@ -139,6 +141,7 @@ export default function SignUpScreen({ navigation }: Props) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
+      setAlertMessage(err.errors[0].message);
     }
   };
 
@@ -244,6 +247,15 @@ export default function SignUpScreen({ navigation }: Props) {
             )}
           </View>
         </View>
+
+        {/* Modale Alerte*/}
+        {alertMessage && (
+          <CustomAlert
+            visible={!!alertMessage}
+            message={alertMessage}
+            onClose={() => setAlertMessage(null)}
+          />
+        )}
       </SafeAreaView>
     </View>
   );

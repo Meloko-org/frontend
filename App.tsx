@@ -49,6 +49,7 @@ import mode from "./reducers/mode";
 import shop from "./reducers/shop";
 import producer from "./reducers/producer";
 import OrderDetailsScreen from "./screens/OrderDetails";
+
 const reducers = combineReducers({ user, cart, mode, shop, producer });
 const persistConfig = {
   key: "meloko",
