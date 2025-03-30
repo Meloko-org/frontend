@@ -253,6 +253,7 @@ export default function SignUpScreen({ navigation }: Props) {
           <CustomAlert
             visible={!!alertMessage}
             message={alertMessage}
+            alertType="danger"
             onClose={() => setAlertMessage(null)}
           />
         )}

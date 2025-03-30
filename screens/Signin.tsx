@@ -7,16 +7,13 @@ import * as Linking from "expo-linking";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
 
-import { Button, View, Modal } from "react-native";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
-import TextHeading2 from "../components/utils/texts/Heading2";
-import TextHeading3 from "../components/utils/texts/Heading3";
 import InputText from "../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
-import ButtonBack from "../components/utils/buttons/Back";
-import BackLabelButton from "../components/utils/buttons/BackLabel";
 import TopBar from "../components/TopBar";
+import CustomAlert from "../components/modals/CustomAlert";
 
 import { useDispatch, useSelector } from "react-redux";
 import { UserState, updateUser } from "../reducers/user";
@@ -58,16 +55,13 @@ export default function SignInScreen({ navigation }: Props) {
     (state: { producer: ProducerState }) => state.producer.value,
   );
 
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+
   // need to get the user infos
   const { signOut, isSignedIn, getToken } = useAuth();
-  const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
+
   // and store user infos in the store
   const dispatch = useDispatch();
-  // Email verification status
-  const [pendingVerification, setPendingVerification] =
-    useState<boolean>(false);
-  // Email verification code
-  const [code, setCode] = useState<string>("");
 
   // Import the Clerk Auth functions
   const { signIn, setActive, isLoaded } = useSignIn();
@@ -79,9 +73,9 @@ export default function SignInScreen({ navigation }: Props) {
   // Form fields
   const [emailAddress, setEmailAddress] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [passwordInvisible, setPasswordInvisible] = useState<boolean>(true);
 
   const [performedSignedIn, setPerformedSignedIn] = useState(false);
-  //const [performedSignedUp, setPerformedSignedUp] = useState(false);
   const [isConnectionLoading, setConnectionLoading] = useState(false);
 
   /* 
@@ -238,6 +232,7 @@ export default function SignInScreen({ navigation }: Props) {
       setConnectionLoading(false);
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
+      setAlertMessage(err.errors[0].message);
       setConnectionLoading(false);
     }
   }, [isLoaded, emailAddress, password]);
@@ -301,10 +296,12 @@ export default function SignInScreen({ navigation }: Props) {
               onChangeText={(newPassword: string) => setPassword(newPassword)}
               placeholder="Mot de passe"
               label="Mot de passe"
-              size="large"
               autoCapitalize="none"
               extraClasses="w-full mb-2"
-              secureTextEntry={true}
+              size="large"
+              secureTextEntry={passwordInvisible}
+              iconName="eye"
+              onIconPressFn={() => setPasswordInvisible((prev) => !prev)}
             />
             <View className="flex flex-row justify-center">
               <View className="w-[90%]">
@@ -326,61 +323,15 @@ export default function SignInScreen({ navigation }: Props) {
             <OpenScreenButton label="Créer un compte" screen="SignUp" />
           </View>
 
-          {/** 
-            {!pendingVerification ? (
-              <>
-                <InputText
-                  value={newEmailAddress}
-                  onChangeText={(newEmail: string) =>
-                    setNewEmailAddress(newEmail)
-                  }
-                  placeholder="example@gmail.com"
-                  label="Email"
-                  autoCapitalize="none"
-                  extraClasses="w-full mb-2"
-                />
-                <InputText
-                  value={newPassword}
-                  onChangeText={(newPassword: string) =>
-                    setNewPassword(newPassword)
-                  }
-                  placeholder="Mot de passe"
-                  label="Mot de passe"
-                  autoCapitalize="none"
-                  extraClasses="w-full mb-2"
-                  secureTextEntry={true}
-                />
-                <InputText
-                  value={confirmPassword}
-                  onChangeText={(confirmPassword: string) =>
-                    setConfirmPassword(confirmPassword)
-                  }
-                  placeholder="Confirmer mot de passe"
-                  label="Confirmer mot de passe"
-                  autoCapitalize="none"
-                  extraClasses="w-full mb-2"
-                  secureTextEntry={true}
-                />
-                <ButtonPrimaryEnd
-                  label="Inscription"
-                  iconName="arrow-right"
-                  onPressFn={onSignUpPress}
-                  isLoading={isConnectionLoading}
-                  extraClasses="w-full mb-5"
-                />
-              </>
-            ) : (
-              <>
-                <InputText
-                  label="Code de validation"
-                  value={code}
-                  placeholder="Code..."
-                  onChangeText={(code: string) => setCode(code)}
-                />
-                <Button title="Verify Email" onPress={onPressVerify} />
-              </>
-            )}
-*/}
+          {/* Modale Alerte*/}
+          {alertMessage && (
+            <CustomAlert
+              visible={!!alertMessage}
+              message={alertMessage}
+              alertType="danger"
+              onClose={() => setAlertMessage(null)}
+            />
+          )}
         </ScrollView>
       </SafeAreaView>
     </View>

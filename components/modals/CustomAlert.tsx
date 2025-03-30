@@ -4,29 +4,35 @@ import { useColorScheme } from "nativewind";
 
 type CustomAlertProps = {
   message: string;
+  alertType: "danger" | "success";
   visible: boolean;
   onClose: () => void;
 };
 
 export default function CustomAlert({
   message,
+  alertType,
   visible,
   onClose,
 }: CustomAlertProps): JSX.Element {
   const { colorScheme, toggleColorScheme } = useColorScheme();
+
   const screenStyle =
     colorScheme === "light" ? styles.screenLight : styles.screenDark;
   const containerStyle =
     colorScheme === "light" ? styles.containerLight : styles.containerDark;
   const messageStyle =
     colorScheme === "light" ? styles.messageLight : styles.messageDark;
+  const titleStyle = [styles.titleBar, styles[alertType]];
 
   return (
     <Modal transparent={true} visible={visible} animationType="fade">
       <View style={screenStyle}>
         <View style={containerStyle}>
-          <View style={styles.titleBar}>
-            <Text style={styles.title}>Erreur</Text>
+          <View style={titleStyle}>
+            <Text style={styles.title}>
+              {alertType === "danger" ? "Erreur" : "Success"}
+            </Text>
           </View>
           <View style={messageStyle}>
             <Text>{message}</Text>
@@ -51,7 +57,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(252, 255, 240, 0.2)",
+    backgroundColor: "rgba(252, 255, 240, 0.8)",
   },
   screenDark: {
     flex: 1,
@@ -63,16 +69,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "#98B66E",
     borderWidth: 1,
-    //backgroundColor: "rgb(252 255 240)",
-    width: "90%",
+    backgroundColor: "rgb(252 255 240)",
+    //backgroundColor: "#98B66E",
+    width: "80%",
   },
   containerDark: {
     borderRadius: 10,
     borderColor: "#98B66E",
     borderWidth: 1,
-    //backgroundColor: "rgb(38 46 32)",
-    backgroundColor: "#98B66E",
-    width: "90%",
+    backgroundColor: "rgb(38 46 32)",
+    //backgroundColor: "#98B66E",
+    width: "80%",
   },
   titleBar: {
     borderTopLeftRadius: 10,
@@ -80,7 +87,12 @@ const styles = StyleSheet.create({
     padding: 5,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgb(148 41 17)",
+  },
+  danger: {
+    backgroundColor: "#942911",
+  },
+  success: {
+    backgroundColor: "#98B66E",
   },
   title: {
     color: "white",
