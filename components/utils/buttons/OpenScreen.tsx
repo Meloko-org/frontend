@@ -27,7 +27,7 @@ export default function OpenScreenButton({
       className={`${extraClasses} `}
       onPress={() => navigation.navigate(screen)}
     >
-      <View className="flex flex-row w-auto py-4 items-center rounded-lg bg-darkbg/25 dark:bg-lightbg/25">
+      <View className="flex flex-row w-auto py-4 items-center rounded-lg bg-darkbg/20 dark:bg-lightbg/25">
         <View className="flex-grow ml-3">
           <TextBody1>{label}</TextBody1>
         </View>

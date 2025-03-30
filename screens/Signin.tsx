@@ -78,50 +78,44 @@ export default function SignInScreen({ navigation }: Props) {
   const [performedSignedIn, setPerformedSignedIn] = useState(false);
   const [isConnectionLoading, setConnectionLoading] = useState(false);
 
-  /* 
-  useEffect(() => {
-    if (isSignedIn) {
-      if (performedSignedIn) {
-        fetchData();
-        setPerformedSignedIn(false);
-        //setPerformedSignedUp(false);
-      }
-
-      if (performedSignedUp) {
-        setTimeout(() => {
-          fetchData();
-          setPerformedSignedIn(false);
-          setPerformedSignedUp(false);
-        }, 3000);
-      }
-    } else {
-    }
-  }, [isSignedIn, performedSignedIn, ]); //performedSignedUp
-*/
-
   const fetchData = async () => {
     try {
       // store user info in the store
       const token = await getToken();
-      const user = await userTools.getUserInfos(token);
-      if (user) {
-        dispatch(updateUser(user));
-        const producer = await producerTools.getProducerInfos(token);
-        if (producer) {
-          dispatch(setProducerData(producer));
-          const shop = await shopTools.getShopInfos(token, producer._id);
-          if (shop) {
-            dispatch(setShopData(shop));
-            navigation.navigate("TabNavigatorProducer", {
-              screen: "BusinessCenter",
-            });
-          } else {
-            navigation.navigate("TabNavigatorProducer", { screen: "Stocks" });
-          }
-        } else {
-          navigation.navigate("TabNavigatorUser", { screen: "Search" });
-        }
+      const userResponse = await userTools.getUserInfos(token);
+
+      if (!userResponse.success) {
+        console.error(userResponse.message);
+        return;
       }
+
+      dispatch(updateUser(userResponse.data!));
+
+      const producerResponse = await producerTools.getProducerInfos(token);
+
+      if (!producerResponse.success) {
+        console.error(producerResponse.message);
+        // pas de profil producer, on dirige vers la SearchScreen
+        navigation.navigate("TabNavigatorUser", { screen: "Search" });
+        return;
+      }
+
+      const producer = producerResponse.data;
+      dispatch(setProducerData(producer));
+
+      const shopResponse = await shopTools.getShopInfos(token, producer?._id);
+
+      if (!shopResponse.success) {
+        console.error(shopResponse.message);
+        navigation.navigate("TabNavigatorProducer", { screen: "Shop" });
+      }
+
+      const shop = shopResponse.data;
+      dispatch(setShopData(shop));
+
+      navigation.navigate("TabNavigatorProducer", {
+        screen: "BusinessCenter",
+      });
     } catch (error) {
       console.error(error);
     }
@@ -151,61 +145,18 @@ export default function SignInScreen({ navigation }: Props) {
     }
   }, []);
 
-  /*
-  const onSignUpPress = async () => {
-    // If Clerk is not loaded
-    if (!isLoaded) {
-      return;
-    }
-
-    try {
-      // Try to signup
-      await signUp.create({
-        emailAddress: newEmailAddress,
-        password: newPassword,
-      });
-
-      // Send the email verification code
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-
-      // Verification is pending
-      setPendingVerification(true);
-    } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2));
-    }
-  };
-
-  const onPressVerify = async () => {
-    // If Clerk is not loaded
-    if (!isLoaded) {
-      return;
-    }
-
-    try {
-      // Try to verify the email with the provided code
-      const completeSignUp = await signUp?.attemptEmailAddressVerification({
-        code,
-      });
-
-      // If the verification event is sucessfull
-      if (completeSignUp?.status === "complete") {
-        await setActive({ session: completeSignUp.createdSessionId });
-        setPerformedSignedUp(true);
-      } else {
-        console.error(JSON.stringify(completeSignUp, null, 2));
-      }
-    } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2));
-    }
-  };
-*/
-
   // Signin the user with Clerk
   const onSignInPress = useCallback(async () => {
+    // vérification des champs
+    if (emailAddress === "") {
+      setAlertMessage("Veuillez saisir un email.");
+      return;
+    }
+    if (password === "") {
+      setAlertMessage("Veuillez saisir un mot de passe.");
+      return;
+    }
+
     // If Clerk is not loaded
     if (!isLoaded) {
       return;

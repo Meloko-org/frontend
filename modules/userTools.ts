@@ -1,12 +1,9 @@
+import { ApiResponse, UserData } from "../types/API";
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
-/**
- * Get the user's info to store
- * @param apiUrl the url of the backend
- * @param token  the clerk token needed to fetch
- * @returns {object} Get only email, firstname, lastname, avatar, favSearch and bookmarks
- */
-const getUserInfos = async (token: string | null) => {
+const getUserInfos = async (
+  token: string | null,
+): Promise<ApiResponse<UserData>> => {
   try {
     const response = await fetch(`${API_ROOT}/users/logged`, {
       method: "GET",
@@ -16,11 +13,28 @@ const getUserInfos = async (token: string | null) => {
         mode: "cors",
       },
     });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible de récupérer l'utilisateur.`,
+      };
+    }
+
     const data = await response.json();
 
-    return data;
+    return data.success
+      ? { success: true, data: data.user }
+      : { success: false, data: null, message: data.message };
   } catch (error) {
     console.error(error);
+    return {
+      success: false,
+      data: null,
+      message:
+        "Une erreur s'est produite lors de la récupération de l'utilisateur.",
+    };
   }
 };
 

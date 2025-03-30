@@ -1,10 +1,10 @@
-import { ProducerData } from "../types/API";
+import { ApiResponse, ProducerData } from "../types/API";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
 const getProducerInfos = async (
   token: string | null,
-): Promise<ProducerData> => {
+): Promise<ApiResponse<ProducerData>> => {
   try {
     const response = await fetch(`${API_ROOT}/producers/logged`, {
       method: "GET",
@@ -15,12 +15,27 @@ const getProducerInfos = async (
       },
     });
 
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible de récupérer le producteur.`,
+      };
+    }
+
     const data = await response.json();
-    // console.log("getProducerInfos: ", data)
-    return data;
+
+    return data.success
+      ? { success: true, data: data.producer }
+      : { success: false, data: null, message: data.message };
   } catch (error) {
     console.log(error);
-    return null;
+    return {
+      success: false,
+      data: null,
+      message:
+        "Une erreur s'est produite lors de la récupération du producteur.",
+    };
   }
 };
 

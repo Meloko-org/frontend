@@ -18,7 +18,7 @@ export default function BackLabelButton(
   return (
     <TouchableOpacity onPress={props.onPressFn}>
       <View
-        className={`${props.extraClasses} flex flex-row w-auto py-1 items-center rounded-lg bg-darkbg/25 dark:bg-lightbg/25`}
+        className={`${props.extraClasses} flex flex-row w-auto py-1 items-center rounded-lg bg-darkbg/20 dark:bg-lightbg/25`}
       >
         <View className="">
           <FontAwesome name="arrow-left" size={30} color="#98B66E" />

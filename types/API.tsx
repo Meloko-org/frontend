@@ -151,6 +151,13 @@ type ProductDetail = {
   isConfirmed: boolean | null;
 };
 
+// type de réponse de l'api
+type ApiResponse<T> = {
+  success: boolean;
+  data: T | null;
+  message?: string;
+};
+
 export type {
   ProductData,
   ShopData,
@@ -166,4 +173,5 @@ export type {
   OpeningHoursData,
   PeriodData,
   ProductDetail,
+  ApiResponse,
 };

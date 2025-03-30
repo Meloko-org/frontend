@@ -1,4 +1,4 @@
-import { ShopData, MarketData } from "../types/API";
+import { ApiResponse, ShopData, MarketData } from "../types/API";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -104,9 +104,9 @@ const updateShopMarkets = async (values: UpdateShopMarketsData) => {
 const getShopInfos = async (
   token: string | null,
   id: string,
-): Promise<ShopData> => {
+): Promise<ApiResponse<ShopData>> => {
   try {
-    console.log(`${API_ROOT}/shops/myshop/${id}`);
+    //console.log(`${API_ROOT}/shops/myshop/${id}`);
     const response = await fetch(`${API_ROOT}/shops/myshop/${id}`, {
       method: "GET",
       headers: {
@@ -115,12 +115,28 @@ const getShopInfos = async (
         mode: "cors",
       },
     });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible de récupérer le shop.`,
+      };
+    }
+
     const data = await response.json();
-    console.log("getShopInfos: ", data);
-    return data;
+
+    return data.success
+      ? { success: true, data: data.shop }
+      : { success: false, data: null, message: data.message };
   } catch (error) {
     console.log(error);
-    return null;
+    return {
+      success: false,
+      data: null,
+      message:
+        "Une erreur s'est produite lors de la récupération du producteur.",
+    };
   }
 };
 

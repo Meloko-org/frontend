@@ -54,8 +54,52 @@ export default function SignUpScreen({ navigation }: Props) {
   // Email verification code
   const [code, setCode] = useState<string>("");
 
+  const fetchData = async () => {
+    try {
+      const token = await getToken();
+      const userResponse = await userTools.getUserInfos(token);
+
+      if (!userResponse.success) {
+        console.error(userResponse.message);
+        return;
+      }
+
+      // mise à jour du store
+      dispatch(updateUser(userResponse.data!));
+
+      if (isProducer) {
+        const producerResponse = await producerTools.initialiseProducer(token);
+
+        if (!producerResponse.success) {
+          console.error(producerResponse.message);
+          //setAlertMessage(producerResponse.message);
+        } else {
+          navigation.navigate("TabNavigatorProducer", {
+            screen: "ProducerProfile",
+          });
+        }
+      } else {
+        navigation.navigate("TabNavigatorUser", { screen: "UserProfile" });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const onSignUpPress = async () => {
-    // vérification des mots de passe
+    // vérification des champs
+    if (emailAddress === "") {
+      setAlertMessage("Veuillez saisir un email.");
+      return;
+    }
+    if (password === "") {
+      setAlertMessage("Veuillez saisir un mot de passe.");
+      return;
+    }
+    if (confirmPassword === "") {
+      setAlertMessage("Veuillez confirmer le mot de passe.");
+      return;
+    }
     if (password !== confirmPassword) {
       setAlertMessage("Les deux mots de passe ne sont pas identiques.");
       return;
@@ -82,7 +126,7 @@ export default function SignUpScreen({ navigation }: Props) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
-      setAlertMessage(err.errors[0].message);
+      setAlertMessage(err.errors.map((err: string) => err.message).join("\n"));
     }
   };
 
@@ -110,30 +154,7 @@ export default function SignUpScreen({ navigation }: Props) {
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
 
-        const token = await getToken();
-        const userResponse = await userTools.getUserInfos(token);
-
-        if (userResponse.success) {
-          console.log("user in Response :", userResponse.user);
-          // mise à jour du store
-          dispatch(updateUser(userResponse.user));
-          if (isProducer) {
-            const producerResponse =
-              await producerTools.initialiseProducer(token);
-            if (producerResponse.success) {
-              navigation.navigate("TabNavigatorProducer", {
-                screen: "ProducerProfile",
-              });
-            } else {
-              setAlertMessage(producerResponse.message);
-            }
-          } else {
-            navigation.navigate("TabNavigatorUser", { screen: "UserProfile" });
-          }
-        } else {
-          Alert.alert(userResponse.message);
-          setPendingVerification(false);
-        }
+        fetchData();
       } else {
         console.error(JSON.stringify(completeSignUp, null, 2));
       }
@@ -144,8 +165,6 @@ export default function SignUpScreen({ navigation }: Props) {
       setAlertMessage(err.errors[0].message);
     }
   };
-
-  console.log("producer", isProducer);
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
