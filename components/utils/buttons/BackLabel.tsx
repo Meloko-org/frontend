@@ -3,7 +3,6 @@ import { TouchableOpacity, View } from "react-native";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
 const FontAwesome = _Fontawesome as React.ElementType;
 import { GestureResponderEvent } from "react-native";
-import TextHeading4 from "../texts/Heading4";
 import TextBody1 from "../texts/Body1";
 
 type BackLabelButtonProps = {

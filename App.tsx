@@ -66,8 +66,8 @@ const persistor = persistStore(store);
 const FontAwesome = _FontAwesome as React.ElementType;
 
 // Create a Natrive Stack Navigator
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<RootStackParamList>();
 
 // Navigator screen options
 const options: NativeStackNavigationOptions = {

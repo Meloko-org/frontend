@@ -11,7 +11,7 @@ import BackLabelButton from "./utils/buttons/BackLabel";
 type TopBarProps = {
   backLabel: string;
   label: string;
-  screen: keyof RootStackParamList;
+  screen: keyof RootStackParamList | string;
   extraClasses?: string;
 };
 

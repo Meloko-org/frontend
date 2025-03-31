@@ -77,7 +77,10 @@ export default function UserProfileScreen({ navigation }: Props) {
   useEffect(() => {
     if (!isSignedIn) {
       // à modifier
-      navigation.navigate("SignIn");
+      navigation.navigate("SignIn", {
+        from: "UserProfile",
+        label: "Retour à la recherche",
+      });
     } else {
       fetchData();
       setFirstname(userStore.firstname);

@@ -2,9 +2,8 @@
 // To keep synced with the Native Stack
 type RootStackParamList = {
   Home: undefined;
-  SignIn: undefined;
-  SignUp: undefined;
-  // SignUp: undefined;
+  SignIn: { from?: string; backLabel?: string; screenTitle?: string };
+  SignUp: { from: string; backLabel: string; screenTitle: string };
   TabNavigatorUser: {
     screen:
       | "Search"

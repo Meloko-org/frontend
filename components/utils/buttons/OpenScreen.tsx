@@ -11,13 +11,13 @@ import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
 type OpenScreenButtonProps = {
   label: string;
   extraClasses?: string;
-  screen: keyof RootStackParamList;
+  onPressFn: () => void;
 };
 
 export default function OpenScreenButton({
   label,
   extraClasses,
-  screen,
+  onPressFn,
 }: OpenScreenButtonProps): JSX.Element {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -25,7 +25,7 @@ export default function OpenScreenButton({
   return (
     <TouchableOpacity
       className={`${extraClasses} `}
-      onPress={() => navigation.navigate(screen)}
+      onPress={() => onPressFn()}
     >
       <View className="flex flex-row w-auto py-4 items-center rounded-lg bg-darkbg/20 dark:bg-lightbg/25">
         <View className="flex-grow ml-3">

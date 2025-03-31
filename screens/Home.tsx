@@ -213,7 +213,13 @@ export default function HomeScreen({ navigation }: Props) {
                     label={`Connexion\nInscription`}
                     iconName="sign-in-alt"
                     disabled={false}
-                    onPressFn={() => navigation.navigate("SignIn")}
+                    onPressFn={() =>
+                      navigation.navigate("SignIn", {
+                        from: "Home",
+                        backLabel: "Retour à l'accueil",
+                        screenTitle: "CONNEXION\nINSCRIPTION",
+                      })
+                    }
                     extraClasses="w-full h-20"
                   />
                 </>

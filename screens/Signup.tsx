@@ -5,6 +5,8 @@ import { updateUser } from "../reducers/user";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
+import { useRoute } from "@react-navigation/native";
+import { RouteProp } from "@react-navigation/native";
 
 import userTools from "../modules/userTools";
 import producerTools from "../modules/producerTools";
@@ -19,16 +21,21 @@ import CodeInput from "../components/CodeInput";
 import TextHeading4 from "../components/utils/texts/Heading4";
 import CustomAlert from "../components/modals/CustomAlert";
 
-type ProfileScreenNavigationProp = NativeStackNavigationProp<
+type SignUpScreenRouteProp = RouteProp<RootStackParamList, "SignUp">;
+
+type SignUpScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "SignUp"
 >;
 
-type Props = {
-  navigation: ProfileScreenNavigationProp;
+type SignUpScreenProps = {
+  navigation: SignUpScreenNavigationProp;
 };
 
-export default function SignUpScreen({ navigation }: Props) {
+export default function SignUpScreen({ navigation }: SignUpScreenProps) {
+  const route = useRoute<SignUpScreenRouteProp>();
+  const { from, backLabel, screenTitle } = route.params;
+
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   // Import the Clerk signup functions
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -166,13 +173,15 @@ export default function SignUpScreen({ navigation }: Props) {
     }
   };
 
+  console.log("from :", from);
+
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
       <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
         <TopBar
-          backLabel="Retour à la connexion"
-          screen="SignIn"
-          label={`CREER UN\nCOMPTE`}
+          backLabel={backLabel}
+          screen={from}
+          label={screenTitle}
           extraClasses="mt-2"
         />
 

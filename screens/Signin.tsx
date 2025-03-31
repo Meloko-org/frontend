@@ -6,6 +6,8 @@ import * as Linking from "expo-linking";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
+import { useRoute } from "@react-navigation/native";
+import { RouteProp } from "@react-navigation/native";
 
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -27,13 +29,15 @@ import TextHeading4 from "../components/utils/texts/Heading4";
 import TextBody1 from "../components/utils/texts/Body1";
 import OpenScreenButton from "../components/utils/buttons/OpenScreen";
 
-type ProfileScreenNavigationProp = NativeStackNavigationProp<
+type SignInScreenRouteProp = RouteProp<RootStackParamList, "SignIn">;
+
+type SignInScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "SignIn"
 >;
 
-type Props = {
-  navigation: ProfileScreenNavigationProp;
+type SignInScreenProps = {
+  navigation: SignInScreenNavigationProp;
 };
 
 // Warm up the android browser to improve UX
@@ -49,8 +53,12 @@ export const useWarmUpBrowser = () => {
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function SignInScreen({ navigation }: Props) {
+export default function SignInScreen({ navigation }: SignInScreenProps) {
   useWarmUpBrowser();
+
+  const route = useRoute<SignInScreenRouteProp>();
+  const { from, backLabel, screenTitle } = route.params || {}; // route.params peut être non défini quand on revient SignUpScreen
+
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
   );
@@ -68,7 +76,6 @@ export default function SignInScreen({ navigation }: Props) {
 
   // Import the Clerk Auth functions
   const { signIn, setActive, isLoaded } = useSignIn();
-  //const { signUp } = useSignUp();
 
   // import the Clerk Google OAuth flow
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
@@ -201,9 +208,9 @@ export default function SignInScreen({ navigation }: Props) {
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
       <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
         <TopBar
-          backLabel="Retour à l'accueil"
-          screen="Home"
-          label={`CONNEXION\nINSCRIPTION`}
+          backLabel={backLabel || "Retour à l'accueil"}
+          screen={from || "Home"}
+          label={screenTitle || "CONNEXION\nINSCRIPTION"}
           extraClasses="mt-2"
         />
 
@@ -278,7 +285,16 @@ export default function SignInScreen({ navigation }: Props) {
             <View className="flex flex-row justify-center mb-3">
               <TextBody1>Pas encore membre ?</TextBody1>
             </View>
-            <OpenScreenButton label="Créer un compte" screen="SignUp" />
+            <OpenScreenButton
+              label="Créer un compte"
+              onPressFn={() =>
+                navigation.navigate("SignUp", {
+                  from: "SignIn",
+                  backLabel: "Retour à la connexion",
+                  screenTitle: "CREER UN\nCOMPTE",
+                })
+              }
+            />
           </View>
 
           {/* Modale Alerte*/}
