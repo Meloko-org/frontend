@@ -1,9 +1,8 @@
 import React from "react";
 import { useState, useRef } from "react";
 import { TouchableOpacity, Animated, Easing } from "react-native";
-import _Fontawesome from "react-native-vector-icons/FontAwesome";
 import { GestureResponderEvent } from "react-native";
-const FontAwesome = _Fontawesome as React.ElementType;
+import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
 
 type ButtonIconProps = {
   iconName: string;
@@ -52,7 +51,7 @@ export default function ButtonIcon(props: ButtonIconProps): JSX.Element {
     >
       {/* Applique la rotation à l'icône via transform */}
       <Animated.View style={{ transform: [{ rotate: rotation }] }}>
-        <FontAwesome
+        <FontAwesome5Icon
           name={props.iconName}
           size={props.size ? props.size : 25}
           color="#FFFFFF"
