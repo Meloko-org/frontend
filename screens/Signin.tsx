@@ -51,6 +51,9 @@ WebBrowser.maybeCompleteAuthSession();
 
 export default function SignInScreen({ navigation }: Props) {
   useWarmUpBrowser();
+  const userStore = useSelector(
+    (state: { user: UserState }) => state.user.value,
+  );
   const producerStore = useSelector(
     (state: { producer: ProducerState }) => state.producer.value,
   );
@@ -88,6 +91,8 @@ export default function SignInScreen({ navigation }: Props) {
         console.error(userResponse.message);
         return;
       }
+
+      console.log("user fetchData :", userResponse.data);
 
       dispatch(updateUser(userResponse.data!));
 
@@ -188,6 +193,8 @@ export default function SignInScreen({ navigation }: Props) {
     }
   }, [isLoaded, emailAddress, password]);
 
+  console.log("---------------- SIGNIN -------------------");
+  console.log("userStore :", userStore);
   console.log("producerStore: ", producerStore);
 
   return (

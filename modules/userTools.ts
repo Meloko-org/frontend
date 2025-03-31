@@ -24,6 +24,8 @@ const getUserInfos = async (
 
     const data = await response.json();
 
+    console.log("data returned :", data);
+
     return data.success
       ? { success: true, data: data.user }
       : { success: false, data: null, message: data.message };
@@ -38,7 +40,7 @@ const getUserInfos = async (
   }
 };
 
-const updateUser = async (token: string, values: string) => {
+const updateUser = async (token: string | null, values: {}) => {
   try {
     const response = await fetch(`${API_ROOT}/users/logged`, {
       method: "PUT",

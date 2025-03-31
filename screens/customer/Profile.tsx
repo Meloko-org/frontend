@@ -76,7 +76,8 @@ export default function UserProfileScreen({ navigation }: Props) {
 
   useEffect(() => {
     if (!isSignedIn) {
-      setIsSigninModalVisible(true);
+      // à modifier
+      navigation.navigate("SignIn");
     } else {
       fetchData();
       setFirstname(userStore.firstname);
@@ -89,25 +90,24 @@ export default function UserProfileScreen({ navigation }: Props) {
     try {
       const token = await getToken();
       // store producer info in the store
-      const producerInfos = await producerTools.getProducerInfos(token);
+      const producerResponse = await producerTools.getProducerInfos(token);
 
-      if (producerInfos) {
-        if (!("message" in producerInfos)) {
-          // si on n'a pas une réponse {message: "Producer ot found."}
-          dispatch(setProducerData(producerInfos));
-          // store shop infos to the store
-          const shopInfos = await shopTools.getShopInfos(
-            token,
-            producerInfos._id,
-          );
-          if (shopInfos) {
-            if (!("message" in shopInfos)) {
-              // si on n'a pas une réponse {message: "Shop not found."}
-              dispatch(setShopData(shopInfos));
-            }
-          }
-        }
+      if (!producerResponse.success) {
+        console.error(producerResponse.message);
+        return;
       }
+
+      const producer = producerResponse.data;
+      dispatch(setProducerData(producer));
+
+      const shopResponse = await shopTools.getShopInfos(token, producer?._id);
+
+      if (!shopResponse.success) {
+        console.error(shopResponse.message);
+        return;
+      }
+
+      dispatch(setShopData(shopResponse.data));
     } catch (error) {
       console.error(error);
     }

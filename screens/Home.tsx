@@ -160,18 +160,19 @@ export default function HomeScreen({ navigation }: Props) {
                 <>
                   {producerStore !== null ? (
                     <>
-                      <ButtonPrimaryEnd
-                        label="Mon Activité"
-                        iconName="search"
-                        iconFamily="FontAwesomeIcon"
-                        disabled={false}
-                        onPressFn={() =>
-                          navigation.navigate("TabNavigatorUser", {
-                            screen: "Search",
-                          })
-                        }
-                        extraClasses="mb-3 h-14"
-                      />
+                      <View className="w-full">
+                        <ButtonPrimaryEnd
+                          label="Mon Activité"
+                          iconName="search"
+                          disabled={false}
+                          onPressFn={() =>
+                            navigation.navigate("TabNavigatorUser", {
+                              screen: "Search",
+                            })
+                          }
+                          extraClasses="mb-3 h-14"
+                        />
+                      </View>
                     </>
                   ) : (
                     <>
