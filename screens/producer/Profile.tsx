@@ -1,6 +1,8 @@
-import React, { useAuth } from "@clerk/clerk-expo";
-import { useState, useEffect } from "react";
+import { useAuth } from "@clerk/clerk-expo";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useColorScheme } from "nativewind";
+
 import BottomSheet, {
   BottomSheetView,
   BottomSheetScrollView,
@@ -18,7 +20,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 
 /* Eléments graphiques */
-import { View, Alert, Text } from "react-native";
+import { View, Alert, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import InputText from "../../components/utils/inputs/Text";
@@ -33,6 +35,8 @@ import Animated, {
 } from "react-native-reanimated";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import ColorSchemeButton from "../../components/utils/buttons/ColorScheme";
+import TextBody1 from "../../components/utils/texts/Body1";
+import CheckBox from "../../components/utils/inputs/CheckBox";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -46,6 +50,13 @@ type Props = {
 export default function ProducerProfileScreen({ navigation }: Props) {
   const [isOpenInfo, setOpenInfo] = useState(false);
   const [isOpenAddress, setOpenAddress] = useState(false);
+
+  const { colorScheme, toggleColorScheme } = useColorScheme();
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  const openBottomSheet = () => {
+    bottomSheetRef.current?.expand();
+  };
 
   // Import the Clerk Auth functions
   const { getToken, signOut } = useAuth();
@@ -163,6 +174,8 @@ export default function ProducerProfileScreen({ navigation }: Props) {
       screen: "UserProfile",
     });
   };
+
+  const handleSheetChanges = useCallback((index: number) => {}, []);
 
   console.log(
     "---------------------------------- PRODUCER --------------------------------------------------------------------",
@@ -358,7 +371,7 @@ export default function ProducerProfileScreen({ navigation }: Props) {
               iconFamily="FontAwesome5Icon"
               extraClasses="bg-premium rounded-full my-4 h-[60px]"
               textClasses="text-lightbg text-lg font-bold"
-              onPressFn={() => {}}
+              onPressFn={openBottomSheet}
             />
           </View>
         </ScrollView>
@@ -370,6 +383,67 @@ export default function ProducerProfileScreen({ navigation }: Props) {
           onPressFn={switchUser}
         />
       </View>
+
+      <BottomSheet
+        ref={bottomSheetRef}
+        snapPoints={["75%"]}
+        enablePanDownToClose={true}
+        handleStyle={{
+          backgroundColor: colorScheme === "dark" ? "#444C3D" : "#FFF",
+        }}
+        handleIndicatorStyle={{
+          backgroundColor: colorScheme === "dark" ? "#FCFFF0" : "#444C3D",
+        }}
+        onChange={handleSheetChanges}
+      >
+        <BottomSheetView
+          style={[
+            styles.contentContainer,
+            {
+              backgroundColor: colorScheme === "dark" ? "#262E20" : "#FCFFF0",
+            },
+          ]}
+        >
+          <View className="flex justify-center items-center p-3 w-full h-full">
+            <View>
+              <TextBody1 centered>
+                En devenant membre Premium, bla bla bla. Cet abonnement est au
+                prix de 15 € ht par mois
+              </TextBody1>
+              <View className="items-center my-5">
+                <CheckBox
+                  label="J'accèpte les conditions"
+                  textClasses="text-secondary dark:text-lightbg"
+                />
+              </View>
+              <View className="px-3">
+                <ButtonPrimaryEnd
+                  label="Valider"
+                  iconName="check"
+                  iconFamily="FontAwesome5Icon"
+                  disabled={false}
+                  onPressFn={() => console.log("youpi")}
+                  extraClasses="mb-3 h-14"
+                />
+              </View>
+            </View>
+          </View>
+        </BottomSheetView>
+      </BottomSheet>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  map: {
+    flex: 1,
+    position: "relative",
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
+  },
+});
