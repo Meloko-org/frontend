@@ -67,6 +67,7 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   );
 
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertType, setAlertType] = useState<"success" | "danger">("danger");
 
   // need to get the user infos
   const { signOut, isSignedIn, getToken } = useAuth();
@@ -164,10 +165,12 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
     // vérification des champs
     if (emailAddress === "") {
       setAlertMessage("Veuillez saisir un email.");
+      setAlertType("danger");
       return;
     }
     if (password === "") {
       setAlertMessage("Veuillez saisir un mot de passe.");
+      setAlertType("danger");
       return;
     }
 
@@ -197,7 +200,8 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
       setConnectionLoading(false);
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
-      setAlertMessage(err.errors[0].message);
+      setAlertMessage(err.errors.map((err: string) => err.message).join("\n"));
+      setAlertType("danger");
       setConnectionLoading(false);
     }
   }, [isLoaded, emailAddress, password]);
@@ -304,7 +308,7 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
             <CustomAlert
               visible={!!alertMessage}
               message={alertMessage}
-              alertType="danger"
+              alertType={alertType}
               onClose={() => setAlertMessage(null)}
             />
           )}
