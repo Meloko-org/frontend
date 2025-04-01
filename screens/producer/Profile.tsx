@@ -1,6 +1,7 @@
 import { useAuth } from "@clerk/clerk-expo";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { ModeState, changeMode } from "../../reducers/mode";
 import { useColorScheme } from "nativewind";
 
 import BottomSheet, {
@@ -48,6 +49,9 @@ type Props = {
 };
 
 export default function ProducerProfileScreen({ navigation }: Props) {
+  const modeStore = useSelector(
+    (state: { mode: ModeState }) => state.mode.value,
+  );
   const [isOpenInfo, setOpenInfo] = useState(false);
   const [isOpenAddress, setOpenAddress] = useState(false);
 
@@ -175,6 +179,12 @@ export default function ProducerProfileScreen({ navigation }: Props) {
     });
   };
 
+  const toggleMode = () => {
+    toggleColorScheme();
+    const displayMode = modeStore.mode === "light" ? "dark" : "light";
+    dispatch(changeMode(displayMode));
+  };
+
   const handleSheetChanges = useCallback((index: number) => {}, []);
 
   console.log(
@@ -195,10 +205,10 @@ export default function ProducerProfileScreen({ navigation }: Props) {
           <View className="flex flex-row items-center mb-5">
             <View className="">
               <ColorSchemeButton
-                iconName="sun"
+                iconName={colorScheme === "dark" ? "sun" : "moon"}
                 iconFamily="FontAwesome5Icon"
                 size={40}
-                onPressFn={() => {}}
+                onPressFn={toggleMode}
               />
             </View>
             <View className="flex-grow">
