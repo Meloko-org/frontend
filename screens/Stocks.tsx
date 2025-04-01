@@ -17,7 +17,7 @@ import TextHeading4 from "../components/utils/texts/Heading4";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import BackLabelButton from "../components/utils/buttons/BackLabel";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
-import ButtonIcon from "../components/utils/buttons/Icon";
+import IconButton from "../components/utils/buttons/Icon";
 import TextBody1 from "../components/utils/texts/Body1";
 import AddProductModal from "../components/modals/producer/AddProduct";
 import Spinner from "../components/utils/Spinner";
@@ -212,7 +212,7 @@ export default function StocksScreen({ navigation }: Props) {
                         }
                         )
                       </TextHeading4>
-                      <ButtonIcon
+                      <IconButton
                         iconName="arrow-down"
                         extraClasses="p-3 bg-primary"
                         onPressFn={() => toggleOpenList(category)}
@@ -276,7 +276,7 @@ export default function StocksScreen({ navigation }: Props) {
 
                                 <View className="flex flex-row items-center mt-1">
                                   <TextBody1>Quantité</TextBody1>
-                                  <ButtonIcon
+                                  <IconButton
                                     iconName="minus"
                                     extraClasses="bg-primary px-2 ml-2"
                                     size={20}
@@ -289,7 +289,7 @@ export default function StocksScreen({ navigation }: Props) {
                                       {stock.stock ? stock.stock : 0}
                                     </TextHeading4>
                                   </View>
-                                  <ButtonIcon
+                                  <IconButton
                                     iconName="plus"
                                     extraClasses="bg-primary px-2"
                                     size={20}

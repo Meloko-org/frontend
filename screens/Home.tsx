@@ -20,8 +20,13 @@ import shopTools from "../modules/shopTools";
 
 import { useSelector, useDispatch } from "react-redux";
 import { UserState, updateUser, resetUser } from "../reducers/user";
-import { ProducerState, setProducerData } from "../reducers/producer";
-import { ShopState, setShopData } from "../reducers/shop";
+import {
+  ProducerState,
+  setProducerData,
+  resetProducerData,
+} from "../reducers/producer";
+import { ShopState, setShopData, resetShopData } from "../reducers/shop";
+import { emptyCart } from "../reducers/cart";
 import { ModeState } from "../reducers/mode";
 import SignInScreen from "./Signin";
 
@@ -62,29 +67,33 @@ export default function HomeScreen({ navigation }: Props) {
     try {
       // store user's info in the store
       const token = await getToken();
-      const user = await userTools.getUserInfos(token);
-      if (user) {
-        dispatch(updateUser(user));
-        const producerInfos = await producerTools.getProducerInfos(token);
+      const userResponse = await userTools.getUserInfos(token);
 
-        if (producerInfos) {
-          if (!("message" in producerInfos)) {
-            // si on n'a pas une réponse {message: "Producer ot found."}
-            dispatch(setProducerData(producerInfos));
-            // store shop infos to the store
-            const shopInfos = await shopTools.getShopInfos(
-              token,
-              producerInfos._id,
-            );
-            if (shopInfos) {
-              if (!("message" in shopInfos)) {
-                // si on n'a pas une réponse {message: "Shop not found."}
-                dispatch(setShopData(shopInfos));
-              }
-            }
-          }
-        }
+      if (!userResponse.success) {
+        console.error(userResponse.message);
+        return;
       }
+
+      dispatch(updateUser(userResponse.data!));
+
+      const producerResponse = await producerTools.getProducerInfos(token);
+
+      if (!producerResponse.success) {
+        console.error(producerResponse.message);
+        return;
+      }
+
+      const producer = producerResponse.data;
+      dispatch(setProducerData(producer));
+
+      const shopResponse = await shopTools.getShopInfos(token, producer?._id);
+
+      if (!shopResponse.success) {
+        console.error(shopResponse.message);
+      }
+
+      const shop = shopResponse.data;
+      dispatch(setShopData(shop));
     } catch (error) {
       console.error(error);
     }
@@ -105,6 +114,10 @@ export default function HomeScreen({ navigation }: Props) {
   const onSignoutPress = async () => {
     try {
       await signOut();
+      dispatch(resetUser());
+      dispatch(emptyCart());
+      dispatch(resetProducerData());
+      dispatch(resetShopData());
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
     }
@@ -166,8 +179,8 @@ export default function HomeScreen({ navigation }: Props) {
                           iconName="search"
                           disabled={false}
                           onPressFn={() =>
-                            navigation.navigate("TabNavigatorUser", {
-                              screen: "Search",
+                            navigation.navigate("TabNavigatorProducer", {
+                              screen: "BusinessCenter",
                             })
                           }
                           extraClasses="mb-3 h-14"

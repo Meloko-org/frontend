@@ -1,25 +1,38 @@
-import { useAuth } from "@clerk/clerk-expo";
+import React, { useAuth } from "@clerk/clerk-expo";
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import { UserState, updateUser } from "../../reducers/user";
+import { useSelector, useDispatch } from "react-redux";
+import BottomSheet, {
+  BottomSheetView,
+  BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
+
+import { UserState, updateUser, resetUser } from "../../reducers/user";
+import { resetProducerData } from "../../reducers/producer";
+import { resetShopData } from "../../reducers/shop";
+import { emptyCart } from "../../reducers/cart";
+
 import producerTools from "../../modules/producerTools";
+import { ProducerData, ShopData } from "../../types/API";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 
 /* Eléments graphiques */
-import { View, Alert } from "react-native";
+import { View, Alert, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
-import TextHeading2 from "../../components/utils/texts/Heading2";
-import TextHeading3 from "../../components/utils/texts/Heading3";
-import Text from "../../components/utils/inputs/Text";
+import InputText from "../../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
-import Custom from "../../components/utils/buttons/Custom";
-import { ProducerData, ShopData } from "../../types/API";
-import ButtonIcon from "../../components/utils/buttons/Icon";
-import React from "react";
+import CustomButton from "../../components/utils/buttons/Custom";
+import IconButton from "../../components/utils/buttons/Icon";
+import OpenMenuButton from "../../components/utils/buttons/OpenMenu";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
+import TextHeading4 from "../../components/utils/texts/Heading4";
+import ColorSchemeButton from "../../components/utils/buttons/ColorScheme";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -31,18 +44,22 @@ type Props = {
 };
 
 export default function ProducerProfileScreen({ navigation }: Props) {
+  const [isOpenInfo, setOpenInfo] = useState(false);
   const [isOpenAddress, setOpenAddress] = useState(false);
+
   // Import the Clerk Auth functions
-  const { getToken } = useAuth();
+  const { getToken, signOut } = useAuth();
+
   const [isProducerSaveLoading, setProducerSaveLoading] = useState(false);
+
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
   );
   const producerStore = useSelector(
-    (state: { producer: ProducerData }) => state.producer.value,
+    (state: { producer: ProducerData }) => state.producer?.value,
   );
   const shopStore = useSelector(
-    (state: { shop: ShopData }) => state.shop.value,
+    (state: { shop: ShopData }) => state.shop?.value,
   );
   const dispatch = useDispatch();
 
@@ -57,8 +74,34 @@ export default function ProducerProfileScreen({ navigation }: Props) {
     city: "",
     country: "",
   });
+  const [isPremium, setPremium] = useState<boolean>(true); // à modifier
+
+  const heightInfo = useSharedValue(0);
+  const heightAddress = useSharedValue(0);
+
+  const toggleOpenInfo = () => {
+    setOpenInfo((prev) => !prev);
+    heightInfo.value = isOpenInfo ? withTiming(0) : withTiming(330);
+    // heightInfo.value = isOpenInfo ? withTiming(infoMeasuredHeight) : withTiming(0);
+  };
+
+  const toggleOpenAddress = () => {
+    setOpenAddress((prev) => !prev);
+    heightAddress.value = isOpenAddress ? withTiming(0) : withTiming(380);
+  };
+
+  const animatedStyleInfo = useAnimatedStyle(() => ({
+    height: heightInfo.value,
+    opacity: heightInfo.value > 0 ? 1 : 0, // Facultatif : gérer l'opacité
+  }));
+
+  const animatedStyleAddress = useAnimatedStyle(() => ({
+    height: heightAddress.value,
+    opacity: heightAddress.value > 0 ? 1 : 0, // Facultatif : gérer l'opacité
+  }));
 
   useEffect(() => {
+    console.log("Valeur actuelle de producerStore:", producerStore);
     if (producerStore !== null) {
       setSocialReason(producerStore.socialReason);
       setSiren(producerStore.siren);
@@ -71,11 +114,21 @@ export default function ProducerProfileScreen({ navigation }: Props) {
         city: producerStore.address.city,
         country: producerStore.address.country,
       });
+      //setIsPremium()
     }
   }, []);
 
-  const toggleOpenAddress = () => {
-    setOpenAddress(!isOpenAddress);
+  // Signout the user from Clerk
+  const onSignoutPress = async () => {
+    try {
+      await signOut();
+      dispatch(resetUser());
+      dispatch(emptyCart());
+      dispatch(resetProducerData());
+      dispatch(resetShopData());
+    } catch (err) {
+      console.error(JSON.stringify(err, null, 2));
+    }
   };
 
   const handleProducerUpdate = async () => {
@@ -126,142 +179,193 @@ export default function ProducerProfileScreen({ navigation }: Props) {
           showsVerticalScrollIndicator={false}
           className="flex h-full w-full p-3"
         >
-          <TextHeading2 extraClasses="my-3" centered>
-            Profil Producteur
-          </TextHeading2>
-
-          <Text
-            label="Raison sociale"
-            placeholder="Saisissez votre raison sociale"
-            value={socialReason}
-            onChangeText={(value: string) => setSocialReason(value)}
-            extraClasses="mb-2"
-          />
-          <Text
-            label="SIREN"
-            placeholder="Saisissez votre Siren"
-            value={siren}
-            onChangeText={(value: string) => setSiren(value)}
-            extraClasses="mb-2"
-          />
-          <Text
-            label="IBAN"
-            placeholder="Saisissez votre Iban"
-            value={iban}
-            onChangeText={(value: string) => setIban(value)}
-            extraClasses="mb-2"
-          />
-          <Text
-            label="BIC"
-            placeholder="Saisissez votre Bic"
-            value={bic}
-            onChangeText={(value: string) => setBic(value)}
-            extraClasses="mb-2"
-          />
-          <View className="flex flex-row justify-stretch mb-1">
-            <View className="flex flex-grow">
-              <TextHeading3 centered>Adresse</TextHeading3>
+          <View className="flex flex-row items-center mb-5">
+            <View className="">
+              <ColorSchemeButton
+                iconName="sun"
+                iconFamily="FontAwesome5Icon"
+                size={40}
+                onPressFn={() => {}}
+              />
             </View>
-            <ButtonIcon
-              iconName="arrow-down"
-              extraClasses="p-3 bg-tertiary"
-              onPressFn={toggleOpenAddress}
-              animated={true}
+            <View className="flex-grow">
+              <TextHeading4 centered>{`MON COMPTE\nPRODUCTEUR`}</TextHeading4>
+            </View>
+            <View className="">
+              <IconButton
+                iconName="sign-in-alt"
+                iconFamily="FontAwesome5Icon"
+                size={40}
+                onPressFn={onSignoutPress}
+              />
+            </View>
+          </View>
+
+          <OpenMenuButton
+            label="Informations"
+            onPressFn={toggleOpenInfo}
+            extraClasses="mb-3"
+          />
+
+          <Animated.View
+            style={[animatedStyleInfo]}
+            className="overflow-hidden"
+          >
+            <InputText
+              label="Raison sociale"
+              placeholder="Saisissez votre raison sociale"
+              value={socialReason}
+              onChangeText={(value: string) => setSocialReason(value)}
+              extraClasses="mb-2"
+            />
+            <InputText
+              label="SIREN"
+              placeholder="Saisissez votre Siren"
+              value={siren}
+              onChangeText={(value: string) => setSiren(value)}
+              extraClasses="mb-2"
+            />
+            <InputText
+              label="IBAN"
+              placeholder="Saisissez votre Iban"
+              value={iban}
+              onChangeText={(value: string) => setIban(value)}
+              extraClasses="mb-2"
+            />
+            <InputText
+              label="BIC"
+              placeholder="Saisissez votre Bic"
+              value={bic}
+              onChangeText={(value: string) => setBic(value)}
+              extraClasses="mb-2"
+            />
+          </Animated.View>
+
+          <OpenMenuButton
+            label="Adresse"
+            onPressFn={toggleOpenAddress}
+            extraClasses="mb-3"
+          />
+
+          <Animated.View
+            style={[animatedStyleAddress]}
+            className="overflow-hidden"
+          >
+            <InputText
+              label="Adresse"
+              placeholder="Saisissez votre adresse"
+              value={address.address1}
+              onChangeText={(value: string) =>
+                setAddress({
+                  address1: value,
+                  address2: address.address2,
+                  postalCode: address.postalCode,
+                  city: address.city,
+                  country: address.country,
+                })
+              }
+              extraClasses="mb-2"
+            />
+            <InputText
+              label="Adresse complément"
+              placeholder="Saisissez votre adresse"
+              value={address.address2}
+              onChangeText={(value: string) =>
+                setAddress({
+                  address1: address.address1,
+                  address2: value,
+                  postalCode: address.postalCode,
+                  city: address.city,
+                  country: address.country,
+                })
+              }
+              extraClasses="mb-2"
+            />
+            <InputText
+              label="Code Postal"
+              placeholder="Saisissez le code postal"
+              value={address.postalCode}
+              onChangeText={(value: string) =>
+                setAddress({
+                  address1: address.address1,
+                  address2: address.address2,
+                  postalCode: value,
+                  city: address.city,
+                  country: address.country,
+                })
+              }
+              extraClasses="mb-2"
+            />
+            <InputText
+              label="Ville"
+              placeholder="Saisissez la ville"
+              value={address.city}
+              onChangeText={(value: string) =>
+                setAddress({
+                  address1: address.address1,
+                  address2: address.address2,
+                  postalCode: address.postalCode,
+                  city: value,
+                  country: address.country,
+                })
+              }
+              extraClasses="mb-2"
+            />
+            <InputText
+              label="Pays"
+              placeholder="Saisissez le pays"
+              value={address.country}
+              onChangeText={(value: string) =>
+                setAddress({
+                  address1: address.address1,
+                  address2: address.address2,
+                  postalCode: address.postalCode,
+                  city: address.city,
+                  country: value,
+                })
+              }
+              extraClasses="mb-2"
+            />
+          </Animated.View>
+
+          <View className="flex flex-row justify-center">
+            <View className="w-[90%]">
+              <ButtonPrimaryEnd
+                label="Mettre à jour"
+                iconFamily="FontAwesome5Icon"
+                iconName="sync-alt"
+                disabled={isProducerSaveLoading}
+                onPressFn={() => handleProducerUpdate()}
+                isLoading={isProducerSaveLoading}
+                extraClasses="mt-5 mb-5 h-14"
+              />
+            </View>
+          </View>
+
+          <View className="px-3 items-center">
+            <Text className="text-premium text-lg font-bold">
+              Membre PREMIUM
+            </Text>
+            <Text className="text-secondary dark:text-lightbg text-md">
+              jusqu'au 21/12/25
+            </Text>
+          </View>
+
+          <View className="px-5">
+            <CustomButton
+              label="Devenir membre Premium"
+              icon="crown"
+              iconFamily="FontAwesome5Icon"
+              extraClasses="bg-premium rounded-full my-4 h-[60px]"
+              textClasses="text-lightbg text-lg font-bold"
+              onPressFn={() => {}}
             />
           </View>
-          {isOpenAddress && (
-            <>
-              <Text
-                label="Adresse"
-                placeholder="Saisissez votre adresse"
-                value={address.address1}
-                onChangeText={(value: string) =>
-                  setAddress({
-                    address1: value,
-                    address2: address.address2,
-                    postalCode: address.postalCode,
-                    city: address.city,
-                    country: address.country,
-                  })
-                }
-                extraClasses="mb-2"
-              />
-              <Text
-                label="Adresse complément"
-                placeholder="Saisissez votre adresse"
-                value={address.address2}
-                onChangeText={(value: string) =>
-                  setAddress({
-                    address1: address.address1,
-                    address2: value,
-                    postalCode: address.postalCode,
-                    city: address.city,
-                    country: address.country,
-                  })
-                }
-                extraClasses="mb-2"
-              />
-              <Text
-                label="Code Postal"
-                placeholder="Saisissez le code postal"
-                value={address.postalCode}
-                onChangeText={(value: string) =>
-                  setAddress({
-                    address1: address.address1,
-                    address2: address.address2,
-                    postalCode: value,
-                    city: address.city,
-                    country: address.country,
-                  })
-                }
-                extraClasses="mb-2"
-              />
-              <Text
-                label="Ville"
-                placeholder="Saisissez la ville"
-                value={address.city}
-                onChangeText={(value: string) =>
-                  setAddress({
-                    address1: address.address1,
-                    address2: address.address2,
-                    postalCode: address.postalCode,
-                    city: value,
-                    country: address.country,
-                  })
-                }
-                extraClasses="mb-2"
-              />
-              <Text
-                label="Pays"
-                placeholder="Saisissez le pays"
-                value={address.country}
-                onChangeText={(value: string) =>
-                  setAddress({
-                    address1: address.address1,
-                    address2: address.address2,
-                    postalCode: address.postalCode,
-                    city: address.city,
-                    country: value,
-                  })
-                }
-                extraClasses="mb-2"
-              />
-            </>
-          )}
-
-          <ButtonPrimaryEnd
-            label="Mettre à jour"
-            iconName="arrow-right"
-            disabled={isProducerSaveLoading}
-            onPressFn={() => handleProducerUpdate()}
-            isLoading={isProducerSaveLoading}
-            extraClasses="mt-5 mb-5"
-          />
         </ScrollView>
 
-        <Custom
+        <CustomButton
           label="Basculer en mode Utilisateur"
-          extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-5 px-5 h-[60px]"
+          extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-4 px-5 h-[60px]"
           textClasses="text-lightbg dark:text-tertiary text-lg font-bold"
           onPressFn={switchUser}
         />

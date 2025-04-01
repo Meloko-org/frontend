@@ -28,7 +28,7 @@ import BadgeWithdrawStatus from "../../components/utils/badges/WithdrawStatus";
 import BackLabelButton from "../../components/utils/buttons/BackLabel";
 import Spinner from "../../components/utils/Spinner";
 import OrderStatusBadge from "../../components/utils/badges/OrderStatus";
-import Custom from "../../components/utils/buttons/Custom";
+import CustomButton from "../../components/utils/buttons/Custom";
 import TextBody1 from "../../components/utils/texts/Body1";
 import QRCodeModal from "../../components/modals/user/QRCodeModal";
 import TextBody2 from "../../components/utils/texts/Body2";
@@ -213,7 +213,7 @@ export default function OrdersCustomerScreen({
             </View>
             <View>
               {cco.status === "validated" && (
-                <Custom
+                <CustomButton
                   extraClasses="rounded-lg p-2 h-[40px] bg-success"
                   textClasses="text-white"
                   label="Afficher QR code"
@@ -320,7 +320,7 @@ export default function OrdersCustomerScreen({
             </View>
             <View>
               {mo.status === "validated" && (
-                <Custom
+                <CustomButton
                   extraClasses="rounded-lg p-2 h-[40px] bg-success"
                   textClasses="text-white"
                   label="Afficher QR code"

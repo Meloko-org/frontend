@@ -14,7 +14,7 @@ import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import TextBody1 from "../../components/utils/texts/Body1";
 import BadgeSecondary from "../../components/utils/badges/Secondary";
-import ButtonIcon from "../../components/utils/buttons/Icon";
+import IconButton from "../../components/utils/buttons/Icon";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import CardProduct from "../../components/cards/Product";
 import ButtonBack from "../../components/utils/buttons/Back";
@@ -263,7 +263,7 @@ export default function ShopUserScreen({ route, navigation }: Props) {
                   </View>
                   {isSignedIn && (
                     <View className="w-1/6 h-full">
-                      <ButtonIcon
+                      <IconButton
                         iconName={isBookmarked ? "heart" : "heart-o"}
                         extraClasses="h-16"
                         onPressFn={handleBookmarkPress}

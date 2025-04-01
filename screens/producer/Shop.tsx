@@ -20,7 +20,7 @@ import Text from "../../components/utils/inputs/Text";
 import InputTextarea from "../../components/utils/inputs/Textarea";
 import SwitchInput from "../../components/utils/inputs/Switch";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
-import ButtonIcon from "../../components/utils/buttons/Icon";
+import IconButton from "../../components/utils/buttons/Icon";
 import TextBody1 from "../../components/utils/texts/Body1";
 import ButtonBack from "../../components/utils/buttons/Back";
 
@@ -281,7 +281,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
           <View className="flex flex-grow">
             <TextHeading3 centered>Adresse</TextHeading3>
           </View>
-          <ButtonIcon
+          <IconButton
             iconName="arrow-down"
             extraClasses="p-3 bg-tertiary"
             onPressFn={toggleOpenAddress}
@@ -393,22 +393,22 @@ export default function ShopProducteurScreen({ navigation }: Props) {
         {buttonLabel === "Mettre à jour" && (
           <>
             <View className="flex flex-row my-3 justify-center">
-              <ButtonIcon
+              <IconButton
                 iconName="photo"
                 extraClasses="bg-primary p-4 mr-3 h-[50px]"
                 onPressFn={() => setPhotoModalVisible(true)}
               />
-              <ButtonIcon
+              <IconButton
                 iconName="video-camera"
                 extraClasses="bg-primary p-4 mr-3"
                 onPressFn={() => setVideoModalVisible(true)}
               />
-              <ButtonIcon
+              <IconButton
                 iconName="shopping-bag"
                 extraClasses="bg-primary p-4 mr-3"
                 onPressFn={() => setClickCollectModalVisible(true)}
               />
-              <ButtonIcon
+              <IconButton
                 iconName="globe"
                 extraClasses="bg-primary p-4 mr-3"
                 onPressFn={() => setMarketsModalVisible(true)}

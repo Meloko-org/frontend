@@ -2,7 +2,7 @@ import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import BadgeSecondary from "../utils/badges/Secondary";
 import StarsNotation from "../utils/StarsNotation";
-import ButtonIcon from "../utils/buttons/Icon";
+import IconButton from "../utils/buttons/Icon";
 import _Fontawesome from "react-native-vector-icons/FontAwesome6";
 import { GestureResponderEvent } from "react-native";
 import { ShopData } from "../../types/API";
@@ -82,7 +82,7 @@ export default function CardProducerSearchResult(
         </View>
         {props.showDirectionButton && (
           <View className="flex flex-row justify-center items-center w-1/5">
-            <ButtonIcon
+            <IconButton
               iconName="location-arrow"
               onPressFn={() => console.log("open google map")}
               extraClasses="w-[50px] h-[50px] bg-success"

@@ -3,7 +3,7 @@ import { Image, Text, TouchableOpacity, View } from "react-native";
 import _Fontawesome from "react-native-vector-icons/FontAwesome6";
 import { GestureResponderEvent } from "react-native";
 import PricePer from "../utils/badges/Dark";
-import ButtonIcon from "../utils/buttons/Icon";
+import IconButton from "../utils/buttons/Icon";
 import BadgeGrey from "../utils/badges/Grey";
 import TextHeading4 from "../utils/texts/Heading4";
 import globalTools from "../../modules/globalTools";

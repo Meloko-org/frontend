@@ -6,7 +6,7 @@ import { useColorScheme } from "nativewind";
 import Text from "../../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import ButtonSecondaryEnd from "../../components/utils/buttons/SecondaryEnd";
-import Custom from "../../components/utils/buttons/Custom";
+import CustomButton from "../../components/utils/buttons/Custom";
 import { useAuth } from "@clerk/clerk-expo";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -286,12 +286,12 @@ export default function UserProfileScreen({ navigation }: Props) {
                 />
               </View>
             </ScrollView>
-            <Custom
+            <CustomButton
               label="Basculer en mode Producteur"
               extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-5 px-5 h-[60px]"
               textClasses="text-lightbg dark:text-tertiary text-lg font-bold"
               onPressFn={switchProducer}
-            ></Custom>
+            ></CustomButton>
           </View>
         ) : (
           <View className="flex justify-center items-center h-full">

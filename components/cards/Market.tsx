@@ -7,7 +7,7 @@ import { Image, Text, TouchableOpacity, View, Alert } from "react-native";
 import TextHeading4 from "../utils/texts/Heading4";
 import TextBody1 from "../utils/texts/Body1";
 import TextBody2 from "../utils/texts/Body2";
-import ButtonIcon from "../utils/buttons/Icon";
+import IconButton from "../utils/buttons/Icon";
 
 import { useColorScheme } from "nativewind";
 import _Fontawesome from "react-native-vector-icons/FontAwesome6";
@@ -178,7 +178,7 @@ export default function Market(props: CardMarketProps): JSX.Element {
           </View>
           <View className="flex flew-row w-1/5 justify-center">
             {props.goto && (
-              <ButtonIcon
+              <IconButton
                 iconName="location-arrow"
                 extraClasses="w-full h-16"
                 onPressFn={handleMarketRoutePress}

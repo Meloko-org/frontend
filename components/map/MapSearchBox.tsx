@@ -4,7 +4,7 @@ import { Animated, View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import InputText from "../utils/inputs/Text";
 import ButtonPrimaryEnd from "../utils/buttons/PrimaryEnd";
-import ButtonIcon from "../utils/buttons/Icon";
+import IconButton from "../utils/buttons/Icon";
 import { Slider } from "@miblanchard/react-native-slider";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
@@ -233,7 +233,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
                 />
               </View>
               <View className="w-1/4 flex flex-row justify-end">
-                <ButtonIcon
+                <IconButton
                   iconName="map-marker"
                   extraClasses="w-20 bg-secondary dark:bg-primary"
                   onPressFn={useMyPosition}
@@ -305,7 +305,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
                 autoCapitalize="none"
                 extraClasses="w-72"
               />
-              <ButtonIcon
+              <IconButton
                 iconName="map-marker"
                 extraClasses="w-20 bg-secondary dark:bg-primary"
                 onPressFn={useMyPosition}

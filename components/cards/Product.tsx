@@ -8,7 +8,7 @@ import { StockData } from "../../types/API";
 import TextBody1 from "../utils/texts/Body1";
 import PricePer from "../utils/badges/Dark";
 import PriceBadge from "../utils/badges/Price";
-import ButtonIcon from "../utils/buttons/Icon";
+import IconButton from "../utils/buttons/Icon";
 import BadgeGrey from "../utils/badges/Grey";
 import TextHeading4 from "../utils/texts/Heading4";
 import { useDispatch, useSelector } from "react-redux";
@@ -120,7 +120,7 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
       )}
     </BadgeGrey>
   ) : (
-    <ButtonIcon
+    <IconButton
       iconName="cart-plus"
       onPressFn={() => handleAddCartPress()}
       extraClasses="h-20 w-full bg-primary"

@@ -26,6 +26,7 @@ module.exports = {
         warning: "#D16014",
         success: "#0081A7",
         night: "#0A090B",
+        premium: "#FAA200",
       },
     },
   },

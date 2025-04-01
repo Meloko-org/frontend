@@ -12,7 +12,7 @@ import { BarcodeScanningResult } from "expo-camera";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import TextHeading3 from "../../utils/texts/Heading3";
 import Spinner from "../../utils/Spinner";
-import Custom from "../../utils/buttons/Custom";
+import CustomButton from "../../utils/buttons/Custom";
 import TextBody1 from "../../utils/texts/Body1";
 
 type QRCodeScannerModalProps = {
@@ -42,13 +42,13 @@ export default function QRCodeScannerModal({
           <TextBody1 extraClasses="mb-3">
             Autorisez-vous l'utilisation de la caméra ?
           </TextBody1>
-          <Custom
+          <CustomButton
             label="Autoriser caméra"
             onPressFn={requestPermission}
             extraClasses="rounded-lg bg-secondary p-2 mb-2 w-[200px]"
             textClasses="text-white font-font"
           />
-          <Custom
+          <CustomButton
             label="Annuler"
             onPressFn={onClose}
             extraClasses="rounded-lg bg-danger p-2 w-[200px]"
@@ -73,7 +73,7 @@ export default function QRCodeScannerModal({
           style={{ width: "100%", height: "80%" }}
         />
         <View className="flex flex-row justify-center w-full bg-warning">
-          <Custom
+          <CustomButton
             extraClasses="bg-danger rounded-lg mt-5 p-2 w-[200px]"
             textClasses="text-white font-bold"
             label="Annuler"

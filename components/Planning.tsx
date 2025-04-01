@@ -6,7 +6,7 @@ import BadgeGrey from "./utils/badges/Grey";
 import SwitchInput from "./utils/inputs/Switch";
 import TimeSlot from "./TimeSlot";
 import TextBody2 from "./utils/texts/Body2";
-import ButtonIcon from "./utils/buttons/Icon";
+import IconButton from "./utils/buttons/Icon";
 import TextBody1 from "./utils/texts/Body1";
 
 type ActiveDaysData = {

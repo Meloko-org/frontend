@@ -33,9 +33,7 @@
       }
     },
     "owner": "meloko",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+    "runtimeVersion": "1.0.0",
     "updates": {
       "url": "https://u.expo.dev/3d2f7777-279f-49a3-8a15-f6a953419463"
     },

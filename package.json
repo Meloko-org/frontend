@@ -6,8 +6,8 @@
   "scripts": {
     "start-c": "expo start -c",
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "prepare": "husky"
   },
@@ -17,7 +17,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "@gorhom/bottom-sheet": "^4",
+    "@gorhom/bottom-sheet": "^5.1.2",
     "@miblanchard/react-native-slider": "^2.6.0",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/datetimepicker": "8.2.0",
@@ -46,6 +46,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.7",
+    "react-native-animatable": "^1.4.0",
     "react-native-awesome-slider": "^2.5.3",
     "react-native-check-box": "^2.1.7",
     "react-native-elements": "^3.4.3",

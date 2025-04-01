@@ -20,7 +20,7 @@ import productsTools from "../modules/productsTools";
 import orderTools from "../modules/orderTools";
 import globalTools from "../modules/globalTools";
 import OrderProductCard from "../components/cards/OrderProductCard";
-import Custom from "../components/utils/buttons/Custom";
+import CustomButton from "../components/utils/buttons/Custom";
 import { ShopState } from "../reducers/shop";
 import TextBody2 from "../components/utils/texts/Body2";
 import Spinner from "../components/utils/Spinner";
@@ -179,7 +179,7 @@ export default function OrderDetailsScreen({ route }: OrderDetailsProps) {
     switch (status) {
       case "canceled":
         return (
-          <Custom
+          <CustomButton
             label={`REMETTRE LA COMMANDE\nEN ATTENTE`}
             extraClasses="border border-primary bg-lightbg/90 dark:bg-transparent flex-1 mt-5 mx-1 rounded-lg px-2 h-[60px]"
             textClasses="text-lightbg font-bold text-sm"
@@ -195,7 +195,7 @@ export default function OrderDetailsScreen({ route }: OrderDetailsProps) {
       case "pending":
         return (
           <>
-            <Custom
+            <CustomButton
               label={`VALIDER`}
               extraClasses="bg-primary flex-1 mb-5 mx-1 rounded-lg px-2 h-[80px]"
               textClasses="text-lightbg font-bold text-lg"
@@ -211,7 +211,7 @@ export default function OrderDetailsScreen({ route }: OrderDetailsProps) {
               }
               isLoading={isLoading}
             />
-            <Custom
+            <CustomButton
               label={`ANNULER LA COMMANDE`}
               extraClasses="bg-danger flex-1 mt-5 mx-1 rounded-lg px-2 h-[60px]"
               textClasses="text-lightbg font-bold text-sm"
@@ -228,7 +228,7 @@ export default function OrderDetailsScreen({ route }: OrderDetailsProps) {
       case "validated":
         return (
           <>
-            <Custom
+            <CustomButton
               label={`VALIDER LE RETRAIT`}
               extraClasses="bg-primary flex-1 mx-1 mb-5 rounded-lg px-2 h-[80px]"
               textClasses="text-lightbg font-bold text-lg"

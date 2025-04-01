@@ -7,11 +7,13 @@ import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
 type OpenScreenButtonProps = {
   label: string;
   extraClasses?: string;
+  onPressFn: () => void;
 };
 
 export default function OpenMenuButton({
   label,
   extraClasses,
+  onPressFn,
 }: OpenScreenButtonProps): JSX.Element {
   const rotationValue = useRef(new Animated.Value(0)).current; // Valeur animée pour la rotation
   const [rotated, setRotated] = useState(false); // État pour savoir si l'icône est déjà pivotée
@@ -34,6 +36,7 @@ export default function OpenMenuButton({
 
   const handlePress = () => {
     startAnimation();
+    if (onPressFn) onPressFn();
   };
 
   return (

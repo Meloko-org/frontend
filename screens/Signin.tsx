@@ -112,6 +112,8 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
         return;
       }
 
+      console.log("producer fetchData :", producerResponse.data);
+
       const producer = producerResponse.data;
       dispatch(setProducerData(producer));
 

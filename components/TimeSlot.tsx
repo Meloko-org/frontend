@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import SelectDropdown from "react-native-select-dropdown";
 import { View, Text, StyleSheet } from "react-native";
 import TextBody2 from "./utils/texts/Body2";
-import ButtonIcon from "./utils/buttons/Icon";
+import IconButton from "./utils/buttons/Icon";
 
 type TimeSlotProps = {
   data: string[];
@@ -106,7 +106,7 @@ export default function TimeSlot(props: TimeSlotProps): JSX.Element {
         </View>
         <View className="flex flew-row flex-grow justify-end px-1 mb-1">
           {trash && (
-            <ButtonIcon
+            <IconButton
               iconName="trash"
               extraClasses="w-10 bg-danger"
               onPressFn={props.onPressDel}
@@ -114,7 +114,7 @@ export default function TimeSlot(props: TimeSlotProps): JSX.Element {
           )}
         </View>
         <View className="flex flew-row justify-end px-1">
-          <ButtonIcon
+          <IconButton
             iconName="plus"
             extraClasses="w-10 mb-1 bg-primary"
             onPressFn={props.onPressPlus}

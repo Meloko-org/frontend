@@ -18,7 +18,7 @@ import OctIcon from "@expo/vector-icons/Octicons";
 import SimpleLineIcon from "@expo/vector-icons/SimpleLineIcons";
 import ZocialIcon from "@expo/vector-icons/Zocial";
 
-type IconButtonProps = {
+type ColorSchemeButtonProps = {
   iconName: string;
   iconFamily?: keyof typeof iconLibraries;
   extraClasses?: string;
@@ -44,14 +44,14 @@ const iconLibraries = {
   ZocialIcon,
 };
 
-export default function IconButton({
+export default function ColorSchemeButton({
   iconName,
   iconFamily,
   extraClasses,
   onPressFn,
   animated,
   size,
-}: IconButtonProps): JSX.Element {
+}: ColorSchemeButtonProps): JSX.Element {
   const rotationValue = useRef(new Animated.Value(0)).current; // Valeur animée pour la rotation
   const [rotated, setRotated] = useState(false); // État pour savoir si l'icône est déjà pivotée
 
