@@ -49,24 +49,10 @@ type Props = {
 };
 
 export default function ProducerProfileScreen({ navigation }: Props) {
+  const dispatch = useDispatch();
   const modeStore = useSelector(
     (state: { mode: ModeState }) => state.mode.value,
   );
-  const [isOpenInfo, setOpenInfo] = useState(false);
-  const [isOpenAddress, setOpenAddress] = useState(false);
-
-  const { colorScheme, toggleColorScheme } = useColorScheme();
-  const bottomSheetRef = useRef<BottomSheet>(null);
-
-  const openBottomSheet = () => {
-    bottomSheetRef.current?.expand();
-  };
-
-  // Import the Clerk Auth functions
-  const { getToken, signOut } = useAuth();
-
-  const [isProducerSaveLoading, setProducerSaveLoading] = useState(false);
-
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
   );
@@ -76,7 +62,22 @@ export default function ProducerProfileScreen({ navigation }: Props) {
   const shopStore = useSelector(
     (state: { shop: ShopData }) => state.shop?.value,
   );
-  const dispatch = useDispatch();
+
+  // Import the Clerk Auth functions
+  const { getToken, signOut } = useAuth();
+  const { colorScheme, toggleColorScheme } = useColorScheme();
+
+  const [isOpenInfo, setOpenInfo] = useState(false);
+  const [isOpenAddress, setOpenAddress] = useState(false);
+
+  const [isProducerSaveLoading, setProducerSaveLoading] = useState(false);
+
+  const [isBottomSheetOpen, setBottomSheetOpen] = useState(false);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  const openBottomSheet = () => {
+    bottomSheetRef.current?.expand();
+  };
 
   const [socialReason, setSocialReason] = useState<string>("");
   const [siren, setSiren] = useState<string>("");
@@ -151,14 +152,14 @@ export default function ProducerProfileScreen({ navigation }: Props) {
       setProducerSaveLoading(true);
       const token = await getToken();
       const values = { socialReason, siren, iban, bic, address };
-      let data;
+      let producerResponse;
       if (producerStore === null) {
-        data = await producerTools.createProducer(token, values);
+        producerResponse = await producerTools.createProducer(token, values);
       } else {
-        data = await producerTools.updateProducer(token, values);
+        producerResponse = await producerTools.updateProducer(token, values);
       }
 
-      console.log(data);
+      console.log(producerResponse);
       if (data) {
         dispatch(updateUser(data));
         Alert.alert(
@@ -396,6 +397,7 @@ export default function ProducerProfileScreen({ navigation }: Props) {
 
       <BottomSheet
         ref={bottomSheetRef}
+        index={-1}
         snapPoints={["75%"]}
         enablePanDownToClose={true}
         handleStyle={{
@@ -404,7 +406,7 @@ export default function ProducerProfileScreen({ navigation }: Props) {
         handleIndicatorStyle={{
           backgroundColor: colorScheme === "dark" ? "#FCFFF0" : "#444C3D",
         }}
-        onChange={handleSheetChanges}
+        onChange={(index) => setBottomSheetOpen(index !== -1)}
       >
         <BottomSheetView
           style={[

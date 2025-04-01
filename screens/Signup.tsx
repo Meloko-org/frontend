@@ -37,6 +37,8 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
   const { from, backLabel, screenTitle } = route.params;
 
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertType, setAlertType] = useState<"success" | "danger">("danger");
+
   // Import the Clerk signup functions
   const { isLoaded, signUp, setActive } = useSignUp();
   const { getToken } = useAuth();
@@ -97,18 +99,22 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
     // vérification des champs
     if (emailAddress === "") {
       setAlertMessage("Veuillez saisir un email.");
+      setAlertType("danger");
       return;
     }
     if (password === "") {
       setAlertMessage("Veuillez saisir un mot de passe.");
+      setAlertType("danger");
       return;
     }
     if (confirmPassword === "") {
       setAlertMessage("Veuillez confirmer le mot de passe.");
+      setAlertType("danger");
       return;
     }
     if (password !== confirmPassword) {
       setAlertMessage("Les deux mots de passe ne sont pas identiques.");
+      setAlertType("danger");
       return;
     }
 
@@ -134,6 +140,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
       setAlertMessage(err.errors.map((err: string) => err.message).join("\n"));
+      setAlertType("danger");
     }
   };
 
@@ -141,7 +148,8 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
     if (code.length === 6) {
       onPressVerify();
     } else {
-      Alert.alert("Veuillez entrer un code à 6 chiffres.");
+      setAlertMessage("Veuillez entrer un code à 6 chiffres.");
+      setAlertType("danger");
     }
   };
 
@@ -169,7 +177,8 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
-      setAlertMessage(err.errors[0].message);
+      setAlertMessage(err.errors.map((err: string) => err.message).join("\n"));
+      setAlertType("danger");
     }
   };
 
@@ -281,7 +290,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
           <CustomAlert
             visible={!!alertMessage}
             message={alertMessage}
-            alertType="danger"
+            alertType={alertType}
             onClose={() => setAlertMessage(null)}
           />
         )}
