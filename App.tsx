@@ -37,6 +37,13 @@ import OrderCustomerScreen from "./screens/customer/Order";
 import PaymentCustomerScreen from "./screens/customer/Payment";
 import OrdersCustomerScreen from "./screens/customer/Orders";
 import SalesScreen from "./screens/Sales";
+import ShopDetailsScreen from "./screens/producer/ShopDetails";
+import PremiumOptionsScreen from "./screens/producer/PremiumOptions";
+import ShopOfflineScreen from "./screens/producer/ShopOffline";
+import ShopParamsScreen from "./screens/producer/ShopParams";
+import ShopWithdrawModesScreen from "./screens/producer/ShopWithdrawModes";
+import StockCategoriesScreen from "./screens/producer/StockCategories";
+import StockScreen from "./screens/producer/Stocks";
 
 import { Provider } from "react-redux";
 import { persistStore, persistReducer } from "redux-persist";
@@ -192,7 +199,7 @@ const TabNavigatorProducer: React.FC = () => {
 
           if (route.name === "Home") {
             iconName = "home";
-          } else if (route.name === "Shop") {
+          } else if (route.name === "ShopProducer") {
             iconName = "store";
           } else if (route.name === "BusinessCenter") {
             iconName = "file-invoice-dollar";
@@ -217,7 +224,42 @@ const TabNavigatorProducer: React.FC = () => {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Shop" component={ShopProducerScreen} />
+      <Tab.Screen name="ShopProducer" component={ShopProducerScreen} />
+      <Tab.Screen
+        name="ShopDetails"
+        component={ShopDetailsScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="ShopOffline"
+        component={ShopOfflineScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="ShopParams"
+        component={ShopParamsScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="ShopWithdrawModes"
+        component={ShopWithdrawModesScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="StockCategories"
+        component={StockCategoriesScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="Stock"
+        component={PremiumOptionsScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="PremiumOptions"
+        component={ShopDetailsScreen}
+        options={{ tabBarButton: () => null }}
+      />
       <Tab.Screen name="BusinessCenter" component={BusinessScreen} />
       <Tab.Screen name="ProducerProfile" component={ProducerProfileScreen} />
 

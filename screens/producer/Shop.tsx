@@ -313,27 +313,57 @@ export default function ShopProducteurScreen({ navigation }: Props) {
         <View>
           <OpenScreenButton
             label="Informations de la boutique"
-            onPressFn={() => {}}
+            onPressFn={() =>
+              navigation.navigate("ShopDetails", {
+                from: "ShopProducer",
+                backLabel: "Retour à la boutique",
+                screenTitle: "INFORMATIONS",
+              })
+            }
             extraClasses="mb-1"
           />
           <OpenScreenButton
             label="Paramètres de la boutique"
-            onPressFn={() => {}}
+            onPressFn={() =>
+              navigation.navigate("ShopParams", {
+                from: "ShopProducer",
+                backLabel: "Retour à la boutique",
+                screenTitle: "PARAMETRES",
+              })
+            }
             extraClasses="mb-1"
           />
           <OpenScreenButton
             label="Mode de retrait"
-            onPressFn={() => {}}
+            onPressFn={() =>
+              navigation.navigate("ShopWithdrawModes", {
+                from: "ShopProducer",
+                backLabel: "Retour à la boutique",
+                screenTitle: "MODES DE\nRETRAIT",
+              })
+            }
             extraClasses="mb-1"
           />
           <OpenScreenButton
             label="Gestion des stocks"
-            onPressFn={() => {}}
+            onPressFn={() =>
+              navigation.navigate("Stock", {
+                from: "ShopProducer",
+                backLabel: "Retour à la boutique",
+                screenTitle: "GESTION\nDES STOCKS",
+              })
+            }
             extraClasses="mb-1"
           />
           <OpenScreenButton
             label="Mettre en pause"
-            onPressFn={() => {}}
+            onPressFn={() =>
+              navigation.navigate("ShopOffline", {
+                from: "ShopProducer",
+                backLabel: "Retour à la boutique",
+                screenTitle: "METTRE EN\nPAUSE",
+              })
+            }
             extraClasses="mb-1"
           />
           <OpenScreenButton
@@ -341,7 +371,13 @@ export default function ShopProducteurScreen({ navigation }: Props) {
             bgColor="bg-premium"
             notice="2"
             redAlert={true}
-            onPressFn={() => {}}
+            onPressFn={() =>
+              navigation.navigate("PremiumOptions", {
+                from: "ShopProducer",
+                backLabel: "Retour à la boutique",
+                screenTitle: "OPTIONS\nPREMIUM",
+              })
+            }
             extraClasses="mb-1"
           />
         </View>

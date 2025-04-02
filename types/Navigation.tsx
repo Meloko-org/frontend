@@ -4,41 +4,37 @@ type RootStackParamList = {
   Home: undefined;
   SignIn: { from?: string; backLabel?: string; screenTitle?: string };
   SignUp: { from: string; backLabel: string; screenTitle: string };
-  TabNavigatorUser: {
-    screen:
-      | "Search"
-      | "Cart"
-      | "Bookmarks"
-      | "UserProfile"
-      | "ShopUser"
-      | "WithdrawModesUser"
-      | "OrdersCustomer"
-      | "PaymentCustomer"
-      | "BookmarksCustomer"
-      | "OrderCustomer";
+  TabNavigatorUser: undefined;
+  TabNavigatorProducer: undefined;
+
+  Search: undefined;
+  Cart: undefined;
+  Bookmarks: undefined;
+  UserProfile: undefined;
+  ShopUser: undefined;
+  WithdrawModesUser: undefined;
+  OrdersCustomer: undefined;
+  PaymentCustomer: undefined;
+  BookmarksCustomer: undefined;
+  OrderCustomer: undefined;
+
+  ShopProducer: undefined;
+  ShopDetails: { from?: string; backLabel?: string; screenTitle?: string };
+  ShopOffline: { from?: string; backLabel?: string; screenTitle?: string };
+  ShopParams: { from?: string; backLabel?: string; screenTitle?: string };
+  ShopWithdrawModes: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
   };
-  TabNavigatorProducer: {
-    screen:
-      | "Home"
-      | "Shop"
-      | "BusinessCenter"
-      | "ProducerProfile"
-      | "Stocks"
-      | "OrderDetails"
-      | "Sales";
-  };
-  SearchCustomer: undefined;
-  // GestionDesStocks: undefined;
-  // ShopProducer: undefined;
-  // UserProfile: undefined;
-  // ProducerProfile: undefined;
-  // BusinessCenter: undefined;
-  // Sales: undefined;
-  // MapCustomer: undefined;
-  // PaymentCustomer: undefined;
-  // ShopUser: undefined;
-  // OrderCustomer: undefined;
-  // MarketsShopProducer: undefined;
+  StockCategories: { from?: string; backLabel?: string; screenTitle?: string };
+  Stock: { from?: string; backLabel?: string; screenTitle?: string };
+  PremiumOptions: { from?: string; backLabel?: string; screenTitle?: string };
+  BusinessCenter: undefined;
+  ProducerProfile: undefined;
+  Stocks: undefined;
+  OrderDetails: undefined;
+  Sales: undefined;
 };
 
 export type { RootStackParamList };
