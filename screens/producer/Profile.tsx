@@ -227,6 +227,7 @@ export default function ProducerProfileScreen({ navigation }: Props) {
       <View className="flex-1 items-center">
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
+          showsVerticalScrollIndicator={false}
           className="flex h-full w-full p-3"
         >
           <View className="flex flex-row items-center mb-5">

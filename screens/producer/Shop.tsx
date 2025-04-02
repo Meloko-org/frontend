@@ -10,13 +10,13 @@ import { setShopData, ShopState } from "../../reducers/shop";
 import { UserState } from "../../reducers/user";
 
 /* Eléments graphiques */
-import { View, TouchableOpacity, Alert } from "react-native";
+import { View, TouchableOpacity, Alert, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
-import Text from "../../components/utils/inputs/Text";
+import InputText from "../../components/utils/inputs/Text";
 import InputTextarea from "../../components/utils/inputs/Textarea";
 import SwitchInput from "../../components/utils/inputs/Switch";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
@@ -32,6 +32,13 @@ import MarketsModal from "../../components/modals/producer/Markets";
 import { ProducerState } from "../../reducers/producer";
 
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
+import TextHeading4 from "../../components/utils/texts/Heading4";
+import BadgeSecondary from "../../components/utils/badges/Secondary";
+import OpenMenuButton from "../../components/utils/buttons/OpenMenu";
+import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
+import StarsNotation from "../../components/utils/StarsNotation";
+import Thumbnail from "../../components/utils/Thumbnail";
+import ThumbnailCarousel from "../../components/utils/ThumbnailCarousel";
 const FontAwesome = _Fontawesome as React.ElementType;
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
@@ -44,6 +51,14 @@ type Props = {
 };
 
 export default function ShopProducteurScreen({ navigation }: Props) {
+  // à remplacer par les images du producteur
+  const fakeImages = [
+    require("../../assets/images/image1.jpg"),
+    require("../../assets/images/image2.png"),
+    require("../../assets/images/image3.jpg"),
+    require("../../assets/images/image4.jpg"),
+  ];
+
   const [isOpenAddress, setOpenAddress] = useState(false);
 
   const [name, setName] = useState<string>("");
@@ -70,6 +85,8 @@ export default function ShopProducteurScreen({ navigation }: Props) {
     (state: { shop: ShopState }) => state.shop.value,
   );
   const dispatch = useDispatch();
+
+  const [shopData, setShopData] = useState(shopStore);
 
   const [isShopSaveLoading, setShopSaveLoading] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Créer le shop");
@@ -231,11 +248,103 @@ export default function ShopProducteurScreen({ navigation }: Props) {
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <ScrollView
         showsVerticalScrollIndicator={false}
-        className="w-full flex-1 p-3"
+        className="w-full flex-1 px-3"
       >
-        <TextHeading2 extraClasses="my-1" centered>
-          Boutique
-        </TextHeading2>
+        <View className="flex flex-row justify-center items-center mb-1 mt-1">
+          <View className="flex-grow">
+            <TextHeading4 centered>{`MA BOUTIQUE`}</TextHeading4>
+          </View>
+          <View className="absolute right-0 mr-2">
+            <Text className="text-danger font-bold">{`HORS\nLIGNE`}</Text>
+          </View>
+        </View>
+
+        <View className="flex flex-row justify-center mb-1">
+          <StarsNotation
+            iconNames={["star", "star-half", "star-o"]}
+            shopData={shopData}
+            extraClasses="pb-1"
+          />
+        </View>
+
+        <View className="flex flex-row items-center w-full h-[80px]">
+          <View className="flex justify-center items-center w-1/4">
+            <FontAwesome
+              name="github-alt"
+              size={80}
+              color="#FFFFFF"
+              className=""
+            />
+          </View>
+          <View className="w-3/4 ">
+            <TextBody1 centered>{description}</TextBody1>
+          </View>
+        </View>
+
+        <View className="flex flex-row items-center justify-center w-full mb-2">
+          <BadgeSecondary
+            uppercase
+            textClasses="text-xs"
+            extraClasses="px-1 mr-1"
+          >
+            click & collect
+          </BadgeSecondary>
+          <BadgeSecondary
+            uppercase
+            textClasses="text-xs"
+            extraClasses="px-1 mr-1"
+          >
+            point de vente
+          </BadgeSecondary>
+          <BadgeSecondary
+            uppercase
+            textClasses="text-xs"
+            extraClasses="px-1 mr-1"
+          >
+            livraison
+          </BadgeSecondary>
+        </View>
+
+        <View className="flex flex-row mb-2">
+          {/* {pictures} */}
+          <ThumbnailCarousel images={fakeImages} />
+        </View>
+
+        <View>
+          <OpenScreenButton
+            label="Informations de la boutique"
+            onPressFn={() => {}}
+            extraClasses="mb-1"
+          />
+          <OpenScreenButton
+            label="Paramètres de la boutique"
+            onPressFn={() => {}}
+            extraClasses="mb-1"
+          />
+          <OpenScreenButton
+            label="Mode de retrait"
+            onPressFn={() => {}}
+            extraClasses="mb-1"
+          />
+          <OpenScreenButton
+            label="Gestion des stocks"
+            onPressFn={() => {}}
+            extraClasses="mb-1"
+          />
+          <OpenScreenButton
+            label="Mettre en pause"
+            onPressFn={() => {}}
+            extraClasses="mb-1"
+          />
+          <OpenScreenButton
+            label="Options Premium"
+            bgColor="bg-premium"
+            notice="2"
+            redAlert={true}
+            onPressFn={() => {}}
+            extraClasses="mb-1"
+          />
+        </View>
 
         <View className="flex flex-row justify-between items-center">
           <View className="flex flex-row justify-center items-center w-2/6">
@@ -252,14 +361,14 @@ export default function ShopProducteurScreen({ navigation }: Props) {
           </View>
 
           <View className="w-4/6">
-            <Text
+            <InputText
               label="Nom"
               placeholder="Saisissez le nom de la boutique"
               value={name}
               onChangeText={(value: string) => setName(value)}
               extraClasses="mb-2"
             />
-            <Text
+            <InputText
               label="Siret"
               placeholder="Saisissez le siret de la boutique"
               value={siret}
@@ -290,7 +399,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
         </View>
         {isOpenAddress && (
           <>
-            <Text
+            <InputText
               label="Adresse"
               placeholder="Saisissez votre adresse"
               value={address.address1}
@@ -305,7 +414,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
               }
               extraClasses="mb-2"
             />
-            <Text
+            <InputText
               label="Adresse complément"
               placeholder="Complément d'adresse"
               value={address.address2}
@@ -320,7 +429,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
               }
               extraClasses="mb-2"
             />
-            <Text
+            <InputText
               label="Code Postal"
               placeholder="Saisissez le code postal"
               value={address.postalCode}
@@ -335,7 +444,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
               }
               extraClasses="mb-2"
             />
-            <Text
+            <InputText
               label="Ville"
               placeholder="Saisissez la ville"
               value={address.city}
@@ -350,7 +459,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
               }
               extraClasses="mb-2"
             />
-            <Text
+            <InputText
               label="Pays"
               placeholder="Saisissez le pays"
               value={address.country}
@@ -426,7 +535,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
               {isReopenDateVisible && (
                 <View>
                   <TextBody1>Sélectionner une date de réouverture</TextBody1>
-                  <Text
+                  <InputText
                     placeholder="Choisissez une date"
                     label="Date de réouverture"
                     editable={false}

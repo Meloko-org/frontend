@@ -7,12 +7,14 @@ import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
 type OpenScreenButtonProps = {
   label: string;
   extraClasses?: string;
+  bgColor?: string;
   onPressFn: () => void;
 };
 
 export default function OpenMenuButton({
   label,
   extraClasses,
+  bgColor,
   onPressFn,
 }: OpenScreenButtonProps): JSX.Element {
   const rotationValue = useRef(new Animated.Value(0)).current; // Valeur animée pour la rotation
@@ -41,7 +43,9 @@ export default function OpenMenuButton({
 
   return (
     <TouchableOpacity className={`${extraClasses} `} onPress={handlePress}>
-      <View className="flex flex-row w-auto py-4 items-center rounded-lg bg-darkbg/20 dark:bg-lightbg/25">
+      <View
+        className={`flex flex-row w-auto py-4 items-center rounded-lg ${bgColor ? bgColor : "bg-darkbg/20 dark:bg-lightbg/25"}`}
+      >
         <View className="flex-grow ml-3">
           <TextBody1>{label}</TextBody1>
         </View>

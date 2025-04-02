@@ -7,15 +7,23 @@ import { RootStackParamList } from "../../../types/Navigation";
 import { TouchableOpacity, View } from "react-native";
 import TextBody1 from "../texts/Body1";
 import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
+import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
+import TextHeading4 from "../texts/Heading4";
 
 type OpenScreenButtonProps = {
   label: string;
+  bgColor?: string;
+  redAlert?: boolean;
+  notice?: string;
   extraClasses?: string;
   onPressFn: () => void;
 };
 
 export default function OpenScreenButton({
   label,
+  bgColor,
+  redAlert,
+  notice,
   extraClasses,
   onPressFn,
 }: OpenScreenButtonProps): JSX.Element {
@@ -27,11 +35,28 @@ export default function OpenScreenButton({
       className={`${extraClasses} `}
       onPress={() => onPressFn()}
     >
-      <View className="flex flex-row w-auto py-4 items-center rounded-lg bg-darkbg/20 dark:bg-lightbg/25">
+      <View
+        className={`${extraClasses} flex flex-row w-auto h-[60px] items-center rounded-lg ${bgColor ? bgColor : "bg-darkbg/20 dark:bg-lightbg/25"}`}
+      >
         <View className="flex-grow ml-3">
           <TextBody1>{label}</TextBody1>
         </View>
-        <View className="pr-4">
+        {notice && (
+          <View className="flex items-center justify-center rounded-lg bg-primary w-8 h-8">
+            <TextHeading4 centered>{notice}</TextHeading4>
+          </View>
+        )}
+
+        {redAlert && (
+          <View className="ml-5">
+            <FontAwesome5Icon
+              name="exclamation"
+              color="#ff0000"
+              size={20}
+            ></FontAwesome5Icon>
+          </View>
+        )}
+        <View className="pr-4 ml-5">
           <FontAwesome6Icon name="angle-right" size={25} color="#98B66E" />
         </View>
       </View>
