@@ -39,7 +39,10 @@ const getProducerInfos = async (
   }
 };
 
-const updateProducer = async (token: string | null, values: {}) => {
+const updateProducer = async (
+  token: string | null,
+  values: {},
+): Promise<ApiResponse<ProducerData>> => {
   try {
     const response = await fetch(`${API_ROOT}/producers/update`, {
       method: "PUT",
@@ -51,11 +54,26 @@ const updateProducer = async (token: string | null, values: {}) => {
       body: JSON.stringify(values),
     });
 
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible de mettre à jour.`,
+      };
+    }
+
     const data = await response.json();
 
-    return data;
+    return data.success
+      ? { success: true, data: data.producer }
+      : { success: false, data: null, message: data.message };
   } catch (error) {
     console.log(error);
+    return {
+      success: false,
+      data: null,
+      message: "Une erreur s'est produite lors de la mise à jour.",
+    };
   }
 };
 

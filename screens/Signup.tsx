@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth, useSignUp } from "@clerk/clerk-expo";
 import { useDispatch } from "react-redux";
 import { updateUser } from "../reducers/user";
+import { useModal } from "../context/ModalContext";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
@@ -36,8 +37,10 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
   const route = useRoute<SignUpScreenRouteProp>();
   const { from, backLabel, screenTitle } = route.params;
 
-  const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [alertType, setAlertType] = useState<"success" | "danger">("danger");
+  const { setAlertMessage } = useModal();
+
+  // const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  // const [alertType, setAlertType] = useState<"success" | "danger">("danger");
 
   // Import the Clerk signup functions
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -98,23 +101,26 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
   const onSignUpPress = async () => {
     // vérification des champs
     if (emailAddress === "") {
-      setAlertMessage("Veuillez saisir un email.");
-      setAlertType("danger");
+      setAlertMessage("Veuillez saisir un email.", "warning");
+      // setAlertType("danger");
       return;
     }
     if (password === "") {
-      setAlertMessage("Veuillez saisir un mot de passe.");
-      setAlertType("danger");
+      setAlertMessage("Veuillez saisir un mot de passe.", "warning");
+      // setAlertType("danger");
       return;
     }
     if (confirmPassword === "") {
-      setAlertMessage("Veuillez confirmer le mot de passe.");
-      setAlertType("danger");
+      setAlertMessage("Veuillez confirmer le mot de passe.", "warning");
+      // setAlertType("danger");
       return;
     }
     if (password !== confirmPassword) {
-      setAlertMessage("Les deux mots de passe ne sont pas identiques.");
-      setAlertType("danger");
+      setAlertMessage(
+        "Les deux mots de passe ne sont pas identiques.",
+        "error",
+      );
+      // setAlertType("danger");
       return;
     }
 
@@ -139,8 +145,11 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
-      setAlertMessage(err.errors.map((err: string) => err.message).join("\n"));
-      setAlertType("danger");
+      setAlertMessage(
+        err.errors.map((err: string) => err.message).join("\n"),
+        "error",
+      );
+      // setAlertType("danger");
     }
   };
 
@@ -148,8 +157,8 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
     if (code.length === 6) {
       onPressVerify();
     } else {
-      setAlertMessage("Veuillez entrer un code à 6 chiffres.");
-      setAlertType("danger");
+      setAlertMessage("Veuillez entrer un code à 6 chiffres.", "warning");
+      // setAlertType("danger");
     }
   };
 
@@ -177,8 +186,11 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
-      setAlertMessage(err.errors.map((err: string) => err.message).join("\n"));
-      setAlertType("danger");
+      setAlertMessage(
+        err.errors.map((err: string) => err.message).join("\n"),
+        "error",
+      );
+      // setAlertType("danger");
     }
   };
 
@@ -286,14 +298,14 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
         </View>
 
         {/* Modale Alerte*/}
-        {alertMessage && (
+        {/* {alertMessage && (
           <CustomAlert
             visible={!!alertMessage}
             message={alertMessage}
             alertType={alertType}
             onClose={() => setAlertMessage(null)}
           />
-        )}
+        )} */}
       </SafeAreaView>
     </View>
   );

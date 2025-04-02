@@ -4,13 +4,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { ModeState, changeMode } from "../../reducers/mode";
 import { useColorScheme } from "nativewind";
 
+import { useModal } from "../../context/ModalContext";
+
 import BottomSheet, {
   BottomSheetView,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 
 import { UserState, updateUser, resetUser } from "../../reducers/user";
-import { resetProducerData } from "../../reducers/producer";
+import { resetProducerData, setProducerData } from "../../reducers/producer";
 import { resetShopData } from "../../reducers/shop";
 import { emptyCart } from "../../reducers/cart";
 
@@ -21,9 +23,21 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 
 /* Eléments graphiques */
-import { View, Alert, Text, StyleSheet } from "react-native";
+import {
+  View,
+  Alert,
+  Text,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView } from "react-native-gesture-handler";
+import {
+  GestureHandlerRootView,
+  ScrollView,
+} from "react-native-gesture-handler";
 import InputText from "../../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import CustomButton from "../../components/utils/buttons/Custom";
@@ -38,6 +52,7 @@ import TextHeading4 from "../../components/utils/texts/Heading4";
 import ColorSchemeButton from "../../components/utils/buttons/ColorScheme";
 import TextBody1 from "../../components/utils/texts/Body1";
 import CheckBox from "../../components/utils/inputs/CheckBox";
+import CustomAlert from "../../components/modals/CustomAlert";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -49,6 +64,8 @@ type Props = {
 };
 
 export default function ProducerProfileScreen({ navigation }: Props) {
+  const { setAlertMessage } = useModal();
+
   const dispatch = useDispatch();
   const modeStore = useSelector(
     (state: { mode: ModeState }) => state.mode.value,
@@ -66,6 +83,9 @@ export default function ProducerProfileScreen({ navigation }: Props) {
   // Import the Clerk Auth functions
   const { getToken, signOut } = useAuth();
   const { colorScheme, toggleColorScheme } = useColorScheme();
+
+  // const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  // const [alertType, setAlertType] = useState<"success" | "danger">("danger");
 
   const [isOpenInfo, setOpenInfo] = useState(false);
   const [isOpenAddress, setOpenAddress] = useState(false);
@@ -142,6 +162,7 @@ export default function ProducerProfileScreen({ navigation }: Props) {
       dispatch(emptyCart());
       dispatch(resetProducerData());
       dispatch(resetShopData());
+      navigation.navigate("Home");
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
     }
@@ -152,6 +173,7 @@ export default function ProducerProfileScreen({ navigation }: Props) {
       setProducerSaveLoading(true);
       const token = await getToken();
       const values = { socialReason, siren, iban, bic, address };
+
       let producerResponse;
       if (producerStore === null) {
         producerResponse = await producerTools.createProducer(token, values);
@@ -160,13 +182,17 @@ export default function ProducerProfileScreen({ navigation }: Props) {
       }
 
       console.log(producerResponse);
-      if (data) {
-        dispatch(updateUser(data));
-        Alert.alert(
-          "Mise à jour de votre profil",
-          "Votre profil à bien été mis à jour.",
-        );
+
+      if (!producerResponse.success) {
+        setAlertMessage(producerResponse.message, "error");
+        // setAlertType("danger")
+        return;
       }
+
+      dispatch(setProducerData(producerResponse.data));
+      setAlertMessage("Informations mises à jour.", "success");
+      // setAlertType("success")
+
       setProducerSaveLoading(false);
     } catch (error) {
       console.error(error);
@@ -198,9 +224,9 @@ export default function ProducerProfileScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <View className="items-center w-full flex-1">
+      <View className="flex-1 items-center">
         <ScrollView
-          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ flexGrow: 1 }}
           className="flex h-full w-full p-3"
         >
           <View className="flex flex-row items-center mb-5">
@@ -395,6 +421,16 @@ export default function ProducerProfileScreen({ navigation }: Props) {
         />
       </View>
 
+      {/* Modale Alerte*/}
+      {/* {alertMessage && (
+        <CustomAlert
+          visible={!!alertMessage}
+          message={alertMessage}
+          alertType={alertType}
+          onClose={() => setAlertMessage(null)}
+        />
+      )} */}
+
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
@@ -447,13 +483,6 @@ export default function ProducerProfileScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    flex: 1,
-    position: "relative",
-  },
   contentContainer: {
     flex: 1,
     alignItems: "center",

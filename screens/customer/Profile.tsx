@@ -310,10 +310,10 @@ export default function UserProfileScreen({ navigation }: Props) {
         )}
       </View>
 
-      <SignInScreen
+      {/* <SignInScreen
         showModal={isSigninModalVisible}
         onCloseFn={() => setIsSigninModalVisible(false)}
-      />
+      /> */}
     </SafeAreaView>
   );
 }

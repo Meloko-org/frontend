@@ -6,6 +6,7 @@ import * as SecureStore from "expo-secure-store";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { NavigationContainer } from "@react-navigation/native";
+import { ModalProvider } from "./context/ModalContext";
 
 import {
   createNativeStackNavigator,
@@ -249,29 +250,31 @@ export default function App(): JSX.Element {
             publishableKey={publishableKey}
           >
             <ClerkLoaded>
-              <NavigationContainer>
-                <Stack.Navigator screenOptions={options}>
-                  <Stack.Screen name="Home" component={HomeScreen} />
-                  <Stack.Screen name="SignUp" component={SignUpScreen} />
-                  <Stack.Screen name="SignIn" component={SignInScreen} />
-                  <Stack.Screen
-                    name="SearchCustomer"
-                    component={SearchCustomerScreen}
-                  />
-                  {/* <Stack.Screen
-                    name="Components"
-                    component={ComponentsScreen}
-                  /> */}
-                  <Stack.Screen
-                    name="TabNavigatorUser"
-                    component={TabNavigatorUser}
-                  />
-                  <Stack.Screen
-                    name="TabNavigatorProducer"
-                    component={TabNavigatorProducer}
-                  />
-                </Stack.Navigator>
-              </NavigationContainer>
+              <ModalProvider>
+                <NavigationContainer>
+                  <Stack.Navigator screenOptions={options}>
+                    <Stack.Screen name="Home" component={HomeScreen} />
+                    <Stack.Screen name="SignUp" component={SignUpScreen} />
+                    <Stack.Screen name="SignIn" component={SignInScreen} />
+                    <Stack.Screen
+                      name="SearchCustomer"
+                      component={SearchCustomerScreen}
+                    />
+                    {/* <Stack.Screen
+                      name="Components"
+                      component={ComponentsScreen}
+                    /> */}
+                    <Stack.Screen
+                      name="TabNavigatorUser"
+                      component={TabNavigatorUser}
+                    />
+                    <Stack.Screen
+                      name="TabNavigatorProducer"
+                      component={TabNavigatorProducer}
+                    />
+                  </Stack.Navigator>
+                </NavigationContainer>
+              </ModalProvider>
             </ClerkLoaded>
           </ClerkProvider>
         </GestureHandlerRootView>

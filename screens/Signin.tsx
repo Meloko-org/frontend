@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useSignIn, useSignUp, useOAuth } from "@clerk/clerk-expo";
 import { useAuth } from "@clerk/clerk-expo";
+import { useModal } from "../context/ModalContext";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 
@@ -66,8 +67,9 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
     (state: { producer: ProducerState }) => state.producer.value,
   );
 
-  const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [alertType, setAlertType] = useState<"success" | "danger">("danger");
+  const { setAlertMessage } = useModal();
+  // const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  // const [alertType, setAlertType] = useState<"success" | "danger">("danger");
 
   // need to get the user infos
   const { signOut, isSignedIn, getToken } = useAuth();
@@ -164,13 +166,13 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   const onSignInPress = useCallback(async () => {
     // vérification des champs
     if (emailAddress === "") {
-      setAlertMessage("Veuillez saisir un email.");
-      setAlertType("danger");
+      setAlertMessage("Veuillez saisir un email.", "warning");
+      // setAlertType("danger");
       return;
     }
     if (password === "") {
-      setAlertMessage("Veuillez saisir un mot de passe.");
-      setAlertType("danger");
+      setAlertMessage("Veuillez saisir un mot de passe.", "warning");
+      // setAlertType("danger");
       return;
     }
 
@@ -200,8 +202,11 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
       setConnectionLoading(false);
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
-      setAlertMessage(err.errors.map((err: string) => err.message).join("\n"));
-      setAlertType("danger");
+      setAlertMessage(
+        err.errors.map((err: string) => err.message).join("\n"),
+        "error",
+      );
+      // setAlertType("danger");
       setConnectionLoading(false);
     }
   }, [isLoaded, emailAddress, password]);
@@ -304,14 +309,14 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
           </View>
 
           {/* Modale Alerte*/}
-          {alertMessage && (
+          {/* {alertMessage && (
             <CustomAlert
               visible={!!alertMessage}
               message={alertMessage}
               alertType={alertType}
               onClose={() => setAlertMessage(null)}
             />
-          )}
+          )} */}
         </ScrollView>
       </SafeAreaView>
     </View>
