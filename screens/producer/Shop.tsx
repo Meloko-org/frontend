@@ -96,9 +96,6 @@ export default function ShopProducteurScreen({ navigation }: Props) {
     useState(false);
   const [isMarketsModalVisible, setMarketsModalVisible] = useState(false);
 
-  // Contient les différents types de shop
-  const [shopTypes, setShopTypes] = useState([]);
-
   useEffect(() => {
     (async () => {
       /* retrieve types shop from bdd */
@@ -120,10 +117,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
         country: shopStore.address.country,
       });
       setTypes(shopStore.types.map((type) => type._id));
-      if (shopStore.reopenDate !== null) {
-        setReopenDate(shopStore.reopen);
-        setReopenDateVisible(true);
-      }
+
       setButtonLabel("Mettre à jour");
     }
   }, []);
@@ -131,32 +125,6 @@ export default function ShopProducteurScreen({ navigation }: Props) {
   const toggleOpenAddress = () => {
     setOpenAddress(!isOpenAddress);
   };
-
-  /**
-   * Permet d'ajouter ou supprimer les id des types de shop en fonction des clics sur les switch
-   * @param typeId string
-   */
-  const handleSwitchType = (typeId: string) => {
-    setTypes((prevSelectedTypes) =>
-      prevSelectedTypes.includes(typeId)
-        ? prevSelectedTypes.filter((id) => id !== typeId)
-        : [...prevSelectedTypes, typeId],
-    );
-  };
-
-  // Créer des switch en fonction des types de shop
-  const typesList = shopTypes.map((item) => {
-    return (
-      <SwitchInput
-        key={item._id}
-        thumbColor="#215487"
-        label={item.name}
-        value={types.includes(item._id)}
-        onValueChange={(isSelected) => handleSwitchType(item._id, isSelected)}
-        extraClasses="pl-5 mb-2"
-      />
-    );
-  });
 
   const handleSaveShop = async () => {
     try {
@@ -480,8 +448,6 @@ export default function ShopProducteurScreen({ navigation }: Props) {
           </>
         )}
 
-        <View className="py-3">{typesList}</View>
-
         <ButtonPrimaryEnd
           label={buttonLabel}
           iconName="refresh"
@@ -497,7 +463,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
           extraClasses="my-3"
           onPressFn={() =>
             navigation.navigate("TabNavigatorProducer", {
-              screen: "Stocks",
+              screen: "Stock",
             })
           }
         />

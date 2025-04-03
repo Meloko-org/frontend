@@ -16,6 +16,8 @@ import SwitchInput from "../../components/utils/inputs/Switch";
 import TextBody1 from "../../components/utils/texts/Body1";
 import InputText from "../../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
+import { useSelector } from "react-redux";
+import { ShopState } from "../../reducers/shop";
 
 type ShopOfflineScreenRouteProp = RouteProp<RootStackParamList, "ShopOffline">;
 
@@ -31,6 +33,10 @@ type Props = {
 export default function ShopOfflineScreen({ navigation }: Props) {
   const route = useRoute<ShopOfflineScreenRouteProp>();
   const { from, backLabel, screenTitle } = route.params || {};
+
+  const shopStore = useSelector(
+    (state: { shop: ShopState }) => state.shop.value,
+  );
 
   /* gestion du switch de désactivation de la boutique */
   const [isReopenDateVisible, setReopenDateVisible] = useState(false);
@@ -49,6 +55,13 @@ export default function ShopOfflineScreen({ navigation }: Props) {
   useEffect(() => {
     if (!isReopenDateVisible) setDisabled(true);
   }, [isReopenDateVisible]);
+
+  useEffect(() => {
+    if (shopStore !== null && shopStore.reopenDate !== null) {
+      setReopenDate(shopStore.reopen);
+      setReopenDateVisible(true);
+    }
+  }, []);
 
   const handleDateChange = ({ type }, selectedDate) => {
     if (type == "set") {

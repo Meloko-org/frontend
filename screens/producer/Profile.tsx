@@ -422,16 +422,6 @@ export default function ProducerProfileScreen({ navigation }: Props) {
         />
       </View>
 
-      {/* Modale Alerte*/}
-      {/* {alertMessage && (
-        <CustomAlert
-          visible={!!alertMessage}
-          message={alertMessage}
-          alertType={alertType}
-          onClose={() => setAlertMessage(null)}
-        />
-      )} */}
-
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
