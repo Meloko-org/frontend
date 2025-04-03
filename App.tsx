@@ -252,12 +252,12 @@ const TabNavigatorProducer: React.FC = () => {
       />
       <Tab.Screen
         name="Stock"
-        component={PremiumOptionsScreen}
+        component={StockScreen}
         options={{ tabBarButton: () => null }}
       />
       <Tab.Screen
         name="PremiumOptions"
-        component={ShopDetailsScreen}
+        component={PremiumOptionsScreen}
         options={{ tabBarButton: () => null }}
       />
       <Tab.Screen name="BusinessCenter" component={BusinessScreen} />
