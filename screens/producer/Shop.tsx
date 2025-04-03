@@ -13,8 +13,6 @@ import { UserState } from "../../reducers/user";
 import { View, TouchableOpacity, Alert, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import InputText from "../../components/utils/inputs/Text";
 import InputTextarea from "../../components/utils/inputs/Textarea";
@@ -37,7 +35,6 @@ import BadgeSecondary from "../../components/utils/badges/Secondary";
 import OpenMenuButton from "../../components/utils/buttons/OpenMenu";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import StarsNotation from "../../components/utils/StarsNotation";
-import Thumbnail from "../../components/utils/Thumbnail";
 import ThumbnailCarousel from "../../components/utils/ThumbnailCarousel";
 const FontAwesome = _Fontawesome as React.ElementType;
 
@@ -90,12 +87,6 @@ export default function ShopProducteurScreen({ navigation }: Props) {
 
   const [isShopSaveLoading, setShopSaveLoading] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Créer le shop");
-
-  /* gestion du switch de désactivation de la boutique */
-  const [isReopenDateVisible, setReopenDateVisible] = useState(false);
-  const [reopenDate, setReopenDate] = useState();
-  const [showPicker, setShowPicker] = useState(false);
-  const [date, setDate] = useState(new Date());
 
   /* Gestion de l'affichage des modals */
   const [isLogoModalVisible, setLogoModalVisible] = useState(false);
@@ -208,30 +199,6 @@ export default function ShopProducteurScreen({ navigation }: Props) {
       console.log(error);
       setShopSaveLoading(false);
     }
-  };
-
-  const handleReopenDate = () => {
-    setReopenDateVisible(!isReopenDateVisible);
-    setReopenDate(undefined);
-  };
-
-  const handleDateChange = ({ type }, selectedDate) => {
-    if (type == "set") {
-      const currentDate = selectedDate;
-      setDate(currentDate);
-      toggleDatePicker();
-      setReopenDate(currentDate.toDateString());
-      // if (Platform.OS === "android") {
-      //   toggleDatePicker()
-      //   setReopenDate(currentDate.toDateString())
-      // }
-    } else {
-      toggleDatePicker();
-    }
-  };
-
-  const toggleDatePicker = () => {
-    setShowPicker(!showPicker);
   };
 
   console.log(
@@ -558,40 +525,6 @@ export default function ShopProducteurScreen({ navigation }: Props) {
                 extraClasses="bg-primary p-4 mr-3"
                 onPressFn={() => setMarketsModalVisible(true)}
               />
-            </View>
-
-            <View className="flex my-5 pl-3 items-center">
-              <SwitchInput
-                thumbColor="#215487"
-                label="Désactiver la boutique"
-                value={isReopenDateVisible}
-                extraClasses="pl-5 mb-2"
-                onValueChange={handleReopenDate}
-              />
-              {isReopenDateVisible && (
-                <View>
-                  <TextBody1>Sélectionner une date de réouverture</TextBody1>
-                  <InputText
-                    placeholder="Choisissez une date"
-                    label="Date de réouverture"
-                    editable={false}
-                    onChangeText={(value: string) => setReopenDate(value)}
-                    value={reopenDate}
-                    iconName="calendar"
-                    onIconPressFn={toggleDatePicker}
-                    size="large"
-                  />
-
-                  {showPicker && (
-                    <DateTimePicker
-                      mode="date"
-                      display="spinner"
-                      value={date}
-                      onChange={handleDateChange}
-                    />
-                  )}
-                </View>
-              )}
             </View>
           </>
         )}
