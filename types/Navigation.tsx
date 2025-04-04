@@ -27,6 +27,31 @@ type RootStackParamList = {
     backLabel?: string;
     screenTitle?: string;
   };
+  ShopWithdrawClickcollect: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+  };
+  ShopWithdrawShopMarkets: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+  };
+  ShopWithdrawShopMarketsSearch: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+  };
+  ShopWithdrawShopMarketsManage: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+  };
+  ShopWithdrawDelivery: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+  };
   StockCategories: { from?: string; backLabel?: string; screenTitle?: string };
   Stock: { from?: string; backLabel?: string; screenTitle?: string };
   PremiumOptions: { from?: string; backLabel?: string; screenTitle?: string };

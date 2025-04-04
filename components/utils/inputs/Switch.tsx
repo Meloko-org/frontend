@@ -7,7 +7,7 @@ type SwitchInputProps = {
     false: string;
     true: string;
   };
-  thumbColor: string;
+  thumbColor?: string;
   ios_backgroundColor?: string;
   label: string;
   value: boolean;

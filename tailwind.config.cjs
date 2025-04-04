@@ -27,6 +27,7 @@ module.exports = {
         success: "#0081A7",
         night: "#0A090B",
         premium: "#FAA200",
+        premiumbg: "#686B65",
       },
     },
   },
