@@ -81,6 +81,10 @@ export default function Planning(props: PlanningProps): JSX.Element {
   //console.log("------------------------------- PLANNING --------------------------------------------------------------------");
 
   useEffect(() => {
+    console.log(
+      "props planning :",
+      JSON.stringify(props.openingHoursValues, null, 2),
+    );
     if (props.openingHoursValues?.length) {
       const newActiveDays: ActiveDaysData = {
         monday: false,
@@ -191,7 +195,7 @@ export default function Planning(props: PlanningProps): JSX.Element {
     );
   };
 
-  // console.log("PLANNING:", JSON.stringify(openingHours, null, 2))
+  // console.log("PLANNING:", JSON.stringify(props.openingHoursValues, null, 2))
   // console.log("PLANNING:", openingHours)
   // console.log("activeDays:", activeDays.monday)
   // console.log("--------------------------------------------------------------------------------------------------");
