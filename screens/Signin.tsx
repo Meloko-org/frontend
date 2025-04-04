@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { useSignIn, useSignUp, useOAuth } from "@clerk/clerk-expo";
+import { useSignIn, useSignUp, useSSO } from "@clerk/clerk-expo";
 import { useAuth } from "@clerk/clerk-expo";
+import * as AuthSession from "expo-auth-session";
 import { useModal } from "../context/ModalContext";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
@@ -81,7 +82,7 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   const { signIn, setActive, isLoaded } = useSignIn();
 
   // import the Clerk Google OAuth flow
-  const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
+  const { startSSOFlow } = useSSO();
 
   // Form fields
   const [emailAddress, setEmailAddress] = useState<string>("");
@@ -146,15 +147,27 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
     }
 
     try {
+      // Start the authentication process by calling `startSSOFlow()`
+      const { createdSessionId, setActive, signIn, signUp } =
+        await startSSOFlow({
+          strategy: "oauth_google",
+          // For web, defaults to current path
+          // For native, you must pass a scheme, like AuthSession.makeRedirectUri({ scheme, path })
+          // For more info, see https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturioptions
+          redirectUrl: AuthSession.makeRedirectUri(),
+        });
       // Try to start the Google OAuth flow
-      const { createdSessionId, setActive } = await startOAuthFlow({
-        redirectUrl: Linking.createURL("/home", { scheme: "Meloko" }), // Redirect path on successful signin
-      });
+      //   const { createdSessionId, setActive } = await startOAuthFlow({
+      //     redirectUrl: Linking.createURL("/home", { scheme: "Meloko" }), // Redirect path on successful signin
+      //   });
 
       // If the signin event went well
       if (createdSessionId) {
-        setActive!({ session: createdSessionId });
+        console.log("sessionId", createdSessionId);
+        await setActive!({ session: createdSessionId });
+        // setActive!({ session: createdSessionId });
         setPerformedSignedIn(true);
+        fetchData();
       } else {
       }
     } catch (err: any) {
