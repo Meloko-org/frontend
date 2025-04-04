@@ -9,12 +9,22 @@ import TextBody1 from "../texts/Body1";
 import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
 import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
 import TextHeading4 from "../texts/Heading4";
+import SwitchInput from "../inputs/Switch";
 
 type OpenScreenButtonProps = {
   label: string;
   bgColor?: string;
   redAlert?: boolean;
   notice?: string;
+  switchProps?: {
+    label: string;
+    value: boolean;
+    onValueChange: (isEnabled: boolean) => void;
+    trackColor?: { false: string; true: string };
+    thumbColor?: string;
+    ios_backgroundColor?: string;
+    extraClasses?: string;
+  } | null;
   extraClasses?: string;
   onPressFn: () => void;
 };
@@ -24,11 +34,14 @@ export default function OpenScreenButton({
   bgColor,
   redAlert,
   notice,
+  switchProps = null,
   extraClasses,
   onPressFn,
 }: OpenScreenButtonProps): JSX.Element {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  console.log("label openscreen :", label);
 
   return (
     <TouchableOpacity
@@ -38,7 +51,12 @@ export default function OpenScreenButton({
       <View
         className={`${extraClasses} flex flex-row w-auto h-[60px] items-center rounded-lg ${bgColor ? bgColor : "bg-darkbg/20 dark:bg-lightbg/25"}`}
       >
-        <View className="flex-grow ml-3">
+        {switchProps && (
+          <View className="w-[60px]">
+            <SwitchInput {...switchProps} />
+          </View>
+        )}
+        <View className="grow ml-3">
           <TextBody1>{label}</TextBody1>
         </View>
         {notice && (

@@ -94,6 +94,7 @@ type ShopData = {
 type ClickCollectData =
   | {
       instructions: string;
+      isActive: boolean;
       openingHours: OpeningHourData[];
     }
   | undefined;

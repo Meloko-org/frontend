@@ -44,6 +44,11 @@ import ShopParamsScreen from "./screens/producer/ShopParams";
 import ShopWithdrawModesScreen from "./screens/producer/ShopWithdrawModes";
 import StockCategoriesScreen from "./screens/producer/StockCategories";
 import StockScreen from "./screens/producer/Stocks";
+import ShopWithdrawClickcollectScreen from "./screens/producer/ShopWithdrawClickcollect";
+import ShopWithdrawDeliveryScreen from "./screens/producer/ShopWithdrawDelivery";
+import ShopWithdrawShopMarketsScreen from "./screens/producer/ShopWithdrawShopMarkets";
+import ShopWithdrawShopMarketsManageScreen from "./screens/producer/ShopWithdrawShopMarketsManage";
+import ShopWithdrawShopMarketsSearchScreen from "./screens/producer/ShopWithdrawShopMarketsSearch";
 
 import { Provider } from "react-redux";
 import { persistStore, persistReducer } from "redux-persist";
@@ -243,6 +248,31 @@ const TabNavigatorProducer: React.FC = () => {
       <Tab.Screen
         name="ShopWithdrawModes"
         component={ShopWithdrawModesScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="ShopWithdrawClickcollect"
+        component={ShopWithdrawClickcollectScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="ShopWithdrawShopMarkets"
+        component={ShopWithdrawShopMarketsScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="ShopWithdrawShopMarketsSearch"
+        component={ShopWithdrawShopMarketsSearchScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="ShopWithdrawShopMarketsManage"
+        component={ShopWithdrawShopMarketsManageScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="ShopWithdrawDelivery"
+        component={ShopWithdrawDeliveryScreen}
         options={{ tabBarButton: () => null }}
       />
       <Tab.Screen
