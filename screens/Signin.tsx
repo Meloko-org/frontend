@@ -139,6 +139,38 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
     }
   };
 
+  // Signin/up with Facebook
+  const onFacebookAuthPress = useCallback(async () => {
+    // If Clerk is not loaded
+    if (!isLoaded) {
+      return;
+    }
+
+    try {
+      // Start the authentication process by calling `startSSOFlow()`
+      const { createdSessionId, setActive, signIn, signUp } =
+        await startSSOFlow({
+          strategy: "oauth_facebook",
+          // For web, defaults to current path
+          // For native, you must pass a scheme, like AuthSession.makeRedirectUri({ scheme, path })
+          // For more info, see https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturioptions
+          redirectUrl: AuthSession.makeRedirectUri(),
+        });
+
+      // If the signin event went well
+      if (createdSessionId) {
+        console.log("sessionId", createdSessionId);
+        await setActive!({ session: createdSessionId });
+        // setActive!({ session: createdSessionId });
+        setPerformedSignedIn(true);
+        fetchData();
+      } else {
+      }
+    } catch (err: any) {
+      console.error(JSON.stringify(err, null, 2));
+    }
+  }, []);
+
   // Signin/up with Google
   const onGoogleAuthPress = useCallback(async () => {
     // If Clerk is not loaded
@@ -254,14 +286,8 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
               <ButtonPrimaryEnd
                 label="Facebook"
                 iconName="facebook-f"
-                onPressFn={onGoogleAuthPress}
+                onPressFn={onFacebookAuthPress}
                 extraClasses="w-full mb-3"
-              />
-              <ButtonPrimaryEnd
-                label="Instagram"
-                iconName="instagram"
-                onPressFn={onGoogleAuthPress}
-                extraClasses="w-full"
               />
             </View>
           </View>
