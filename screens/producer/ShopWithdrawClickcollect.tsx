@@ -91,10 +91,6 @@ export default function ShopWithdrawClickcollectScreen({ navigation }: Props) {
       const updatedOpeningHours = updateOpeningHours(storedOpeningHours);
       setClickCollectHours([...updatedOpeningHours]);
       setRefreshKey((prev) => prev + 1);
-      console.log(
-        "State updated:",
-        JSON.stringify(updatedOpeningHours, null, 2),
-      );
     }
   }, []);
 
@@ -159,8 +155,8 @@ export default function ShopWithdrawClickcollectScreen({ navigation }: Props) {
 
         <ScrollView>
           <View className="px-3">
-            <TextBody1 centered={true} extraClasses="mb-5">
-              {`Définissez ici les jours, les horaires\nd'ouverture et les conditions du click & collect`}
+            <TextBody1 centered={true} extraClasses="mb-5 px-3">
+              {`Définissez ici les jours,\nles horaires d'ouverture\net les conditions du click & collect`}
             </TextBody1>
 
             <View>

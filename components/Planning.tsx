@@ -1,13 +1,18 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { LayoutChangeEvent, TouchableOpacity, View } from "react-native";
+
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 import BadgeGrey from "./utils/badges/Grey";
 import SwitchInput from "./utils/inputs/Switch";
 import TimeSlot from "./TimeSlot";
-import TextBody2 from "./utils/texts/Body2";
-import IconButton from "./utils/buttons/Icon";
-import TextBody1 from "./utils/texts/Body1";
+import OpenMenuButton from "./utils/buttons/OpenMenu";
 
 type ActiveDaysData = {
   [key: string]: boolean;
@@ -28,11 +33,40 @@ type PlanningProps = {
 };
 
 export default function Planning(props: PlanningProps): JSX.Element {
-  const [isOpen, setOpen] = useState(props.open ? props.open : false);
+  // bouton menu déroulant "Jours et horaires" ------------------
+  const [isOpenSlots, setOpenSlots] = useState(props.open ? props.open : false);
+  const contentHeight = useSharedValue(0);
+  const heightSlots = useSharedValue(0);
 
-  const toggleAccordion = () => {
-    setOpen(!isOpen);
+  const animatedStyleSlots = useAnimatedStyle(() => ({
+    height: heightSlots.value,
+    opacity: heightSlots.value > 0 ? 1 : 0, // Facultatif : gérer l'opacité
+  }));
+
+  const toggleOpenSlots = () => {
+    setOpenSlots((prev) => {
+      const newState = !prev;
+      heightSlots.value = withTiming(newState ? contentHeight.value : 0, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+      return newState;
+    });
+
+    console.log("toggleOpenSlots:", isOpenSlots);
   };
+
+  const onContentLayout = (event: LayoutChangeEvent) => {
+    const measuredHeight = event.nativeEvent.layout.height;
+    contentHeight.value = measuredHeight;
+
+    // if (isOpenSlots) {
+    //   heightSlots.value = withTiming(measuredHeight)
+    // }
+
+    console.log("Mesured height:", measuredHeight);
+  };
+  // -----------------------------------------------
 
   const hours = [
     "8:00",
@@ -78,13 +112,7 @@ export default function Planning(props: PlanningProps): JSX.Element {
     sunday: 7,
   };
 
-  //console.log("------------------------------- PLANNING --------------------------------------------------------------------");
-
   useEffect(() => {
-    console.log(
-      "props planning :",
-      JSON.stringify(props.openingHoursValues, null, 2),
-    );
     if (props.openingHoursValues?.length) {
       const newActiveDays: ActiveDaysData = {
         monday: false,
@@ -195,241 +223,245 @@ export default function Planning(props: PlanningProps): JSX.Element {
     );
   };
 
-  // console.log("PLANNING:", JSON.stringify(props.openingHoursValues, null, 2))
-  // console.log("PLANNING:", openingHours)
-  // console.log("activeDays:", activeDays.monday)
-  // console.log("--------------------------------------------------------------------------------------------------");
-
+  console.log("openslots :", isOpenSlots);
   return (
     <View>
-      <View className="flex flex-row justify-between items-center cursor-pointer">
-        <TextBody1>Jours et horaires</TextBody1>
-        <TouchableOpacity onPress={toggleAccordion}>
-          <TextBody2>{isOpen ? "Réduire" : "Déplier"}</TextBody2>
-        </TouchableOpacity>
-      </View>
-      {isOpen && (
-        <View className="overflow-hidden transition-all ease-out duration-300">
-          <View className="mx-4 mb-4">
-            <View className="flex-row items-center w-full">
-              <BadgeGrey extraClasses="flex-1">Lundi</BadgeGrey>
-              <SwitchInput
-                thumbColor="#215487"
-                label=""
-                value={activeDays.monday}
-                extraClasses="w-16 pl-2"
-                onValueChange={() => handleToggleDay("monday")}
-              />
-            </View>
-            {activeDays.monday &&
-              openingHours[0] &&
-              openingHours[0].periods.map((period, index) => (
-                <TimeSlot
-                  key={index}
-                  data={hours}
-                  trash={index === 0 ? false : true}
-                  defaultStartByIndex={period.openingTime || "Select"}
-                  defaultEndByIndex={period.closingTime || "Select"}
-                  onSelectStart={(selectedItem) => {
-                    handleSelectHour(1, index, "openingTime", selectedItem);
-                  }}
-                  onSelectEnd={(selectedItem) => {
-                    handleSelectHour(1, index, "closingTime", selectedItem);
-                  }}
-                  onPressPlus={() => handleAddTimeSlot(1)}
-                  onPressDel={() => handleRemoveTimeSlot(1, index)}
-                  extraClasses=""
+      <OpenMenuButton
+        label="Jours et horaires"
+        onPressFn={toggleOpenSlots}
+        extraClasses="mb-2"
+      />
+
+      <Animated.View style={[animatedStyleSlots]} className="overflow-hidden">
+        <View
+          onLayout={onContentLayout}
+          style={{
+            opacity: isOpenSlots ? 1 : 0,
+            position: isOpenSlots ? "relative" : "absolute",
+          }}
+        >
+          <View className="overflow-hidden transition-all ease-out duration-300">
+            <View className="mx-4 mb-4">
+              <View className="flex-row items-center w-full">
+                <BadgeGrey extraClasses="flex-1">Lundi</BadgeGrey>
+                <SwitchInput
+                  thumbColor="#215487"
+                  label=""
+                  value={activeDays.monday}
+                  extraClasses="w-16 pl-2"
+                  onValueChange={() => handleToggleDay("monday")}
                 />
-              ))}
-          </View>
-          <View className="mx-4 mb-4">
-            <View className="flex-row items-center w-full">
-              <BadgeGrey extraClasses="flex-1">Mardi</BadgeGrey>
-              <SwitchInput
-                thumbColor="#215487"
-                label=""
-                value={activeDays.tuesday}
-                extraClasses="w-16 pl-2"
-                onValueChange={() => handleToggleDay("tuesday")}
-              />
+              </View>
+              {activeDays.monday &&
+                openingHours[0] &&
+                openingHours[0].periods.map((period, index) => (
+                  <TimeSlot
+                    key={index}
+                    data={hours}
+                    trash={index === 0 ? false : true}
+                    defaultStartByIndex={period.openingTime || "Select"}
+                    defaultEndByIndex={period.closingTime || "Select"}
+                    onSelectStart={(selectedItem) => {
+                      handleSelectHour(1, index, "openingTime", selectedItem);
+                    }}
+                    onSelectEnd={(selectedItem) => {
+                      handleSelectHour(1, index, "closingTime", selectedItem);
+                    }}
+                    onPressPlus={() => handleAddTimeSlot(1)}
+                    onPressDel={() => handleRemoveTimeSlot(1, index)}
+                    extraClasses=""
+                  />
+                ))}
             </View>
-            {activeDays.tuesday &&
-              openingHours[1] &&
-              openingHours[1].periods.map((period, index) => (
-                <TimeSlot
-                  key={index}
-                  data={hours}
-                  trash={index === 0 ? false : true}
-                  defaultStartByIndex={period.openingTime || "Select"}
-                  defaultEndByIndex={period.closingTime || "Select"}
-                  onSelectStart={(selectedItem) => {
-                    handleSelectHour(2, index, "openingTime", selectedItem);
-                  }}
-                  onSelectEnd={(selectedItem) => {
-                    handleSelectHour(2, index, "closingTime", selectedItem);
-                  }}
-                  onPressPlus={() => handleAddTimeSlot(2)}
-                  onPressDel={() => handleRemoveTimeSlot(2, index)}
+            <View className="mx-4 mb-4">
+              <View className="flex-row items-center w-full">
+                <BadgeGrey extraClasses="flex-1">Mardi</BadgeGrey>
+                <SwitchInput
+                  thumbColor="#215487"
+                  label=""
+                  value={activeDays.tuesday}
+                  extraClasses="w-16 pl-2"
+                  onValueChange={() => handleToggleDay("tuesday")}
                 />
-              ))}
-          </View>
-          <View className="mx-4 mb-4">
-            <View className="flex-row items-center w-full">
-              <BadgeGrey extraClasses="flex-1">Mercredi</BadgeGrey>
-              <SwitchInput
-                thumbColor="#215487"
-                label=""
-                value={activeDays.wednesday}
-                extraClasses="w-16 pl-2"
-                onValueChange={() => handleToggleDay("wednesday")}
-              />
+              </View>
+              {activeDays.tuesday &&
+                openingHours[1] &&
+                openingHours[1].periods.map((period, index) => (
+                  <TimeSlot
+                    key={index}
+                    data={hours}
+                    trash={index === 0 ? false : true}
+                    defaultStartByIndex={period.openingTime || "Select"}
+                    defaultEndByIndex={period.closingTime || "Select"}
+                    onSelectStart={(selectedItem) => {
+                      handleSelectHour(2, index, "openingTime", selectedItem);
+                    }}
+                    onSelectEnd={(selectedItem) => {
+                      handleSelectHour(2, index, "closingTime", selectedItem);
+                    }}
+                    onPressPlus={() => handleAddTimeSlot(2)}
+                    onPressDel={() => handleRemoveTimeSlot(2, index)}
+                  />
+                ))}
             </View>
-            {activeDays.wednesday &&
-              openingHours[2] &&
-              openingHours[2].periods.map((period, index) => (
-                <TimeSlot
-                  key={index}
-                  data={hours}
-                  trash={index === 0 ? false : true}
-                  defaultStartByIndex={period.openingTime || "Select"}
-                  defaultEndByIndex={period.closingTime || "Select"}
-                  onSelectStart={(selectedItem) => {
-                    handleSelectHour(3, index, "openingTime", selectedItem);
-                  }}
-                  onSelectEnd={(selectedItem) => {
-                    handleSelectHour(3, index, "closingTime", selectedItem);
-                  }}
-                  onPressPlus={() => handleAddTimeSlot(3)}
-                  onPressDel={() => handleRemoveTimeSlot(3, index)}
+            <View className="mx-4 mb-4">
+              <View className="flex-row items-center w-full">
+                <BadgeGrey extraClasses="flex-1">Mercredi</BadgeGrey>
+                <SwitchInput
+                  thumbColor="#215487"
+                  label=""
+                  value={activeDays.wednesday}
+                  extraClasses="w-16 pl-2"
+                  onValueChange={() => handleToggleDay("wednesday")}
                 />
-              ))}
-          </View>
-          <View className="mx-4 mb-4">
-            <View className="flex-row items-center w-full">
-              <BadgeGrey extraClasses="flex-1">Jeudi</BadgeGrey>
-              <SwitchInput
-                thumbColor="#215487"
-                label=""
-                value={activeDays.thursday}
-                extraClasses="w-16 pl-2"
-                onValueChange={() => handleToggleDay("thursday")}
-              />
+              </View>
+              {activeDays.wednesday &&
+                openingHours[2] &&
+                openingHours[2].periods.map((period, index) => (
+                  <TimeSlot
+                    key={index}
+                    data={hours}
+                    trash={index === 0 ? false : true}
+                    defaultStartByIndex={period.openingTime || "Select"}
+                    defaultEndByIndex={period.closingTime || "Select"}
+                    onSelectStart={(selectedItem) => {
+                      handleSelectHour(3, index, "openingTime", selectedItem);
+                    }}
+                    onSelectEnd={(selectedItem) => {
+                      handleSelectHour(3, index, "closingTime", selectedItem);
+                    }}
+                    onPressPlus={() => handleAddTimeSlot(3)}
+                    onPressDel={() => handleRemoveTimeSlot(3, index)}
+                  />
+                ))}
             </View>
-            {activeDays.thursday &&
-              openingHours[3] &&
-              openingHours[3].periods.map((period, index) => (
-                <TimeSlot
-                  key={index}
-                  data={hours}
-                  trash={index === 0 ? false : true}
-                  defaultStartByIndex={period.openingTime || "Select"}
-                  defaultEndByIndex={period.closingTime || "Select"}
-                  onSelectStart={(selectedItem) => {
-                    handleSelectHour(4, index, "openingTime", selectedItem);
-                  }}
-                  onSelectEnd={(selectedItem) => {
-                    handleSelectHour(4, index, "closingTime", selectedItem);
-                  }}
-                  onPressPlus={() => handleAddTimeSlot(4)}
-                  onPressDel={() => handleRemoveTimeSlot(4, index)}
+            <View className="mx-4 mb-4">
+              <View className="flex-row items-center w-full">
+                <BadgeGrey extraClasses="flex-1">Jeudi</BadgeGrey>
+                <SwitchInput
+                  thumbColor="#215487"
+                  label=""
+                  value={activeDays.thursday}
+                  extraClasses="w-16 pl-2"
+                  onValueChange={() => handleToggleDay("thursday")}
                 />
-              ))}
-          </View>
-          <View className="mx-4 mb-4">
-            <View className="flex-row items-center w-full">
-              <BadgeGrey extraClasses="flex-1">Vendredi</BadgeGrey>
-              <SwitchInput
-                thumbColor="#215487"
-                label=""
-                value={activeDays.friday}
-                extraClasses="w-16 pl-2"
-                onValueChange={() => handleToggleDay("friday")}
-              />
+              </View>
+              {activeDays.thursday &&
+                openingHours[3] &&
+                openingHours[3].periods.map((period, index) => (
+                  <TimeSlot
+                    key={index}
+                    data={hours}
+                    trash={index === 0 ? false : true}
+                    defaultStartByIndex={period.openingTime || "Select"}
+                    defaultEndByIndex={period.closingTime || "Select"}
+                    onSelectStart={(selectedItem) => {
+                      handleSelectHour(4, index, "openingTime", selectedItem);
+                    }}
+                    onSelectEnd={(selectedItem) => {
+                      handleSelectHour(4, index, "closingTime", selectedItem);
+                    }}
+                    onPressPlus={() => handleAddTimeSlot(4)}
+                    onPressDel={() => handleRemoveTimeSlot(4, index)}
+                  />
+                ))}
             </View>
-            {activeDays.friday &&
-              openingHours[4] &&
-              openingHours[4].periods.map((period, index) => (
-                <TimeSlot
-                  key={index}
-                  data={hours}
-                  trash={index === 0 ? false : true}
-                  defaultStartByIndex={period.openingTime || "Select"}
-                  defaultEndByIndex={period.closingTime || "Select"}
-                  onSelectStart={(selectedItem) => {
-                    handleSelectHour(5, index, "openingTime", selectedItem);
-                  }}
-                  onSelectEnd={(selectedItem) => {
-                    handleSelectHour(5, index, "closingTime", selectedItem);
-                  }}
-                  onPressPlus={() => handleAddTimeSlot(5)}
-                  onPressDel={() => handleRemoveTimeSlot(5, index)}
+            <View className="mx-4 mb-4">
+              <View className="flex-row items-center w-full">
+                <BadgeGrey extraClasses="flex-1">Vendredi</BadgeGrey>
+                <SwitchInput
+                  thumbColor="#215487"
+                  label=""
+                  value={activeDays.friday}
+                  extraClasses="w-16 pl-2"
+                  onValueChange={() => handleToggleDay("friday")}
                 />
-              ))}
-          </View>
-          <View className="mx-4 mb-4">
-            <View className="flex-row items-center w-full">
-              <BadgeGrey extraClasses="flex-1">Samedi</BadgeGrey>
-              <SwitchInput
-                thumbColor="#215487"
-                label=""
-                value={activeDays.saturday}
-                extraClasses="w-16 pl-2"
-                onValueChange={() => handleToggleDay("saturday")}
-              />
+              </View>
+              {activeDays.friday &&
+                openingHours[4] &&
+                openingHours[4].periods.map((period, index) => (
+                  <TimeSlot
+                    key={index}
+                    data={hours}
+                    trash={index === 0 ? false : true}
+                    defaultStartByIndex={period.openingTime || "Select"}
+                    defaultEndByIndex={period.closingTime || "Select"}
+                    onSelectStart={(selectedItem) => {
+                      handleSelectHour(5, index, "openingTime", selectedItem);
+                    }}
+                    onSelectEnd={(selectedItem) => {
+                      handleSelectHour(5, index, "closingTime", selectedItem);
+                    }}
+                    onPressPlus={() => handleAddTimeSlot(5)}
+                    onPressDel={() => handleRemoveTimeSlot(5, index)}
+                  />
+                ))}
             </View>
-            {activeDays.saturday &&
-              openingHours[5] &&
-              openingHours[5].periods.map((period, index) => (
-                <TimeSlot
-                  key={index}
-                  data={hours}
-                  trash={index === 0 ? false : true}
-                  defaultStartByIndex={period.openingTime || "Select"}
-                  defaultEndByIndex={period.closingTime || "Select"}
-                  onSelectStart={(selectedItem) => {
-                    handleSelectHour(6, index, "openingTime", selectedItem);
-                  }}
-                  onSelectEnd={(selectedItem) => {
-                    handleSelectHour(6, index, "closingTime", selectedItem);
-                  }}
-                  onPressPlus={() => handleAddTimeSlot(6)}
-                  onPressDel={() => handleRemoveTimeSlot(6, index)}
+            <View className="mx-4 mb-4">
+              <View className="flex-row items-center w-full">
+                <BadgeGrey extraClasses="flex-1">Samedi</BadgeGrey>
+                <SwitchInput
+                  thumbColor="#215487"
+                  label=""
+                  value={activeDays.saturday}
+                  extraClasses="w-16 pl-2"
+                  onValueChange={() => handleToggleDay("saturday")}
                 />
-              ))}
-          </View>
-          <View className="mx-4 mb-4">
-            <View className="flex-row items-center w-full">
-              <BadgeGrey extraClasses="flex-1">Dimanche</BadgeGrey>
-              <SwitchInput
-                thumbColor="#215487"
-                label=""
-                value={activeDays.sunday}
-                extraClasses="w-16 pl-2"
-                onValueChange={() => handleToggleDay("sunday")}
-              />
+              </View>
+              {activeDays.saturday &&
+                openingHours[5] &&
+                openingHours[5].periods.map((period, index) => (
+                  <TimeSlot
+                    key={index}
+                    data={hours}
+                    trash={index === 0 ? false : true}
+                    defaultStartByIndex={period.openingTime || "Select"}
+                    defaultEndByIndex={period.closingTime || "Select"}
+                    onSelectStart={(selectedItem) => {
+                      handleSelectHour(6, index, "openingTime", selectedItem);
+                    }}
+                    onSelectEnd={(selectedItem) => {
+                      handleSelectHour(6, index, "closingTime", selectedItem);
+                    }}
+                    onPressPlus={() => handleAddTimeSlot(6)}
+                    onPressDel={() => handleRemoveTimeSlot(6, index)}
+                  />
+                ))}
             </View>
-            {activeDays.sunday &&
-              openingHours[6] &&
-              openingHours[6].periods.map((period, index) => (
-                <TimeSlot
-                  key={index}
-                  data={hours}
-                  trash={index === 0 ? false : true}
-                  defaultStartByIndex={period.openingTime || "Select"}
-                  defaultEndByIndex={period.closingTime || "Select"}
-                  onSelectStart={(selectedItem) => {
-                    handleSelectHour(7, index, "openingTime", selectedItem);
-                  }}
-                  onSelectEnd={(selectedItem) => {
-                    handleSelectHour(7, index, "closingTime", selectedItem);
-                  }}
-                  onPressPlus={() => handleAddTimeSlot(7)}
-                  onPressDel={() => handleRemoveTimeSlot(7, index)}
+            <View className="mx-4 mb-4">
+              <View className="flex-row items-center w-full">
+                <BadgeGrey extraClasses="flex-1">Dimanche</BadgeGrey>
+                <SwitchInput
+                  thumbColor="#215487"
+                  label=""
+                  value={activeDays.sunday}
+                  extraClasses="w-16 pl-2"
+                  onValueChange={() => handleToggleDay("sunday")}
                 />
-              ))}
+              </View>
+              {activeDays.sunday &&
+                openingHours[6] &&
+                openingHours[6].periods.map((period, index) => (
+                  <TimeSlot
+                    key={index}
+                    data={hours}
+                    trash={index === 0 ? false : true}
+                    defaultStartByIndex={period.openingTime || "Select"}
+                    defaultEndByIndex={period.closingTime || "Select"}
+                    onSelectStart={(selectedItem) => {
+                      handleSelectHour(7, index, "openingTime", selectedItem);
+                    }}
+                    onSelectEnd={(selectedItem) => {
+                      handleSelectHour(7, index, "closingTime", selectedItem);
+                    }}
+                    onPressPlus={() => handleAddTimeSlot(7)}
+                    onPressDel={() => handleRemoveTimeSlot(7, index)}
+                  />
+                ))}
+            </View>
           </View>
         </View>
-      )}
+      </Animated.View>
     </View>
   );
 }
