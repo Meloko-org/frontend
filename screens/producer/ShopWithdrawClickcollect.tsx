@@ -162,7 +162,7 @@ export default function ShopWithdrawClickcollectScreen({ navigation }: Props) {
             <View>
               <Planning
                 key={refreshKey} // force le re-render pour mettre à jour Planning
-                open={true}
+                open={false}
                 openingHoursValues={clickCollectHours}
                 onOpeningHoursChange={handlePlanningChange}
               />
