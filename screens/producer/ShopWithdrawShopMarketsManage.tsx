@@ -171,11 +171,8 @@ export default function ShopWithdrawShopMarketsManageScreen({
         <ScrollView>
           <View className="px-3">
             <View>
-              <TextHeading4 centered={true} extraClasses="mt-5 mb-5">
-                {`Gestion des places de marché`}
-              </TextHeading4>
               <TextBody1 centered={true} extraClasses="mb-5">
-                {`Activez ou désactivez chaque place de marché en cliquant dessus.\nDéfinissez les jours et les horaires où vous êtes présent sur ces places de marché.`}
+                {`Activez ou désactivez un point de vente\nen cliquant dessus.\nDéfinissez les jours et les horaires où vous êtes présent sur ces places de marché.`}
               </TextBody1>
 
               {marketPlaces}
