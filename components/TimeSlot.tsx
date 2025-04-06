@@ -108,6 +108,8 @@ export default function TimeSlot(props: TimeSlotProps): JSX.Element {
           {trash && (
             <IconButton
               iconName="trash"
+              iconFamily="FontAwesomeIcon"
+              iconColor="#ffffff"
               extraClasses="w-10 bg-danger"
               onPressFn={props.onPressDel}
             />
@@ -116,6 +118,8 @@ export default function TimeSlot(props: TimeSlotProps): JSX.Element {
         <View className="flex flew-row justify-end px-1">
           <IconButton
             iconName="plus"
+            iconFamily="FontAwesomeIcon"
+            iconColor="#ffffff"
             extraClasses="w-10 mb-1 bg-primary"
             onPressFn={props.onPressPlus}
           />
