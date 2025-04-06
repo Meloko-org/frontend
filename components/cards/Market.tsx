@@ -146,9 +146,11 @@ export default function Market(props: CardMarketProps): JSX.Element {
       }
     >
       <View
-        className={`${props.extraClasses} flex rounded-lg p-2 shadow-lg w-full ${isHighlighted || props.isRadioButtonActive ? "bg-primary" : "bg-white dark:bg-tertiary"} `}
+        className={`${props.extraClasses} flex rounded-lg p-2 shadow-lg w-full bg-white dark:bg-tertiary  `}
       >
-        <View className="flex flex-row w-full mb-2 items-center">
+        <View
+          className={`${isHighlighted || props.isRadioButtonActive ? "bg-primary" : ""} flex flex-row w-full rounded-lg mb-2 items-center`}
+        >
           <View className="flex-none justify-center rounded-lg h-full h-16 mr-1">
             <Image
               source={require("../../assets/images/tomate.webp")}

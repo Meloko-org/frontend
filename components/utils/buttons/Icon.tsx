@@ -21,6 +21,7 @@ import ZocialIcon from "@expo/vector-icons/Zocial";
 type IconButtonProps = {
   iconName: string;
   iconFamily?: keyof typeof iconLibraries;
+  iconColor: string;
   extraClasses?: string;
   onPressFn: ((event: GestureResponderEvent) => void) | undefined;
   animated?: boolean;
@@ -47,6 +48,7 @@ const iconLibraries = {
 export default function IconButton({
   iconName,
   iconFamily,
+  iconColor,
   extraClasses,
   onPressFn,
   animated,
@@ -89,7 +91,7 @@ export default function IconButton({
 
   return (
     <TouchableOpacity
-      className={`${extraClasses} flex flex-row rounded-lg border border-primary p-1 justify-center items-center bg-lightbg dark:bg-darkbg`}
+      className={`${extraClasses} flex flex-row rounded-lg p-1 justify-center items-center`}
       onPress={handlePress}
     >
       {/* Applique la rotation à l'icône via transform */}
@@ -98,7 +100,7 @@ export default function IconButton({
           <IconComponent
             name={iconName}
             size={size ? size : 25}
-            color="#98b66e"
+            color={iconColor}
           />
         )}
       </Animated.View>

@@ -35,7 +35,7 @@ export default function ShopWithdrawShopMarketsScreen({ navigation }: Props) {
       <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
         <TopBar
           backLabel={backLabel || "Retour modes de retrait"}
-          screen={from || "Shop"}
+          screen={from || "ShopWithdrawModes"}
           label={screenTitle || "POINTS DE\nVENTE"}
           extraClasses="mt-2"
         />
@@ -48,7 +48,7 @@ export default function ShopWithdrawShopMarketsScreen({ navigation }: Props) {
                 navigation.navigate("ShopWithdrawShopMarketsSearch", {
                   from: "ShopWithdrawShopMarkets",
                   backLabel: "Retour points de vente",
-                  screenTitle: "RECHERCHER\nPOINTS DE VENTE",
+                  screenTitle: "RECHERCHE\nPOINTS DE VENTE",
                 })
               }
               extraClasses="mb-2"
@@ -56,10 +56,10 @@ export default function ShopWithdrawShopMarketsScreen({ navigation }: Props) {
             <OpenScreenButton
               label="Gérer les points de vente"
               onPressFn={() =>
-                navigation.navigate("ShopWithdrawShopMarketsSearch", {
+                navigation.navigate("ShopWithdrawShopMarketsManage", {
                   from: "ShopWithdrawShopMarkets",
                   backLabel: "Retour points de vente",
-                  screenTitle: "GERER POINTS\nDE VENTE",
+                  screenTitle: "GESTION\nPOINTS DE VENTE",
                 })
               }
               extraClasses="mb-2"

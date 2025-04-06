@@ -346,16 +346,6 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
               }
             />
           </View>
-
-          {/* Modale Alerte*/}
-          {/* {alertMessage && (
-            <CustomAlert
-              visible={!!alertMessage}
-              message={alertMessage}
-              alertType={alertType}
-              onClose={() => setAlertMessage(null)}
-            />
-          )} */}
         </ScrollView>
       </SafeAreaView>
     </View>

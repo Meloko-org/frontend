@@ -37,7 +37,7 @@ type ClickCollectValues = {
 const updateClickCollect = async (
   token: string | null,
   values: ClickCollectValues,
-) => {
+): Promise<ApiResponse<ShopData>> => {
   try {
     const response = await fetch(`${API_ROOT}/shops/clickCollect`, {
       method: "PUT",
@@ -49,10 +49,26 @@ const updateClickCollect = async (
       body: JSON.stringify(values),
     });
 
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible de mettre à jour.`,
+      };
+    }
+
     const data = await response.json();
-    return data;
+
+    return data.success
+      ? { success: true, data: data.shop }
+      : { success: false, data: null, message: data.message };
   } catch (error) {
     console.log(error);
+    return {
+      success: false,
+      data: null,
+      message: "Une erreur s'est produite lors de la mise à jour.",
+    };
   }
 };
 
@@ -94,10 +110,28 @@ const updateShopMarkets = async (values: UpdateShopMarketsData) => {
       },
       body: JSON.stringify(values),
     });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible de mettre à jour.`,
+      };
+    }
+
     const data = await response.json();
-    return data;
+
+    return data.success
+      ? { success: true, data: data.markets }
+      : { succes: false, data: null, message: data.message };
   } catch (error) {
     console.log(error);
+    return {
+      success: false,
+      data: null,
+      message:
+        "Une erreur s'est produite lors de la récupération du producteur.",
+    };
   }
 };
 
