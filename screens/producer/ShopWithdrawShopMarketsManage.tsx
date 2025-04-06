@@ -72,10 +72,10 @@ export default function ShopWithdrawShopMarketsManageScreen({
 
   // permet d'afficher la liste des markets du shop
   useEffect(() => {
-    console.log(
-      "shopstore.markets:",
-      JSON.stringify(shopStore.markets, null, 2),
-    );
+    // console.log(
+    //   "shopstore.markets:",
+    //   JSON.stringify(shopStore.markets, null, 2),
+    // );
     if (shopStore?.markets) {
       const markets = shopStore?.markets.map(
         ({ market, openingHours, isActive }) => (
@@ -139,24 +139,28 @@ export default function ShopWithdrawShopMarketsManageScreen({
 
       // console.log("values :", JSON.stringify(values, null, 2))
 
-      const data = await shopTools.updateShopMarkets(values);
+      const shopMarketsResponse = await shopTools.updateShopMarkets(values);
 
-      if (data.error) {
-        setAlertMessage(data.error, "error");
+      if (!shopMarketsResponse.success) {
+        setAlertMessage(shopMarketsResponse.message);
         setValidateLoading(false);
         return;
-      } else {
-        setAlertMessage("Mise à jour des points de vente effectuée", "success");
-        console.log("databack2: ", JSON.stringify(data, null, 2));
-        dispatch(resetMarkets());
-        dispatch(addMarket(data.markets));
       }
+
+      console.log("shopMarketsResponse :", shopMarketsResponse.data);
+
+      dispatch(resetMarkets());
+      dispatch(addMarket(shopMarketsResponse.data.markets));
+      setAlertMessage("Mise à jour des points de vente effectuée", "success");
 
       setValidateLoading(false);
     } catch (error) {
       console.log(error);
+      setValidateLoading(false);
     }
   };
+
+  console.log("markets :", shopStore?.markets);
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
