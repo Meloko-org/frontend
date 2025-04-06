@@ -4,6 +4,7 @@ import _Fontawesome from "react-native-vector-icons/FontAwesome";
 const FontAwesome = _Fontawesome as React.ElementType;
 import { GestureResponderEvent } from "react-native";
 import { useColorScheme } from "nativewind";
+
 type InputTextareaProps = {
   placeholder: string;
   label: string;
@@ -27,7 +28,7 @@ export default function InputTextarea(props: InputTextareaProps): JSX.Element {
     <View
       className={`${props.extraClasses} flex flex-row rounded-lg p-2 shadow-sm border border-secondary bg-white ${props.size === "large" ? "h-[70px]" : "text-xs"} dark:border-primary/20 dark:bg-tertiary`}
     >
-      <View className="flex w-4/6">
+      <View className={`flex ${props.iconName ? "w-4/6" : "w-full"}`}>
         <Text
           className={`${props.size === "large" ? "text-lg" : "text-xs"} font-bold text-secondary/50 uppercase p-0 dark:text-lightbg/50`}
         >

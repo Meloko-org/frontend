@@ -35,7 +35,7 @@ export default function ShopWithdrawShopMarketsScreen({ navigation }: Props) {
       <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
         <TopBar
           backLabel={backLabel || "Retour modes de retrait"}
-          screen={from || "ShopwithdrawModes"}
+          screen={from || "ShopWithdrawModes"}
           label={screenTitle || "POINTS DE\nVENTE"}
           extraClasses="mt-2"
         />
