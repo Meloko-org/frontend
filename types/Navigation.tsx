@@ -55,6 +55,21 @@ type RootStackParamList = {
   StockCategories: { from?: string; backLabel?: string; screenTitle?: string };
   Stock: { from?: string; backLabel?: string; screenTitle?: string };
   PremiumOptions: { from?: string; backLabel?: string; screenTitle?: string };
+  PostType: { from?: string; backLabel?: string; screenTitle?: string };
+  ProgrammedPosts: { from?: string; backLabel?: string; screenTitle?: string };
+  PostParameters: { from?: string; backLabel?: string; screenTitle?: string };
+  ProductPostChoice: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+  };
+  ActivityPost: { from?: string; backLabel?: string; screenTitle?: string };
+  NoticePostChoice: { from?: string; backLabel?: string; screenTitle?: string };
+  CreatePost: { from?: string; backLabel?: string; screenTitle?: string };
+  PostPreview: { from?: string; backLabel?: string; screenTitle?: string };
+  PostNetworks: { from?: string; backLabel?: string; screenTitle?: string };
+  PostFrequency: { from?: string; backLabel?: string; screenTitle?: string };
+  PostHashtags: { from?: string; backLabel?: string; screenTitle?: string };
   BusinessCenter: undefined;
   ProducerProfile: undefined;
   Stocks: undefined;

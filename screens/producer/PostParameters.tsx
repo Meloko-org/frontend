@@ -12,69 +12,67 @@ import { ScrollView } from "react-native-gesture-handler";
 import TopBar from "../../components/TopBar";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 
-type PremiumOptionsScreenRouteProp = RouteProp<
+type PostParametersScreenRouteProp = RouteProp<
   RootStackParamList,
-  "PremiumOptions"
+  "PostParameters"
 >;
 
-type PremiumOptionsScreenNavigationProp = NativeStackNavigationProp<
+type PostParametersScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "PremiumOptions"
+  "PostParameters"
 >;
 
 type Props = {
-  navigation: PremiumOptionsScreenNavigationProp;
+  navigation: PostParametersScreenNavigationProp;
 };
 
-export default function PremiumOptionsScreen({ navigation }: Props) {
-  const route = useRoute<PremiumOptionsScreenRouteProp>();
+export default function PostParametersScreen({ navigation }: Props) {
+  const route = useRoute<PostParametersScreenRouteProp>();
   const { from, backLabel, screenTitle } = route.params || {};
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
       <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
         <TopBar
-          backLabel={backLabel || "Retour à la boutique"}
-          screen={from || "ShopProducer"}
+          backLabel={backLabel || "Retour au premium"}
+          screen={from || "PremiumOptions"}
           label={screenTitle || "OPTIONS\nPREMIUM"}
           extraClasses="mt-2"
         />
 
         <View className="px-3">
           <OpenScreenButton
-            label="Créer un post"
-            bgColor="bg-premium"
-            onPressFn={() => {
-              navigation.navigate("PostType", {
-                from: "PremiumOptions",
-                backLabel: "Retour au premium",
-                screenTitle: "CREER\nUN POST",
-              });
-            }}
-            extraClasses="mb-1"
-          />
-          <OpenScreenButton
-            label="Posts programmés"
-            bgColor="bg-premium"
-            notice="2"
-            onPressFn={() => {
-              navigation.navigate("ProgrammedPosts", {
-                from: "PremiumOptions",
-                backLabel: "Retour au premium",
-                screenTitle: "POSTS\nPROGRAMMES",
-              });
-            }}
-            extraClasses="mb-1"
-          />
-          <OpenScreenButton
-            label="Paramètres"
-            bgColor="bg-premium"
+            label="Mes réseaux"
             redAlert={true}
             onPressFn={() => {
-              navigation.navigate("PostParameters", {
-                from: "PremiumOptions",
-                backLabel: "Retour au premium",
-                screenTitle: "PARAMETRES",
+              navigation.navigate("PostNetworks", {
+                from: "PostParameters",
+                backLabel: "Retour aux paramètres",
+                screenTitle: "MES\nRESEAUX",
+              });
+            }}
+            extraClasses="mb-1"
+          />
+          <OpenScreenButton
+            label="Fréquence des posts"
+            redAlert={true}
+            onPressFn={() => {
+              navigation.navigate("PostFrequency", {
+                from: "PostParameters",
+                backLabel: "Retour aux paramètres",
+                screenTitle: "FREQUENCE\nDES POSTS",
+              });
+            }}
+            extraClasses="mb-1"
+          />
+          <OpenScreenButton
+            label="Hashtags"
+            redAlert={true}
+            onPressFn={() => {
+              navigation.navigate("PostHashtags", {
+                from: "PostParameters",
+                backLabel: "Retour aux paramètres",
+                screenTitle: "HASHTAGS",
               });
             }}
             extraClasses="mb-1"

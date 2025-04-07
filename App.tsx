@@ -49,6 +49,17 @@ import ShopWithdrawDeliveryScreen from "./screens/producer/ShopWithdrawDelivery"
 import ShopWithdrawShopMarketsScreen from "./screens/producer/ShopWithdrawShopMarkets";
 import ShopWithdrawShopMarketsManageScreen from "./screens/producer/ShopWithdrawShopMarketsManage";
 import ShopWithdrawShopMarketsSearchScreen from "./screens/producer/ShopWithdrawShopMarketsSearch";
+import PostTypeScreen from "./screens/producer/PostType";
+import ProgrammedPostsScreen from "./screens/producer/ProgrammedPosts";
+import PostParametersScreen from "./screens/producer/PostParameters";
+import ProductPostChoiceScreen from "./screens/producer/ProductPostChoice";
+import ActivityPostScreen from "./screens/producer/ActivityPost";
+import NoticePostChoiceScreen from "./screens/producer/NoticePostChoice";
+import CreatePostScreen from "./screens/producer/CreatePost";
+import PostPreviewScreen from "./screens/producer/PostPreview";
+import PostNetworksScreen from "./screens/producer/PostNetworks";
+import PostFrequencyScreen from "./screens/producer/PostFrequency";
+import PostHashtagsScreen from "./screens/producer/PostHashtags";
 
 import { Provider } from "react-redux";
 import { persistStore, persistReducer } from "redux-persist";
@@ -288,6 +299,61 @@ const TabNavigatorProducer: React.FC = () => {
       <Tab.Screen
         name="PremiumOptions"
         component={PremiumOptionsScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="PostType"
+        component={PostTypeScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="ProductPostChoice"
+        component={ProductPostChoiceScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="ActivityPost"
+        component={ActivityPostScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="NoticePostChoice"
+        component={NoticePostChoiceScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="CreatePost"
+        component={CreatePostScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="PostPreview"
+        component={PostPreviewScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="ProgrammedPosts"
+        component={ProgrammedPostsScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="PostParameters"
+        component={PostParametersScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="PostNetworks"
+        component={PostNetworksScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="PostFrequency"
+        component={PostFrequencyScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="PostHashtags"
+        component={PostHashtagsScreen}
         options={{ tabBarButton: () => null }}
       />
       <Tab.Screen name="BusinessCenter" component={BusinessScreen} />
