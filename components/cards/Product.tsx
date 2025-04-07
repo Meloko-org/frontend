@@ -149,18 +149,15 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
         transparent={true}
         onRequestClose={closeSheet}
       >
-        <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.3)" }}>
+        <View style={{ flex: 1 }}>
           <BottomSheet
             ref={bottomSheetRef}
-            snapPoints={["100%"]}
+            snapPoints={["95%"]}
             index={0}
             enablePanDownToClose
             onClose={closeSheet}
-            handleStyle={{
+            backgroundStyle={{
               backgroundColor: colorScheme === "dark" ? "#444C3D" : "#FFF",
-            }}
-            handleIndicatorStyle={{
-              backgroundColor: colorScheme === "dark" ? "#FCFFF0" : "#444C3D",
             }}
           >
             <BottomSheetView>
@@ -186,7 +183,7 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
                 >
                   <PricePer>{`${props.stockData?.price.$numberDecimal} € / ${unit}`}</PricePer>
 
-                  <View className="flex flex-row items-center rounded-lg w-auto h-full">
+                  <View className="flex flex-row items-center rounded-lg w-auto h-full bg-white m-2">
                     <Image
                       source={
                         props.stockData?.product.image
