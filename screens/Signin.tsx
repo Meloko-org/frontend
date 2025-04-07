@@ -99,6 +99,8 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   const [isModalVisible, setModalVisible] = useState(false);
   const { colorScheme } = useColorScheme();
 
+  const handleSheetChanges = useCallback((index: number) => {}, []);
+
   const openSheet = () => {
     setModalVisible(true);
   };
@@ -119,20 +121,16 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
           <BottomSheet
             ref={bottomSheetRef}
             snapPoints={["30%"]}
-            index={0}
             enablePanDownToClose
             onClose={closeSheet}
+            onChange={handleSheetChanges}
             backgroundStyle={{
               backgroundColor: colorScheme === "dark" ? "#444C3D" : "#FFF",
             }}
           >
             <BottomSheetView>
               <View className="px-3 pt-5 w-full h-full">
-                <View className="flex flex-row items-center">
-                  <View className="w-4/5">
-                    <TextHeading2>Error</TextHeading2>
-                  </View>
-                </View>
+                <TextHeading2>Error</TextHeading2>
                 <ScrollView
                   showsVerticalScrollIndicator={false}
                   style={{
