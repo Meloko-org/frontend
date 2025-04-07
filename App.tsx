@@ -49,6 +49,9 @@ import ShopWithdrawDeliveryScreen from "./screens/producer/ShopWithdrawDelivery"
 import ShopWithdrawShopMarketsScreen from "./screens/producer/ShopWithdrawShopMarkets";
 import ShopWithdrawShopMarketsManageScreen from "./screens/producer/ShopWithdrawShopMarketsManage";
 import ShopWithdrawShopMarketsSearchScreen from "./screens/producer/ShopWithdrawShopMarketsSearch";
+import PostTypeScreen from "./screens/producer/PostType";
+import ProgrammedPostsScreen from "./screens/producer/ProgrammedPosts";
+import PostParametersScreen from "./screens/producer/PostParameters";
 
 import { Provider } from "react-redux";
 import { persistStore, persistReducer } from "redux-persist";
@@ -288,6 +291,21 @@ const TabNavigatorProducer: React.FC = () => {
       <Tab.Screen
         name="PremiumOptions"
         component={PremiumOptionsScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="PostType"
+        component={PostTypeScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="ProgrammedPosts"
+        component={ProgrammedPostsScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="PostParameters"
+        component={PostParametersScreen}
         options={{ tabBarButton: () => null }}
       />
       <Tab.Screen name="BusinessCenter" component={BusinessScreen} />

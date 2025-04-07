@@ -55,6 +55,9 @@ type RootStackParamList = {
   StockCategories: { from?: string; backLabel?: string; screenTitle?: string };
   Stock: { from?: string; backLabel?: string; screenTitle?: string };
   PremiumOptions: { from?: string; backLabel?: string; screenTitle?: string };
+  PostType: { from?: string; backLabel?: string; screenTitle?: string };
+  ProgrammedPosts: { from?: string; backLabel?: string; screenTitle?: string };
+  PostParameters: { from?: string; backLabel?: string; screenTitle?: string };
   BusinessCenter: undefined;
   ProducerProfile: undefined;
   Stocks: undefined;
