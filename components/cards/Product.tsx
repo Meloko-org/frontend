@@ -1,16 +1,14 @@
-import React, { useEffect } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
-import BadgeSecondary from "../utils/badges/Secondary";
-import StarsNotation from "../utils/StarsNotation";
-import _Fontawesome from "react-native-vector-icons/FontAwesome6";
-import { GestureResponderEvent } from "react-native";
-import { StockData } from "../../types/API";
-import TextBody1 from "../utils/texts/Body1";
-import PricePer from "../utils/badges/Dark";
-import PriceBadge from "../utils/badges/Price";
-import IconButton from "../utils/buttons/Icon";
-import BadgeGrey from "../utils/badges/Grey";
-import TextHeading4 from "../utils/texts/Heading4";
+import React, { useRef, useState, useCallback } from "react";
+import {
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+  ScrollView,
+  Modal,
+  GestureResponderEvent,
+} from "react-native";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addProductToCart,
@@ -18,10 +16,17 @@ import {
   decreaseCartQuantity,
   CartState,
 } from "../../reducers/cart";
-import { ProductData } from "../../types/API";
+import { StockData } from "../../types/API";
+import TextBody1 from "../utils/texts/Body1";
+import PricePer from "../utils/badges/Dark";
+import PriceBadge from "../utils/badges/Price";
+import IconButton from "../utils/buttons/Icon";
+import BadgeGrey from "../utils/badges/Grey";
+import TextHeading2 from "../utils/texts/Heading2";
+import TextHeading3 from "../utils/texts/Heading3";
+import { useColorScheme } from "nativewind";
+import BadgeSecondary from "../utils/badges/Secondary";
 import orderTools from "../../modules/orderTools";
-
-const FontAwesome = _Fontawesome as React.ElementType;
 
 type CardProductProps = {
   stockData?: StockData;
@@ -37,14 +42,23 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
   const cartStore = useSelector(
     (state: { cart: CartState }) => state.cart.value,
   );
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const { colorScheme } = useColorScheme();
+
+  const openSheet = () => {
+    setModalVisible(true);
+  };
+
+  const closeSheet = () => {
+    setModalVisible(false);
+  };
 
   const formatQuantity = (quantity: number, unit: string) => {
     if (unit === "gr") {
-      if (quantity < 1000) {
-        return `${quantity} gr`;
-      } else {
-        return `${(quantity / 1000).toFixed(1)} kg`;
-      }
+      return quantity < 1000
+        ? `${quantity} gr`
+        : `${(quantity / 1000).toFixed(1)} kg`;
     }
     return `${quantity}`;
   };
@@ -127,81 +141,140 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
     />
   );
 
-  const tags =
-    props.stockData.tags &&
-    props.stockData.tags.map((s) => {
-      // console.log("s", s)
-      return (
-        <BadgeSecondary
-          key={s._id}
-          uppercase
-          extraClasses="mt-1 p-1 mr-1"
-        >{`${s.name}`}</BadgeSecondary>
-      );
-    });
-  // console.log(props.stockData)
+  const detailModal = () => {
+    return (
+      <Modal
+        visible={isModalVisible}
+        animationType="none"
+        transparent={true}
+        onRequestClose={closeSheet}
+      >
+        <View style={{ flex: 1 }}>
+          <BottomSheet
+            ref={bottomSheetRef}
+            snapPoints={["95%"]}
+            index={0}
+            enablePanDownToClose
+            onClose={closeSheet}
+            backgroundStyle={{
+              backgroundColor: colorScheme === "dark" ? "#444C3D" : "#FFF",
+            }}
+          >
+            <BottomSheetView>
+              <View className="px-3 pt-5 w-full h-full">
+                <View className="flex flex-row items-center">
+                  <View className="w-4/5">
+                    <TextHeading2>
+                      {`${props.stockData?.product.family.name} ${props.stockData?.product.name}`}
+                    </TextHeading2>
+                  </View>
+
+                  <View className="w-1/5 flex flex-column justify-center items-center">
+                    {cartButton}
+                  </View>
+                </View>
+                <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  style={{
+                    flex: 1,
+                    width: "100%",
+                  }}
+                  className="py-3"
+                >
+                  <PricePer>{`${props.stockData?.price.$numberDecimal} € / ${unit}`}</PricePer>
+
+                  <View className="flex flex-row items-center rounded-lg w-auto h-full bg-white m-2">
+                    <Image
+                      source={
+                        props.stockData?.product.image
+                          ? {
+                              uri: props.stockData.product.image,
+                            }
+                          : require("../../assets/icon.png")
+                      }
+                      className=""
+                      alt={`Illustration du produit ${props.stockData?.product.name}`}
+                      resizeMode="contain"
+                      style={{
+                        width: "100%",
+                        aspectRatio: 16 / 9,
+                      }}
+                    />
+                  </View>
+                </ScrollView>
+              </View>
+            </BottomSheetView>
+          </BottomSheet>
+        </View>
+      </Modal>
+    );
+  };
 
   const unit =
     props.stockData?.product.weight.unit === "gr" ? "kg" : "la pièce";
 
-  // console.log("cartStore: ", JSON.stringify(cartStore, null, 2));
-
   return (
-    <View
-      className={`${props.extraClasses} rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary flex flex-row w-full`}
-    >
-      <View className="flex flex-row items-center w-full">
-        <View className="flex flex-row w-4/5">
-          {props.showImage && (
-            <View className="flex flex-row items-center rounded-lg w-auto h-full">
-              <Image
-                source={
-                  props.stockData.product.image
-                    ? { uri: props.stockData.product.image }
-                    : require("../../assets/icon.png")
-                }
-                className="rounded-full w-20 h-20"
-                alt={`Illustration du produit ${props.stockData.product.name}`}
-                resizeMode="cover"
-                width={72}
-                height={48}
-              />
-            </View>
-          )}
+    <>
+      {detailModal()}
 
-          <View
-            className={`${props.showImage ? "w-3/5" : "w-4/5"} h-full px-2 items-start`}
-          >
-            <TextBody1 extraClasses="mb-1">{`${props.stockData.product.family.name} ${props.stockData.product.name}`}</TextBody1>
-            {/* <PricePer>{`${props.stockData.price.$numberDecimal} € / ${props.stockData.product.weight.measurement.$numberDecimal}${props.stockData.product.weight.unit}`}</PricePer> */}
-
-            {props.displayMode === "detail" ? (
-              <PriceBadge
-                colour="bg-secondary"
-                extraClasses="px-2 py-1"
-                textClasses="font-bold"
-              >
-                {orderTools
-                  .getProductCost(
-                    props.stockData?.price.$numberDecimal,
-                    props.stockData?.quantity,
-                    props.stockData?.product.weight.unit,
-                  )
-                  .toFixed(2)}
-              </PriceBadge>
-            ) : (
-              <PricePer>{`${props.stockData?.price.$numberDecimal} € / ${unit}`}</PricePer>
+      <TouchableOpacity
+        onPress={openSheet}
+        activeOpacity={0.8}
+        className={`${props.extraClasses} rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary flex flex-row w-full`}
+      >
+        <View className="flex flex-row items-center w-full">
+          <View className="flex flex-row w-4/5">
+            {props.showImage && (
+              <View className="flex flex-row items-center rounded-lg w-auto h-full">
+                <Image
+                  source={
+                    props.stockData.product.image
+                      ? {
+                          uri: props.stockData.product.image,
+                        }
+                      : require("../../assets/icon.png")
+                  }
+                  className="rounded-full w-20 h-20"
+                  alt={`Illustration du produit ${props.stockData.product.name}`}
+                  resizeMode="cover"
+                  width={72}
+                  height={48}
+                />
+              </View>
             )}
-            {/* <View className="flex flex-row justify-start items-center">
-              {tags}
-            </View> */}
+
+            <View
+              className={`${
+                props.showImage ? "w-3/5" : "w-4/5"
+              } h-full px-2 items-start`}
+            >
+              <TextBody1 extraClasses="mb-1">{`${props.stockData.product.family.name} ${props.stockData.product.name}`}</TextBody1>
+
+              {props.displayMode === "detail" ? (
+                <PriceBadge
+                  colour="bg-secondary"
+                  extraClasses="px-2 py-1"
+                  textClasses="font-bold"
+                >
+                  {orderTools
+                    .getProductCost(
+                      props.stockData?.price.$numberDecimal,
+                      props.stockData?.quantity,
+                      props.stockData?.product.weight.unit,
+                    )
+                    .toFixed(2)}
+                </PriceBadge>
+              ) : (
+                <PricePer>{`${props.stockData?.price.$numberDecimal} € / ${unit}`}</PricePer>
+              )}
+            </View>
+          </View>
+
+          <View className="w-1/5 flex flex-column justify-center items-center">
+            {cartButton}
           </View>
         </View>
-
-        <View className="w-1/5 flex flex-column justify-center items-center">
-          {cartButton}
-        </View>
-      </View>
-    </View>
+      </TouchableOpacity>
+    </>
   );
 }
