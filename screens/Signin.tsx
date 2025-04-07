@@ -114,18 +114,17 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
       <Modal
         visible={isModalVisible}
         animationType="none"
-        transparent={true}
         onRequestClose={closeSheet}
       >
         <View style={{ flex: 1 }}>
           <BottomSheet
             ref={bottomSheetRef}
-            snapPoints={["30%"]}
+            snapPoints={["30%", "50%"]}
             enablePanDownToClose
             onClose={closeSheet}
             onChange={handleSheetChanges}
             backgroundStyle={{
-              backgroundColor: colorScheme === "dark" ? "#444C3D" : "#FFF",
+              backgroundColor: colorScheme === "dark" ? "#444C3D" : "#CCC",
             }}
           >
             <BottomSheetView>
