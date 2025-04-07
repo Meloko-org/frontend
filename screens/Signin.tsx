@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useSignIn, useSignUp, useSSO } from "@clerk/clerk-expo";
 import { useAuth } from "@clerk/clerk-expo";
 import * as AuthSession from "expo-auth-session";
@@ -11,18 +11,20 @@ import { RootStackParamList } from "../types/Navigation";
 import { useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
-import { View } from "react-native";
+import { View, Modal, StyleSheet, ImageBackground } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import InputText from "../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import TopBar from "../components/TopBar";
 import CustomAlert from "../components/modals/CustomAlert";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 
 import { useDispatch, useSelector } from "react-redux";
 import { UserState, updateUser } from "../reducers/user";
 import { ProducerState, setProducerData } from "../reducers/producer";
 import { ShopState, setShopData } from "../reducers/shop";
+import { useColorScheme } from "nativewind";
 
 import userTools from "../modules/userTools";
 import producerTools from "../modules/producerTools";
@@ -30,6 +32,7 @@ import shopTools from "../modules/shopTools";
 import TextHeading4 from "../components/utils/texts/Heading4";
 import TextBody1 from "../components/utils/texts/Body1";
 import OpenScreenButton from "../components/utils/buttons/OpenScreen";
+import TextHeading2 from "../components/utils/texts/Heading2";
 
 type SignInScreenRouteProp = RouteProp<RootStackParamList, "SignIn">;
 
@@ -91,6 +94,64 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
 
   const [performedSignedIn, setPerformedSignedIn] = useState(false);
   const [isConnectionLoading, setConnectionLoading] = useState(false);
+
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const { colorScheme } = useColorScheme();
+
+  const openSheet = () => {
+    setModalVisible(true);
+  };
+
+  const closeSheet = () => {
+    setModalVisible(false);
+  };
+
+  const AlertModal = () => {
+    return (
+      <Modal
+        visible={isModalVisible}
+        animationType="none"
+        transparent={true}
+        onRequestClose={closeSheet}
+      >
+        <View style={{ flex: 1 }}>
+          <BottomSheet
+            ref={bottomSheetRef}
+            snapPoints={["30%"]}
+            index={0}
+            enablePanDownToClose
+            onClose={closeSheet}
+            backgroundStyle={{
+              backgroundColor: colorScheme === "dark" ? "#444C3D" : "#FFF",
+            }}
+          >
+            <BottomSheetView>
+              <View className="px-3 pt-5 w-full h-full">
+                <View className="flex flex-row items-center">
+                  <View className="w-4/5">
+                    <TextHeading2>Error</TextHeading2>
+                  </View>
+                </View>
+                <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  style={{
+                    flex: 1,
+                    width: "100%",
+                  }}
+                  className="py-3"
+                >
+                  <View className="flex flex-row items-center rounded-lg w-auto h-full bg-white m-2">
+                    <TextHeading2>Error ta mere</TextHeading2>
+                  </View>
+                </ScrollView>
+              </View>
+            </BottomSheetView>
+          </BottomSheet>
+        </View>
+      </Modal>
+    );
+  };
 
   const fetchData = async () => {
     try {
@@ -211,7 +272,8 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   const onSignInPress = useCallback(async () => {
     // vérification des champs
     if (emailAddress === "") {
-      setAlertMessage("Veuillez saisir un email.", "warning");
+      openSheet();
+      // setAlertMessage("Veuillez saisir un email.", "warning");
       // setAlertType("danger");
       return;
     }
@@ -262,6 +324,7 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
+      {AlertModal()}
       <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
         <TopBar
           backLabel={backLabel || "Retour à l'accueil"}
@@ -351,3 +414,29 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+  modalView: {
+    width: "100%",
+    position: "absolute",
+    bottom: 0,
+    backgroundColor: "white",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+});
