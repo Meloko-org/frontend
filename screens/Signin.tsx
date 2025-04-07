@@ -11,14 +11,25 @@ import { RootStackParamList } from "../types/Navigation";
 import { useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
-import { View, Modal, StyleSheet, ImageBackground } from "react-native";
+import {
+  View,
+  Modal,
+  StyleSheet,
+  ImageBackground,
+  Button,
+  Text,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import InputText from "../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import TopBar from "../components/TopBar";
 import CustomAlert from "../components/modals/CustomAlert";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import {
+  BottomSheetView,
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from "@gorhom/bottom-sheet";
 
 import { useDispatch, useSelector } from "react-redux";
 import { UserState, updateUser } from "../reducers/user";
@@ -95,11 +106,19 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   const [performedSignedIn, setPerformedSignedIn] = useState(false);
   const [isConnectionLoading, setConnectionLoading] = useState(false);
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const { colorScheme } = useColorScheme();
+  // ref
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  const handleSheetChanges = useCallback((index: number) => {}, []);
+  // callbacks
+  const handlePresentModalPress = useCallback(() => {
+    console.log("ran");
+    bottomSheetModalRef.current?.present();
+  }, []);
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
 
   const openSheet = () => {
     setModalVisible(true);
@@ -111,42 +130,22 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
 
   const AlertModal = () => {
     return (
-      <Modal
-        visible={isModalVisible}
-        animationType="none"
-        onRequestClose={closeSheet}
-      >
-        <View style={{ flex: 1 }}>
-          <BottomSheet
-            ref={bottomSheetRef}
-            snapPoints={["30%", "50%"]}
-            enablePanDownToClose
-            onClose={closeSheet}
-            onChange={handleSheetChanges}
-            backgroundStyle={{
-              backgroundColor: colorScheme === "dark" ? "#444C3D" : "#CCC",
-            }}
-          >
-            <BottomSheetView>
-              <View className="px-3 pt-5 w-full h-full">
-                <TextHeading2>Error</TextHeading2>
-                <ScrollView
-                  showsVerticalScrollIndicator={false}
-                  style={{
-                    flex: 1,
-                    width: "100%",
-                  }}
-                  className="py-3"
-                >
-                  <View className="flex flex-row items-center rounded-lg w-auto h-full bg-white m-2">
-                    <TextHeading2>Error ta mere</TextHeading2>
-                  </View>
-                </ScrollView>
-              </View>
-            </BottomSheetView>
-          </BottomSheet>
-        </View>
-      </Modal>
+      <>
+        <Button
+          onPress={handlePresentModalPress}
+          title="Present Modal"
+          color="black"
+        />
+        <BottomSheetModal
+          ref={bottomSheetModalRef}
+          onChange={handleSheetChanges}
+          snapPoints={["30%"]}
+        >
+          <BottomSheetView style={styles.contentContainer}>
+            <Text>Awesome 🎉</Text>
+          </BottomSheetView>
+        </BottomSheetModal>
+      </>
     );
   };
 
@@ -269,7 +268,7 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   const onSignInPress = useCallback(async () => {
     // vérification des champs
     if (emailAddress === "") {
-      openSheet();
+      handlePresentModalPress();
       // setAlertMessage("Veuillez saisir un email.", "warning");
       // setAlertType("danger");
       return;
@@ -413,27 +412,14 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  centeredView: {
+  container: {
     flex: 1,
+    padding: 24,
     justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
+    backgroundColor: "grey",
   },
-  modalView: {
-    width: "100%",
-    position: "absolute",
-    bottom: 0,
-    backgroundColor: "white",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
   },
 });
