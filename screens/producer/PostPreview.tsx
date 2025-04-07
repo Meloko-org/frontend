@@ -11,31 +11,28 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import TopBar from "../../components/TopBar";
 
-type ProgrammedPostsScreenRouteProp = RouteProp<
-  RootStackParamList,
-  "ProgrammedPosts"
->;
+type PostPreviewScreenRouteProp = RouteProp<RootStackParamList, "PostPreview">;
 
-type ProgrammedPostsScreenNavigationProp = NativeStackNavigationProp<
+type PostPreviewChoiceScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "ProgrammedPosts"
+  "PostPreview"
 >;
 
 type Props = {
-  navigation: ProgrammedPostsScreenNavigationProp;
+  navigation: PostPreviewScreenNavigationProp;
 };
 
-export default function ProgrammedPostsScreen({ navigation }: Props) {
-  const route = useRoute<ProgrammedPostsScreenRouteProp>();
+export default function PostPreviewScreen({ navigation }: Props) {
+  const route = useRoute<PostPreviewScreenRouteProp>();
   const { from, backLabel, screenTitle } = route.params || {};
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
       <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
         <TopBar
-          backLabel={backLabel || "Retour au premium"}
-          screen={from || "PremiumOptions"}
-          label={screenTitle || "OPTIONS\nPREMIUM"}
+          backLabel={backLabel || "Retour au choix"}
+          screen={from || "PostPreview"}
+          label={screenTitle || "PREVISUALISATION\nDU POST"}
           extraClasses="mt-2"
         />
 

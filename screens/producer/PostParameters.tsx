@@ -43,16 +43,25 @@ export default function PostParametersScreen({ navigation }: Props) {
         <View className="px-3">
           <OpenScreenButton
             label="Mes réseaux"
+            redAlert={true}
             onPressFn={() => {
-              navigation.navigate();
+              navigation.navigate("PostNetworks", {
+                from: "PostParameters",
+                backLabel: "Retour aux paramètres",
+                screenTitle: "MES\nRESEAUX",
+              });
             }}
             extraClasses="mb-1"
           />
           <OpenScreenButton
             label="Fréquence des posts"
-            notice="2"
+            redAlert={true}
             onPressFn={() => {
-              navigation.navigate();
+              navigation.navigate("PostFrequency", {
+                from: "PostParameters",
+                backLabel: "Retour aux paramètres",
+                screenTitle: "FREQUENCE\nDES POSTS",
+              });
             }}
             extraClasses="mb-1"
           />
@@ -60,7 +69,11 @@ export default function PostParametersScreen({ navigation }: Props) {
             label="Hashtags"
             redAlert={true}
             onPressFn={() => {
-              navigation.navigate();
+              navigation.navigate("PostHashtags", {
+                from: "PostParameters",
+                backLabel: "Retour aux paramètres",
+                screenTitle: "HASHTAGS",
+              });
             }}
             extraClasses="mb-1"
           />

@@ -39,28 +39,35 @@ export default function PostTypeScreen({ navigation }: Props) {
 
         <View className="px-3">
           <OpenScreenButton
-            label="Créer un post"
-            bgColor="bg-premium"
+            label="Produit"
             onPressFn={() => {
-              navigation.navigate();
+              navigation.navigate("ProductPostChoice", {
+                from: "PostType",
+                backLabel: "Retour au type",
+                screenTitle: "CHOISIR\nUN PRODUIT",
+              });
             }}
             extraClasses="mb-1"
           />
           <OpenScreenButton
-            label="Posts programmés"
-            bgColor="bg-premium"
-            notice="2"
+            label="Avis"
             onPressFn={() => {
-              navigation.navigate();
+              navigation.navigate("NoticePostChoice", {
+                from: "PostType",
+                backLabel: "Retour au type",
+                screenTitle: "CHOISIR\nUN AVIS",
+              });
             }}
             extraClasses="mb-1"
           />
           <OpenScreenButton
-            label="Paramètres"
-            bgColor="bg-premium"
-            redAlert={true}
+            label="Activité"
             onPressFn={() => {
-              navigation.navigate();
+              navigation.navigate("ActivityPost", {
+                from: "PostType",
+                backLabel: "Retour au type",
+                screenTitle: "POSTER UNE\nACTIVITE",
+              });
             }}
             extraClasses="mb-1"
           />

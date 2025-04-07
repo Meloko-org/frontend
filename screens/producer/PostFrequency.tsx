@@ -11,35 +11,36 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import TopBar from "../../components/TopBar";
 
-type ProgrammedPostsScreenRouteProp = RouteProp<
+type PostFrequencyScreenRouteProp = RouteProp<
   RootStackParamList,
-  "ProgrammedPosts"
+  "PostFrequency"
 >;
 
-type ProgrammedPostsScreenNavigationProp = NativeStackNavigationProp<
+type PostFrequencyScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "ProgrammedPosts"
+  "PostFrequency"
 >;
 
 type Props = {
-  navigation: ProgrammedPostsScreenNavigationProp;
+  navigation: PostFrequencyScreenNavigationProp;
 };
 
-export default function ProgrammedPostsScreen({ navigation }: Props) {
-  const route = useRoute<ProgrammedPostsScreenRouteProp>();
+export default function PostFrequencyScreen({ navigation }: Props) {
+  const route = useRoute<PostFrequencyScreenRouteProp>();
   const { from, backLabel, screenTitle } = route.params || {};
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
       <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
         <TopBar
-          backLabel={backLabel || "Retour au premium"}
-          screen={from || "PremiumOptions"}
-          label={screenTitle || "OPTIONS\nPREMIUM"}
+          backLabel={backLabel || "Retour aux paramètres"}
+          screen={from || "PostFrequency"}
+          label={screenTitle || "PARAMETRES"}
           extraClasses="mt-2"
         />
-
-        <View className="px-3"></View>
+        <ScrollView>
+          <View className="px-3"></View>
+        </ScrollView>
       </SafeAreaView>
     </View>
   );
