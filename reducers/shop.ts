@@ -33,11 +33,23 @@ export const shopSlice = createSlice({
         state.value.clickCollect = action.payload;
       }
     },
-    addProducts: (state: ShopState, action: PayloadAction<StockData>): void => {
-      if (state.value && state.value.products) {
-        state.value.products.push(action.payload);
-      } else if (state.value) {
-        state.value.products = [action.payload];
+    addProducts: (
+      state: ShopState,
+      action: PayloadAction<StockData[]>,
+    ): void => {
+      if (state.value) {
+        const existingStockIds = state.value.products!.map(
+          (stock: StockData) => stock._id,
+        );
+        const newStocks = action.payload.filter(
+          (newStock) => !existingStockIds.includes(newStock._id),
+        );
+        state.value.products = [...state.value.products, ...newStocks];
+      }
+    },
+    resetProducts: (state: ShopState): void => {
+      if (state.value) {
+        state.value.products = [];
       }
     },
     addNote: (

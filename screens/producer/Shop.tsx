@@ -225,7 +225,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
           <OpenScreenButton
             label="Gestion des stocks"
             onPressFn={() =>
-              navigation.navigate("Stock", {
+              navigation.navigate("StockCategories", {
                 from: "ShopProducer",
                 backLabel: "Retour à la boutique",
                 screenTitle: "GESTION\nDES STOCKS",

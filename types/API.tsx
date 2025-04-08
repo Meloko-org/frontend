@@ -30,10 +30,8 @@ type ProductData = {
   image: string;
   description: string;
   family?: any;
-  weight: {
-    unit: string;
-    measurement: number;
-  };
+  weight: WeightData;
+  hasCustomName: boolean;
 };
 
 type MarketData = {
@@ -52,10 +50,17 @@ type MarketsData = {
 
 type StockData = {
   _id: string;
+  productCustomName: string;
   price: { $numberDecimal: string };
   stock: { $numberDecimal: string };
   shop: ShopData;
   product: ProductData;
+  weightPerUnit: string;
+  origin: string;
+  format: string;
+  portion: string;
+  betsBeforeDate: string;
+  description: string;
   tags: TagData[];
 };
 
@@ -152,6 +157,11 @@ type ProductDetail = {
   isConfirmed: boolean | null;
 };
 
+type WeightData = {
+  unit: string;
+  measurement: number;
+};
+
 // type de réponse de l'api
 type ApiResponse<T> = {
   success: boolean;
@@ -174,5 +184,6 @@ export type {
   OpeningHoursData,
   PeriodData,
   ProductDetail,
+  WeightData,
   ApiResponse,
 };

@@ -5,6 +5,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
+  Easing,
 } from "react-native-reanimated";
 
 import { ShopState } from "../../reducers/shop";
@@ -14,7 +15,7 @@ import { RootStackParamList } from "../../types/Navigation";
 import { useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
-import { View, Text } from "react-native";
+import { View, Text, LayoutChangeEvent } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import TopBar from "../../components/TopBar";
@@ -50,18 +51,31 @@ export default function ShopParamsScreen({ navigation }: Props) {
     useState<boolean>(false);
 
   // bouton menu déroulant "Type" ------------------
-  const [isOpenType, setOpenType] = useState(false);
+  const [isOpenType, setOpenType] = useState<boolean>(false);
+  const contentType = useSharedValue(0);
   const heightType = useSharedValue(0);
-
-  const toggleOpenType = () => {
-    setOpenType((prev) => !prev);
-    heightType.value = isOpenType ? withTiming(0) : withTiming(150);
-  };
 
   const animatedStyleType = useAnimatedStyle(() => ({
     height: heightType.value,
     opacity: heightType.value > 0 ? 1 : 0, // Facultatif : gérer l'opacité
   }));
+
+  const toggleOpenType = () => {
+    setOpenType((prev) => {
+      const newState = !prev;
+      heightType.value = withTiming(newState ? contentType.value : 0, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+      return newState;
+    });
+  };
+
+  const onContentLayout = (event: LayoutChangeEvent) => {
+    const measuredHeight = event.nativeEvent.layout.height;
+    contentType.value = measuredHeight;
+  };
+
   // -----------------------------------------------
 
   // Contient les différents types de shop
@@ -124,7 +138,15 @@ export default function ShopParamsScreen({ navigation }: Props) {
               style={[animatedStyleType]}
               className="overflow-hidden"
             >
-              <View className="py-3">{typesList}</View>
+              <View
+                onLayout={onContentLayout}
+                style={{
+                  opacity: isOpenType ? 1 : 0,
+                  position: isOpenType ? "relative" : "absolute",
+                }}
+              >
+                <View className="py-5">{typesList}</View>
+              </View>
             </Animated.View>
           </View>
 
