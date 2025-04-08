@@ -59,8 +59,9 @@ type StockData = {
   origin: string;
   format: string;
   portion: string;
-  betsBeforeDate: string;
+  bestBeforeDate: string;
   description: string;
+  image: string;
   tags: TagData[];
 };
 
@@ -69,6 +70,12 @@ type TagData = {
   name: string;
   description: string;
   color: string;
+};
+
+type TagCategoryData = {
+  _id: string;
+  name: string;
+  description: string;
 };
 
 type CartData = {
@@ -174,6 +181,8 @@ export type {
   ShopData,
   UserData,
   StockData,
+  TagData,
+  TagCategoryData,
   CartData,
   MarketData,
   MarketsData,

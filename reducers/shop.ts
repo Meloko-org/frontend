@@ -44,7 +44,7 @@ export const shopSlice = createSlice({
         const newStocks = action.payload.filter(
           (newStock) => !existingStockIds.includes(newStock._id),
         );
-        state.value.products = [...state.value.products, ...newStocks];
+        state.value.products = [...(state.value.products ?? []), ...newStocks];
       }
     },
     resetProducts: (state: ShopState): void => {
@@ -89,6 +89,7 @@ export const {
   setShopData,
   resetShopData,
   addProducts,
+  resetProducts,
   addNote,
   addMarket,
   setClickCollect,

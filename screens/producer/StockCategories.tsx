@@ -6,8 +6,8 @@ import { RootStackParamList } from "../../types/Navigation";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
-import { useSelector } from "react-redux";
-import { ShopState } from "../../reducers/shop";
+import { useDispatch, useSelector } from "react-redux";
+import { addProducts, resetProducts, ShopState } from "../../reducers/shop";
 
 import stocksTools from "../../modules/stocksTools";
 
@@ -17,6 +17,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import TopBar from "../../components/TopBar";
 import Spinner from "../../components/utils/Spinner";
 import { StockData } from "../../types/API";
+import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 
 type StockCategoriesScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -36,14 +37,16 @@ export default function StockCategoriesScreen({ navigation }: Props) {
   const route = useRoute<StockCategoriesScreenRouteProp>();
   const { from, backLabel, screenTitle } = route.params || {};
 
+  const dispatch = useDispatch();
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
 
   const [shopId, setShopId] = useState<string>(shopStore!._id);
   const [isFetchLoading, setIsFetchLoading] = useState<boolean>(true);
-  const [stocks, setStocks] = useState<StockData[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [stocks, setStocks] = useState<StockData[] | null>([]);
+  // const [categories, setCategories] = useState<string[]>([]);
+  const [openScreenButtons, setOpenScreenButtons] = useState<JSX.Element[]>([]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -59,29 +62,47 @@ export default function StockCategoriesScreen({ navigation }: Props) {
       return;
     }
 
-    const formattedData = stocksResponse.data?.map((item: StockData) => ({
-      _id: item?._id,
-      price: parseFloat(item.price.$numberDecimal),
-      stock: parseInt(item.stock.$numberDecimal, 10),
-      shop: item?.shop, // en supposant que shop est déjà formaté selon ShopData
-      product: item?.product, // en supposant que product est formaté selon ProductData
-      tags: item?.tags,
-    }));
-    setStocks(formattedData);
-    setIsFetchLoading(false);
+    // console.log("stocksResponse :", stocksResponse.data)
+    dispatch(resetProducts());
+    dispatch(addProducts(stocksResponse.data));
+    setStocks(stocksResponse.data);
 
-    console.log("formattedData :", formattedData);
+    setIsFetchLoading(false);
   };
 
   useEffect(() => {
     if (!isFetchLoading && stocks.length > 0) {
+      // suppression des doublons de catégorie
       const categoriesList: string[] = Array.from(
         new Set(stocks?.map((stock) => stock?.product.family.category.name)),
       );
-      setCategories(categoriesList);
+      // setCategories(categoriesList);
+
+      setOpenScreenButtons(
+        categoriesList.map((cat: string) => {
+          return (
+            <OpenScreenButton
+              key={cat}
+              label={cat}
+              onPressFn={() =>
+                navigation.navigate("Stocks", {
+                  from: "StockCategories",
+                  backLabel: "Retour aux catégories",
+                  screenTitle: "STOCKS\n" + cat.toLocaleUpperCase(),
+                  category: cat,
+                })
+              }
+              extraClasses="mb-1"
+            />
+          );
+        }),
+      );
     }
   }, [isFetchLoading]);
-  console.log(categories);
+
+  // console.log("stocks :", stocks);
+  // console.log(categories);
+  // console.log("shopStore :", shopStore)
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
@@ -89,11 +110,15 @@ export default function StockCategoriesScreen({ navigation }: Props) {
         <TopBar
           backLabel={backLabel || "Retour à la boutique"}
           screen={from || "ShopProducer"}
-          label={screenTitle || ""}
+          label={screenTitle || "GESTION\nDES STOCKS"}
           extraClasses="mt-2"
         />
         <ScrollView>
-          <View className="px-3"></View>
+          {isFetchLoading ? (
+            <Spinner />
+          ) : (
+            <View className="px-3">{openScreenButtons}</View>
+          )}
         </ScrollView>
       </SafeAreaView>
     </View>
