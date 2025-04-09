@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { useAuth, useSignUp } from "@clerk/clerk-expo";
 import { useDispatch } from "react-redux";
 import { updateUser } from "../reducers/user";
-import { useModal } from "../context/ModalContext";
-
+import { SheetManager } from "react-native-actions-sheet";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
 import { useRoute } from "@react-navigation/native";
@@ -36,11 +35,6 @@ type SignUpScreenProps = {
 export default function SignUpScreen({ navigation }: SignUpScreenProps) {
   const route = useRoute<SignUpScreenRouteProp>();
   const { from, backLabel, screenTitle } = route.params;
-
-  const { setAlertMessage } = useModal();
-
-  // const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  // const [alertType, setAlertType] = useState<"success" | "danger">("danger");
 
   // Import the Clerk signup functions
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -84,7 +78,6 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
 
         if (!producerResponse.success) {
           console.error(producerResponse.message);
-          //setAlertMessage(producerResponse.message);
         } else {
           navigation.navigate("TabNavigatorProducer", {
             screen: "ProducerProfile",
@@ -103,26 +96,39 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
   const onSignUpPress = async () => {
     // vérification des champs
     if (emailAddress === "") {
-      setAlertMessage("Veuillez saisir un email.", "warning");
-      // setAlertType("danger");
+      SheetManager.show("alert", {
+        payload: {
+          message: "Veuillez saisir un email.",
+          alertType: "warning",
+        },
+      });
       return;
     }
     if (password === "") {
-      setAlertMessage("Veuillez saisir un mot de passe.", "warning");
-      // setAlertType("danger");
+      SheetManager.show("alert", {
+        payload: {
+          message: "Veuillez saisir un mot de passe.",
+          alertType: "warning",
+        },
+      });
       return;
     }
     if (confirmPassword === "") {
-      setAlertMessage("Veuillez confirmer le mot de passe.", "warning");
-      // setAlertType("danger");
+      SheetManager.show("alert", {
+        payload: {
+          message: "Veuillez confirmer le mot de passe.",
+          alertType: "warning",
+        },
+      });
       return;
     }
     if (password !== confirmPassword) {
-      setAlertMessage(
-        "Les deux mots de passe ne sont pas identiques.",
-        "error",
-      );
-      // setAlertType("danger");
+      SheetManager.show("alert", {
+        payload: {
+          message: "Les deux mots de passe ne sont pas identiques.",
+          alertType: "error",
+        },
+      });
       return;
     }
 
@@ -149,11 +155,12 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
-      setAlertMessage(
-        err.errors.map((err: string) => err.message).join("\n"),
-        "error",
-      );
-      // setAlertType("danger");
+      SheetManager.show("alert", {
+        payload: {
+          message: err.errors.map((err: string) => err.message).join("\n"),
+          alertType: "error",
+        },
+      });
     }
   };
 
@@ -161,8 +168,12 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
     if (code.length === 6) {
       onPressVerify();
     } else {
-      setAlertMessage("Veuillez entrer un code à 6 chiffres.", "warning");
-      // setAlertType("danger");
+      SheetManager.show("alert", {
+        payload: {
+          message: "Veuillez entrer un code à 6 chiffres.",
+          alertType: "warning",
+        },
+      });
     }
   };
 
@@ -190,11 +201,12 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
-      setAlertMessage(
-        err.errors.map((err: string) => err.message).join("\n"),
-        "error",
-      );
-      // setAlertType("danger");
+      SheetManager.show("alert", {
+        payload: {
+          message: err.errors.map((err: string) => err.message).join("\n"),
+          alertType: "warning",
+        },
+      });
     }
   };
 
@@ -300,16 +312,6 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
             )}
           </View>
         </View>
-
-        {/* Modale Alerte*/}
-        {/* {alertMessage && (
-          <CustomAlert
-            visible={!!alertMessage}
-            message={alertMessage}
-            alertType={alertType}
-            onClose={() => setAlertMessage(null)}
-          />
-        )} */}
       </SafeAreaView>
     </View>
   );

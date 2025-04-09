@@ -1,22 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  Text,
-  Image,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 import { Region } from "react-native-maps";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
-import BottomSheet, {
-  BottomSheetView,
-  BottomSheetScrollView,
-} from "@gorhom/bottom-sheet";
+import { SheetManager } from "react-native-actions-sheet";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import CardProducer from "../../components/cards/ProducerSearchResult";
 import ShopMarkerCard from "../../components/cards/ShopMarkerCard";
@@ -46,7 +36,6 @@ export default function MapCustomerScreen({
 }: MapProps): JSX.Element {
   const { colorScheme, toggleColorScheme } = useColorScheme();
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
   const [currentPosition, setCurrentPosition] = useState<userPosition>(null);
   const [searchResults, setSearchResults] = useState<ShopData[]>([]);
   const [region, setRegion] = useState<Region | undefined>(undefined);
@@ -95,6 +84,16 @@ export default function MapCustomerScreen({
         displayMode="bottomSheet"
       />
     ));
+
+  useEffect(() => {
+    if (producersList.length > 0) {
+      SheetManager.show("map-search-results", {
+        payload: {
+          producersList: producersList,
+        },
+      });
+    }
+  }, [producersList]);
 
   const markers =
     searchResults &&
@@ -163,42 +162,6 @@ export default function MapCustomerScreen({
           displayMode="widget"
         />
       </View>
-      {searchResults.length > 0 && (
-        <BottomSheet
-          ref={bottomSheetRef}
-          snapPoints={["25%", "75%"]}
-          handleStyle={{
-            backgroundColor: colorScheme === "dark" ? "#444C3D" : "#FFF",
-          }}
-          handleIndicatorStyle={{
-            backgroundColor: colorScheme === "dark" ? "#FCFFF0" : "#444C3D",
-          }}
-          onChange={handleSheetChanges}
-        >
-          <BottomSheetView
-            style={[
-              styles.contentContainer,
-              {
-                backgroundColor: colorScheme === "dark" ? "#262E20" : "#FCFFF0",
-              },
-            ]}
-          >
-            <View className="px-3 w-full">
-              <TextHeading3 extraClasses="mt-2 mb-4 h-10">
-                {`${producersList.length.toString()} Résultats `}
-              </TextHeading3>
-            </View>
-
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              style={{ flex: 0.3, width: "100%" }}
-              className="px-3"
-            >
-              {producersList}
-            </ScrollView>
-          </BottomSheetView>
-        </BottomSheet>
-      )}
     </View>
   );
 }

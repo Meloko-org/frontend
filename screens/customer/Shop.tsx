@@ -1,4 +1,5 @@
-import { Image, View, Modal } from "react-native";
+import { Image, View } from "react-native";
+import Modal from "react-native-modal";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from "react";
@@ -216,6 +217,59 @@ export default function ShopUserScreen({ route, navigation }: Props) {
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
+      <Modal
+        isVisible={isModalVisible}
+        coverScreen={false}
+        onModalHide={() => setIsSearchResultsModalVisible(false)}
+        style={{ margin: 0 }}
+      >
+        <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+          <View className="flex flex-row mb-5 mt-3">
+            <BackLabelButton
+              onPressFn={() => setIsModalVisible(false)}
+              extraClasses="ml-5 p-1"
+            >
+              Retour à la boutique
+            </BackLabelButton>
+          </View>
+          <TextHeading4 centered extraClasses="mb-1">
+            Tous les produits
+          </TextHeading4>
+          <View className="flex-1 p-3">
+            <ScrollView showsVerticalScrollIndicator={false} className="w-full">
+              {categoryProducts}
+            </ScrollView>
+          </View>
+        </SafeAreaView>
+      </Modal>
+
+      {searchProduct.length > 0 && (
+        <Modal
+          isVisible={isSearchResultsModalVisible}
+          coverScreen={false}
+          onModalHide={() => setIsSearchResultsModalVisible(false)}
+          style={{ margin: 0 }}
+        >
+          <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+            <View className="p-3">
+              <ButtonBack
+                onPressFn={() => setIsSearchResultsModalVisible(false)}
+              />
+
+              <TextHeading2 extraClasses="mb-4">
+                Tous vos résultats
+              </TextHeading2>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                className="w-full"
+              >
+                {searchProduct}
+              </ScrollView>
+            </View>
+          </SafeAreaView>
+        </Modal>
+      )}
+
       <View className="flex flex-row mb-5 mt-3">
         <BackLabelButton
           onPressFn={() => navigation.goBack()}
@@ -329,60 +383,6 @@ export default function ShopUserScreen({ route, navigation }: Props) {
               <View className="p-2 flex flex-row">{categories}</View>
             </ScrollView>
           </View>
-
-          <Modal
-            visible={isModalVisible}
-            animationType="slide"
-            onRequestClose={() => setIsModalVisible(false)}
-          >
-            <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-              <View className="flex flex-row mb-5 mt-3">
-                <BackLabelButton
-                  onPressFn={() => setIsModalVisible(false)}
-                  extraClasses="ml-5 p-1"
-                >
-                  Retour à la boutique
-                </BackLabelButton>
-              </View>
-              <TextHeading4 centered extraClasses="mb-1">
-                Tous les produits
-              </TextHeading4>
-              <View className="flex-1 p-3">
-                <ScrollView
-                  showsVerticalScrollIndicator={false}
-                  className="w-full"
-                >
-                  {categoryProducts}
-                </ScrollView>
-              </View>
-            </SafeAreaView>
-          </Modal>
-
-          {searchProduct.length > 0 && (
-            <Modal
-              visible={isSearchResultsModalVisible}
-              animationType="slide"
-              onRequestClose={() => setIsSearchResultsModalVisible(false)}
-            >
-              <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-                <View className="p-3">
-                  <ButtonBack
-                    onPressFn={() => setIsSearchResultsModalVisible(false)}
-                  />
-
-                  <TextHeading2 extraClasses="mb-4">
-                    Tous vos résultats
-                  </TextHeading2>
-                  <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    className="w-full"
-                  >
-                    {searchProduct}
-                  </ScrollView>
-                </View>
-              </SafeAreaView>
-            </Modal>
-          )}
         </ScrollView>
       </View>
     </SafeAreaView>

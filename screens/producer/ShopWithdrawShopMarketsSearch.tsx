@@ -7,7 +7,7 @@ import { useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
 import { Slider } from "@miblanchard/react-native-slider";
-import { useModal } from "../../context/ModalContext";
+import { SheetManager } from "react-native-actions-sheet";
 
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -44,8 +44,6 @@ export default function ShopWithdrawShopMarketsSearchScreen({
 }: Props) {
   const route = useRoute<ShopWithdrawShopMarketsSearchScreenRouteProp>();
   const { from, backLabel, screenTitle } = route.params || {};
-
-  const { setAlertMessage } = useModal();
 
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
@@ -91,18 +89,31 @@ export default function ShopWithdrawShopMarketsSearchScreen({
   const handleAddMarket = async () => {
     try {
       setAddMarketLoading(true);
-      const values = { shopId: shopStore?._id, marketIds: marketSelected };
+      const values = {
+        shopId: shopStore?._id,
+        marketIds: marketSelected,
+      };
 
       const data = await shopTools.addShopMarkets(values);
 
       if (data.error) {
-        setAlertMessage(data.error, "error");
+        SheetManager.show("alert", {
+          payload: {
+            message: data.error,
+            alertType: "error",
+          },
+        });
         setAddMarketLoading(false);
         return;
       }
 
       if (data) {
-        setAlertMessage(data.message, "success");
+        SheetManager.show("alert", {
+          payload: {
+            message: data.message,
+            alertType: "success",
+          },
+        });
         dispatch(addMarket(data.markets.markets));
       }
 
@@ -110,10 +121,13 @@ export default function ShopWithdrawShopMarketsSearchScreen({
       setMarketSelected([]);
       setMarketsList([]);
       setCity("");
-      setAlertMessage(
-        "Rendez vous sur l'ecran\nprécédent pour paramétrer\nles places de marché que\nvous venez d'ajouter.",
-        "success",
-      );
+      SheetManager.show("alert", {
+        payload: {
+          message:
+            "Rendez vous sur l'ecran\nprécédent pour paramétrer\nles places de marché que\nvous venez d'ajouter.",
+          alertType: "success",
+        },
+      });
     } catch (error) {
       console.log(error);
     }

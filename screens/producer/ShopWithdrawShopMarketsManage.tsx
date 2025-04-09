@@ -6,7 +6,7 @@ import { RootStackParamList } from "../../types/Navigation";
 import { useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
-import { useModal } from "../../context/ModalContext";
+import { SheetManager } from "react-native-actions-sheet";
 
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -56,8 +56,6 @@ export default function ShopWithdrawShopMarketsManageScreen({
   const route = useRoute<ShopWithdrawShopMarketsManageScreenRouteProp>();
   const { from, backLabel, screenTitle } = route.params || {};
 
-  const { setAlertMessage } = useModal();
-
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
@@ -67,7 +65,11 @@ export default function ShopWithdrawShopMarketsManageScreen({
   const [isValidateLoading, setValidateLoading] = useState(false);
 
   const [marketsDataToSave, setMarketsDataToSave] = useState<
-    { market: MarketData; openingHours: OpeningHourData[]; isActive: boolean }[]
+    {
+      market: MarketData;
+      openingHours: OpeningHourData[];
+      isActive: boolean;
+    }[]
   >([]);
 
   // permet d'afficher la liste des markets du shop
@@ -135,14 +137,22 @@ export default function ShopWithdrawShopMarketsManageScreen({
     try {
       setValidateLoading(true);
       // enregistrer les données
-      const values = { shopId: shopStore?._id, markets: marketsDataToSave };
+      const values = {
+        shopId: shopStore?._id,
+        markets: marketsDataToSave,
+      };
 
       // console.log("values :", JSON.stringify(values, null, 2))
 
       const shopMarketsResponse = await shopTools.updateShopMarkets(values);
 
       if (!shopMarketsResponse.success) {
-        setAlertMessage(shopMarketsResponse.message);
+        SheetManager.show("alert", {
+          payload: {
+            message: shopMarketsResponse.message,
+            alertType: "warning",
+          },
+        });
         setValidateLoading(false);
         return;
       }
@@ -151,7 +161,12 @@ export default function ShopWithdrawShopMarketsManageScreen({
 
       dispatch(resetMarkets());
       dispatch(addMarket(shopMarketsResponse.data.markets));
-      setAlertMessage("Mise à jour des points de vente effectuée", "success");
+      SheetManager.show("alert", {
+        payload: {
+          message: "Mise à jour des points de vente effectuée",
+          alertType: "success",
+        },
+      });
 
       setValidateLoading(false);
     } catch (error) {
