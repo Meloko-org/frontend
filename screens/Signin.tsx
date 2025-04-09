@@ -25,12 +25,8 @@ import InputText from "../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import TopBar from "../components/TopBar";
 import CustomAlert from "../components/modals/CustomAlert";
-import {
-  BottomSheetView,
-  BottomSheetModal,
-  BottomSheetModalProvider,
-} from "@gorhom/bottom-sheet";
-
+import { BottomSheetView, BottomSheetModal } from "@gorhom/bottom-sheet";
+import ActionSheet from "react-native-actions-sheet";
 import { useDispatch, useSelector } from "react-redux";
 import { UserState, updateUser } from "../reducers/user";
 import { ProducerState, setProducerData } from "../reducers/producer";
@@ -71,7 +67,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 export default function SignInScreen({ navigation }: SignInScreenProps) {
   useWarmUpBrowser();
-
+  const actionSheetRef = useRef<ActionSheetRef>(null);
   const route = useRoute<SignInScreenRouteProp>();
   const { from, backLabel, screenTitle } = route.params || {}; // route.params peut être non défini quand on revient SignUpScreen
 
@@ -130,22 +126,17 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
 
   const AlertModal = () => {
     return (
-      <>
-        <Button
-          onPress={handlePresentModalPress}
-          title="Present Modal"
-          color="black"
-        />
-        <BottomSheetModal
-          ref={bottomSheetModalRef}
-          onChange={handleSheetChanges}
-          snapPoints={["30%"]}
-        >
-          <BottomSheetView style={styles.contentContainer}>
-            <Text>Awesome 🎉</Text>
-          </BottomSheetView>
-        </BottomSheetModal>
-      </>
+      <ActionSheet
+        ref={actionSheetRef}
+        snapPoints={[20, 50, 100]}
+        initialSnapIndex={1}
+        indicatorStyle={{ backgroundColor: "#000000" }}
+        gestureEnabled={true}
+      >
+        <View className="p-4 h-[50%]">
+          <Text>Hi, I am here.</Text>
+        </View>
+      </ActionSheet>
     );
   };
 
@@ -268,7 +259,7 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   const onSignInPress = useCallback(async () => {
     // vérification des champs
     if (emailAddress === "") {
-      handlePresentModalPress();
+      actionSheetRef.current?.show();
       // setAlertMessage("Veuillez saisir un email.", "warning");
       // setAlertType("danger");
       return;
