@@ -1,28 +1,34 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useSignIn, useSignUp, useSSO } from "@clerk/clerk-expo";
 import { useAuth } from "@clerk/clerk-expo";
 import * as AuthSession from "expo-auth-session";
 import { useModal } from "../context/ModalContext";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
-
+import { SheetManager } from "react-native-actions-sheet";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
 import { useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
-import { View } from "react-native";
+import {
+  View,
+  Modal,
+  StyleSheet,
+  ImageBackground,
+  Button,
+  Text,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import InputText from "../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import TopBar from "../components/TopBar";
-import CustomAlert from "../components/modals/CustomAlert";
-
 import { useDispatch, useSelector } from "react-redux";
 import { UserState, updateUser } from "../reducers/user";
 import { ProducerState, setProducerData } from "../reducers/producer";
 import { ShopState, setShopData } from "../reducers/shop";
+import { useColorScheme } from "nativewind";
 
 import userTools from "../modules/userTools";
 import producerTools from "../modules/producerTools";
@@ -30,6 +36,7 @@ import shopTools from "../modules/shopTools";
 import TextHeading4 from "../components/utils/texts/Heading4";
 import TextBody1 from "../components/utils/texts/Body1";
 import OpenScreenButton from "../components/utils/buttons/OpenScreen";
+import TextHeading2 from "../components/utils/texts/Heading2";
 
 type SignInScreenRouteProp = RouteProp<RootStackParamList, "SignIn">;
 
@@ -91,6 +98,8 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
 
   const [performedSignedIn, setPerformedSignedIn] = useState(false);
   const [isConnectionLoading, setConnectionLoading] = useState(false);
+
+  const { colorScheme } = useColorScheme();
 
   const fetchData = async () => {
     try {
@@ -211,7 +220,14 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   const onSignInPress = useCallback(async () => {
     // vérification des champs
     if (emailAddress === "") {
-      setAlertMessage("Veuillez saisir un email.", "warning");
+      // actionSheetRef.current?.show();
+      SheetManager.show("alert", {
+        payload: {
+          message: "Veuillez saisir un email.",
+          alertType: "warning",
+        },
+      });
+      // setAlertMessage("Veuillez saisir un email.", "warning");
       // setAlertType("danger");
       return;
     }
@@ -351,3 +367,16 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 24,
+    justifyContent: "center",
+    backgroundColor: "grey",
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
+  },
+});
