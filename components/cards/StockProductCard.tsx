@@ -8,10 +8,12 @@ import BadgeGrey from "../utils/badges/Grey";
 
 type StockProductCardProps = {
   stock: StockData;
+  onPress?: () => void;
 };
 
 export default function StockProductCard({
   stock,
+  onPress,
 }: StockProductCardProps): JSX.Element {
   const tagBadges = stock.tags.map((tag: TagData) => {
     return (
@@ -21,11 +23,9 @@ export default function StockProductCard({
     );
   });
 
-  console.log("tags :", stock.tags);
-
   return (
     <TouchableOpacity
-      onPress={() => {}}
+      onPress={onPress}
       className="rounded-lg bg-lightbg dark:bg-tertiary p-2 mb-2"
     >
       <View className="flex flex-row items-center w-full">

@@ -1,12 +1,24 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
+import { useColorScheme } from "nativewind";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 import { useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
-import { View } from "react-native";
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetBackdrop,
+} from "@gorhom/bottom-sheet";
+
+import { View, StyleSheet, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import TopBar from "../../components/TopBar";
@@ -15,6 +27,9 @@ import { ShopState } from "../../reducers/shop";
 import { StockData } from "../../types/API";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import StockProductCard from "../../components/cards/StockProductCard";
+import TextHeading1 from "../../components/utils/texts/Heading1";
+import EditProduct from "../../components/EditProduct";
+import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 
 type StocksScreenRouteProp = RouteProp<RootStackParamList, "Stocks">;
 
@@ -38,10 +53,6 @@ export default function StocksScreen({ navigation }: Props) {
   const filteredProducts = shopStore?.products?.filter(
     (product: StockData) => product.product.family.category.name === category,
   );
-
-  const stockProductCards = filteredProducts?.map((product, index) => {
-    return <StockProductCard key={index} stock={product} />;
-  });
 
   // console.log(JSON.stringify(filteredProducts, null, 2))
 
@@ -71,7 +82,15 @@ export default function StocksScreen({ navigation }: Props) {
         </View>
 
         <ScrollView>
-          <View className="px-3">{stockProductCards}</View>
+          <View className="px-3">
+            {filteredProducts?.map((product, index) => (
+              <StockProductCard
+                key={index}
+                stock={product}
+                onPress={() => {}}
+              />
+            ))}
+          </View>
         </ScrollView>
       </SafeAreaView>
     </View>
