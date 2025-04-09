@@ -52,7 +52,7 @@ import TextHeading4 from "../../components/utils/texts/Heading4";
 import ColorSchemeButton from "../../components/utils/buttons/ColorScheme";
 import TextBody1 from "../../components/utils/texts/Body1";
 import CheckBox from "../../components/utils/inputs/CheckBox";
-import CustomAlert from "../../components/modals/CustomAlert";
+import CustomAlert from "../../components/bottomSheets/CustomAlert";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,

@@ -5,7 +5,7 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
-import CustomAlert from "../components/modals/CustomAlert";
+import CustomAlert from "../components/bottomSheets/CustomAlert";
 
 type ModalContextType = {
   setAlertMessage: (

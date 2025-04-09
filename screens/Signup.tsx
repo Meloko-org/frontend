@@ -20,7 +20,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CheckBox from "../components/utils/inputs/CheckBox";
 import CodeInput from "../components/CodeInput";
 import TextHeading4 from "../components/utils/texts/Heading4";
-import CustomAlert from "../components/modals/CustomAlert";
+import CustomAlert from "../components/bottomSheets/CustomAlert";
 
 type SignUpScreenRouteProp = RouteProp<RootStackParamList, "SignUp">;
 
@@ -91,7 +91,9 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
           });
         }
       } else {
-        navigation.navigate("TabNavigatorUser", { screen: "UserProfile" });
+        navigation.navigate("TabNavigatorUser", {
+          screen: "UserProfile",
+        });
       }
     } catch (error) {
       console.error(error);
@@ -137,7 +139,9 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
       });
 
       // Send the email verification code
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      await signUp.prepareEmailAddressVerification({
+        strategy: "email_code",
+      });
 
       // Verification is pending
       setPendingVerification(true);
