@@ -4,10 +4,10 @@ LogBox.ignoreAllLogs();
 import { ClerkProvider, ClerkLoaded } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { NavigationContainer } from "@react-navigation/native";
 import { ModalProvider } from "./context/ModalContext";
-
+import { SheetProvider } from "react-native-actions-sheet";
+import "./components/bottomSheets/sheets";
 import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
@@ -383,12 +383,12 @@ export default function App(): JSX.Element {
     <Provider store={store}>
       <PersistGate persistor={persistor}>
         <GestureHandlerRootView style={{ flex: 1 }}>
-          <BottomSheetModalProvider>
-            <ClerkProvider
-              tokenCache={tokenCache}
-              publishableKey={publishableKey}
-            >
-              <ClerkLoaded>
+          <ClerkProvider
+            tokenCache={tokenCache}
+            publishableKey={publishableKey}
+          >
+            <ClerkLoaded>
+              <SheetProvider>
                 <ModalProvider>
                   <NavigationContainer>
                     <Stack.Navigator screenOptions={options}>
@@ -414,9 +414,9 @@ export default function App(): JSX.Element {
                     </Stack.Navigator>
                   </NavigationContainer>
                 </ModalProvider>
-              </ClerkLoaded>
-            </ClerkProvider>
-          </BottomSheetModalProvider>
+              </SheetProvider>
+            </ClerkLoaded>
+          </ClerkProvider>
         </GestureHandlerRootView>
       </PersistGate>
     </Provider>

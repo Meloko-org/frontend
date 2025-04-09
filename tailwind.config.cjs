@@ -7,6 +7,8 @@ module.exports = {
     "./screens/producer/*.{js,jsx,ts,tsx}",
     "./components/*.{js,jsx,ts,tsx}",
     "./components/cards/*.{js,jsx,ts,tsx}",
+    "./components/modals/*.{js,jsx,ts,tsx}",
+    "./components/bottomSheets/*.{js,jsx,ts,tsx}",
     "./components/utils/*.{js,jsx,ts,tsx}",
     "./components/utils/badges/*.{js,jsx,ts,tsx}",
     "./components/utils/buttons/*.{js,jsx,ts,tsx}",

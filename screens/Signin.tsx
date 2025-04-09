@@ -5,7 +5,7 @@ import * as AuthSession from "expo-auth-session";
 import { useModal } from "../context/ModalContext";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
-
+import { SheetManager } from "react-native-actions-sheet";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
 import { useRoute } from "@react-navigation/native";
@@ -24,9 +24,6 @@ import { ScrollView } from "react-native-gesture-handler";
 import InputText from "../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import TopBar from "../components/TopBar";
-import CustomAlert from "../components/modals/CustomAlert";
-import { BottomSheetView, BottomSheetModal } from "@gorhom/bottom-sheet";
-import ActionSheet from "react-native-actions-sheet";
 import { useDispatch, useSelector } from "react-redux";
 import { UserState, updateUser } from "../reducers/user";
 import { ProducerState, setProducerData } from "../reducers/producer";
@@ -67,7 +64,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 export default function SignInScreen({ navigation }: SignInScreenProps) {
   useWarmUpBrowser();
-  const actionSheetRef = useRef<ActionSheetRef>(null);
+
   const route = useRoute<SignInScreenRouteProp>();
   const { from, backLabel, screenTitle } = route.params || {}; // route.params peut être non défini quand on revient SignUpScreen
 
@@ -102,43 +99,7 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   const [performedSignedIn, setPerformedSignedIn] = useState(false);
   const [isConnectionLoading, setConnectionLoading] = useState(false);
 
-  const [isModalVisible, setModalVisible] = useState(false);
   const { colorScheme } = useColorScheme();
-  // ref
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-
-  // callbacks
-  const handlePresentModalPress = useCallback(() => {
-    console.log("ran");
-    bottomSheetModalRef.current?.present();
-  }, []);
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-  }, []);
-
-  const openSheet = () => {
-    setModalVisible(true);
-  };
-
-  const closeSheet = () => {
-    setModalVisible(false);
-  };
-
-  const AlertModal = () => {
-    return (
-      <ActionSheet
-        ref={actionSheetRef}
-        snapPoints={[20, 50, 100]}
-        initialSnapIndex={1}
-        indicatorStyle={{ backgroundColor: "#000000" }}
-        gestureEnabled={true}
-      >
-        <View className="p-4 h-[50%]">
-          <Text>Hi, I am here.</Text>
-        </View>
-      </ActionSheet>
-    );
-  };
 
   const fetchData = async () => {
     try {
@@ -259,7 +220,13 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   const onSignInPress = useCallback(async () => {
     // vérification des champs
     if (emailAddress === "") {
-      actionSheetRef.current?.show();
+      // actionSheetRef.current?.show();
+      SheetManager.show("alert", {
+        payload: {
+          message: "Veuillez saisir un email.",
+          alertType: "warning",
+        },
+      });
       // setAlertMessage("Veuillez saisir un email.", "warning");
       // setAlertType("danger");
       return;
@@ -311,7 +278,6 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
-      {AlertModal()}
       <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
         <TopBar
           backLabel={backLabel || "Retour à l'accueil"}
