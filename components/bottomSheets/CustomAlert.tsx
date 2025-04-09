@@ -10,11 +10,25 @@ export default function CustomAlert(props: SheetProps<"alert">) {
   const alertIcon = () => {
     switch (props.payload?.alertType) {
       case "warning":
-        return <FontAwesome6Icon name="triangle-exclamation" color="#ff9d00" />;
+        return (
+          <FontAwesome6Icon
+            name="triangle-exclamation"
+            size={70}
+            color="#ff9d00"
+          />
+        );
       case "error":
-        return <FontAwesome6Icon name="circle-exclamation" color="#f2170c" />;
+        return (
+          <FontAwesome6Icon
+            name="circle-exclamation"
+            size={70}
+            color="#f2170c"
+          />
+        );
       case "success":
-        return <FontAwesome6Icon name="circle-check" color="#29db11" />;
+        return (
+          <FontAwesome6Icon name="circle-check" size={70} color="#29db11" />
+        );
     }
   };
 
