@@ -1,14 +1,12 @@
-import React, { useRef, useState, useCallback } from "react";
+import React from "react";
 import {
   Image,
   Text,
   TouchableOpacity,
   View,
-  ScrollView,
-  Modal,
   GestureResponderEvent,
 } from "react-native";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+
 import { useDispatch, useSelector } from "react-redux";
 import {
   addProductToCart,
@@ -22,11 +20,9 @@ import PricePer from "../utils/badges/Dark";
 import PriceBadge from "../utils/badges/Price";
 import IconButton from "../utils/buttons/Icon";
 import BadgeGrey from "../utils/badges/Grey";
-import TextHeading2 from "../utils/texts/Heading2";
-import TextHeading3 from "../utils/texts/Heading3";
 import { useColorScheme } from "nativewind";
-import BadgeSecondary from "../utils/badges/Secondary";
 import orderTools from "../../modules/orderTools";
+import { SheetManager } from "react-native-actions-sheet";
 
 type CardProductProps = {
   stockData?: StockData;
@@ -42,16 +38,16 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
   const cartStore = useSelector(
     (state: { cart: CartState }) => state.cart.value,
   );
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const [isModalVisible, setModalVisible] = useState(false);
   const { colorScheme } = useColorScheme();
 
-  const openSheet = () => {
-    setModalVisible(true);
-  };
-
-  const closeSheet = () => {
-    setModalVisible(false);
+  const showProductDetailsBottomSheet = () => {
+    SheetManager.show("product-details", {
+      payload: {
+        stockData: props.stockData,
+        cartButton: cartButton,
+        unit: unit,
+      },
+    });
   };
 
   const formatQuantity = (quantity: number, unit: string) => {
@@ -141,84 +137,13 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
     />
   );
 
-  const detailModal = () => {
-    return (
-      <Modal
-        visible={isModalVisible}
-        animationType="none"
-        transparent={true}
-        onRequestClose={closeSheet}
-      >
-        <View style={{ flex: 1 }}>
-          <BottomSheet
-            ref={bottomSheetRef}
-            snapPoints={["95%"]}
-            index={0}
-            enablePanDownToClose
-            onClose={closeSheet}
-            backgroundStyle={{
-              backgroundColor: colorScheme === "dark" ? "#444C3D" : "#FFF",
-            }}
-          >
-            <BottomSheetView>
-              <View className="px-3 pt-5 w-full h-full">
-                <View className="flex flex-row items-center">
-                  <View className="w-4/5">
-                    <TextHeading2>
-                      {`${props.stockData?.product.family.name} ${props.stockData?.product.name}`}
-                    </TextHeading2>
-                  </View>
-
-                  <View className="w-1/5 flex flex-column justify-center items-center">
-                    {cartButton}
-                  </View>
-                </View>
-                <ScrollView
-                  showsVerticalScrollIndicator={false}
-                  style={{
-                    flex: 1,
-                    width: "100%",
-                  }}
-                  className="py-3"
-                >
-                  <PricePer>{`${props.stockData?.price.$numberDecimal} € / ${unit}`}</PricePer>
-
-                  <View className="flex flex-row items-center rounded-lg w-auto h-full bg-white m-2">
-                    <Image
-                      source={
-                        props.stockData?.product.image
-                          ? {
-                              uri: props.stockData.product.image,
-                            }
-                          : require("../../assets/icon.png")
-                      }
-                      className=""
-                      alt={`Illustration du produit ${props.stockData?.product.name}`}
-                      resizeMode="contain"
-                      style={{
-                        width: "100%",
-                        aspectRatio: 16 / 9,
-                      }}
-                    />
-                  </View>
-                </ScrollView>
-              </View>
-            </BottomSheetView>
-          </BottomSheet>
-        </View>
-      </Modal>
-    );
-  };
-
   const unit =
     props.stockData?.product.weight.unit === "gr" ? "kg" : "la pièce";
 
   return (
     <>
-      {detailModal()}
-
       <TouchableOpacity
-        onPress={openSheet}
+        onPress={showProductDetailsBottomSheet}
         activeOpacity={0.8}
         className={`${props.extraClasses} rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary flex flex-row w-full`}
       >

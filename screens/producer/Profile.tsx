@@ -4,13 +4,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { ModeState, changeMode } from "../../reducers/mode";
 import { useColorScheme } from "nativewind";
 
-import { useModal } from "../../context/ModalContext";
-
-import BottomSheet, {
-  BottomSheetView,
-  BottomSheetScrollView,
-} from "@gorhom/bottom-sheet";
-
 import { UserState, updateUser, resetUser } from "../../reducers/user";
 import { resetProducerData, setProducerData } from "../../reducers/producer";
 import { resetShopData } from "../../reducers/shop";
@@ -52,7 +45,7 @@ import TextHeading4 from "../../components/utils/texts/Heading4";
 import ColorSchemeButton from "../../components/utils/buttons/ColorScheme";
 import TextBody1 from "../../components/utils/texts/Body1";
 import CheckBox from "../../components/utils/inputs/CheckBox";
-import CustomAlert from "../../components/bottomSheets/CustomAlert";
+import { SheetManager } from "react-native-actions-sheet";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -64,8 +57,6 @@ type Props = {
 };
 
 export default function ProducerProfileScreen({ navigation }: Props) {
-  const { setAlertMessage } = useModal();
-
   const dispatch = useDispatch();
   const modeStore = useSelector(
     (state: { mode: ModeState }) => state.mode.value,
@@ -184,14 +175,22 @@ export default function ProducerProfileScreen({ navigation }: Props) {
       console.log(producerResponse);
 
       if (!producerResponse.success) {
-        setAlertMessage(producerResponse.message, "error");
-        // setAlertType("danger")
+        SheetManager.show("alert", {
+          payload: {
+            message: producerResponse.message,
+            alertType: "error",
+          },
+        });
         return;
       }
 
       dispatch(setProducerData(producerResponse.data));
-      setAlertMessage("Informations mises à jour.", "success");
-      // setAlertType("success")
+      SheetManager.show("alert", {
+        payload: {
+          message: "Informations mises à jour.",
+          alertType: "success",
+        },
+      });
 
       setProducerSaveLoading(false);
     } catch (error) {
@@ -211,8 +210,6 @@ export default function ProducerProfileScreen({ navigation }: Props) {
     const displayMode = modeStore.mode === "light" ? "dark" : "light";
     dispatch(changeMode(displayMode));
   };
-
-  const handleSheetChanges = useCallback((index: number) => {}, []);
 
   console.log(
     "---------------------------------- PRODUCER --------------------------------------------------------------------",
@@ -409,7 +406,7 @@ export default function ProducerProfileScreen({ navigation }: Props) {
               iconFamily="FontAwesome5Icon"
               extraClasses="bg-premium rounded-full my-4 h-[60px]"
               textClasses="text-lightbg text-lg font-bold"
-              onPressFn={openBottomSheet}
+              onPressFn={async () => await SheetManager.show("become-premium")}
             />
           </View>
         </ScrollView>
@@ -421,54 +418,6 @@ export default function ProducerProfileScreen({ navigation }: Props) {
           onPressFn={switchUser}
         />
       </View>
-
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={["75%"]}
-        enablePanDownToClose={true}
-        handleStyle={{
-          backgroundColor: colorScheme === "dark" ? "#444C3D" : "#FFF",
-        }}
-        handleIndicatorStyle={{
-          backgroundColor: colorScheme === "dark" ? "#FCFFF0" : "#444C3D",
-        }}
-        onChange={(index) => setBottomSheetOpen(index !== -1)}
-      >
-        <BottomSheetView
-          style={[
-            styles.contentContainer,
-            {
-              backgroundColor: colorScheme === "dark" ? "#262E20" : "#FCFFF0",
-            },
-          ]}
-        >
-          <View className="flex justify-center items-center p-3 w-full h-full">
-            <View>
-              <TextBody1 centered>
-                En devenant membre Premium, bla bla bla. Cet abonnement est au
-                prix de 15 € ht par mois
-              </TextBody1>
-              <View className="items-center my-5">
-                <CheckBox
-                  label="J'accèpte les conditions"
-                  textClasses="text-secondary dark:text-lightbg"
-                />
-              </View>
-              <View className="px-3">
-                <ButtonPrimaryEnd
-                  label="Valider"
-                  iconName="check"
-                  iconFamily="FontAwesome5Icon"
-                  disabled={false}
-                  onPressFn={() => console.log("youpi")}
-                  extraClasses="mb-3 h-14"
-                />
-              </View>
-            </View>
-          </View>
-        </BottomSheetView>
-      </BottomSheet>
     </SafeAreaView>
   );
 }

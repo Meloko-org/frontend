@@ -11,8 +11,6 @@ import { RouteProp } from "@react-navigation/native";
 
 import shopTools from "../../modules/shopTools";
 
-import { useModal } from "../../context/ModalContext";
-
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
@@ -21,6 +19,7 @@ import TextBody1 from "../../components/utils/texts/Body1";
 import Planning from "../../components/Planning";
 import InputTextarea from "../../components/utils/inputs/Textarea";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
+import { SheetManager } from "react-native-actions-sheet";
 
 type ShopWithdrawClickcollectScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -39,8 +38,6 @@ type Props = {
 export default function ShopWithdrawClickcollectScreen({ navigation }: Props) {
   const route = useRoute<ShopWithdrawClickcollectScreenRouteProp>();
   const { from, backLabel, screenTitle } = route.params || {};
-
-  const { setAlertMessage } = useModal();
 
   const { getToken } = useAuth();
   const dispatch = useDispatch();
@@ -129,13 +126,23 @@ export default function ShopWithdrawClickcollectScreen({ navigation }: Props) {
       const shopResponse = await shopTools.updateClickCollect(token, values);
 
       if (!shopResponse.success && shopResponse.message) {
-        setAlertMessage(shopResponse.message, "error");
+        SheetManager.show("alert", {
+          payload: {
+            message: shopResponse.message,
+            alertType: "error",
+          },
+        });
         setValidateLoading(false);
         return;
       }
 
       dispatch(setClickCollect(values));
-      setAlertMessage("Click&Collect mis à jour", "success");
+      SheetManager.show("alert", {
+        payload: {
+          message: "Click&Collect mis à jour",
+          alertType: "error",
+        },
+      });
       setValidateLoading(false);
     } catch (error) {
       console.log(error);
