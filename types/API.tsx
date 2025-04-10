@@ -34,6 +34,14 @@ type ProductData = {
   hasCustomName: boolean;
 };
 
+type ProductCategoryData = {
+  _id: string;
+  name: string;
+  description: string;
+  image: string;
+  type: string;
+};
+
 type MarketData = {
   _id: string;
   name: string;
@@ -188,6 +196,7 @@ export type {
   MarketsData,
   OrderData,
   ProducerData,
+  ProductCategoryData,
   AddressData,
   ClickCollectData,
   OpeningHoursData,

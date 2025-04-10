@@ -16,8 +16,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import TopBar from "../../components/TopBar";
 import Spinner from "../../components/utils/Spinner";
-import { StockData } from "../../types/API";
+import { ProductCategoryData, StockData } from "../../types/API";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
+import categoriesTools from "../../modules/categoriesTools";
 
 type StockCategoriesScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -45,11 +46,22 @@ export default function StockCategoriesScreen({ navigation }: Props) {
   const [shopId, setShopId] = useState<string>(shopStore!._id);
   const [isFetchLoading, setIsFetchLoading] = useState<boolean>(true);
   const [stocks, setStocks] = useState<StockData[] | null>([]);
+  const [shopTypes, setShopTypes] = useState<string[]>([]);
+  const [globalCategories, setGlobalCategories] = useState<
+    ProductCategoryData[]
+  >([]);
   // const [categories, setCategories] = useState<string[]>([]);
   const [openScreenButtons, setOpenScreenButtons] = useState<JSX.Element[]>([]);
 
   useFocusEffect(
     React.useCallback(() => {
+      // récupération des types du shop
+      if (shopStore !== null) {
+        setShopTypes(shopStore.types.map((type: { _id: string }) => type._id));
+      }
+      // récupération des catégories globales
+      fetchGlobalCategories();
+      // récupération des stocks
       fetchStocks();
     }, []),
   );
@@ -64,32 +76,65 @@ export default function StockCategoriesScreen({ navigation }: Props) {
 
     // console.log("stocksResponse :", stocksResponse.data)
     dispatch(resetProducts());
-    dispatch(addProducts(stocksResponse.data));
+    dispatch(addProducts(stocksResponse.data!));
     setStocks(stocksResponse.data);
 
     setIsFetchLoading(false);
   };
 
+  const fetchGlobalCategories = async () => {
+    const categoriesResponse = await categoriesTools.getGlobalCategories();
+
+    if (!categoriesResponse.success) {
+      console.log(categoriesResponse.message);
+      return;
+    }
+
+    // console.log("les categories :", categoriesResponse.data)
+
+    setGlobalCategories(categoriesResponse.data);
+  };
+
   useEffect(() => {
-    if (!isFetchLoading && stocks.length > 0) {
-      // suppression des doublons de catégorie
-      const categoriesList: string[] = Array.from(
-        new Set(stocks?.map((stock) => stock?.product.family.category.name)),
+    if (!isFetchLoading) {
+      // on détermine les catégories possibles en fonction des types du shop
+      const availableCategories = globalCategories.filter((category) =>
+        shopStore!.types.some(
+          (shopType: { _id: string }) => shopType._id === category.type,
+        ),
       );
-      // setCategories(categoriesList);
+
+      console.log("avalableCategories: ", availableCategories);
+
+      // on ajoute le nombre de produits pour chaque catégorie qui appartient aux types du shop
+      const availableCategoriesWithCount = availableCategories.map(
+        (category) => {
+          console.log("available cat id : ", category.type);
+          const count = shopStore!.products?.filter(
+            (p) => p.product.family.category.type === category.type,
+          ).length;
+          return {
+            ...category,
+            count,
+          };
+        },
+      );
+
+      console.log("categories with count :", availableCategoriesWithCount);
 
       setOpenScreenButtons(
-        categoriesList.map((cat: string) => {
+        availableCategoriesWithCount.map((cat) => {
           return (
             <OpenScreenButton
-              key={cat}
-              label={cat}
+              key={cat._id}
+              label={cat.name}
+              notice={cat.count?.toString()}
               onPressFn={() =>
                 navigation.navigate("Stocks", {
                   from: "StockCategories",
                   backLabel: "Retour aux catégories",
-                  screenTitle: "STOCKS\n" + cat.toLocaleUpperCase(),
-                  category: cat,
+                  screenTitle: "STOCKS\n" + cat.name.toLocaleUpperCase(),
+                  category: cat.name,
                 })
               }
               extraClasses="mb-1"
@@ -100,9 +145,7 @@ export default function StockCategoriesScreen({ navigation }: Props) {
     }
   }, [isFetchLoading]);
 
-  // console.log("stocks :", stocks);
-  // console.log(categories);
-  // console.log("shopStore :", shopStore)
+  // console.log("shopTypes :", JSON.stringify(shopStore.products, null, 2))
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">

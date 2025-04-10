@@ -1,3 +1,6 @@
+import { ApiResponse, ProductCategoryData } from "../types/API";
+const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
+
 const formatDateToFr = (isoDate: Date) => {
   const date = new Date(isoDate);
   return new Intl.DateTimeFormat("fr-Fr", {
