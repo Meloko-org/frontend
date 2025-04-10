@@ -10,9 +10,7 @@ import { View, Text, Image } from "react-native";
 import InputText from "../utils/inputs/Text";
 import TextHeading3 from "../utils/texts/Heading3";
 
-export default function EditProductSheet(
-  props: SheetProps<"EditProductSheet">,
-) {
+export default function EditProductSheet(props: SheetProps<"edit-product">) {
   const [name, setName] = useState<string>("");
 
   console.log(JSON.stringify(props.payload?.stock, null, 2));
