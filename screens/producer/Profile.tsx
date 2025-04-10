@@ -243,8 +243,10 @@ export default function ProducerProfileScreen({ navigation }: Props) {
               <IconButton
                 iconName="sign-in-alt"
                 iconFamily="FontAwesome5Icon"
+                iconColor="#98B66E"
                 size={40}
                 onPressFn={onSignoutPress}
+                extraClasses="border border-primary"
               />
             </View>
           </View>

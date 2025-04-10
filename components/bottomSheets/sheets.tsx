@@ -5,11 +5,13 @@ import ProductDetails from "./ProductDetails";
 import MapSearchResults from "./MapSearchResults";
 import BecomePremium from "./BecomePremium";
 import { StockData } from "../../types/API";
+import EditProductSheet from "./EditProductSheet";
 
 registerSheet("alert", CustomAlert);
 registerSheet("product-details", ProductDetails);
 registerSheet("map-search-results", MapSearchResults);
 registerSheet("become-premium", BecomePremium);
+registerSheet("edit-product", EditProductSheet);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -36,7 +38,7 @@ declare module "react-native-actions-sheet" {
     "become-premium": SheetDefinition;
     "edit-product": SheetDefinition<{
       payload: {
-        stock: StockData;
+        stock: StockData | null;
       };
     }>;
   }

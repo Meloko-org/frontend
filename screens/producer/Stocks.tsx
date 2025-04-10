@@ -51,8 +51,8 @@ export default function StocksScreen({ navigation }: Props) {
   );
 
   const handleOpenEdit = (product: StockData) => {
-    console.log("youpi");
-    SheetManager.show("EditProductSheet", {
+    console.log(product);
+    SheetManager.show("edit-product", {
       payload: { stock: product },
     });
   };

@@ -60,7 +60,7 @@ export default function OpenScreenButton({
           <TextBody1>{label}</TextBody1>
         </View>
         {notice && (
-          <View className="flex items-center justify-center rounded-lg bg-primary w-8 h-8">
+          <View className="flex items-center justify-center rounded-lg bg-primary px-1 min-w-[30px] h-8">
             <TextHeading4 centered>{notice}</TextHeading4>
           </View>
         )}
