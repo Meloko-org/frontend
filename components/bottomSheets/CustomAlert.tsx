@@ -1,12 +1,10 @@
 import React from "react";
 import { View, Text } from "react-native";
 import ActionSheet, { SheetProps } from "react-native-actions-sheet";
-import { useColorScheme } from "nativewind";
 import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
+import TextHeading3 from "../utils/texts/Heading3";
 
 export default function CustomAlert(props: SheetProps<"alert">) {
-  const { colorScheme, toggleColorScheme } = useColorScheme();
-
   const alertIcon = () => {
     switch (props.payload?.alertType) {
       case "warning":
@@ -34,14 +32,15 @@ export default function CustomAlert(props: SheetProps<"alert">) {
 
   return (
     <ActionSheet
-      snapPoints={[100]}
       indicatorStyle={{ backgroundColor: "#000000" }}
       gestureEnabled={true}
       id={props.sheetId}
     >
-      <View className="p-5 min-h-min w-full flex justify-center items-center">
+      <View className="p-5 min-h-min w-full flex justify-center items-center bg-white dark:bg-darkbg">
         <View className="mb-3">{alertIcon()}</View>
-        <Text className="font-extrabold text-xl">{props.payload?.message}</Text>
+        <TextHeading3 centered extraClasses="font-extrabold text-xl">
+          {props.payload?.message}
+        </TextHeading3>
       </View>
     </ActionSheet>
   );

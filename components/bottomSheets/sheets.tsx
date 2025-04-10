@@ -1,7 +1,10 @@
 import { registerSheet, SheetDefinition } from "react-native-actions-sheet";
 import CustomAlert from "./CustomAlert";
+import EditProductSheet from "./EditProductSheet";
+import { StockData } from "../../types/API";
 
 registerSheet("alert", CustomAlert);
+registerSheet("EditProductSheet", EditProductSheet);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -11,6 +14,11 @@ declare module "react-native-actions-sheet" {
       payload: {
         message: string;
         alertType: "success" | "error" | "warning";
+      };
+    }>;
+    EditProductSheet: SheetDefinition<{
+      payload: {
+        stock: StockData;
       };
     }>;
   }

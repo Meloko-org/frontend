@@ -33,6 +33,11 @@ export const shopSlice = createSlice({
         state.value.clickCollect = action.payload;
       }
     },
+    setTypes: (state: ShopState, action: PayloadAction<string[]>): void => {
+      if (state.value) {
+        state.value.type = action.payload;
+      }
+    },
     addProducts: (
       state: ShopState,
       action: PayloadAction<StockData[]>,
@@ -88,6 +93,7 @@ export const shopSlice = createSlice({
 export const {
   setShopData,
   resetShopData,
+  setTypes,
   addProducts,
   resetProducts,
   addNote,

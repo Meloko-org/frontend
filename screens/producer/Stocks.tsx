@@ -12,11 +12,7 @@ import { RootStackParamList } from "../../types/Navigation";
 import { useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
-import {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-  BottomSheetBackdrop,
-} from "@gorhom/bottom-sheet";
+import { SheetManager } from "react-native-actions-sheet";
 
 import { View, StyleSheet, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -54,45 +50,50 @@ export default function StocksScreen({ navigation }: Props) {
     (product: StockData) => product.product.family.category.name === category,
   );
 
+  const handleOpenEdit = (product: StockData) => {
+    console.log("youpi");
+    SheetManager.show("EditProductSheet", {
+      payload: { stock: product },
+    });
+  };
+
   // console.log(JSON.stringify(filteredProducts, null, 2))
 
   return (
-    <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
-      <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-        <TopBar
-          backLabel={backLabel || "Retour aux catégories"}
-          screen={from || "StockCategories"}
-          label={screenTitle || "STOCK\n" + category}
-          extraClasses="mt-2"
+    <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+      <TopBar
+        backLabel={backLabel || "Retour aux catégories"}
+        screen={from || "StockCategories"}
+        label={screenTitle || "STOCK\n" + category}
+        extraClasses="mt-2"
+      />
+
+      <View className="px-3">
+        <OpenScreenButton
+          label="Ajouter un produit"
+          onPressFn={() =>
+            navigation.navigate("StocksAdd", {
+              from: "Stocks",
+              backLabel: "Retour au stock",
+              screenTitle: "AJOUTER\nUN PRODUIT",
+              category: category,
+            })
+          }
+          extraClasses="mb-2"
         />
+      </View>
 
+      <ScrollView>
         <View className="px-3">
-          <OpenScreenButton
-            label="Ajouter un produit"
-            onPressFn={() =>
-              navigation.navigate("StocksAdd", {
-                from: "Stocks",
-                backLabel: "Retour au stock",
-                screenTitle: "AJOUTER\nUN PRODUIT",
-                category: category,
-              })
-            }
-            extraClasses="mb-2"
-          />
+          {filteredProducts?.map((product, index) => (
+            <StockProductCard
+              key={index}
+              stock={product}
+              onPress={() => handleOpenEdit(product)}
+            />
+          ))}
         </View>
-
-        <ScrollView>
-          <View className="px-3">
-            {filteredProducts?.map((product, index) => (
-              <StockProductCard
-                key={index}
-                stock={product}
-                onPress={() => {}}
-              />
-            ))}
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

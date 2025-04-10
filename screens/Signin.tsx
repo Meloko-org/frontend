@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useSignIn, useSignUp, useSSO } from "@clerk/clerk-expo";
 import { useAuth } from "@clerk/clerk-expo";
 import * as AuthSession from "expo-auth-session";
-import { useModal } from "../context/ModalContext";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import { SheetManager } from "react-native-actions-sheet";
@@ -74,10 +73,6 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   const producerStore = useSelector(
     (state: { producer: ProducerState }) => state.producer.value,
   );
-
-  const { setAlertMessage } = useModal();
-  // const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  // const [alertType, setAlertType] = useState<"success" | "danger">("danger");
 
   // need to get the user infos
   const { signOut, isSignedIn, getToken } = useAuth();
@@ -227,13 +222,15 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
           alertType: "warning",
         },
       });
-      // setAlertMessage("Veuillez saisir un email.", "warning");
-      // setAlertType("danger");
       return;
     }
     if (password === "") {
-      setAlertMessage("Veuillez saisir un mot de passe.", "warning");
-      // setAlertType("danger");
+      SheetManager.show("alert", {
+        payload: {
+          message: "Veuillez saisir un mot de passe.",
+          alertType: "warning",
+        },
+      });
       return;
     }
 
@@ -263,10 +260,13 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
       setConnectionLoading(false);
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
-      setAlertMessage(
-        err.errors.map((err: string) => err.message).join("\n"),
-        "error",
-      );
+      SheetManager.show("alert", {
+        payload: {
+          message: err.errors.map((err: string) => err.message).join("\n"),
+          alertType: "warning",
+        },
+      });
+
       // setAlertType("danger");
       setConnectionLoading(false);
     }
