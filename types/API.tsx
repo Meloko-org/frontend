@@ -60,6 +60,7 @@ type StockData = {
   _id: string;
   productCustomName: string;
   price: { $numberDecimal: string };
+  pricePerKilo: { $numberDecimal: string };
   stock: { $numberDecimal: string };
   shop: ShopData;
   product: ProductData;
