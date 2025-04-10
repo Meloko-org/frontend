@@ -215,13 +215,13 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   const onSignInPress = useCallback(async () => {
     // vérification des champs
     if (emailAddress === "") {
-      // actionSheetRef.current?.show();
       SheetManager.show("alert", {
         payload: {
           message: "Veuillez saisir un email.",
           alertType: "warning",
         },
       });
+
       return;
     }
     if (password === "") {
@@ -231,6 +231,7 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
           alertType: "warning",
         },
       });
+
       return;
     }
 
@@ -263,11 +264,10 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
       SheetManager.show("alert", {
         payload: {
           message: err.errors.map((err: string) => err.message).join("\n"),
-          alertType: "warning",
+          alertType: "error",
         },
       });
 
-      // setAlertType("danger");
       setConnectionLoading(false);
     }
   }, [isLoaded, emailAddress, password]);
