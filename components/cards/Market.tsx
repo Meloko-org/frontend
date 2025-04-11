@@ -12,7 +12,7 @@ import IconButton from "../utils/buttons/Icon";
 import { useColorScheme } from "nativewind";
 import _Fontawesome from "react-native-vector-icons/FontAwesome6";
 
-const FontAwesome = _Fontawesome as React.ElementType;
+const FontAwesome = _Fontawesome as unknown as React.ElementType;
 
 type CardMarketProps = {
   marketData: MarketData;
@@ -151,7 +151,7 @@ export default function Market(props: CardMarketProps): JSX.Element {
         <View
           className={`${isHighlighted || props.isRadioButtonActive ? "bg-primary" : ""} flex flex-row w-full rounded-lg mb-2 items-center`}
         >
-          <View className="flex-none justify-center rounded-lg h-full h-16 mr-1">
+          <View className="flex-none justify-center rounded-lg h-full mr-1">
             <Image
               source={require("../../assets/images/tomate.webp")}
               className="rounded-full w-16 h-16"

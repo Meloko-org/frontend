@@ -2,13 +2,12 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { ShopState } from "../../reducers/shop";
 import { OrderData } from "../../types/API";
-import { GestureResponderEvent, View } from "react-native";
+import { View } from "react-native";
 import { useColorScheme } from "nativewind";
 
 import globalTools from "../../modules/globalTools";
 
 import { TouchableOpacity } from "react-native-gesture-handler";
-import TextHeading3 from "../utils/texts/Heading3";
 import TextHeading4 from "../utils/texts/Heading4";
 import TextBody1 from "../utils/texts/Body1";
 import OrderStatusBadge from "../utils/badges/OrderStatus";

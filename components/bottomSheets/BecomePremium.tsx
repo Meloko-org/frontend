@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, ScrollView, Image } from "react-native";
+import { View } from "react-native";
 import ActionSheet, { SheetProps } from "react-native-actions-sheet";
 import { useColorScheme } from "nativewind";
 import TextBody1 from "../utils/texts/Body1";

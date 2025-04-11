@@ -22,7 +22,7 @@ const getAvailableProductsForAShop = async (
   }
 };
 
-const addProductsToAShop = async (token: string, values: string) => {
+const addProductsToAShop = async (token: string, values: string[]) => {
   try {
     const response = await fetch(`${API_ROOT}/shops/add-products`, {
       method: "POST",

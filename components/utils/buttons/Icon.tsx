@@ -21,7 +21,7 @@ import ZocialIcon from "@expo/vector-icons/Zocial";
 type IconButtonProps = {
   iconName: string;
   iconFamily?: keyof typeof iconLibraries;
-  iconColor: string;
+  iconColor?: string;
   extraClasses?: string;
   onPressFn: ((event: GestureResponderEvent) => void) | undefined;
   animated?: boolean;

@@ -3,8 +3,6 @@ import { MarketData } from "../../types/API";
 import SwitchInput from "../utils/inputs/Switch";
 
 import { View } from "react-native";
-import { Switch } from "react-native-gesture-handler";
-import TextHeading3 from "../utils/texts/Heading3";
 import TextBody2 from "../utils/texts/Body2";
 import TextBody1 from "../utils/texts/Body1";
 import BadgeGrey from "../utils/badges/Grey";

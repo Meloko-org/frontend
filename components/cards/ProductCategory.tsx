@@ -1,11 +1,16 @@
 import React from "react";
 import { Image, Text, View, TouchableOpacity } from "react-native";
 import { GestureResponderEvent } from "react-native";
+import { ProductData } from "../../types/API";
 
 type CardProductCategoryProps = {
-  category: object;
+  category: {
+    name: string;
+    image: string;
+    products: ProductData[];
+  };
   extraClasses?: string;
-  onPressFn: ((event: GestureResponderEvent) => void) | undefined;
+  onPressFn: ((name: string) => void) | undefined;
 };
 
 export default function ProductCategory(
@@ -13,9 +18,7 @@ export default function ProductCategory(
 ): JSX.Element {
   return (
     <TouchableOpacity
-      onPress={(event) =>
-        props.onPressFn && props.onPressFn(props.category.name)
-      }
+      onPress={() => props.onPressFn && props.onPressFn(props.category.name)}
       className={`${props.extraClasses && props.extraClasses} w-[150px] bg-white shadow-sm rounded-lg dark:bg-tertiary`}
     >
       <Image

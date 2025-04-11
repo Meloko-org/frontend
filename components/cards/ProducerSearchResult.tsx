@@ -7,8 +7,6 @@ import _Fontawesome from "react-native-vector-icons/FontAwesome6";
 import { GestureResponderEvent } from "react-native";
 import { ShopData } from "../../types/API";
 
-const FontAwesome = _Fontawesome as React.ElementType;
-
 type CardProducerSearchResultProps = {
   shopData: ShopData;
   withdrawData?: object[];
@@ -72,7 +70,7 @@ export default function CardProducerSearchResult(
                 <BadgeSecondary extraClasses="px-2">{`${props.shopData.searchData.relevantProducts.length} produit que vous recherchez`}</BadgeSecondary>
               )}
             {props.displayMode === "order" && (
-              <BadgeSecondary extraClasses="px-2">{`${props.withdrawData.length} produit${props.withdrawData.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
+              <BadgeSecondary extraClasses="px-2">{`${props.withdrawData?.length} produit${props.withdrawData?.length && props.withdrawData.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
             )}
             {props.displayMode === "mapCallout" ||
               (props.displayMode === "bottomSheet" && (

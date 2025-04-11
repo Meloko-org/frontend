@@ -13,7 +13,6 @@ import InputText from "../../utils/inputs/Text";
 import AvailableProduct from "../../cards/AvailableProduct";
 import ButtonPrimaryEnd from "../../utils/buttons/PrimaryEnd";
 import { ProductData } from "../../../types/API";
-import TextBody1 from "../../utils/texts/Body1";
 
 type AddProductModalProps = {
   isVisible: boolean;
@@ -28,8 +27,8 @@ export default function AddProductModal(
   const bgStyle = colorScheme === "light" ? styles.light : styles.dark;
   const { getToken } = useAuth();
 
-  const [availableProducts, setAvailableProducts] = useState<string[]>([]);
-  const [productsToAdd, setProductsToAdd] = useState([]);
+  const [availableProducts, setAvailableProducts] = useState<ProductData[]>([]);
+  const [productsToAdd, setProductsToAdd] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
@@ -43,16 +42,18 @@ export default function AddProductModal(
     try {
       const token = await getToken();
       console.log(token);
-      const data = await productsTools.getAvailableProductsForAShop(
-        token,
-        searchTerm,
-      );
-      if (data) {
-        if ("message" in data) {
-          Alert.alert("Informations", data.message);
-        } else {
-          // création de le liste des produits
-          setAvailableProducts(data);
+      if (token) {
+        const data = await productsTools.getAvailableProductsForAShop(
+          token,
+          searchTerm,
+        );
+        if (data) {
+          if ("message" in data) {
+            Alert.alert("Informations", data.message);
+          } else {
+            // création de le liste des produits
+            setAvailableProducts(data);
+          }
         }
       }
     } catch (error) {
@@ -72,11 +73,16 @@ export default function AddProductModal(
   const handleAddProducts = async () => {
     try {
       const token = await getToken();
-      const data = await productsTools.addProductsToAShop(token, productsToAdd);
+      if (token) {
+        const data = await productsTools.addProductsToAShop(
+          token,
+          productsToAdd,
+        );
 
-      if (data) {
-        Alert.alert("", data.message);
-        props.afterAddProducts();
+        if (data) {
+          Alert.alert("", data.message);
+          props.afterAddProducts();
+        }
       }
     } catch (error) {
       console.log(error);

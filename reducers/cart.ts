@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CartData } from "../types/API";
-
+import { CartData, ShopData, StockData } from "../types/API";
 export type CartState = {
-  value: CartData[] | [];
+  value: CartData[];
 };
 
 type CartPayload = {
@@ -10,6 +9,15 @@ type CartPayload = {
   stockId: string;
   increment?: number;
   decrement?: number;
+  withdrawMode?: "market" | "clickCollect" | null | undefined;
+  withdrawMarket?: string | null;
+  withdrawDay?: string | null;
+};
+
+type addProductToCartPayload = {
+  shop: ShopData;
+  stockData: StockData;
+  quantity: number;
 };
 
 const initialState: CartState = {
@@ -20,10 +28,14 @@ export const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    addProductToCart: (state: CartState, action: PayloadAction) => {
+    addProductToCart: (
+      state: CartState,
+      action: PayloadAction<addProductToCartPayload>,
+    ) => {
       const shop = state.value.find(
-        (c) => c.shop._id === action.payload.shop._id,
+        (c) => c.shop?._id === action.payload?.shop?._id,
       );
+      console.log("adding to cart", action.payload);
       if (shop) {
         shop.products.push({
           stockData: action.payload.stockData,
@@ -64,7 +76,7 @@ export const cartSlice = createSlice({
     ) => {
       const { shopId, stockId, decrement = 1 } = action.payload;
 
-      const shop = state.value.find((c) => c.shop._id === shopId);
+      const shop = state.value.find((c) => c.shop?._id === shopId);
 
       if (shop) {
         const product = shop.products.find((p) => p.stockData._id === stockId);
@@ -81,13 +93,16 @@ export const cartSlice = createSlice({
 
         // on supprime le shop si tous les produits du shop sont retirés
         if (shop.products.length === 0) {
-          state.value = state.value.filter((c) => c.shop._id !== shopId);
+          state.value = state.value.filter((c) => c.shop?._id !== shopId);
         }
       }
     },
-    updateWithdrawMode: (state: CartState, action: PayloadAction) => {
+    updateWithdrawMode: (
+      state: CartState,
+      action: PayloadAction<CartPayload>,
+    ) => {
       const shop = state.value.find(
-        (c) => c.shop._id === action.payload.shopId,
+        (c) => c.shop?._id === action.payload.shopId,
       );
       if (shop) {
         shop.withdrawMode = action.payload.withdrawMode;
@@ -99,7 +114,10 @@ export const cartSlice = createSlice({
       //   if(action.payload.daySelected) shop.market.day = action.payload.daySelected
       // }
     },
-    setWithdrawMarket: (state: CartState, action: PayloadAction) => {
+    setWithdrawMarket: (
+      state: CartState,
+      action: PayloadAction<CartPayload>,
+    ) => {
       const shop = state.value.find(
         (c) => c.shop?._id === action.payload.shopId,
       );

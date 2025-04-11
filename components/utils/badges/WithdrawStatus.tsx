@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 import TextHeading4 from "../texts/Heading4";
 import TextBody2 from "../texts/Body2";
 
-type BadgeWithdrawStatusProps = {
+export type BadgeWithdrawStatusProps = {
   type:
     | "pending"
     | "partialPending"
