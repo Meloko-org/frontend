@@ -12,10 +12,14 @@ export default function MapSearchResults(
   return (
     <ActionSheet
       snapPoints={[25, 75]}
-      initialSnapIndex={1}
+      initialSnapIndex={0}
       indicatorStyle={{ backgroundColor: "#000000" }}
       gestureEnabled={true}
+      backgroundInteractionEnabled={true}
+      isModal={false}
       id={props.sheetId}
+      closable={false}
+      useBottomSafeAreaPadding={true}
     >
       <View className="h-full">
         <View className="px-3 w-full">
