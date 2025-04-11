@@ -3,7 +3,7 @@ import { Image, Text, TouchableOpacity, View } from "react-native";
 import PricePer from "../utils/badges/Dark";
 import _Fontawesome from "react-native-vector-icons/FontAwesome6";
 
-const FontAwesome = _Fontawesome as React.ElementType;
+const FontAwesome = _Fontawesome as unknown as React.ElementType;
 
 export default function Product(): JSX.Element {
   return (

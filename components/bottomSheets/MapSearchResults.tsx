@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, ScrollView, Image } from "react-native";
+import { View, ScrollView } from "react-native";
 import ActionSheet, { SheetProps } from "react-native-actions-sheet";
 import { useColorScheme } from "nativewind";
 import TextHeading3 from "../utils/texts/Heading3";

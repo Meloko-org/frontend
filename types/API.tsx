@@ -22,6 +22,7 @@ type OrderData = {
   isWithdraw: boolean;
   isPaid: boolean;
   totalPrice: number;
+  createdAt: Date;
 };
 
 type ProductData = {
@@ -36,12 +37,19 @@ type ProductData = {
   };
 };
 
+type address = {
+  address1: string;
+  address2: string;
+  postalCode: string;
+  city: string;
+};
+
 type MarketData = {
   _id: string;
   name: string;
   image: string;
   description: string;
-  address: object;
+  address: address;
 };
 
 type MarketsData = {
@@ -68,14 +76,19 @@ type TagData = {
 
 type CartData = {
   shop: ShopData;
-  products: [
-    {
-      product: StockData;
-      quantity: number;
-    },
-  ];
+  products: {
+    stockData: StockData;
+    quantity: number;
+  }[];
   withdrawMode: "market" | "clickCollect" | null | undefined;
+  withdrawMarket?: string | null;
+  withdrawDay?: string | null;
   market?: MarketData;
+};
+
+type Note = {
+  note: { $numberDecimal: string } | number | any;
+  comment: string;
 };
 
 type ShopData = {
@@ -86,7 +99,7 @@ type ShopData = {
   address: AddressData;
   markets: MarketsData[];
   clickCollect: ClickCollectData;
-  notes: { note: { $numberDecimal: string } | number | any }[];
+  notes: Note[];
   products?: StockData[];
   [key: string]: any;
 } | null;
@@ -175,4 +188,5 @@ export type {
   PeriodData,
   ProductDetail,
   ApiResponse,
+  Note,
 };

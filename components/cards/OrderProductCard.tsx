@@ -6,11 +6,10 @@ import TextBody1 from "../utils/texts/Body1";
 import PricePer from "../utils/badges/Dark";
 import TextHeading4 from "../utils/texts/Heading4";
 import TextBody2 from "../utils/texts/Body2";
-
-const FontAwesome = _Fontawesome as React.ElementType;
+import { OrderData } from "../../types/API";
 
 type OrderProductCardProps = {
-  orderProductData?: string;
+  orderProductData?: OrderData["details"][0]["products"][0];
   onPressFn?: (id: string) => void;
   extraClasses?: string;
   showImage?: boolean;
@@ -93,7 +92,9 @@ export default function OrderProductCard(
               <Image
                 source={
                   props.orderProductData?.product.product.image
-                    ? { uri: props.orderProductData?.product.product.image }
+                    ? {
+                        uri: props.orderProductData?.product.product.image,
+                      }
                     : require("../../assets/icon.png")
                 }
                 className="rounded-full w-20 h-20"

@@ -1,6 +1,6 @@
 import React from "react";
 import { ShopData } from "../../types/API";
-import { TouchableOpacity, View, Image, Text } from "react-native";
+import { TouchableOpacity, View, Text } from "react-native";
 import BadgeSecondary from "../utils/badges/Secondary";
 import { Svg, Image as ImageSvg, Defs, ClipPath, Rect } from "react-native-svg";
 

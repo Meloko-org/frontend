@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { ProductData } from "../../types/API";
 
 import { View, Image, TouchableOpacity } from "react-native";
-import TextHeading4 from "../utils/texts/Heading4";
 import TextHeading3 from "../utils/texts/Heading3";
 import TextBody1 from "../utils/texts/Body1";
 
