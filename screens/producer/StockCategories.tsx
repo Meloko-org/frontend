@@ -111,7 +111,7 @@ export default function StockCategoriesScreen({ navigation }: Props) {
         (category) => {
           console.log("available cat id : ", category.type);
           const count = shopStore!.products?.filter(
-            (p) => p.product.family.category.type === category.type,
+            (p) => p.product.family.category.name === category.name,
           ).length;
           return {
             ...category,
@@ -123,10 +123,10 @@ export default function StockCategoriesScreen({ navigation }: Props) {
       console.log("categories with count :", availableCategoriesWithCount);
 
       setOpenScreenButtons(
-        availableCategoriesWithCount.map((cat) => {
+        availableCategoriesWithCount.map((cat, index) => {
           return (
             <OpenScreenButton
-              key={cat._id}
+              key={index}
               label={cat.name}
               notice={cat.count?.toString()}
               onPressFn={() =>

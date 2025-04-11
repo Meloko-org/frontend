@@ -175,7 +175,7 @@ type ProductDetail = {
 
 type WeightData = {
   unit: string;
-  measurement: number;
+  measurement: { $numberDecimal: string };
 };
 
 // type de réponse de l'api

@@ -59,8 +59,11 @@ export default function StockProductCard({
                 {parseFloat(stock.price.$numberDecimal)}
               </TextBody1>
               <TextBody2>
-                {" "}
-                € / {stock.product.weight.unit === "gr" ? "kg" : "pièce"}
+                {stock.productCustomName !== undefined
+                  ? " €"
+                  : stock.product.weight.unit === "gr"
+                    ? " € / kg"
+                    : " € / pièce"}
               </TextBody2>
             </View>
             <View className="flex flex-row flex-grow items-center justify-end pr-5">

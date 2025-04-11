@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useAuth } from "@clerk/clerk-expo";
 import ActionSheet, {
   SheetProps,
   ScrollView,
@@ -19,13 +20,18 @@ import PrimaryButton from "../utils/buttons/Primary";
 import IconButton from "../utils/buttons/Icon";
 import { TagData } from "../../types/API";
 import SelectableTag from "../utils/badges/SelectableTag";
+import Product from "../cards/Products";
+import stocksTools from "../../modules/stocksTools";
 
 export default function EditProductSheet(props: SheetProps<"edit-product">) {
+  const { getToken } = useAuth();
   const [isBulk, setBulk] = useState<boolean>(false);
 
   const [isSaveLoading, setSaveLoading] = useState<boolean>(false);
 
-  const [name, setName] = useState<string | undefined>("");
+  const [productCustomName, setProductCustomName] = useState<
+    string | undefined
+  >("");
   const [weightPerUnit, setWeightPerUnit] = useState<string | undefined>("");
   const [price, setPrice] = useState<number | undefined>(0);
   const [stock, setStock] = useState<number | undefined>(0);
@@ -35,6 +41,7 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
   const [format, setFormat] = useState<string | undefined>("");
   const [portion, setPortion] = useState<string | undefined>("");
   const [bestBeforeDate, setBestBeforeDate] = useState<string | undefined>("");
+  const [image, setImage] = useState<string>();
   const [tags, setTags] = useState<TagData[] | undefined>([]);
 
   useEffect(() => {
@@ -49,7 +56,7 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
       setStock(Number(props.payload?.stock.stock.$numberDecimal));
 
       if (!bulk) {
-        setName(props.payload?.stock?.productCustomName);
+        setProductCustomName(props.payload?.stock?.productCustomName);
         setPricePerKilo(
           Number(props.payload?.stock?.pricePerKilo.$numberDecimal),
         );
@@ -59,6 +66,7 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
         setBestBeforeDate(props.payload?.stock?.bestBeforeDate);
         setDescription(props.payload?.stock.description);
         setWeightPerUnit(props.payload?.stock.weightPerUnit);
+        setImage(props.payload?.stock.image);
       } else {
         setWeightPerUnit(
           props.payload?.stock.product.weight.measurement.$numberDecimal +
@@ -90,6 +98,51 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
     setStock(newStock);
   };
 
+  const handleSaveProduct = async () => {
+    setSaveLoading(true);
+    const token = await getToken();
+
+    let values;
+    if (isBulk) {
+      values = {
+        _id: props.payload?.stock?._id,
+        product: props.payload?.stock?.product,
+        price,
+        stock,
+        description,
+        tags,
+      };
+    } else {
+      values = {
+        _id: props.payload?.stock?._id,
+        product: props.payload?.stock?.product,
+        productCustomName,
+        price,
+        stock,
+        pricePerKilo,
+        weightPerUnit,
+        origin,
+        format,
+        portion,
+        bestBeforeDate,
+        description,
+        image,
+        tags,
+      };
+    }
+
+    const stockResponse = await stocksTools.updateStocks(token, values);
+
+    if (!stockResponse.success) {
+      console.error(stockResponse.message);
+      setSaveLoading(false);
+      return;
+    }
+
+    console.log("mise à jour ok.");
+    setSaveLoading(false);
+  };
+
   console.log(JSON.stringify(props.payload?.stock, null, 2));
   console.log("produit vrac :", isBulk);
 
@@ -111,8 +164,10 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
                   <InputText
                     label="NOM DU PRODUIT"
                     placeholder="sdfgsdf"
-                    value={name}
-                    onChangeText={(value: string) => setName(value)}
+                    value={productCustomName}
+                    onChangeText={(value: string) =>
+                      setProductCustomName(value)
+                    }
                   />
                 </View>
               </View>
@@ -301,7 +356,7 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
           <PrimaryButton
             label="Sauvegarder"
             disabled={isSaveLoading}
-            onPressFn={() => {}}
+            onPressFn={handleSaveProduct}
             isLoading={isSaveLoading}
             extraClasses="h-14"
           />
