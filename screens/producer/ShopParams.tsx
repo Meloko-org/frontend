@@ -1,28 +1,32 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useAuth } from "@clerk/clerk-expo";
+import { useSelector, useDispatch } from "react-redux";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
+  Easing,
 } from "react-native-reanimated";
+import { SheetManager } from "react-native-actions-sheet";
 
-import { ShopState } from "../../reducers/shop";
+import { ShopState, setTypes } from "../../reducers/shop";
+
+import typesTools from "../../modules/typesTools";
+import shopTools from "../../modules/shopTools";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 import { useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
-import { View, Text } from "react-native";
+import { View, Text, LayoutChangeEvent } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import TopBar from "../../components/TopBar";
 import OpenMenuButton from "../../components/utils/buttons/OpenMenu";
 import SwitchInput from "../../components/utils/inputs/Switch";
 import { ShopData } from "../../types/API";
-import { useAuth } from "@clerk/clerk-expo";
-import typesTools from "../../modules/typesTools";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 
 type ShopParamsScreenRouteProp = RouteProp<RootStackParamList, "ShopParams">;
@@ -42,40 +46,54 @@ export default function ShopParamsScreen({ navigation }: Props) {
 
   const { getToken } = useAuth();
 
+  const dispatch = useDispatch();
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
 
-  const [isProducerSaveLoading, setIsProducerSaveLoading] =
+  const [isParamsUpdateLoading, setParamsUpdateLoading] =
     useState<boolean>(false);
 
   // bouton menu déroulant "Type" ------------------
-  const [isOpenType, setOpenType] = useState(false);
+  const [isOpenType, setOpenType] = useState<boolean>(false);
+  const contentType = useSharedValue(0);
   const heightType = useSharedValue(0);
-
-  const toggleOpenType = () => {
-    setOpenType((prev) => !prev);
-    heightType.value = isOpenType ? withTiming(0) : withTiming(150);
-  };
 
   const animatedStyleType = useAnimatedStyle(() => ({
     height: heightType.value,
     opacity: heightType.value > 0 ? 1 : 0, // Facultatif : gérer l'opacité
   }));
+
+  const toggleOpenType = () => {
+    setOpenType((prev) => {
+      const newState = !prev;
+      heightType.value = withTiming(newState ? contentType.value : 0, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+      return newState;
+    });
+  };
+
+  const onContentLayout = (event: LayoutChangeEvent) => {
+    const measuredHeight = event.nativeEvent.layout.height;
+    contentType.value = measuredHeight;
+  };
+
   // -----------------------------------------------
 
   // Contient les différents types de shop
-  const [types, setTypes] = useState<string[]>([]);
-  const [shopTypes, setShopTypes] = useState([]);
+  const [shopTypes, setShopTypes] = useState<string[]>([]);
+  const [globalTypes, setGlobalTypes] = useState([]);
 
   // Créer des switch en fonction des types de shop
-  const typesList = shopTypes.map((item: { _id: string; name: string }) => {
+  const typesList = globalTypes.map((item: { _id: string; name: string }) => {
     return (
       <SwitchInput
         key={item!._id}
         thumbColor="#215487"
         label={item!.name}
-        value={types.includes(item._id)}
+        value={shopTypes.includes(item._id)}
         onValueChange={(isSelected) => handleSwitchType(item._id, isSelected)}
         extraClasses="pl-5 mb-2"
       />
@@ -87,21 +105,47 @@ export default function ShopParamsScreen({ navigation }: Props) {
       // récupération des différents types de shop
       const token = await getToken();
       const response = await typesTools.getTypes(token);
-      setShopTypes(response);
+      setGlobalTypes(response);
     })();
     // récupération des types du shop
     if (shopStore !== null) {
-      setTypes(shopStore.types.map((type: { _id: string }) => type._id));
+      setShopTypes(shopStore.types.map((type: { _id: string }) => type._id));
     }
-  }, []);
+  }, [shopStore?.types]);
 
   const handleSwitchType = (typeId: string) => {
-    setTypes((prevSelectedTypes) =>
+    setShopTypes((prevSelectedTypes) =>
       prevSelectedTypes.includes(typeId)
         ? prevSelectedTypes.filter((id) => id !== typeId)
         : [...prevSelectedTypes, typeId],
     );
   };
+
+  const handleParamsUpdate = async () => {
+    const token = await getToken();
+    const typesResponse = await shopTools.updateShopTypes(token, shopTypes);
+
+    console.log("response :", typesResponse);
+
+    if (!typesResponse.success) {
+      SheetManager.show("alert", {
+        payload: {
+          message: typesResponse.message,
+          alertType: "error",
+        },
+      });
+    } else {
+      dispatch(setTypes(typesResponse.data));
+      SheetManager.show("alert", {
+        payload: {
+          message: "Mise à jour effectuée.",
+          alertType: "success",
+        },
+      });
+    }
+  };
+
+  console.log(shopTypes);
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
@@ -124,7 +168,15 @@ export default function ShopParamsScreen({ navigation }: Props) {
               style={[animatedStyleType]}
               className="overflow-hidden"
             >
-              <View className="py-3">{typesList}</View>
+              <View
+                onLayout={onContentLayout}
+                style={{
+                  opacity: isOpenType ? 1 : 0,
+                  position: isOpenType ? "relative" : "absolute",
+                }}
+              >
+                <View className="py-5">{typesList}</View>
+              </View>
             </Animated.View>
           </View>
 
@@ -133,9 +185,9 @@ export default function ShopParamsScreen({ navigation }: Props) {
               label="Sauvegarder"
               iconFamily="FontAwesome5Icon"
               iconName="sync-alt"
-              disabled={isProducerSaveLoading}
-              onPressFn={() => handleProducerUpdate()}
-              isLoading={isProducerSaveLoading}
+              disabled={isParamsUpdateLoading}
+              onPressFn={() => handleParamsUpdate()}
+              isLoading={isParamsUpdateLoading}
               extraClasses="mt-5 mb-5 h-14"
             />
           </View>

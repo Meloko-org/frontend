@@ -31,10 +31,16 @@ type ProductData = {
   image: string;
   description: string;
   family?: any;
-  weight: {
-    unit: string;
-    measurement: number;
-  };
+  weight: WeightData;
+  hasCustomName: boolean;
+};
+
+type ProductCategoryData = {
+  _id: string;
+  name: string;
+  description: string;
+  image: string;
+  type: string;
 };
 
 type address = {
@@ -60,10 +66,19 @@ type MarketsData = {
 
 type StockData = {
   _id: string;
+  productCustomName: string;
   price: { $numberDecimal: string };
+  pricePerKilo: { $numberDecimal: string };
   stock: { $numberDecimal: string };
   shop: ShopData;
   product: ProductData;
+  weightPerUnit: string;
+  origin: string;
+  format: string;
+  portion: string;
+  bestBeforeDate: string;
+  description: string;
+  image: string;
   tags: TagData[];
 };
 
@@ -72,6 +87,12 @@ type TagData = {
   name: string;
   description: string;
   color: string;
+};
+
+type TagCategoryData = {
+  _id: string;
+  name: string;
+  description: string;
 };
 
 type CartData = {
@@ -165,6 +186,11 @@ type ProductDetail = {
   isConfirmed: boolean | null;
 };
 
+type WeightData = {
+  unit: string;
+  measurement: { $numberDecimal: string };
+};
+
 // type de réponse de l'api
 type ApiResponse<T> = {
   success: boolean;
@@ -177,16 +203,20 @@ export type {
   ShopData,
   UserData,
   StockData,
+  TagData,
+  TagCategoryData,
   CartData,
   MarketData,
   MarketsData,
   OrderData,
   ProducerData,
+  ProductCategoryData,
   AddressData,
   ClickCollectData,
   OpeningHoursData,
   PeriodData,
   ProductDetail,
+  WeightData,
   ApiResponse,
   Note,
 };

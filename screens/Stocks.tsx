@@ -25,16 +25,16 @@ import Spinner from "../components/utils/Spinner";
 const FontAwesome = _Fontawesome as React.ElementType;
 
 // Navigation type
-type StocksScreenNavigationProp = NativeStackNavigationProp<
+type StocksOldScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "TabNavigatorProducer"
 >;
 
 type Props = {
-  navigation: StocksScreenNavigationProp;
+  navigation: StocksOldScreenNavigationProp;
 };
 
-export default function StocksScreen({ navigation }: Props) {
+export default function StocksOldScreen({ navigation }: Props) {
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
