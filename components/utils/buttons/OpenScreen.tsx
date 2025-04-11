@@ -40,12 +40,9 @@ export default function OpenScreenButton({
 }: OpenScreenButtonProps): JSX.Element {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
-  console.log("label openscreen :", label);
-
   return (
     <TouchableOpacity
-      className={`${extraClasses} `}
+      className={`${extraClasses} mb-2`}
       onPress={() => onPressFn()}
     >
       <View

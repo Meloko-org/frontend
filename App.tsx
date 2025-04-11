@@ -25,6 +25,7 @@ import SignInScreen from "./screens/Signin";
 import CartScreen from "./screens/customer/Cart";
 import BookmarksScreen from "./screens/customer/Bookmarks";
 import UserProfileScreen from "./screens/customer/Profile";
+import UserProfileInformationsScreen from "./screens/customer/ProfileInformations";
 import ShopProducerScreen from "./screens/producer/Shop";
 import BusinessScreen from "./screens/Business";
 import ProducerProfileScreen from "./screens/producer/Profile";
@@ -174,6 +175,11 @@ const TabNavigatorUser: React.FC = () => {
         options={{ title: "Favoris" }}
       />
       <Tab.Screen name="UserProfile" component={UserProfileScreen} />
+      <Tab.Screen
+        name="UserProfileInformations"
+        component={UserProfileInformationsScreen}
+        options={{ tabBarButton: () => null }}
+      />
       <Tab.Screen
         name="ShopUser"
         component={ShopUserScreen}
