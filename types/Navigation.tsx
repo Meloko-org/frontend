@@ -53,7 +53,18 @@ type RootStackParamList = {
     screenTitle?: string;
   };
   StockCategories: { from?: string; backLabel?: string; screenTitle?: string };
-  Stock: { from?: string; backLabel?: string; screenTitle?: string };
+  Stocks: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    category: string;
+  };
+  StocksAdd: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    category: string;
+  };
   PremiumOptions: { from?: string; backLabel?: string; screenTitle?: string };
   PostType: { from?: string; backLabel?: string; screenTitle?: string };
   ProgrammedPosts: { from?: string; backLabel?: string; screenTitle?: string };
@@ -72,7 +83,7 @@ type RootStackParamList = {
   PostHashtags: { from?: string; backLabel?: string; screenTitle?: string };
   BusinessCenter: undefined;
   ProducerProfile: undefined;
-  Stocks: undefined;
+  StocksOld: undefined;
   OrderDetails: undefined;
   Sales: undefined;
 };

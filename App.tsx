@@ -29,7 +29,7 @@ import UserProfileInformationsScreen from "./screens/customer/ProfileInformation
 import ShopProducerScreen from "./screens/producer/Shop";
 import BusinessScreen from "./screens/Business";
 import ProducerProfileScreen from "./screens/producer/Profile";
-import StocksScreen from "./screens/Stocks";
+import StocksOldScreen from "./screens/Stocks";
 import SearchCustomerScreen from "./screens/customer/Search";
 import ComponentsScreen from "./screens/Components";
 import ShopUserScreen from "./screens/customer/Shop";
@@ -44,7 +44,8 @@ import ShopOfflineScreen from "./screens/producer/ShopOffline";
 import ShopParamsScreen from "./screens/producer/ShopParams";
 import ShopWithdrawModesScreen from "./screens/producer/ShopWithdrawModes";
 import StockCategoriesScreen from "./screens/producer/StockCategories";
-import StockScreen from "./screens/producer/Stocks";
+import StocksScreen from "./screens/producer/Stocks";
+import StocksAddScreen from "./screens/producer/StocksAdd";
 import ShopWithdrawClickcollectScreen from "./screens/producer/ShopWithdrawClickcollect";
 import ShopWithdrawDeliveryScreen from "./screens/producer/ShopWithdrawDelivery";
 import ShopWithdrawShopMarketsScreen from "./screens/producer/ShopWithdrawShopMarkets";
@@ -298,8 +299,13 @@ const TabNavigatorProducer: React.FC = () => {
         options={{ tabBarButton: () => null }}
       />
       <Tab.Screen
-        name="Stock"
-        component={StockScreen}
+        name="Stocks"
+        component={StocksScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="StocksAdd"
+        component={StocksAddScreen}
         options={{ tabBarButton: () => null }}
       />
       <Tab.Screen
@@ -370,11 +376,11 @@ const TabNavigatorProducer: React.FC = () => {
         component={SalesScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
-        name="Stocks"
-        component={StocksScreen}
+      {/* <Tab.Screen
+        name="StocksOld"
+        component={StocksOldScreen}
         options={{ tabBarButton: () => null }}
-      />
+      /> */}
       <Tab.Screen
         name="OrderDetails"
         component={OrderDetailsScreen}

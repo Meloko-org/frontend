@@ -1,23 +1,25 @@
 import React, { useRef } from "react";
 import { Text, View, TouchableOpacity, Animated, Easing } from "react-native";
-
+import _Fontawesome from "react-native-vector-icons/FontAwesome";
 import { GestureResponderEvent } from "react-native";
 
-type PrimaryButtonProps = {
+type SecondaryButtonProps = {
   label: string;
   extraClasses?: string;
-  disabled?: boolean;
+  textClasses?: string;
+  disabled: boolean;
   onPressFn: ((event: GestureResponderEvent) => void) | undefined;
-  isLoading?: boolean;
+  isLoading: boolean;
 };
 
-export default function PrimaryButton({
+export default function SecondaryButton({
   label,
   extraClasses,
+  textClasses,
   disabled,
   onPressFn,
   isLoading,
-}: PrimaryButtonProps): JSX.Element {
+}: SecondaryButtonProps): JSX.Element {
   const ball1 = useRef(new Animated.Value(0)).current;
   const ball2 = useRef(new Animated.Value(0)).current;
   const ball3 = useRef(new Animated.Value(0)).current;
@@ -66,10 +68,10 @@ export default function PrimaryButton({
   return (
     <TouchableOpacity
       className={`
-					${extraClasses} 
-					${disabled ? "bg-primary/60" : "bg-primary/90"}
-					relative flex flex-row rounded-lg shadow-sm py-1 justify-center items-center px-2 w-min
-				`}
+				${extraClasses} 
+				${disabled ? "bg-lightbg/60" : "bg-lightbg/90 dark:bg-transparent"}
+					border border-primary flex flex-row rounded-lg justify-center items-center
+			`}
       onPress={onPressFn}
       disabled={disabled}
     >
@@ -90,7 +92,9 @@ export default function PrimaryButton({
         </View>
       ) : (
         <>
-          <Text className="text-lightbg text-center font-bold text-[24px]">
+          <Text
+            className={`${textClasses} text-darkbg text-center font-bold dark:text-lightbg`}
+          >
             {label}
           </Text>
         </>
