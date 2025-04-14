@@ -48,8 +48,9 @@ export default function StockCategoriesScreen({ navigation }: Props) {
   const [stocks, setStocks] = useState<StockData[] | null>([]);
   const [shopTypes, setShopTypes] = useState<string[]>([]);
   const [globalCategories, setGlobalCategories] = useState<
-    ProductCategoryData[]
+    ProductCategoryData[] | null
   >([]);
+
   // const [categories, setCategories] = useState<string[]>([]);
   const [openScreenButtons, setOpenScreenButtons] = useState<JSX.Element[]>([]);
 
@@ -98,7 +99,7 @@ export default function StockCategoriesScreen({ navigation }: Props) {
   useEffect(() => {
     if (!isFetchLoading) {
       // on détermine les catégories possibles en fonction des types du shop
-      const availableCategories = globalCategories.filter((category) =>
+      const availableCategories = globalCategories?.filter((category) =>
         shopStore!.types.some(
           (shopType: { _id: string }) => shopType._id === category.type,
         ),
@@ -107,7 +108,7 @@ export default function StockCategoriesScreen({ navigation }: Props) {
       console.log("avalableCategories: ", availableCategories);
 
       // on ajoute le nombre de produits pour chaque catégorie qui appartient aux types du shop
-      const availableCategoriesWithCount = availableCategories.map(
+      const availableCategoriesWithCount = availableCategories?.map(
         (category) => {
           console.log("available cat id : ", category.type);
           const count = shopStore!.products?.filter(
@@ -123,7 +124,7 @@ export default function StockCategoriesScreen({ navigation }: Props) {
       console.log("categories with count :", availableCategoriesWithCount);
 
       setOpenScreenButtons(
-        availableCategoriesWithCount.map((cat, index) => {
+        availableCategoriesWithCount!.map((cat, index) => {
           return (
             <OpenScreenButton
               key={index}

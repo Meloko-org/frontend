@@ -85,9 +85,9 @@ export default function StocksScreen({ navigation }: Props) {
 
       <ScrollView>
         <View className="px-3">
-          {filteredProducts?.map((product, index) => (
+          {filteredProducts?.map((product) => (
             <StockProductCard
-              key={index}
+              key={product._id}
               stock={product}
               onPress={() => handleOpenEdit(product)}
             />

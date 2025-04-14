@@ -20,7 +20,7 @@ const getAllCategories = async () => {
 };
 
 const getGlobalCategories = async (): Promise<
-  ApiResponse<ProductCategoryData>
+  ApiResponse<ProductCategoryData[]>
 > => {
   try {
     const response = await fetch(`${API_ROOT}/categories`, {

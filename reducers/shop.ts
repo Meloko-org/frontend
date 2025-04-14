@@ -52,6 +52,20 @@ export const shopSlice = createSlice({
         state.value.products = [...(state.value.products ?? []), ...newStocks];
       }
     },
+    updateProduct: (
+      state: ShopState,
+      action: PayloadAction<StockData>,
+    ): void => {
+      if (state.value?.products) {
+        const index = state.value.products.findIndex(
+          (p) => p._id === action.payload._id,
+        );
+
+        if (index !== -1) {
+          state.value.products[index] = action.payload;
+        }
+      }
+    },
     resetProducts: (state: ShopState): void => {
       if (state.value) {
         state.value.products = [];
@@ -95,6 +109,7 @@ export const {
   resetShopData,
   setTypes,
   addProducts,
+  updateProduct,
   resetProducts,
   addNote,
   addMarket,

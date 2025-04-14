@@ -1,4 +1,4 @@
-import { ApiResponse, StockData } from "../types/API";
+import { ApiResponse, StockData, TagData } from "../types/API";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -37,6 +37,46 @@ const getStocksByShop = async (
   }
 };
 
+type SuggestedAndRemainingTags = {
+  suggestedTags: TagData[];
+  remainingTags: TagData[];
+};
+
+const getSuggestedTags = async (
+  familyId: string | undefined,
+): Promise<ApiResponse<SuggestedAndRemainingTags>> => {
+  try {
+    const response = await fetch(`${API_ROOT}/tags/suggested/${familyId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        mode: "cors",
+      },
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible d'obtenir les données'.`,
+      };
+    }
+
+    const data = await response.json();
+
+    return data.success
+      ? { success: true, data: data.tags }
+      : { success: false, data: null, message: data.message };
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      data: null,
+      message: "Une erreur s'est produite lors de la récupération des données.",
+    };
+  }
+};
+
 const updateStocks = async (
   token: string | null,
   values: StockData,
@@ -62,7 +102,7 @@ const updateStocks = async (
     const data = await response.json();
 
     return data.success
-      ? { success: true, data: data.stock }
+      ? { success: true, data: data.updatedProduct }
       : { success: false, data: null, message: data.message };
   } catch (error) {
     console.log(error);
@@ -77,4 +117,5 @@ const updateStocks = async (
 export default {
   getStocksByShop,
   updateStocks,
+  getSuggestedTags,
 };

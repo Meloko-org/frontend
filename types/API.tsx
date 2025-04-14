@@ -29,9 +29,18 @@ type ProductData = {
   name: string;
   image: string;
   description: string;
-  family?: any;
+  family: ProductFamilyData;
   weight: WeightData;
   hasCustomName: boolean;
+};
+
+type ProductFamilyData = {
+  _id: string;
+  name: string;
+  description: string;
+  image: string;
+  category: ProductCategoryData;
+  tagCategories: string[];
 };
 
 type ProductCategoryData = {
@@ -78,13 +87,13 @@ type TagData = {
   _id: string;
   name: string;
   description: string;
-  color: string;
 };
 
 type TagCategoryData = {
   _id: string;
   name: string;
   description: string;
+  color: string;
 };
 
 type CartData = {
@@ -197,6 +206,7 @@ export type {
   MarketsData,
   OrderData,
   ProducerData,
+  ProductFamilyData,
   ProductCategoryData,
   AddressData,
   ClickCollectData,

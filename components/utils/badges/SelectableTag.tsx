@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { TagData } from "../../../types/API";
 
 type SelectableTagProps = {
-  value: string;
+  tag: TagData;
   selected?: boolean;
   extraClasses?: string;
   textClasses?: string;
@@ -10,7 +11,7 @@ type SelectableTagProps = {
 };
 
 export default function SelectableTag({
-  value,
+  tag,
   selected,
   extraClasses,
   textClasses,
@@ -28,7 +29,7 @@ export default function SelectableTag({
     <TouchableOpacity
       onPress={() => {
         toggleTag();
-        onPressFn ?? onPressFn;
+        if (onPressFn) onPressFn();
       }}
     >
       <View
@@ -40,7 +41,7 @@ export default function SelectableTag({
         <Text
           className={`${textClasses} text-darkbg font-bold dark:text-lightbg text-center`}
         >
-          {value}
+          {tag.name}
         </Text>
       </View>
     </TouchableOpacity>

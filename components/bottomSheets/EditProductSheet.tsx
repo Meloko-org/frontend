@@ -5,7 +5,8 @@ import ActionSheet, {
   ScrollView,
 } from "react-native-actions-sheet";
 
-import TextHeading2 from "../utils/texts/Heading2";
+import { useDispatch } from "react-redux";
+import { updateProduct } from "../../reducers/shop";
 
 import { View, Text, Image, TextInput } from "react-native";
 import InputText from "../utils/inputs/Text";
@@ -24,6 +25,7 @@ import Product from "../cards/Products";
 import stocksTools from "../../modules/stocksTools";
 
 export default function EditProductSheet(props: SheetProps<"edit-product">) {
+  const dispatch = useDispatch();
   const { getToken } = useAuth();
   const [isBulk, setBulk] = useState<boolean>(false);
 
@@ -42,14 +44,29 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
   const [portion, setPortion] = useState<string | undefined>("");
   const [bestBeforeDate, setBestBeforeDate] = useState<string | undefined>("");
   const [image, setImage] = useState<string>();
-  const [tags, setTags] = useState<TagData[] | undefined>([]);
+  const [tags, setTags] = useState<TagData[] | undefined>();
+
+  const [suggestedTags, setSuggestedTags] = useState<TagData[] | undefined>();
+  const [remaingingTags, setRemainingTags] = useState<TagData[] | undefined>();
+
+  const fetchSuggestedTags = async () => {
+    const tagResponse = await stocksTools.getSuggestedTags(
+      props.payload?.stock?.product.family._id,
+    );
+    if (!tagResponse.success) {
+      console.log("impossible de récupérer les tags suggérés.");
+    }
+    setSuggestedTags(tagResponse.data?.suggestedTags);
+    setRemainingTags(tagResponse.data?.remainingTags);
+  };
 
   useEffect(() => {
+    fetchSuggestedTags();
+
     // si on affiche un produit renseigné (!= produit vierge)
     if (props.payload?.stock !== null) {
-      console.log("customName :", props.payload?.stock?.productCustomName);
       // détermine si c'est un produit vrac
-      const bulk = props.payload?.stock?.productCustomName === undefined;
+      const bulk = props.payload?.stock.product.hasCustomName === false;
       setBulk(bulk);
 
       setPrice(Number(props.payload?.stock.price.$numberDecimal));
@@ -78,15 +95,22 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
     }
   }, []);
 
-  const tagList = tags?.map((tag, index) => (
-    <SelectableTag
-      key={index}
-      value={tag.name}
-      selected={true}
-      extraClasses="mr-1"
-      onPressFn={() => {}}
-    />
-  ));
+  const isTagSelected = (tagId: string) => {
+    return tags?.some((t) => t._id === tagId);
+  };
+
+  const toggleTag = (tag: TagData) => {
+    if (!tags) {
+      setTags([tag]);
+      return;
+    }
+    const isSelected = tags?.some((t) => t._id === tag._id);
+    if (isSelected) {
+      setTags(tags?.filter((t) => t._id !== tag._id));
+    } else {
+      setTags([...(tags ?? []), tag]);
+    }
+  };
 
   const handleQuantityChange = async (change: number) => {
     let newStock = Number(stock) + change;
@@ -139,12 +163,20 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
       return;
     }
 
+    console.log("response :", stockResponse.data);
+
+    dispatch(updateProduct(stockResponse.data!));
+
     console.log("mise à jour ok.");
     setSaveLoading(false);
   };
 
-  console.log(JSON.stringify(props.payload?.stock, null, 2));
-  console.log("produit vrac :", isBulk);
+  // console.log("le produit :", JSON.stringify(props.payload?.stock, null, 2));
+  // console.log("produit vrac :", isBulk);
+  console.log(
+    "les tags :",
+    tags?.map((tag) => tag.name),
+  );
 
   return (
     <ActionSheet
@@ -336,8 +368,34 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
             </>
           )}
 
-          <TextBody1 extraClasses="font-bold mt-5">TAGS SUGGÉRÉS</TextBody1>
-          <View className="flex flex-row">{tagList}</View>
+          <TextBody1 extraClasses="font-bold mt-5 mb-2">
+            TAGS SUGGÉRÉS
+          </TextBody1>
+          <View className="flex flex-row flex-wrap">
+            {suggestedTags?.map((tag) => (
+              <SelectableTag
+                key={tag._id}
+                tag={tag}
+                onPressFn={() => toggleTag(tag)}
+                extraClasses="mr-2 mb-2"
+                selected={isTagSelected(tag._id)}
+              />
+            ))}
+          </View>
+          <TextBody1 extraClasses="font-bold mt-5 mb-2">
+            TOUS LES TAGS
+          </TextBody1>
+          <View className="flex flex-row flex-wrap">
+            {remaingingTags?.map((tag) => (
+              <SelectableTag
+                key={tag._id}
+                tag={tag}
+                onPressFn={() => toggleTag(tag)}
+                extraClasses="mr-2 mb-2"
+                selected={isTagSelected(tag._id)}
+              />
+            ))}
+          </View>
         </View>
       </ScrollView>
 
