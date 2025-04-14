@@ -27,7 +27,7 @@ import TextBody1 from "../../components/utils/texts/Body1";
 import TextBody2 from "../../components/utils/texts/Body2";
 import userTools from "../../modules/userTools";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
-import PrimaryButton from "../../components/utils/buttons/Primary";
+import MainButton from "../../components/utils/buttons/MainButton";
 import producerTools from "../../modules/producerTools";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
 const FontAwesome = _Fontawesome as React.ElementType;
@@ -212,17 +212,19 @@ export default function UserProfileScreen({ navigation }: Props) {
                 <OpenScreenButton
                   label="Mes commandes"
                   onPressFn={handleOrdersPress}
+                  extraClasses="mb-1"
                 ></OpenScreenButton>
 
                 <OpenScreenButton
                   label="Mes alertes"
                   onPressFn={() => console.log("pressed button")}
+                  extraClasses="mb-1"
                 ></OpenScreenButton>
 
                 <View style={styles.app} className="mb-4">
                   <View style={styles.row}>
                     <View style={styles[`1col`]}>
-                      <PrimaryButton
+                      <MainButton
                         iconName="magnifying-glass"
                         iconSize={50}
                         iconColor="#FFF"
@@ -231,10 +233,10 @@ export default function UserProfileScreen({ navigation }: Props) {
                         buttonType="label-icon-top"
                         label="Rechercher"
                         buttonBackground={true}
-                      ></PrimaryButton>
+                      ></MainButton>
                     </View>
                     <View style={styles[`1col`]}>
-                      <PrimaryButton
+                      <MainButton
                         iconName="car"
                         iconSize={50}
                         iconColor="#FFF"
@@ -242,10 +244,10 @@ export default function UserProfileScreen({ navigation }: Props) {
                         buttonType="label-icon-top"
                         label="Visiter"
                         buttonBackground={true}
-                      ></PrimaryButton>
+                      ></MainButton>
                     </View>
                     <View style={styles[`1col`]}>
-                      <PrimaryButton
+                      <MainButton
                         iconName="heart"
                         iconSize={50}
                         iconColor="#FFF"
@@ -253,7 +255,7 @@ export default function UserProfileScreen({ navigation }: Props) {
                         buttonType="label-icon-top"
                         label="Favoris"
                         buttonBackground={true}
-                      ></PrimaryButton>
+                      ></MainButton>
                     </View>
                   </View>
                 </View>
@@ -261,10 +263,12 @@ export default function UserProfileScreen({ navigation }: Props) {
                 <OpenScreenButton
                   label="Mes informations"
                   onPressFn={handlePersonalInfoPress}
+                  extraClasses="mb-1"
                 ></OpenScreenButton>
                 <OpenScreenButton
                   label="Nous contacter"
                   onPressFn={() => console.log("pressed button")}
+                  extraClasses="mb-1"
                 ></OpenScreenButton>
 
                 <ButtonPrimaryEnd

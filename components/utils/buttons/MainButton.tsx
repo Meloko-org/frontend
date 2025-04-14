@@ -53,7 +53,7 @@ const iconLibraries = {
   ZocialIcon,
 };
 
-export default function PrimaryButton({
+export default function MainButton({
   buttonType,
   label,
   iconName,

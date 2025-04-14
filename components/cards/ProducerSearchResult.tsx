@@ -70,11 +70,11 @@ export default function CardProducerSearchResult(
                 <BadgeSecondary extraClasses="px-2">{`${props.shopData.searchData.relevantProducts.length} produit que vous recherchez`}</BadgeSecondary>
               )}
             {props.displayMode === "order" && (
-              <BadgeSecondary extraClasses="px-2">{`${props.withdrawData?.length} produit${props.withdrawData?.length && props.withdrawData.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
+              <BadgeSecondary extraClasses="px-2">{`${props.withdrawData?.length} produit${props.withdrawData?.length && props.withdrawData?.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
             )}
             {props.displayMode === "mapCallout" ||
               (props.displayMode === "bottomSheet" && (
-                <BadgeSecondary extraClasses="px-1">{`${props.shopData?.stocks.length} produit${props.shopData?.stocks.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
+                <BadgeSecondary extraClasses="px-1">{`${props.shopData?.stocks?.length} produit${props.shopData?.stocks?.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
               ))}
           </View>
         </View>
