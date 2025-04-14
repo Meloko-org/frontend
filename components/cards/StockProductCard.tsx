@@ -17,7 +17,7 @@ export default function StockProductCard({
 }: StockProductCardProps): JSX.Element {
   const tagBadges = stock.tags.map((tag: TagData) => {
     return (
-      <BadgeGrey key={tag.name} extraClasses="mr-1">
+      <BadgeGrey key={tag.name} extraClasses="mr-1 mb-1">
         {tag.name}
       </BadgeGrey>
     );
@@ -29,7 +29,7 @@ export default function StockProductCard({
       className="rounded-lg bg-lightbg dark:bg-tertiary p-2 mb-2"
     >
       <View className="flex flex-row items-center w-full">
-        <View className="rounded-lg">
+        <View className="rounded-lg w-1/4">
           <Image
             source={
               stock.image
@@ -46,13 +46,14 @@ export default function StockProductCard({
           />
         </View>
 
-        <View className="grow">
+        <View className="w-3/4">
           <TextBody1 extraClasses="font-bold mb-1">
             {stock.productCustomName
               ? stock.productCustomName
               : stock?.product.family.name + " " + stock?.product.name}
           </TextBody1>
-          <View className="flex flex-row w-full">
+
+          <View className="flex flex-row">
             <View className="flex flex-row items-center">
               <TextBody2>Prix: </TextBody2>
               <TextBody1 extraClasses="font-bold">
@@ -66,14 +67,18 @@ export default function StockProductCard({
                     : " € / pièce"}
               </TextBody2>
             </View>
-            <View className="flex flex-row flex-grow items-center justify-end pr-5">
+
+            <View className="flex flex-row flex-grow items-center justify-end pr-2">
               <TextBody2>Quantité: </TextBody2>
               <TextBody1 extraClasses="font-bold">
                 {parseInt(stock.stock.$numberDecimal)}
               </TextBody1>
             </View>
           </View>
-          <View className="flex flex-row w-full">{tagBadges}</View>
+
+          <View className="flex flex-row w-full flex-wrap mt-1">
+            {tagBadges}
+          </View>
         </View>
       </View>
     </TouchableOpacity>
