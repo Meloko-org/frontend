@@ -1,4 +1,9 @@
-import { ApiResponse, StockData, TagData } from "../types/API";
+import {
+  ApiResponse,
+  ProductsTypesByCategory,
+  StockData,
+  TagData,
+} from "../types/API";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -58,7 +63,7 @@ const getSuggestedTags = async (
       return {
         success: false,
         data: null,
-        message: `Erreur ${response.status}: Impossible d'obtenir les données'.`,
+        message: `Erreur ${response.status}: Impossible d'obtenir les données.`,
       };
     }
 
@@ -114,8 +119,44 @@ const updateStocks = async (
   }
 };
 
+const getProductsTypesByCategory = async (): Promise<
+  ApiResponse<Record<string, string[]>>
+> => {
+  try {
+    const response = await fetch(`${API_ROOT}/categories/products-types`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        mode: "cors",
+      },
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible d'obtenir les données.`,
+      };
+    }
+
+    const data = await response.json();
+
+    return data.success
+      ? { success: true, data: data.categories }
+      : { success: false, data: null, message: data.message };
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      data: null,
+      message: "Une erreur s'est produite lors de la récupération des données.",
+    };
+  }
+};
+
 export default {
   getStocksByShop,
   updateStocks,
   getSuggestedTags,
+  getProductsTypesByCategory,
 };

@@ -66,7 +66,11 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
     // si on affiche un produit renseigné (!= produit vierge)
     if (props.payload?.stock !== null) {
       // détermine si c'est un produit vrac
-      const bulk = props.payload?.stock.product.hasCustomName === false;
+      const bulk = props.payload?.stock.product.family.productsTypes.includes(
+        "bulk",
+      )
+        ? true
+        : false;
       setBulk(bulk);
 
       setPrice(Number(props.payload?.stock.price.$numberDecimal));

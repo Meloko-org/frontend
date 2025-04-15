@@ -8,6 +8,7 @@ import { RouteProp } from "@react-navigation/native";
 
 import { useDispatch, useSelector } from "react-redux";
 import { addProducts, resetProducts, ShopState } from "../../reducers/shop";
+import { setProductsTypes, StocksState } from "../../reducers/stocks";
 
 import stocksTools from "../../modules/stocksTools";
 
@@ -16,7 +17,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import TopBar from "../../components/TopBar";
 import Spinner from "../../components/utils/Spinner";
-import { ProductCategoryData, StockData } from "../../types/API";
+import {
+  ProductCategoryData,
+  ProductsTypesByCategory,
+  StockData,
+} from "../../types/API";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import categoriesTools from "../../modules/categoriesTools";
 
@@ -42,6 +47,9 @@ export default function StockCategoriesScreen({ navigation }: Props) {
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
+  const stocksStore = useSelector(
+    (state: { stocks: StocksState }) => state.stocks.value,
+  );
 
   const [shopId, setShopId] = useState<string>(shopStore!._id);
   const [isFetchLoading, setIsFetchLoading] = useState<boolean>(true);
@@ -51,7 +59,6 @@ export default function StockCategoriesScreen({ navigation }: Props) {
     ProductCategoryData[] | null
   >([]);
 
-  // const [categories, setCategories] = useState<string[]>([]);
   const [openScreenButtons, setOpenScreenButtons] = useState<JSX.Element[]>([]);
 
   useFocusEffect(
@@ -62,6 +69,8 @@ export default function StockCategoriesScreen({ navigation }: Props) {
       }
       // récupération des catégories globales
       fetchGlobalCategories();
+      // récupération des types de produits par catégorie
+      fetchProductsTypes();
       // récupération des stocks
       fetchStocks();
     }, []),
@@ -75,7 +84,6 @@ export default function StockCategoriesScreen({ navigation }: Props) {
       return;
     }
 
-    // console.log("stocksResponse :", stocksResponse.data)
     dispatch(resetProducts());
     dispatch(addProducts(stocksResponse.data!));
     setStocks(stocksResponse.data);
@@ -83,16 +91,33 @@ export default function StockCategoriesScreen({ navigation }: Props) {
     setIsFetchLoading(false);
   };
 
+  const fetchProductsTypes = async () => {
+    const productsTypesResponse =
+      await stocksTools.getProductsTypesByCategory();
+    if (!productsTypesResponse.success) {
+      console.log(productsTypesResponse.message);
+      return;
+    }
+
+    console.log("les types de products :", productsTypesResponse.data);
+    if (productsTypesResponse.success && productsTypesResponse.data) {
+      const formatted: ProductsTypesByCategory[] = Object.entries(
+        productsTypesResponse.data,
+      ).map(([categoryName, productsTypes]) => ({
+        categoryName,
+        productsTypes,
+      }));
+
+      dispatch(setProductsTypes(formatted));
+    }
+  };
+
   const fetchGlobalCategories = async () => {
     const categoriesResponse = await categoriesTools.getGlobalCategories();
-
     if (!categoriesResponse.success) {
       console.log(categoriesResponse.message);
       return;
     }
-
-    // console.log("les categories :", categoriesResponse.data)
-
     setGlobalCategories(categoriesResponse.data);
   };
 
@@ -105,12 +130,9 @@ export default function StockCategoriesScreen({ navigation }: Props) {
         ),
       );
 
-      console.log("avalableCategories: ", availableCategories);
-
       // on ajoute le nombre de produits pour chaque catégorie qui appartient aux types du shop
       const availableCategoriesWithCount = availableCategories?.map(
         (category) => {
-          console.log("available cat id : ", category.type);
           const count = shopStore!.products?.filter(
             (p) => p.product.family.category.name === category.name,
           ).length;
@@ -121,20 +143,38 @@ export default function StockCategoriesScreen({ navigation }: Props) {
         },
       );
 
-      console.log("categories with count :", availableCategoriesWithCount);
-
       setOpenScreenButtons(
         availableCategoriesWithCount!.map((cat, index) => {
+          const productsType = stocksStore
+            .find((element) => element.categoryName === cat.name)
+            ?.productsTypes.toString();
+          // on force le typage de targetScreen car navigation.navigate n'accepte pas les string génériques
+          // mais seulement un RootStackParamList
+          let targetScreen: "StockFamilies" | "Stocks";
+          let screenTitle: string;
+
+          // !! ATTENTION !! pas de gestion de "both" pour l'instant
+          switch (productsType) {
+            case "bulk":
+              targetScreen = "Stocks";
+              screenTitle = "STOCKS\n" + cat.name.toLocaleUpperCase();
+              break;
+            case "classic":
+              targetScreen = "StockFamilies";
+              screenTitle = "CHOIX\n" + cat.name.toLocaleUpperCase();
+              break;
+          }
+
           return (
             <OpenScreenButton
               key={index}
               label={cat.name}
               notice={cat.count?.toString()}
               onPressFn={() =>
-                navigation.navigate("Stocks", {
+                navigation.navigate(targetScreen, {
                   from: "StockCategories",
                   backLabel: "Retour aux catégories",
-                  screenTitle: "STOCKS\n" + cat.name.toLocaleUpperCase(),
+                  screenTitle: screenTitle,
                   category: cat.name,
                 })
               }
@@ -147,6 +187,7 @@ export default function StockCategoriesScreen({ navigation }: Props) {
   }, [isFetchLoading]);
 
   // console.log("shopTypes :", JSON.stringify(shopStore.products, null, 2))
+  // console.log(JSON.stringify(openScreenButtons, null, 2))
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">

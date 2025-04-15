@@ -43,6 +43,7 @@ import ShopOfflineScreen from "./screens/producer/ShopOffline";
 import ShopParamsScreen from "./screens/producer/ShopParams";
 import ShopWithdrawModesScreen from "./screens/producer/ShopWithdrawModes";
 import StockCategoriesScreen from "./screens/producer/StockCategories";
+import StockFamiliesScreen from "./screens/producer/StockFamilies";
 import StocksScreen from "./screens/producer/Stocks";
 import StocksAddScreen from "./screens/producer/StocksAdd";
 import ShopWithdrawClickcollectScreen from "./screens/producer/ShopWithdrawClickcollect";
@@ -72,10 +73,11 @@ import user from "./reducers/user";
 import cart from "./reducers/cart";
 import mode from "./reducers/mode";
 import shop from "./reducers/shop";
+import stocks from "./reducers/stocks";
 import producer from "./reducers/producer";
 import OrderDetailsScreen from "./screens/OrderDetails";
 
-const reducers = combineReducers({ user, cart, mode, shop, producer });
+const reducers = combineReducers({ user, cart, mode, shop, producer, stocks });
 const persistConfig = {
   key: "meloko",
   storage: AsyncStorage,
@@ -290,6 +292,11 @@ const TabNavigatorProducer: React.FC = () => {
       <Tab.Screen
         name="StockCategories"
         component={StockCategoriesScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="StockFamilies"
+        component={StockFamiliesScreen}
         options={{ tabBarButton: () => null }}
       />
       <Tab.Screen

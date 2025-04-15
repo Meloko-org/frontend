@@ -32,14 +32,16 @@ type ProductData = {
   description: string;
   family: ProductFamilyData;
   weight: WeightData;
-  hasCustomName: boolean;
 };
+
+type ProductType = "bulk" | "classic" | "both";
 
 type ProductFamilyData = {
   _id: string;
   name: string;
   description: string;
   image: string;
+  productsTypes: ProductType[];
   category: ProductCategoryData;
   tagCategories: string[];
 };
@@ -50,6 +52,11 @@ type ProductCategoryData = {
   description: string;
   image: string;
   type: string;
+};
+
+type ProductsTypesByCategory = {
+  categoryName: string;
+  productsTypes: string[];
 };
 
 type address = {
@@ -221,6 +228,7 @@ export type {
   ProducerData,
   ProductFamilyData,
   ProductCategoryData,
+  ProductsTypesByCategory,
   AddressData,
   ClickCollectData,
   OpeningHoursData,

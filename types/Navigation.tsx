@@ -53,6 +53,12 @@ type RootStackParamList = {
     screenTitle?: string;
   };
   StockCategories: { from?: string; backLabel?: string; screenTitle?: string };
+  StockFamilies: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    category: string;
+  };
   Stocks: {
     from?: string;
     backLabel?: string;
