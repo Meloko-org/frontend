@@ -1,9 +1,15 @@
-import { View, Alert } from "react-native";
+import { View, Alert, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React from "react";
 import { useColorScheme } from "nativewind";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
+import OpenMenuButton from "../../components/utils/buttons/OpenMenu";
 
-import Text from "../../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import ButtonSecondaryEnd from "../../components/utils/buttons/SecondaryEnd";
 import CustomButton from "../../components/utils/buttons/Custom";
@@ -28,6 +34,7 @@ import TextBody2 from "../../components/utils/texts/Body2";
 import userTools from "../../modules/userTools";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import IconButton from "../../components/utils/buttons/Icon";
+import Address from "../../components/cards/Address";
 import producerTools from "../../modules/producerTools";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
 const FontAwesome = _Fontawesome as React.ElementType;
@@ -56,40 +63,27 @@ export default function UserProfileAddressesScreen({ navigation }: Props) {
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
   );
-  const modeStore = useSelector(
-    (state: { mode: ModeState }) => state.mode.value,
-  );
 
-  const producerStore = useSelector(
-    (state: { producer: ProducerState }) => state.producer.value,
-  );
-  const shopStore = useSelector(
-    (state: { shop: ShopState }) => state.shop.value,
-  );
-
-  const [isSigninModalVisible, setIsSigninModalVisible] =
-    useState<boolean>(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
+  const [isOpenType, setOpenType] = useState<boolean>(false);
+  const contentType = useSharedValue(0);
+  const heightType = useSharedValue(0);
   const [isUserSaveLoading, setUserSaveLoading] = useState(false);
 
-  useEffect(() => {
-    if (!isSignedIn) {
-      // à modifier
-      navigation.navigate("SignIn", {
-        from: "UserProfile",
-        label: "Retour à la recherche",
-      });
-    } else {
-      fetchData();
-      setFirstname(userStore.firstname);
-      setLastname(userStore.lastname);
-      setEmail(userStore.email);
-    }
-  }, [userStore, isSignedIn, dispatch]);
+  // useEffect(() => {
+  //     if (!isSignedIn) {
+  //         // à modifier
+  //         navigation.navigate("SignIn", {
+  //             from: "UserProfile",
+  //             label: "Retour à la recherche",
+  //         });
+  //     } else {
+  //     }
+  // }, [userStore, isSignedIn, dispatch]);
+
+  const animatedStyleType = useAnimatedStyle(() => ({
+    height: heightType.value,
+    opacity: heightType.value > 0 ? 1 : 0, // Facultatif : gérer l'opacité
+  }));
 
   const fetchData = async () => {
     try {
@@ -118,68 +112,25 @@ export default function UserProfileAddressesScreen({ navigation }: Props) {
     }
   };
 
-  const handleSaveUser = async () => {
-    try {
-      setUserSaveLoading(true);
-      const token = await getToken();
-      const values = email
-        ? { email, firstname, lastname }
-        : { email: null, firstname, lastname };
-      const data = await userTools.updateUser(token, values);
-
-      if (data) {
-        Alert.alert(
-          "Mise à jour de votre profil",
-          "Votre profil à bien été mis à jour.",
-        );
-        dispatch(updateUser(data));
-      }
-      setUserSaveLoading(false);
-    } catch (error) {
-      console.error(error);
-      setUserSaveLoading(false);
-    }
-  };
-
-  // Signout the user from Clerk
-  const onSignoutPress = async () => {
-    try {
-      await signOut();
-      dispatch(resetUser());
-      dispatch(emptyCart());
-      dispatch(resetProducerData());
-      dispatch(resetShopData());
-      navigation.navigate("Home");
-    } catch (err) {
-      console.error(JSON.stringify(err, null, 2));
-    }
-  };
-
-  const switchProducer = () => {
-    navigation.navigate("TabNavigatorProducer", {
-      screen: "ProducerProfile",
+  const toggleOpenType = () => {
+    setOpenType((prev) => {
+      const newState = !prev;
+      heightType.value = withTiming(newState ? contentType.value : 0, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+      return newState;
     });
   };
 
-  const handleOrdersPress = () => {
-    navigation.navigate("TabNavigatorUser", {
-      screen: "OrdersCustomer",
-    });
+  const onContentLayout = (event: LayoutChangeEvent) => {
+    const measuredHeight = event.nativeEvent.layout.height;
+    contentType.value = measuredHeight;
   };
 
-  const toggleMode = () => {
-    toggleColorScheme();
-    const displayMode = modeStore.mode === "light" ? "dark" : "light";
-    dispatch(changeMode(displayMode));
-  };
-
-  console.log(
-    "------------------------------- CUSTOMER --------------------------------------------------------------------",
-  );
-  console.log("USERSTORE -> ", userStore);
-  console.log("PRODUCERSTORE -> ", producerStore);
-  console.log("SHOPSTORE -> ", shopStore);
-  console.log("");
+  const addresses = userStore.addresses?.map((address, i) => (
+    <Address address={address} key={i}></Address>
+  ));
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -190,87 +141,32 @@ export default function UserProfileAddressesScreen({ navigation }: Props) {
               Mes addresses
             </TextHeading2>
             <ScrollView>
-              <View className="w-full">
-                {userStore.clerkPasswordEnabled === true ? (
-                  <>
-                    <Text
-                      placeholder="Changez votre email"
-                      label="Email"
-                      onChangeText={(value: string) => setEmail(value)}
-                      value={email}
-                      extraClasses="mb-2"
-                    ></Text>
-                    <Text
-                      placeholder="Saisissez votre mot de passe"
-                      label="Mot de passe"
-                      onChangeText={(value: string) => setPassword(value)}
-                      value={password}
-                      extraClasses="mb-2"
-                    ></Text>
-                    <Text
-                      placeholder="Confirmez votre mot de passse"
-                      label="Confirmation"
-                      onChangeText={(value: string) => setConfirm(value)}
-                      value={confirm}
-                      extraClasses="mb-5"
-                    ></Text>
-                  </>
-                ) : (
-                  <>
-                    <View className="ml-2">
-                      <TextBody2 extraClasses="font-bold text-secondary/60">
-                        EMAIL
-                      </TextBody2>
-                      <TextHeading4 extraClasses="mb-5">
-                        {userStore.email}
-                      </TextHeading4>
-                    </View>
-                  </>
-                )}
-                <View className="flex flex-row justify-between items-center">
-                  <View className="flex flex-row justify-center items-center w-2/6">
-                    <View className="rounded-full bg-warning flex flex-row justify-center items-center mb-5 w-[100px] h-[100px]">
-                      <FontAwesome
-                        name="github-alt"
-                        size={80}
-                        color="#FFFFFF"
-                        className="absolute"
-                      />
-                    </View>
-                  </View>
-
-                  <View className="w-4/6">
-                    <Text
-                      placeholder="Saisissez votre nom"
-                      label="Nom"
-                      onChangeText={(value: string) => setFirstname(value)}
-                      value={firstname}
-                      extraClasses="mb-2"
-                    />
-                    <Text
-                      placeholder="Saisissez votre prénom"
-                      label="Prénom"
-                      onChangeText={(value: string) => setLastname(value)}
-                      value={lastname}
-                      extraClasses="mb-2"
-                    />
-                  </View>
-                </View>
-                <ButtonPrimaryEnd
-                  label="Mes adresses"
-                  iconName="address-book"
-                  onPressFn={() => console.log("going to addresses")}
+              <View className="w-full px-3">
+                <OpenMenuButton
+                  label="Ajouter une adresse"
+                  onPressFn={toggleOpenType}
+                  extraClasses="mb-2"
                 />
+
+                <Animated.View
+                  style={[animatedStyleType]}
+                  className="overflow-hidden"
+                >
+                  <View
+                    onLayout={onContentLayout}
+                    style={{
+                      opacity: isOpenType ? 1 : 0,
+                      position: isOpenType ? "relative" : "absolute",
+                    }}
+                  >
+                    <View className="py-5">
+                      <Text>FORMULAIRE ICI</Text>
+                    </View>
+                  </View>
+                </Animated.View>
               </View>
+              <View>{addresses}</View>
             </ScrollView>
-            <ButtonPrimaryEnd
-              label="Enregistrer"
-              iconName="save"
-              disabled={isUserSaveLoading}
-              onPressFn={() => handleSaveUser()}
-              extraClasses=""
-              isLoading={isUserSaveLoading}
-            />
           </View>
         ) : (
           <View className="flex justify-center items-center h-full">
@@ -282,7 +178,7 @@ export default function UserProfileAddressesScreen({ navigation }: Props) {
               iconName="sign-in"
               disabled={isUserSaveLoading}
               extraClasses="w-full"
-              onPressFn={() => setIsSigninModalVisible(true)}
+              // onPressFn={() => setIsSigninModalVisible(true)}
               isLoading={isUserSaveLoading}
             />
           </View>

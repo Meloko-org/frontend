@@ -170,6 +170,7 @@ type UserData = {
   orders: object[];
   clerkPasswordEnabled: boolean | null | undefined;
   producer: ProducerData | null;
+  addresses: AddressData[] | null;
 };
 
 type ProducerData = {

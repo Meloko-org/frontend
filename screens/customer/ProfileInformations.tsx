@@ -167,6 +167,12 @@ export default function UserProfileInformationsScreen({ navigation }: Props) {
     });
   };
 
+  const handleAddressesPress = () => {
+    navigation.navigate("TabNavigatorUser", {
+      screen: "UserProfileAddressesScreen",
+    });
+  };
+
   const toggleMode = () => {
     toggleColorScheme();
     const displayMode = modeStore.mode === "light" ? "dark" : "light";
@@ -259,7 +265,7 @@ export default function UserProfileInformationsScreen({ navigation }: Props) {
                 <ButtonPrimaryEnd
                   label="Mes adresses"
                   iconName="address-book"
-                  onPressFn={() => console.log("going to addresses")}
+                  onPressFn={handleAddressesPress}
                 />
               </View>
             </ScrollView>

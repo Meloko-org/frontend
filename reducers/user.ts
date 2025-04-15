@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserData, OrderData } from "../types/API";
+import { UserData, OrderData, AddressData } from "../types/API";
 
 export type UserState = {
   value: UserData;
@@ -16,6 +16,7 @@ const initialState: UserState = {
     orders: [],
     clerkPasswordEnabled: null,
     producer: null,
+    addresses: [],
   },
 };
 
