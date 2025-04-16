@@ -1,5 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import { SheetManager } from "react-native-actions-sheet";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
@@ -14,6 +15,7 @@ import { useSelector } from "react-redux";
 import { ShopState } from "../../reducers/shop";
 import { StockData } from "../../types/API";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
+import OpenMenuButton from "../../components/utils/buttons/OpenMenu";
 
 type StockFamiliesScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -37,15 +39,40 @@ export default function StockFamiliesScreen({ navigation }: Props) {
     (state: { shop: ShopState }) => state.shop.value,
   );
 
-  const [products, setProducts] = useState<StockData[] | undefined>([]);
+  const [openScreenButtons, setOpenScreenButtons] = useState<JSX.Element[]>([]);
+
+  const availableFamilies = Array.from(
+    new Set(
+      shopStore?.products
+        ?.filter((product) => product.product.family.category.name === category)
+        ?.map((product) => product.product.family.name),
+    ),
+  );
 
   useEffect(() => {
-    setProducts(
-      shopStore?.products?.map((product) => {
-        return product;
+    setOpenScreenButtons(
+      availableFamilies.map((family, index) => {
+        return (
+          <OpenScreenButton
+            key={index}
+            label={family}
+            onPressFn={() =>
+              navigation.navigate("Stocks", {
+                from: "StockFamilies",
+                backLabel: "Retour au choix " + category,
+                screenTitle: family,
+                category: category,
+                family: family,
+              })
+            }
+            extraClasses="mb-1"
+          />
+        );
       }),
     );
   }, []);
+
+  console.log("la cat :", category);
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
@@ -53,11 +80,46 @@ export default function StockFamiliesScreen({ navigation }: Props) {
         <TopBar
           backLabel={backLabel || "Retour aux catégories"}
           screen={from || "StockCategories"}
-          label={screenTitle || ""}
+          label={screenTitle || "CHOIX\n" + category}
           extraClasses="mt-2"
         />
 
-        <ScrollView></ScrollView>
+        <ScrollView>
+          <View className="px-3">{openScreenButtons}</View>
+        </ScrollView>
+
+        <View className="px-3 my-3">
+          <OpenScreenButton
+            label={`Ajouter une catégorie de ${category}`}
+            bgColor="bg-tertiary"
+            onPressFn={() => {
+              SheetManager.show("product-families", {
+                payload: {
+                  category: category,
+                  onFamilySelected: (newfamilyName: string) => {
+                    setOpenScreenButtons((prev) => [
+                      ...prev,
+                      <OpenScreenButton
+                        key={newfamilyName}
+                        label={newfamilyName}
+                        onPressFn={() =>
+                          navigation.navigate("Stocks", {
+                            from: "StockFamilies",
+                            backLabel: "Retour au choix",
+                            screenTitle: newfamilyName,
+                            category: category,
+                            family: newfamilyName,
+                          })
+                        }
+                        extraClasses="mb-1"
+                      />,
+                    ]);
+                  },
+                },
+              });
+            }}
+          />
+        </View>
       </SafeAreaView>
     </View>
   );

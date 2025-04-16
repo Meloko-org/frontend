@@ -6,12 +6,14 @@ import MapSearchResults from "./MapSearchResults";
 import BecomePremium from "./BecomePremium";
 import { StockData } from "../../types/API";
 import EditProductSheet from "./EditProductSheet";
+import ProductFamiliesSheet from "./ProductFamilies";
 
 registerSheet("alert", CustomAlert);
 registerSheet("product-details", ProductDetails);
 registerSheet("map-search-results", MapSearchResults);
 registerSheet("become-premium", BecomePremium);
 registerSheet("edit-product", EditProductSheet);
+registerSheet("product-families", ProductFamiliesSheet);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -39,6 +41,12 @@ declare module "react-native-actions-sheet" {
     "edit-product": SheetDefinition<{
       payload: {
         stock: StockData | null;
+      };
+    }>;
+    "product-families": SheetDefinition<{
+      payload: {
+        category: string;
+        onFamilySelected: (name: string) => void;
       };
     }>;
   }
