@@ -72,11 +72,11 @@ export default function StockFamiliesScreen({ navigation }: Props) {
     );
   }, []);
 
-  console.log("------------------------------------ STOCKFAMILIES");
-  console.log("from:", from);
-  console.log("backLabel:", backLabel);
-  console.log("screenTitle:", screenTitle);
-  console.log("category:", category);
+  // console.log("------------------------------------ STOCKFAMILIES");
+  // console.log("from:", from);
+  // console.log("backLabel:", backLabel);
+  // console.log("screenTitle:", screenTitle);
+  // console.log("category:", category);
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">

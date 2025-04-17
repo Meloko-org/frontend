@@ -3,6 +3,7 @@ import { useAuth } from "@clerk/clerk-expo";
 import ActionSheet, {
   SheetProps,
   ScrollView,
+  SheetManager,
 } from "react-native-actions-sheet";
 
 import { useDispatch } from "react-redux";
@@ -50,7 +51,7 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
   const [portion, setPortion] = useState<string | undefined>("");
   const [bestBeforeDate, setBestBeforeDate] = useState<string | undefined>("");
   const [image, setImage] = useState<string>();
-  const [tags, setTags] = useState<TagData[] | undefined>();
+  const [tags, setTags] = useState<TagData[] | undefined>([]);
 
   const [suggestedTags, setSuggestedTags] = useState<TagData[] | undefined>();
   const [remaingingTags, setRemainingTags] = useState<TagData[] | undefined>();
@@ -122,7 +123,9 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
 
       if (bulk) {
         setWeightPerUnit(
-          props.payload?.product.weight.measurement.$numberDecimal,
+          props.payload?.product.weight.measurement.$numberDecimal +
+            " " +
+            props.payload?.product.weight.unit,
         );
         // variables adapted
         setNameAdapted(props.payload?.product.name);
@@ -165,37 +168,76 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
 
     let values;
     if (isBulk) {
-      values = {
-        _id: props.payload?.stock?._id,
-        product: props.payload?.stock?.product,
-        price,
-        stock,
-        description,
-        tags,
-      };
+      if (props.payload?.productsType) {
+        values = {
+          product: props.payload?.product,
+          price,
+          stock,
+          description,
+          tags,
+        };
+      } else {
+        values = {
+          _id: props.payload?.stock?._id,
+          product: props.payload?.stock?.product,
+          price,
+          stock,
+          description,
+          tags,
+        };
+      }
     } else {
-      values = {
-        _id: props.payload?.stock?._id,
-        product: props.payload?.stock?.product,
-        productCustomName,
-        price,
-        stock,
-        pricePerKilo,
-        weightPerUnit,
-        origin,
-        format,
-        portion,
-        bestBeforeDate,
-        description,
-        image,
-        tags,
-      };
+      if (props.payload?.productsType) {
+        values = {
+          product: props.payload?.product,
+          productCustomName,
+          price,
+          stock,
+          pricePerKilo,
+          weightPerUnit,
+          origin,
+          format,
+          portion,
+          bestBeforeDate,
+          description,
+          image,
+          tags,
+        };
+      } else {
+        values = {
+          _id: props.payload?.stock?._id,
+          product: props.payload?.stock?.product,
+          productCustomName,
+          price,
+          stock,
+          pricePerKilo,
+          weightPerUnit,
+          origin,
+          format,
+          portion,
+          bestBeforeDate,
+          description,
+          image,
+          tags,
+        };
+      }
     }
 
-    const stockResponse = await stocksTools.updateStocks(token, values);
+    let stockResponse;
+
+    if (props.payload?.productsType) {
+      stockResponse = await stocksTools.createStocks(token, values);
+    } else {
+      stockResponse = await stocksTools.updateStocks(token, values);
+    }
 
     if (!stockResponse.success) {
-      console.error(stockResponse.message);
+      SheetManager.show("alert", {
+        payload: {
+          message: stockResponse.message!,
+          alertType: "error",
+        },
+      });
       setSaveLoading(false);
       return;
     }
@@ -203,9 +245,21 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
     console.log("response :", stockResponse.data);
 
     dispatch(updateProduct(stockResponse.data!));
-
-    console.log("mise à jour ok.");
     setSaveLoading(false);
+
+    let alertMessage: string;
+    if (props.payload?.productsType) {
+      alertMessage = "Produit créé.";
+    } else {
+      alertMessage = "Produit modifié.";
+    }
+
+    SheetManager.show("alert", {
+      payload: {
+        message: alertMessage,
+        alertType: "success",
+      },
+    });
   };
 
   // console.log("le produit :", JSON.stringify(props.payload?.stock, null, 2));
