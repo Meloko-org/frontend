@@ -26,6 +26,7 @@ import StockProductCard from "../../components/cards/StockProductCard";
 import TextHeading1 from "../../components/utils/texts/Heading1";
 import EditProduct from "../../components/EditProduct";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
+import { StocksState } from "../../reducers/stocks";
 
 type StocksScreenRouteProp = RouteProp<RootStackParamList, "Stocks">;
 
@@ -40,49 +41,73 @@ type Props = {
 
 export default function StocksScreen({ navigation }: Props) {
   const route = useRoute<StocksScreenRouteProp>();
-  const { from, backLabel, screenTitle, category } = route.params || {};
+  const { from, backLabel, screenTitle, category, family } = route.params || {};
 
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
-
-  const filteredProducts = shopStore?.products?.filter(
-    (product: StockData) => product.product.family.category.name === category,
+  const stocksStore = useSelector(
+    (state: { stocks: StocksState }) => state.stocks.value,
   );
 
+  const productsType = stocksStore
+    .find((element) => element.categoryName === category)
+    ?.productsTypes.toString();
+
+  const filteredProducts =
+    productsType === "bulk"
+      ? shopStore?.products?.filter(
+          (product: StockData) =>
+            product.product.family.category.name === category,
+        )
+      : shopStore?.products?.filter(
+          (product: StockData) => product.product.family.name === family,
+        );
+
   const handleOpenEdit = (product: StockData) => {
-    console.log(product);
+    // console.log(product);
     SheetManager.show("edit-product", {
       payload: { stock: product },
     });
   };
 
-  // console.log(JSON.stringify(filteredProducts, null, 2))
+  // console.log("------------------------------------ STOCKS")
+  // console.log("from:", from);
+  // console.log("backLabel:", backLabel);
+  // console.log("screenTitle:", screenTitle);
+  // console.log("category:", category);
+  // console.log("family :", family)
 
   return (
     <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
       <TopBar
-        backLabel={backLabel || "Retour aux catégories"}
+        backLabel={
+          backLabel || family ? "Retour au choix" : "Retour aux catégories"
+        }
         screen={from || "StockCategories"}
-        label={screenTitle || "STOCK\n" + category}
+        screenParams={{
+          category: category,
+          family: family,
+        }}
+        label={screenTitle || "STOCK\n" + (family ? family : category)}
         extraClasses="mt-2"
       />
-
-      <View className="px-3">
+      <View className="px-3 mb-3">
         <OpenScreenButton
           label="Ajouter un produit"
+          bgColor="bg-tertiary"
           onPressFn={() =>
             navigation.navigate("StocksAdd", {
               from: "Stocks",
               backLabel: "Retour au stock",
               screenTitle: "AJOUTER\nUN PRODUIT",
               category: category,
+              family: family,
             })
           }
-          extraClasses="mb-2"
+          extraClasses=""
         />
       </View>
-
       <ScrollView>
         <View className="px-3">
           {filteredProducts?.map((product) => (

@@ -99,7 +99,7 @@ export default function StockCategoriesScreen({ navigation }: Props) {
       return;
     }
 
-    console.log("les types de products :", productsTypesResponse.data);
+    // console.log("les types de products :", productsTypesResponse.data);
     if (productsTypesResponse.success && productsTypesResponse.data) {
       const formatted: ProductsTypesByCategory[] = Object.entries(
         productsTypesResponse.data,

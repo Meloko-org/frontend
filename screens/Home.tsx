@@ -125,13 +125,13 @@ export default function HomeScreen({ navigation }: Props) {
 
   // const logo = colorScheme === "dark" ? LogoDark : LogoLight;
 
-  console.log(
-    "------------------------- HOME --------------------------------------------------------------------",
-  );
-  console.log("USERSTORE -> ", userStore);
-  console.log("PRODUCERSTORE:", producerStore);
-  console.log("SHOPSTORE :", shopStore);
-  console.log("");
+  // console.log(
+  //   "------------------------- HOME --------------------------------------------------------------------",
+  // );
+  // console.log("USERSTORE -> ", userStore);
+  // console.log("PRODUCERSTORE:", producerStore);
+  // console.log("SHOPSTORE :", shopStore);
+  // console.log("");
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">

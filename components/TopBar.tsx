@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -12,6 +12,7 @@ type TopBarProps = {
   backLabel: string;
   label: string;
   screen: keyof RootStackParamList | string;
+  screenParams?: object;
   extraClasses?: string;
 };
 
@@ -19,10 +20,19 @@ export default function TopBar({
   backLabel,
   label,
   screen,
+  screenParams,
   extraClasses,
 }: TopBarProps): JSX.Element {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  // useEffect(() => {
+  //   console.log("-- TOPBAR ------")
+  //   console.log("label:", label);
+  //   console.log("backLabel:", backLabel);
+  //   console.log("screen:", screen);
+  //   console.log("screenParams:", screenParams);
+  // }, [])
 
   return (
     <View
@@ -31,14 +41,18 @@ export default function TopBar({
       <View>
         <BackLabelButton
           backLabel={backLabel}
-          onPressFn={() => navigation.navigate(screen)}
+          onPressFn={() =>
+            screenParams
+              ? navigation.navigate(screen as any, screenParams)
+              : navigation.navigate(screen as any)
+          }
           extraClasses="ml-1 px-2"
         />
       </View>
 
       <View className="mr-1">
         <Text className="text-sm text-dark text-right leading-4 font-bold dark:text-white">
-          {label}
+          {label.toLocaleUpperCase()}
         </Text>
       </View>
     </View>
