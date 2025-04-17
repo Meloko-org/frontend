@@ -71,6 +71,7 @@ type RootStackParamList = {
     backLabel?: string;
     screenTitle?: string;
     category: string;
+    family?: string;
   };
   PremiumOptions: { from?: string; backLabel?: string; screenTitle?: string };
   PostType: { from?: string; backLabel?: string; screenTitle?: string };

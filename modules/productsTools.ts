@@ -1,4 +1,78 @@
+import { ApiResponse, ProductData } from "../types/API";
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
+
+const getProductsForFamily = async (
+  familyName: string,
+): Promise<ApiResponse<ProductData[]>> => {
+  try {
+    const response = await fetch(`${API_ROOT}/products/family/${familyName}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        mode: "cors",
+      },
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible d'obtenir les données.`,
+      };
+    }
+
+    const data = await response.json();
+
+    return data.success
+      ? { success: true, data: data.products }
+      : { success: false, data: null, message: data.message };
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      data: null,
+      message: "Une erreur s'est produite lors de la récupération des données.",
+    };
+  }
+};
+
+const getProductsForCategory = async (
+  categoryName: string,
+): Promise<ApiResponse<ProductData[]>> => {
+  try {
+    const response = await fetch(
+      `${API_ROOT}/products/category/${categoryName}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          mode: "cors",
+        },
+      },
+    );
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible d'obtenir les données.`,
+      };
+    }
+
+    const data = await response.json();
+
+    return data.success
+      ? { success: true, data: data.products }
+      : { success: false, data: null, message: data.message };
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      data: null,
+      message: "Une erreur s'est produite lors de la récupération des données.",
+    };
+  }
+};
 
 const getAvailableProductsForAShop = async (
   token: string,
@@ -60,6 +134,8 @@ const getProductById = async (token: string, id: string) => {
 };
 
 export default {
+  getProductsForFamily,
+  getProductsForCategory,
   getAvailableProductsForAShop,
   addProductsToAShop,
   getProductById,

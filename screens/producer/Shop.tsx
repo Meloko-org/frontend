@@ -116,10 +116,10 @@ export default function ShopProducteurScreen({ navigation }: Props) {
     }
   };
 
-  console.log(
-    "------------------------------- SHOP --------------------------------------------------------------------",
-  );
-  console.log("SHOPSTORE -> ", shopStore);
+  // console.log(
+  //   "------------------------------- SHOP --------------------------------------------------------------------",
+  // );
+  // console.log("SHOPSTORE -> ", shopStore);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

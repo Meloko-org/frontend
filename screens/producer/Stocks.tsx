@@ -65,30 +65,49 @@ export default function StocksScreen({ navigation }: Props) {
         );
 
   const handleOpenEdit = (product: StockData) => {
-    console.log(product);
+    // console.log(product);
     SheetManager.show("edit-product", {
       payload: { stock: product },
     });
   };
 
-  // console.log(JSON.stringify(filteredProducts, null, 2))
-  console.log("la cat :", category);
-  console.log(stocksStore);
-  console.log(productsType);
+  // console.log("------------------------------------ STOCKS")
+  // console.log("from:", from);
+  // console.log("backLabel:", backLabel);
+  // console.log("screenTitle:", screenTitle);
+  // console.log("category:", category);
+  // console.log("family :", family)
 
   return (
     <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
       <TopBar
-        backLabel={backLabel || "Retour aux catégories"}
+        backLabel={
+          backLabel || family ? "Retour au choix" : "Retour aux catégories"
+        }
         screen={from || "StockCategories"}
         screenParams={{
           category: category,
           family: family,
         }}
-        label={screenTitle || "STOCK\n" + category}
+        label={screenTitle || "STOCK\n" + (family ? family : category)}
         extraClasses="mt-2"
       />
-
+      <View className="px-3 mb-3">
+        <OpenScreenButton
+          label="Ajouter un produit"
+          bgColor="bg-tertiary"
+          onPressFn={() =>
+            navigation.navigate("StocksAdd", {
+              from: "Stocks",
+              backLabel: "Retour au stock",
+              screenTitle: "AJOUTER\nUN PRODUIT",
+              category: category,
+              family: family,
+            })
+          }
+          extraClasses=""
+        />
+      </View>
       <ScrollView>
         <View className="px-3">
           {filteredProducts?.map((product) => (
@@ -100,22 +119,6 @@ export default function StocksScreen({ navigation }: Props) {
           ))}
         </View>
       </ScrollView>
-
-      <View className="px-3 my-3">
-        <OpenScreenButton
-          label="Ajouter un produit"
-          bgColor="bg-tertiary"
-          onPressFn={() =>
-            navigation.navigate("StocksAdd", {
-              from: "Stocks",
-              backLabel: "Retour au stock",
-              screenTitle: "AJOUTER\nUN PRODUIT",
-              category: category,
-            })
-          }
-          extraClasses=""
-        />
-      </View>
     </SafeAreaView>
   );
 }

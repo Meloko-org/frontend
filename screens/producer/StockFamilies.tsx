@@ -60,7 +60,7 @@ export default function StockFamiliesScreen({ navigation }: Props) {
               navigation.navigate("Stocks", {
                 from: "StockFamilies",
                 backLabel: "Retour au choix " + category,
-                screenTitle: family,
+                screenTitle: "STOCK\n" + family,
                 category: category,
                 family: family,
               })
@@ -72,7 +72,11 @@ export default function StockFamiliesScreen({ navigation }: Props) {
     );
   }, []);
 
-  console.log("la cat :", category);
+  console.log("------------------------------------ STOCKFAMILIES");
+  console.log("from:", from);
+  console.log("backLabel:", backLabel);
+  console.log("screenTitle:", screenTitle);
+  console.log("category:", category);
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">

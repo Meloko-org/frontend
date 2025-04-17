@@ -4,7 +4,7 @@ import CustomAlert from "./CustomAlert";
 import ProductDetails from "./ProductDetails";
 import MapSearchResults from "./MapSearchResults";
 import BecomePremium from "./BecomePremium";
-import { StockData } from "../../types/API";
+import { ProductData, StockData } from "../../types/API";
 import EditProductSheet from "./EditProductSheet";
 import ProductFamiliesSheet from "./ProductFamilies";
 
@@ -41,6 +41,8 @@ declare module "react-native-actions-sheet" {
     "edit-product": SheetDefinition<{
       payload: {
         stock: StockData | null;
+        product: ProductData | null;
+        productsType?: string;
       };
     }>;
     "product-families": SheetDefinition<{

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -25,6 +25,14 @@ export default function TopBar({
 }: TopBarProps): JSX.Element {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  // useEffect(() => {
+  //   console.log("-- TOPBAR ------")
+  //   console.log("label:", label);
+  //   console.log("backLabel:", backLabel);
+  //   console.log("screen:", screen);
+  //   console.log("screenParams:", screenParams);
+  // }, [])
 
   return (
     <View

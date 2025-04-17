@@ -25,11 +25,17 @@ import Product from "../cards/Products";
 import stocksTools from "../../modules/stocksTools";
 
 export default function EditProductSheet(props: SheetProps<"edit-product">) {
+  console.log("payload reçu dans EditProductSheet :", props.payload);
   const dispatch = useDispatch();
   const { getToken } = useAuth();
   const [isBulk, setBulk] = useState<boolean>(false);
 
   const [isSaveLoading, setSaveLoading] = useState<boolean>(false);
+
+  // variables adapted
+  const [nameAdapted, setNameAdapted] = useState<string>();
+  const [familyAdpated, setFamilyAdpated] = useState<string>();
+  const [imageAdapted, setImageAdapted] = useState<string>();
 
   const [productCustomName, setProductCustomName] = useState<
     string | undefined
@@ -49,10 +55,8 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
   const [suggestedTags, setSuggestedTags] = useState<TagData[] | undefined>();
   const [remaingingTags, setRemainingTags] = useState<TagData[] | undefined>();
 
-  const fetchSuggestedTags = async () => {
-    const tagResponse = await stocksTools.getSuggestedTags(
-      props.payload?.stock?.product.family._id,
-    );
+  const fetchSuggestedTags = async (familyId: string | undefined) => {
+    const tagResponse = await stocksTools.getSuggestedTags(familyId);
     if (!tagResponse.success) {
       console.log("impossible de récupérer les tags suggérés.");
     }
@@ -61,9 +65,18 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
   };
 
   useEffect(() => {
-    fetchSuggestedTags();
+    let familyId: string | undefined;
+    if (props.payload?.stock) {
+      familyId = props.payload?.stock?.product.family._id;
+    } else if (props.payload?.product) {
+      familyId = props.payload?.product?.family._id;
+    }
 
-    // si on affiche un produit renseigné (!= produit vierge)
+    console.log("familyId :", familyId);
+
+    fetchSuggestedTags(familyId);
+
+    // si on affiche un produit déjà en stock (!= produit vierge)
     if (props.payload?.stock !== null) {
       // détermine si c'est un produit vrac
       const bulk = props.payload?.stock.product.family.productsTypes.includes(
@@ -95,6 +108,26 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
             props.payload?.stock.product.weight.unit,
         );
         setTags(props.payload?.stock.tags);
+
+        // variables adapted
+        setNameAdapted(props.payload?.stock?.product.name);
+        setFamilyAdpated(props.payload?.stock?.product.family.name);
+        setImageAdapted(props.payload?.stock?.product.image);
+      }
+
+      // si on affiche un produit vierge
+    } else if (props.payload?.product !== null) {
+      const bulk = props.payload?.productsType === "bulk";
+      setBulk(bulk);
+
+      if (bulk) {
+        setWeightPerUnit(
+          props.payload?.product.weight.measurement.$numberDecimal,
+        );
+        // variables adapted
+        setNameAdapted(props.payload?.product.name);
+        setFamilyAdpated(props.payload?.product.family.name);
+        setImageAdapted(props.payload?.product.image);
       }
     }
   }, []);
@@ -199,7 +232,7 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
                 <View className="grow w-3/4 pl-1">
                   <InputText
                     label="NOM DU PRODUIT"
-                    placeholder="sdfgsdf"
+                    placeholder="Saisissez le nom de votre produit"
                     value={productCustomName}
                     onChangeText={(value: string) =>
                       setProductCustomName(value)
@@ -212,12 +245,12 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
                 <View className="flex-none">
                   <Image
                     source={
-                      props.payload?.stock?.product.image
-                        ? { uri: props.payload?.stock.product.image }
+                      imageAdapted
+                        ? { uri: imageAdapted }
                         : require("../../assets/icon.png")
                     }
                     className="rounded-xl w-20 h-20 mr-3"
-                    alt={`Illustration du produit ${props.payload?.stock?.product.name}`}
+                    alt={`Illustration du produit ${nameAdapted}`}
                     resizeMode="stretch"
                     width={96}
                     height={64}
@@ -225,9 +258,7 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
                 </View>
                 <View className="flex flex-row grow">
                   <TextHeading3>
-                    {props.payload?.stock?.product.family.name +
-                      " " +
-                      props.payload!.stock?.product.name}
+                    {familyAdpated + " " + nameAdapted}
                   </TextHeading3>
                 </View>
               </View>
