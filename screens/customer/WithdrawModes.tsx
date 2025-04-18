@@ -241,7 +241,9 @@ export default function WithdrawModesScreen({ navigation }) {
             disabled={false}
             isLoading={false}
             onPressFn={() =>
-              navigation.navigate("TabNavigatorUser", { screen: "Cart" })
+              navigation.navigate("TabNavigatorUser", {
+                screen: "Cart",
+              })
             }
             extraClasses="mb-3"
           />
@@ -252,11 +254,6 @@ export default function WithdrawModesScreen({ navigation }) {
         isVisible={isSelectMarketModalVisible}
         shop={selectedShop}
         onCloseFn={() => setSelectMarketModalVisible(false)}
-      />
-
-      <SignInScreen
-        showModal={isSigninModalVisible}
-        onCloseFn={() => setIsSigninModalVisible(false)}
       />
     </SafeAreaView>
   );

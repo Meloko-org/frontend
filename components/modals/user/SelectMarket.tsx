@@ -87,7 +87,7 @@ export default function SelectMarketModal(
         props.onCloseFn(!props.isVisible);
       }}
     >
-      <SafeAreaView style={bgStyle}>
+      <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
         <View style={styles.navBar}>
           <View style={styles.buttonNavBar}>
             <ButtonBack onPressFn={() => props.onCloseFn(false)} />

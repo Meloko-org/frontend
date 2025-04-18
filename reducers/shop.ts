@@ -63,6 +63,8 @@ export const shopSlice = createSlice({
 
         if (index !== -1) {
           state.value.products[index] = action.payload;
+        } else {
+          state.value.products.push(action.payload);
         }
       }
     },

@@ -60,15 +60,33 @@ export default function StocksScreen({ navigation }: Props) {
     .find((element) => element.categoryName === category)
     ?.productsTypes.toString();
 
+  console.error(shopStore?.products?.length);
+
   const filteredProducts =
     productsType === "bulk"
-      ? shopStore?.products?.filter(
-          (product: StockData) =>
-            product.product.family.category.name === category,
-        )
-      : shopStore?.products?.filter(
-          (product: StockData) => product.product.family.name === family,
-        );
+      ? shopStore?.products
+          ?.filter(
+            (product: StockData) =>
+              product.product.family.category.name === category,
+          )
+          .map((product) => (
+            <StockProductCard
+              key={product._id}
+              stock={product}
+              onPress={() => handleOpenEdit(product)}
+            />
+          ))
+      : shopStore?.products
+          ?.filter(
+            (product: StockData) => product.product.family.name === family,
+          )
+          .map((product) => (
+            <StockProductCard
+              key={product._id}
+              stock={product}
+              onPress={() => handleOpenEdit(product)}
+            />
+          ));
 
   const handleOpenEdit = (product: StockData) => {
     // console.log(product);
@@ -115,15 +133,7 @@ export default function StocksScreen({ navigation }: Props) {
         />
       </View>
       <ScrollView>
-        <View className="px-3">
-          {filteredProducts?.map((product) => (
-            <StockProductCard
-              key={product._id}
-              stock={product}
-              onPress={() => handleOpenEdit(product)}
-            />
-          ))}
-        </View>
+        <View className="px-3">{filteredProducts}</View>
       </ScrollView>
     </SafeAreaView>
   );
