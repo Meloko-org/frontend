@@ -40,8 +40,8 @@ declare module "react-native-actions-sheet" {
     "become-premium": SheetDefinition;
     "edit-product": SheetDefinition<{
       payload: {
-        stock: StockData | null;
-        product: ProductData | null;
+        stock?: StockData | null;
+        product?: ProductData | null;
         productsType?: string;
       };
     }>;

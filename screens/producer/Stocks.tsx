@@ -9,7 +9,7 @@ import { useColorScheme } from "nativewind";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
-import { useRoute } from "@react-navigation/native";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
 import { SheetManager } from "react-native-actions-sheet";
@@ -48,6 +48,12 @@ export default function StocksScreen({ navigation }: Props) {
   );
   const stocksStore = useSelector(
     (state: { stocks: StocksState }) => state.stocks.value,
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // permet un refresh du composant
+    }, [shopStore?.products]),
   );
 
   const productsType = stocksStore
