@@ -25,6 +25,8 @@ import SignInScreen from "./screens/Signin";
 import CartScreen from "./screens/customer/Cart";
 import BookmarksScreen from "./screens/customer/Bookmarks";
 import UserProfileScreen from "./screens/customer/Profile";
+import UserProfileInformationsScreen from "./screens/customer/ProfileInformations";
+import UserProfileAddressesScreen from "./screens/customer/ProfileAddresses";
 import ShopProducerScreen from "./screens/producer/Shop";
 import BusinessScreen from "./screens/Business";
 import ProducerProfileScreen from "./screens/producer/Profile";
@@ -90,7 +92,7 @@ const store = configureStore({
 });
 const persistor = persistStore(store);
 
-const FontAwesome = _FontAwesome as React.ElementType;
+const FontAwesome = _FontAwesome as unknown as React.ElementType;
 
 // Create a Natrive Stack Navigator
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -177,6 +179,16 @@ const TabNavigatorUser: React.FC = () => {
         options={{ title: "Favoris" }}
       />
       <Tab.Screen name="UserProfile" component={UserProfileScreen} />
+      <Tab.Screen
+        name="UserProfileInformations"
+        component={UserProfileInformationsScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="UserProfileAddressesScreen"
+        component={UserProfileAddressesScreen}
+        options={{ tabBarButton: () => null }}
+      />
       <Tab.Screen
         name="ShopUser"
         component={ShopUserScreen}

@@ -1,4 +1,4 @@
-import { View, Alert, StyleSheet } from "react-native";
+import { View, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React from "react";
 import { useColorScheme } from "nativewind";
@@ -27,7 +27,7 @@ import TextBody1 from "../../components/utils/texts/Body1";
 import TextBody2 from "../../components/utils/texts/Body2";
 import userTools from "../../modules/userTools";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
-import MainButton from "../../components/utils/buttons/MainButton";
+import IconButton from "../../components/utils/buttons/Icon";
 import producerTools from "../../modules/producerTools";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
 const FontAwesome = _Fontawesome as React.ElementType;
@@ -47,7 +47,7 @@ type Props = {
   navigation: ProfileScreenNavigationProp;
 };
 
-export default function UserProfileScreen({ navigation }: Props) {
+export default function UserProfileInformationsScreen({ navigation }: Props) {
   const { colorScheme, toggleColorScheme } = useColorScheme();
   // Import the Clerk Auth functions
   const { signOut, isSignedIn, getToken } = useAuth();
@@ -167,21 +167,9 @@ export default function UserProfileScreen({ navigation }: Props) {
     });
   };
 
-  const handlePersonalInfoPress = () => {
+  const handleAddressesPress = () => {
     navigation.navigate("TabNavigatorUser", {
-      screen: "UserProfileInformations",
-    });
-  };
-
-  const handleBookmarksPress = () => {
-    navigation.navigate("TabNavigatorUser", {
-      screen: "BookmarksCustomer",
-    });
-  };
-
-  const handleSearchPress = () => {
-    navigation.navigate("TabNavigatorUser", {
-      screen: "Search",
+      screen: "UserProfileAddressesScreen",
     });
   };
 
@@ -200,100 +188,95 @@ export default function UserProfileScreen({ navigation }: Props) {
   console.log("");
 
   return (
-    <SafeAreaView className="flex bg-lightbg dark:bg-darkbg">
-      <View className="p-3 ">
+    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
+      <View className="p-3">
         {isSignedIn ? (
           <View className="h-full relative flex">
             <TextHeading2 extraClasses="mb-5" centered>
-              Mon compte
+              Mes informations
             </TextHeading2>
             <ScrollView>
-              <View>
-                <OpenScreenButton
-                  label="Mes commandes"
-                  onPressFn={handleOrdersPress}
-                  extraClasses="mb-1"
-                ></OpenScreenButton>
-
-                <OpenScreenButton
-                  label="Mes alertes"
-                  onPressFn={() => console.log("pressed button")}
-                  extraClasses="mb-1"
-                ></OpenScreenButton>
-
-                <View style={styles.app} className="mb-4">
-                  <View style={styles.row}>
-                    <View style={styles[`1col`]}>
-                      <MainButton
-                        iconName="magnifying-glass"
-                        iconSize={50}
-                        iconColor="#FFF"
-                        iconFamily="FontAwesome6Icon"
-                        onPressFn={handleSearchPress}
-                        buttonType="label-icon-top"
-                        label="Rechercher"
-                        buttonBackground={true}
-                      ></MainButton>
+              <View className="w-full">
+                {userStore.clerkPasswordEnabled === true ? (
+                  <>
+                    <Text
+                      placeholder="Changez votre email"
+                      label="Email"
+                      onChangeText={(value: string) => setEmail(value)}
+                      value={email}
+                      extraClasses="mb-2"
+                    ></Text>
+                    <Text
+                      placeholder="Saisissez votre mot de passe"
+                      label="Mot de passe"
+                      onChangeText={(value: string) => setPassword(value)}
+                      value={password}
+                      extraClasses="mb-2"
+                    ></Text>
+                    <Text
+                      placeholder="Confirmez votre mot de passse"
+                      label="Confirmation"
+                      onChangeText={(value: string) => setConfirm(value)}
+                      value={confirm}
+                      extraClasses="mb-5"
+                    ></Text>
+                  </>
+                ) : (
+                  <>
+                    <View className="ml-2">
+                      <TextBody2 extraClasses="font-bold text-secondary/60">
+                        EMAIL
+                      </TextBody2>
+                      <TextHeading4 extraClasses="mb-5">
+                        {userStore.email}
+                      </TextHeading4>
                     </View>
-                    <View style={styles[`1col`]}>
-                      <MainButton
-                        iconName="car"
-                        iconSize={50}
-                        iconColor="#FFF"
-                        onPressFn={() => console.log("button pressed")}
-                        buttonType="label-icon-top"
-                        label="Visiter"
-                        buttonBackground={true}
-                      ></MainButton>
-                    </View>
-                    <View style={styles[`1col`]}>
-                      <MainButton
-                        iconName="heart"
-                        iconSize={50}
-                        iconColor="#FFF"
-                        onPressFn={handleBookmarksPress}
-                        buttonType="label-icon-top"
-                        label="Favoris"
-                        buttonBackground={true}
-                      ></MainButton>
+                  </>
+                )}
+                <View className="flex flex-row justify-between items-center">
+                  <View className="flex flex-row justify-center items-center w-2/6">
+                    <View className="rounded-full bg-warning flex flex-row justify-center items-center mb-5 w-[100px] h-[100px]">
+                      <FontAwesome
+                        name="github-alt"
+                        size={80}
+                        color="#FFFFFF"
+                        className="absolute"
+                      />
                     </View>
                   </View>
+
+                  <View className="w-4/6">
+                    <Text
+                      placeholder="Saisissez votre nom"
+                      label="Nom"
+                      onChangeText={(value: string) => setFirstname(value)}
+                      value={firstname}
+                      extraClasses="mb-2"
+                    />
+                    <Text
+                      placeholder="Saisissez votre prénom"
+                      label="Prénom"
+                      onChangeText={(value: string) => setLastname(value)}
+                      value={lastname}
+                      extraClasses="mb-2"
+                    />
+                  </View>
                 </View>
-
-                <OpenScreenButton
-                  label="Mes informations"
-                  onPressFn={handlePersonalInfoPress}
-                  extraClasses="mb-1"
-                ></OpenScreenButton>
-                <OpenScreenButton
-                  label="Nous contacter"
-                  onPressFn={() => console.log("pressed button")}
-                  extraClasses="mb-1"
-                ></OpenScreenButton>
-
                 <ButtonPrimaryEnd
-                  label={colorScheme === "dark" ? "Mode clair" : "Mode sombre"}
-                  iconName={colorScheme === "dark" ? "sun-o" : "moon-o"}
-                  disabled={false}
-                  onPressFn={toggleMode}
-                  extraClasses="mb-3"
-                />
-                <ButtonSecondaryEnd
-                  label="Déconnexion"
-                  iconName="arrow-right"
-                  onPressFn={onSignoutPress}
-                  extraClasses="mb-3"
-                  disabled={false}
-                  isLoading={false}
+                  label="Mes adresses"
+                  iconName="address-book"
+                  onPressFn={handleAddressesPress}
                 />
               </View>
             </ScrollView>
-            <CustomButton
-              label="Basculer en mode Producteur"
-              extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-5 px-5 h-[60px]"
-              textClasses="text-lightbg dark:text-tertiary text-lg font-bold"
-              onPressFn={switchProducer}
-            ></CustomButton>
+            <ButtonPrimaryEnd
+              label="Enregistrer"
+              iconName="save"
+              disabled={isUserSaveLoading}
+              onPressFn={() => handleSaveUser()}
+              extraClasses=""
+              isLoading={isUserSaveLoading}
+            />
           </View>
         ) : (
           <View className="flex justify-center items-center h-full">
@@ -319,27 +302,3 @@ export default function UserProfileScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  app: {
-    flex: 4, // the number of columns you want to devide the screen into
-    marginHorizontal: "auto",
-    width: "100%",
-  },
-  row: {
-    flexDirection: "row",
-  },
-  "1col": {
-    flex: 1,
-    padding: 5,
-  },
-  "2col": {
-    flex: 2,
-  },
-  "3col": {
-    flex: 3,
-  },
-  "4col": {
-    flex: 4,
-  },
-});
