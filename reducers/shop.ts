@@ -38,7 +38,16 @@ export const shopSlice = createSlice({
         state.value.type = action.payload;
       }
     },
+    setProducts: (
+      state: ShopState,
+      action: PayloadAction<StockData[]>,
+    ): void => {
+      if (state.value) {
+        state.value.products = action.payload;
+      }
+    },
     addProducts: (
+      // à supprimer
       state: ShopState,
       action: PayloadAction<StockData[]>,
     ): void => {
@@ -53,6 +62,7 @@ export const shopSlice = createSlice({
       }
     },
     updateProduct: (
+      // à supprimer
       state: ShopState,
       action: PayloadAction<StockData>,
     ): void => {
@@ -110,6 +120,7 @@ export const {
   setShopData,
   resetShopData,
   setTypes,
+  setProducts,
   addProducts,
   updateProduct,
   resetProducts,

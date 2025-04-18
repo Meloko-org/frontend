@@ -20,6 +20,7 @@ type InputTextProps = {
   extraClasses?: string;
   iconName?: string;
   secureTextEntry?: boolean;
+  twoLines?: boolean;
   onIconPressFn?: ((event: GestureResponderEvent) => void) | undefined;
 };
 
@@ -38,13 +39,17 @@ export default function InputText(props: InputTextProps): JSX.Element {
         </Text>
         <TextInput
           value={props.value}
-          className={`${props.size === "large" ? "text-lg leading-5" : "text-base h-10"} ${props.iconName ? "w-80" : "w-full"} dark:text-lightbg`}
+          className={`${props.size === "large" ? "text-lg leading-5" : "text-base h-10"} 
+                      ${props.iconName ? "w-80" : "w-full"} 
+                      ${props.twoLines && "h-[60px] leading-5"}
+                      dark:text-lightbg `}
           placeholder={props.placeholder}
           placeholderTextColor={colorScheme === "dark" ? "#FCFFF0" : "#444C3D"}
           onChangeText={(value) => props.onChangeText(value)}
           autoCapitalize={props.autoCapitalize ? "none" : props.autoCapitalize}
           secureTextEntry={props.secureTextEntry}
           editable={props.editable}
+          multiline={props.twoLines ?? false}
         ></TextInput>
       </View>
 
