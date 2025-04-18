@@ -58,7 +58,47 @@ const updateUser = async (token: string | null, values: {}) => {
   }
 };
 
+const addUserAddress = async (token: string | null, values: {}) => {
+  try {
+    const response = await fetch(`${API_ROOT}/users/addresses`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        mode: "cors",
+      },
+      body: JSON.stringify(values),
+    });
+    const data = await response.json();
+    console.warn("new address", data);
+
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const removeUserAddress = async (token: string | null, id: string) => {
+  try {
+    const response = await fetch(`${API_ROOT}/users/addresses/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        mode: "cors",
+      },
+    });
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export default {
   getUserInfos,
   updateUser,
+  addUserAddress,
+  removeUserAddress,
 };

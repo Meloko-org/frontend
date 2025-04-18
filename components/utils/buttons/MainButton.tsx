@@ -1,7 +1,13 @@
 import React from "react";
 import { useState, useRef } from "react";
-import { TouchableOpacity, Animated, Easing, Text } from "react-native";
-import { GestureResponderEvent } from "react-native";
+import {
+  TouchableOpacity,
+  Animated,
+  Easing,
+  Text,
+  View,
+  GestureResponderEvent,
+} from "react-native";
 
 import EntypoIcon from "@expo/vector-icons/Entypo";
 import EvilIcon from "@expo/vector-icons/EvilIcons";
@@ -33,7 +39,9 @@ type PrimaryButtonProps = {
   onPressFn: ((event: GestureResponderEvent) => void) | undefined;
   animated?: boolean;
   iconSize?: number;
-  buttonBackground: boolean;
+  buttonBackground?: boolean;
+  disabled?: boolean;
+  isLoading?: boolean;
 };
 
 const iconLibraries = {
@@ -63,6 +71,8 @@ export default function MainButton({
   extraClasses,
   onPressFn,
   animated,
+  disabled,
+  isLoading,
 }: PrimaryButtonProps): JSX.Element {
   const rotationValue = useRef(new Animated.Value(0)).current; // Valeur animée pour la rotation
   const [rotated, setRotated] = useState(false); // État pour savoir si l'icône est déjà pivotée
@@ -99,7 +109,7 @@ export default function MainButton({
     ? iconLibraries[iconFamily]
     : FontAwesome5Icon;
 
-  return (
+  const labelIconTop = (
     <TouchableOpacity
       className={`${extraClasses} flex rounded-lg p-1 justify-center items-center bg-primary/90 mb-2 h-full`}
       onPress={handlePress}
@@ -117,4 +127,123 @@ export default function MainButton({
       <Text className="text-white text-lg text-center">{label}</Text>
     </TouchableOpacity>
   );
+
+  const ball1 = useRef(new Animated.Value(0)).current;
+  const ball2 = useRef(new Animated.Value(0)).current;
+  const ball3 = useRef(new Animated.Value(0)).current;
+
+  Animated.loop(
+    Animated.stagger(100, [
+      Animated.sequence([
+        Animated.timing(ball1, {
+          toValue: -10,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(ball1, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.sequence([
+        Animated.timing(ball2, {
+          toValue: -10,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(ball2, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.sequence([
+        Animated.timing(ball3, {
+          toValue: -10,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(ball3, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]),
+  ).start();
+
+  const labelIconEnd = (
+    <TouchableOpacity
+      className={`
+                    ${extraClasses} 
+                    ${disabled ? "bg-primary/60" : "bg-primary/90"}
+                    relative flex flex-row rounded-lg shadow-sm py-1 justify-center items-center px-2 w-min
+                `}
+      onPress={handlePress}
+      disabled={disabled}
+    >
+      {isLoading ? (
+        <View className="flex flex-row space-x-2 justify-center items-center h-12">
+          <Animated.View
+            className="h-4 w-4 bg-lightbg rounded-full"
+            style={{ transform: [{ translateY: ball1 }] }}
+          ></Animated.View>
+          <Animated.View
+            className="h-4 w-4 bg-lightbg rounded-full"
+            style={{ transform: [{ translateY: ball2 }] }}
+          ></Animated.View>
+          <Animated.View
+            className="h-4 w-4 bg-lightbg rounded-full"
+            style={{ transform: [{ translateY: ball3 }] }}
+          ></Animated.View>
+        </View>
+      ) : (
+        <>
+          <Text className="text-lightbg text-center font-bold text-[24px]">
+            {label}
+          </Text>
+          {IconComponent && (
+            <IconComponent
+              name={iconName}
+              size={25}
+              color="#FFFFFF"
+              className="absolute"
+              style={{ right: 20 }}
+            />
+          )}
+        </>
+      )}
+    </TouchableOpacity>
+  );
+
+  const icon = (
+    <TouchableOpacity
+      className={`${extraClasses} p-1 w-fit`}
+      onPress={handlePress}
+    >
+      {/* Applique la rotation à l'icône via transform */}
+      <Animated.View style={{ transform: [{ rotate: rotation }] }}>
+        {IconComponent && (
+          <IconComponent
+            name={iconName}
+            size={iconSize ? iconSize : 25}
+            color={iconColor}
+          />
+        )}
+      </Animated.View>
+    </TouchableOpacity>
+  );
+  const selectedButton = () => {
+    switch (buttonType) {
+      case "label-icon-top":
+        return labelIconTop;
+      case "label-icon-end":
+        return labelIconEnd;
+      case "icon":
+        return icon;
+    }
+  };
+
+  return <>{selectedButton()}</>;
 }

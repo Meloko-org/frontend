@@ -1,6 +1,6 @@
-import { View, Alert, Text } from "react-native";
+import { View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React from "react";
+import React, { useState } from "react";
 import { useColorScheme } from "nativewind";
 import Animated, {
   useAnimatedStyle,
@@ -8,42 +8,28 @@ import Animated, {
   withTiming,
   Easing,
 } from "react-native-reanimated";
-import OpenMenuButton from "../../components/utils/buttons/OpenMenu";
-
-import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
-import ButtonSecondaryEnd from "../../components/utils/buttons/SecondaryEnd";
-import CustomButton from "../../components/utils/buttons/Custom";
 import { useAuth } from "@clerk/clerk-expo";
-import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { UserState, updateUser, resetUser } from "../../reducers/user";
-import {
-  ProducerState,
-  setProducerData,
-  resetProducerData,
-} from "../../reducers/producer";
-import { ShopState, setShopData, resetShopData } from "../../reducers/shop";
-import { ModeState, changeMode } from "../../reducers/mode";
-import { emptyCart } from "../../reducers/cart";
-
-// import SignInScreen from "../Signin";
-import SignInScreen from "../Signin";
-import TextHeading2 from "../../components/utils/texts/Heading2";
-import TextBody1 from "../../components/utils/texts/Body1";
-import TextBody2 from "../../components/utils/texts/Body2";
-import userTools from "../../modules/userTools";
-import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
-import IconButton from "../../components/utils/buttons/Icon";
-import Address from "../../components/cards/Address";
-import producerTools from "../../modules/producerTools";
-import _Fontawesome from "react-native-vector-icons/FontAwesome";
-const FontAwesome = _Fontawesome as React.ElementType;
-
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
-import TextHeading4 from "../../components/utils/texts/Heading4";
 import { ScrollView } from "react-native-gesture-handler";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import _Fontawesome from "react-native-vector-icons/FontAwesome";
+
+import { updateUserAddresses, UserState } from "../../reducers/user";
+import { setProducerData } from "../../reducers/producer";
+import { setShopData } from "../../reducers/shop";
+
+import OpenMenuButton from "../../components/utils/buttons/OpenMenu";
+import InputText from "../../components/utils/inputs/Text";
+import TextHeading2 from "../../components/utils/texts/Heading2";
+import MainButton from "../../components/utils/buttons/MainButton";
+import Address from "../../components/cards/Address";
+
+import producerTools from "../../modules/producerTools";
 import shopTools from "../../modules/shopTools";
+import userTools from "../../modules/userTools";
+
+import { RootStackParamList } from "../../types/Navigation";
+import { UserAddressData } from "../../types/API";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -68,7 +54,18 @@ export default function UserProfileAddressesScreen({ navigation }: Props) {
   const contentType = useSharedValue(0);
   const heightType = useSharedValue(0);
   const [isUserSaveLoading, setUserSaveLoading] = useState(false);
+  const [isNewAddressSaveLoading, setNewAddressSaveLoading] = useState(false);
 
+  const [newUserAddress, setNewUserAddress] = useState<UserAddressData>({
+    name: "",
+    address: {
+      address1: "",
+      address2: "",
+      postalCode: 0,
+      city: "",
+      country: "",
+    },
+  });
   // useEffect(() => {
   //     if (!isSignedIn) {
   //         // à modifier
@@ -84,6 +81,30 @@ export default function UserProfileAddressesScreen({ navigation }: Props) {
     height: heightType.value,
     opacity: heightType.value > 0 ? 1 : 0, // Facultatif : gérer l'opacité
   }));
+
+  const addNewUserAddress = async () => {
+    try {
+      setNewAddressSaveLoading(true);
+
+      const token = await getToken();
+      // store producer info in the store
+      const newAddressResponse = await userTools.addUserAddress(
+        token,
+        newUserAddress,
+      );
+
+      if (!newAddressResponse.success) {
+        console.error(newAddressResponse.message);
+        return;
+      }
+
+      dispatch(updateUserAddresses(newAddressResponse.user.addresses));
+
+      setNewAddressSaveLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -160,12 +181,125 @@ export default function UserProfileAddressesScreen({ navigation }: Props) {
                     }}
                   >
                     <View className="py-5">
-                      <Text>FORMULAIRE ICI</Text>
+                      <InputText
+                        placeholder="Ex: 4 rue de Paris"
+                        label="Adresse"
+                        extraClasses="mb-2"
+                        onChangeText={(value: string) =>
+                          setNewUserAddress((prev) => ({
+                            ...prev,
+                            address: {
+                              ...prev.address,
+                              address1: value,
+                            },
+                          }))
+                        }
+                        value={newUserAddress.address.address1}
+                      ></InputText>
+                      <InputText
+                        placeholder="Ex: Bat 5 Esc 2"
+                        label="Complément d'adresse"
+                        extraClasses="mb-2"
+                        onChangeText={(value: string) =>
+                          setNewUserAddress((prev) => ({
+                            ...prev,
+                            address: {
+                              ...prev.address,
+                              address2: value,
+                            },
+                          }))
+                        }
+                        value={newUserAddress.address.address2}
+                      ></InputText>
+                      <View className="flex-row">
+                        <InputText
+                          placeholder="75001"
+                          label="Code postal"
+                          extraClasses="mb-2 w-[45%] mr-[5%]"
+                          onChangeText={(value: number) =>
+                            setNewUserAddress((prev) => ({
+                              ...prev,
+                              address: {
+                                ...prev.address,
+                                postalCode: value,
+                              },
+                            }))
+                          }
+                          value={newUserAddress.address.postalCode}
+                        ></InputText>
+                        <InputText
+                          placeholder="Paris"
+                          label="Ville"
+                          extraClasses="mb-2 w-1/2 mr-2"
+                          onChangeText={(value: string) =>
+                            setNewUserAddress((prev) => ({
+                              ...prev,
+                              address: {
+                                ...prev.address,
+                                city: value,
+                              },
+                            }))
+                          }
+                          value={newUserAddress.address.city}
+                        ></InputText>
+                      </View>
+                      <InputText
+                        placeholder="Ex: France"
+                        label="Pays"
+                        extraClasses="mb-2"
+                        onChangeText={(value: string) =>
+                          setNewUserAddress((prev) => ({
+                            ...prev,
+                            address: {
+                              ...prev.address,
+                              country: value,
+                            },
+                          }))
+                        }
+                        value={newUserAddress.address.country}
+                      ></InputText>
+                      <View className="flex-row">
+                        <Text className=" text-white text-sm font-bold p-2 w-[30%] text-right">
+                          Enregistrer sous:
+                        </Text>
+                        <InputText
+                          placeholder="Ex: Maison"
+                          label="Nom de l'adresse"
+                          extraClasses="mb-2 w-[70%]"
+                          onChangeText={(value: string) =>
+                            setNewUserAddress((prev) => ({
+                              ...prev,
+                              name: value,
+                            }))
+                          }
+                          value={newUserAddress.name}
+                        ></InputText>
+                      </View>
+                      <MainButton
+                        buttonType="label-icon-end"
+                        label="Enregistrer"
+                        iconName="save"
+                        onPressFn={addNewUserAddress}
+                        isLoading={isNewAddressSaveLoading}
+                      ></MainButton>
                     </View>
                   </View>
                 </Animated.View>
               </View>
-              <View>{addresses}</View>
+              <View>
+                <Text className="mb-2 text-white text-lg font-bold">
+                  Adresses enregistrées
+                </Text>
+                {addresses.length > 0 ? (
+                  addresses
+                ) : (
+                  <View className="w-full">
+                    <TextHeading2 extraClasses="mb-4 text-center">
+                      Aucune adresse enregistrée
+                    </TextHeading2>
+                  </View>
+                )}
+              </View>
             </ScrollView>
           </View>
         ) : (
@@ -173,7 +307,8 @@ export default function UserProfileAddressesScreen({ navigation }: Props) {
             <TextHeading2 extraClasses="mb-3">
               Connectez-vous pour voir votre profil.
             </TextHeading2>
-            <ButtonPrimaryEnd
+            <MainButton
+              buttonType="label-icon-end"
               label="Connexion"
               iconName="sign-in"
               disabled={isUserSaveLoading}

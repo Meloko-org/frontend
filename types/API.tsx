@@ -156,8 +156,14 @@ type AddressData = {
   postalCode: Number | null;
   city: String | null;
   country: String | null;
-  latitude: Number | null;
-  longitude: Number | null;
+  latitude?: Number | null;
+  longitude?: Number | null;
+};
+
+type UserAddressData = {
+  _id?: string;
+  name: String;
+  address: AddressData;
 };
 
 type UserData = {
@@ -170,7 +176,7 @@ type UserData = {
   orders: object[];
   clerkPasswordEnabled: boolean | null | undefined;
   producer: ProducerData | null;
-  addresses: AddressData[] | null;
+  addresses: UserAddressData[] | null;
 };
 
 type ProducerData = {
@@ -200,6 +206,7 @@ type ApiResponse<T> = {
 };
 
 export type {
+  UserAddressData,
   ProductData,
   ShopData,
   UserData,
