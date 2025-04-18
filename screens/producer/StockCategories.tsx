@@ -184,7 +184,7 @@ export default function StockCategoriesScreen({ navigation }: Props) {
         }),
       );
     }
-  }, [isFetchLoading]);
+  }, [shopStore?.products, globalCategories, stocksStore]);
 
   // console.log("shopTypes :", JSON.stringify(shopStore.products, null, 2))
   // console.log(JSON.stringify(openScreenButtons, null, 2))
