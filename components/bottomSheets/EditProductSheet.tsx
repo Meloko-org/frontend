@@ -24,15 +24,19 @@ import { StockData, TagData } from "../../types/API";
 import SelectableTag from "../utils/badges/SelectableTag";
 import Product from "../cards/Products";
 import stocksTools from "../../modules/stocksTools";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function EditProductSheet(props: SheetProps<"edit-product">) {
-  console.log("payload reçu dans EditProductSheet :", props.payload);
+  console.log(
+    "payload reçu dans EditProductSheet :",
+    JSON.stringify(props.payload, null, 2),
+  );
   const dispatch = useDispatch();
   const { getToken } = useAuth();
 
-  const [createMode, setCreateMode] = useState<boolean>(false);
-
-  const [isBulk, setBulk] = useState<boolean>(false);
+  const [newProductMode, setNewProductMode] = useState<boolean>(false);
+  const [isBulk, setBulk] = useState<boolean | undefined>(false);
+  const [familyId, setFamilyId] = useState<string | undefined>();
 
   const [isSaveLoading, setSaveLoading] = useState<boolean>(false);
 
@@ -69,75 +73,60 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
   };
 
   useEffect(() => {
-    let familyId: string | undefined;
-    if (props.payload?.stock) {
-      familyId = props.payload?.stock?.product.family._id;
-    } else if (props.payload?.product) {
-      familyId = props.payload?.product?.family._id;
-      setCreateMode(true);
-    }
+    if (!props.payload) return;
 
-    console.log("familyId :", familyId);
+    const stock = props.payload?.stock;
+    const product = props.payload?.product;
+    const family = stock?.product.family ?? product?.family;
+    const bulk = family?.productsTypes.includes("bulk");
 
-    fetchSuggestedTags(familyId);
+    setFamilyId(family?._id);
+    setBulk(bulk);
+    setNewProductMode(!!product && !stock);
 
-    // si on affiche un produit déjà en stock (!= produit vierge)
-    if (props.payload?.stock !== null) {
-      // détermine si c'est un produit vrac
-      const bulk = props.payload?.stock?.product.family.productsTypes.includes(
-        "bulk",
-      )
-        ? true
-        : false;
-      setBulk(bulk);
+    fetchSuggestedTags(family?._id);
 
-      setPrice(Number(props.payload?.stock?.price.$numberDecimal));
-      setStock(Number(props.payload?.stock?.stock.$numberDecimal));
-
-      if (!bulk) {
-        setProductCustomName(props.payload?.stock?.productCustomName);
-        setPricePerKilo(
-          Number(props.payload?.stock?.pricePerKilo.$numberDecimal),
-        );
-        setOrigin(props.payload?.stock?.origin);
-        setFormat(props.payload?.stock?.format);
-        setPortion(props.payload?.stock?.portion);
-        setBestBeforeDate(props.payload?.stock?.bestBeforeDate);
-        setDescription(props.payload?.stock?.description);
-        setWeightPerUnit(props.payload?.stock?.weightPerUnit);
-        setImage(props.payload?.stock?.image);
-      } else {
-        setWeightPerUnit(
-          props.payload?.stock?.product.weight.measurement.$numberDecimal +
-            " " +
-            props.payload?.stock?.product.weight.unit,
-        );
-        setTags(props.payload?.stock?.tags);
-
-        // variables adapted
-        setNameAdapted(props.payload?.stock?.product.name);
-        setFamilyAdpated(props.payload?.stock?.product.family.name);
-        setImageAdapted(props.payload?.stock?.product.image);
-      }
-
-      // si on affiche un produit vierge
-    } else if (props.payload?.product !== null) {
-      const bulk = props.payload?.productsType === "bulk";
-      setBulk(bulk);
-
+    if (!!product && !stock) {
+      // mode création
       if (bulk) {
         setWeightPerUnit(
-          props.payload?.product?.weight.measurement.$numberDecimal +
-            " " +
-            props.payload?.product?.weight.unit,
+          product.weight.measurement.$numberDecimal + " " + product.weight.unit,
         );
-        // variables adapted
-        setNameAdapted(props.payload?.product?.name);
-        setFamilyAdpated(props.payload?.product?.family.name);
-        setImageAdapted(props.payload?.product?.image);
+        setNameAdapted(product.name);
+        setFamilyAdpated(product.family.name);
+        setImageAdapted(product.image);
+      } else {
+        // ...
+      }
+    } else if (stock) {
+      // mode modification
+      if (bulk) {
+        setPrice(Number(stock.price.$numberDecimal));
+        setStock(Number(stock.stock.$numberDecimal));
+        setWeightPerUnit(
+          stock.product.weight.measurement.$numberDecimal +
+            " " +
+            stock.product.weight.unit,
+        );
+        setTags(stock.tags);
+        setNameAdapted(stock.product.name);
+        setFamilyAdpated(stock.product.family.name);
+        setImageAdapted(stock.product.image);
+      } else {
+        setPrice(Number(stock.price.$numberDecimal));
+        setStock(Number(stock.stock.$numberDecimal));
+        setProductCustomName(stock.productCustomName);
+        setPricePerKilo(Number(stock.pricePerKilo.$numberDecimal));
+        setOrigin(stock.origin);
+        setFormat(stock.format);
+        setPortion(stock.portion);
+        setBestBeforeDate(stock.bestBeforeDate);
+        setDescription(stock.description);
+        setWeightPerUnit(stock.weightPerUnit);
+        setImage(stock.image);
       }
     }
-  }, []);
+  }, [props.payload]);
 
   const isTagSelected = (tagId: string) => {
     return tags?.some((t) => t._id === tagId);
@@ -256,14 +245,6 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
       payload: "delete",
     });
   };
-
-  // console.log("le produit :", JSON.stringify(props.payload?.stock, null, 2));
-  // console.log("produit vrac :", isBulk);
-  console.log(
-    "les tags :",
-    tags?.map((tag) => tag.name),
-  );
-  console.log("createMode :", createMode);
 
   return (
     <ActionSheet
@@ -487,7 +468,7 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
       </ScrollView>
 
       <View className="flex flex-row px-3 py-2 bg-lightbg dark:bg-darkbg">
-        {!createMode && (
+        {!newProductMode && (
           <>
             <View className="w-1/6">
               <IconButton
@@ -515,7 +496,7 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
         )}
 
         <View
-          className={`${createMode ? "flex flex-row justify-center w-full" : "w-3/6"}`}
+          className={`${newProductMode ? "flex flex-row justify-center w-full" : "w-3/6"}`}
         >
           <PrimaryButton
             label="Sauvegarder"

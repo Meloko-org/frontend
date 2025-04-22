@@ -48,7 +48,6 @@ declare module "react-native-actions-sheet" {
       payload: {
         stock?: StockData | null;
         product?: ProductData | null;
-        productsType?: string;
       };
     }>;
     "product-families": SheetDefinition<{

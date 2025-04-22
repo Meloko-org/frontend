@@ -20,6 +20,7 @@ import productsTools from "../../modules/productsTools";
 import SecondaryButton from "../../components/utils/buttons/Secondary";
 import TextBody1 from "../../components/utils/texts/Body1";
 import { StocksState } from "../../reducers/stocks";
+import { handleSheetFlow, showAlert } from "../../helpers/sheetHelpers";
 
 type StocksAddScreenRouteProp = RouteProp<RootStackParamList, "StocksAdd">;
 
@@ -111,10 +112,12 @@ export default function StocksAddScreen({ navigation }: Props) {
   const renderButtons = () => {
     if (!products || products.length === 0) return null;
 
+    // récupère le type de produit en fonction de la catégorie depuis le store
     const productsType = stocksStore
       .find((element) => element.categoryName === category)
       ?.productsTypes.toString();
 
+    // définit le nom du produit à afficher en fonction de son type
     return products.map((product) => {
       const label =
         productsType === "bulk"
@@ -127,12 +130,24 @@ export default function StocksAddScreen({ navigation }: Props) {
           label={label}
           disabled={false}
           isLoading={false}
-          onPressFn={() => {
-            SheetManager.show("edit-product", {
-              payload: {
-                stock: null,
-                product: product,
-                productsType: productsType,
+          onPressFn={async () => {
+            await handleSheetFlow({
+              sheet: "edit-product",
+              payload: { product: product },
+              onAfter: async (action) => {
+                switch (action) {
+                  case "edit-success":
+                    await showAlert("Produit ajouté.", "success");
+                    break;
+                  case "edit-failed":
+                    await showAlert(
+                      "Erreur lors de l'ajout du produit",
+                      "error",
+                    );
+                    break;
+                  default:
+                    break;
+                }
               },
             });
           }}
