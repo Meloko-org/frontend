@@ -162,7 +162,7 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
 
     let values;
     if (isBulk) {
-      if (props.payload?.productsType) {
+      if (newProductMode) {
         values = {
           product: props.payload?.product,
           price,
@@ -181,7 +181,7 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
         };
       }
     } else {
-      if (props.payload?.productsType) {
+      if (newProductMode) {
         values = {
           product: props.payload?.product,
           productCustomName,
@@ -219,7 +219,7 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
 
     let stockResponse;
 
-    if (props.payload?.productsType) {
+    if (newProductMode) {
       stockResponse = await stocksTools.createStocks(token, values);
     } else {
       stockResponse = await stocksTools.updateStocks(token, values);
