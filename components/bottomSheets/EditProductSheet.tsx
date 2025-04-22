@@ -346,10 +346,16 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
                 size={30}
                 onPressFn={() => handleQuantityChange(-1)}
               />
-              <View className="flex flex-row justify-center w-12">
-                <TextHeading4 centered extraClasses="mx-2">
+              <View className="flex flex-row justify-center w-24">
+                {/* <TextHeading4 centered extraClasses="mx-2">
                   {stock}
-                </TextHeading4>
+                </TextHeading4> */}
+                <TextInput
+                  className="bg-white rounded-lg w-14 text-right text-xl leading-5 pr-2"
+                  value={stock?.toString() ?? ""}
+                  onChangeText={(value: string) => setStock(Number(value))}
+                  keyboardType="numeric"
+                />
               </View>
               <IconButton
                 iconName="plus"
