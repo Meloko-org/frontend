@@ -7,9 +7,9 @@ type SecondaryButtonProps = {
   label: string;
   extraClasses?: string;
   textClasses?: string;
-  disabled: boolean;
+  disabled?: boolean;
   onPressFn: ((event: GestureResponderEvent) => void) | undefined;
-  isLoading: boolean;
+  isLoading?: boolean;
 };
 
 export default function SecondaryButton({

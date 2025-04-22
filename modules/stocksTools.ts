@@ -85,7 +85,7 @@ const getSuggestedTags = async (
 const createStocks = async (
   token: string | null,
   values: StockData,
-): Promise<ApiResponse<StockData>> => {
+): Promise<ApiResponse<StockData[]>> => {
   try {
     const response = await fetch(`${API_ROOT}/stocks/create`, {
       method: "POST",
@@ -107,7 +107,7 @@ const createStocks = async (
     const data = await response.json();
 
     return data.success
-      ? { success: true, data: data.product }
+      ? { success: true, data: data.stocks }
       : { success: false, data: null, message: data.message };
   } catch (error) {
     console.log(error);
@@ -122,7 +122,7 @@ const createStocks = async (
 const updateStocks = async (
   token: string | null,
   values: StockData,
-): Promise<ApiResponse<StockData>> => {
+): Promise<ApiResponse<StockData[]>> => {
   try {
     const response = await fetch(`${API_ROOT}/stocks/update`, {
       method: "POST",
@@ -144,7 +144,7 @@ const updateStocks = async (
     const data = await response.json();
 
     return data.success
-      ? { success: true, data: data.updatedProduct }
+      ? { success: true, data: data.stocks }
       : { success: false, data: null, message: data.message };
   } catch (error) {
     console.log(error);
@@ -161,7 +161,7 @@ const deleteStocks = async (
   id: string,
 ): Promise<ApiResponse<StockData[]>> => {
   try {
-    const response = await fetch(`${API_ROOT}/stocks/{id}`, {
+    const response = await fetch(`${API_ROOT}/stocks/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,

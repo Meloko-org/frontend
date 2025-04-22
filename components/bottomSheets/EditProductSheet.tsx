@@ -236,60 +236,25 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
       stockResponse = await stocksTools.updateStocks(token, values);
     }
 
-    if (!stockResponse.success) {
-      SheetManager.show("alert", {
-        payload: {
-          message: stockResponse.message!,
-          alertType: "error",
-        },
-      });
-      setSaveLoading(false);
-      return;
-    }
-
-    console.log("response :", stockResponse.data);
-
-    dispatch(updateProduct(stockResponse.data!));
     setSaveLoading(false);
 
-    let alertMessage: string;
-    if (props.payload?.productsType) {
-      alertMessage = "Produit créé.";
-    } else {
-      alertMessage = "Produit modifié.";
+    if (!stockResponse.success) {
+      SheetManager.hide(props.sheetId, {
+        payload: "edit-failed",
+      });
     }
 
-    SheetManager.show("alert", {
-      payload: {
-        message: alertMessage,
-        alertType: "success",
-      },
+    dispatch(setProducts(stockResponse.data!));
+
+    SheetManager.hide(props.sheetId, {
+      payload: "edit-success",
     });
   };
 
   const handleDeleteProduct = async (id: string) => {
-    const token = await getToken();
-    const deleteResponse = await stocksTools.deleteStocks(token, id);
-
-    if (!deleteResponse.success) {
-      SheetManager.show("alert", {
-        payload: {
-          message: deleteResponse.message!,
-          alertType: "error",
-        },
-      });
-    }
-
-    dispatch(setProducts(deleteResponse.data!));
-
-    SheetManager.show("alert", {
-      payload: {
-        message: "Produit supprimé.",
-        alertType: "success",
-      },
+    SheetManager.hide(props.sheetId, {
+      payload: "delete",
     });
-
-    // fermer la sheet courante
   };
 
   // console.log("le produit :", JSON.stringify(props.payload?.stock, null, 2));

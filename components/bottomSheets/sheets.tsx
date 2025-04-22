@@ -1,5 +1,9 @@
 import React from "react";
-import { registerSheet, SheetDefinition } from "react-native-actions-sheet";
+import {
+  registerSheet,
+  RouteDefinition,
+  SheetDefinition,
+} from "react-native-actions-sheet";
 import CustomAlert from "./CustomAlert";
 import ProductDetails from "./ProductDetails";
 import MapSearchResults from "./MapSearchResults";
@@ -7,6 +11,7 @@ import BecomePremium from "./BecomePremium";
 import { ProductData, StockData } from "../../types/API";
 import EditProductSheet from "./EditProductSheet";
 import ProductFamiliesSheet from "./ProductFamilies";
+import ConfirmSheet from "./Confirm";
 
 registerSheet("alert", CustomAlert);
 registerSheet("product-details", ProductDetails);
@@ -14,6 +19,7 @@ registerSheet("map-search-results", MapSearchResults);
 registerSheet("become-premium", BecomePremium);
 registerSheet("edit-product", EditProductSheet);
 registerSheet("product-families", ProductFamiliesSheet);
+registerSheet("confirm", ConfirmSheet);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -22,7 +28,7 @@ declare module "react-native-actions-sheet" {
     alert: SheetDefinition<{
       payload: {
         message: string;
-        alertType: "success" | "error" | "warning";
+        alertType: "info" | "success" | "error" | "warning";
       };
     }>;
     "product-details": SheetDefinition<{
@@ -50,6 +56,13 @@ declare module "react-native-actions-sheet" {
         category: string;
         onFamilySelected: (name: string) => void;
       };
+    }>;
+    confirm: SheetDefinition<{
+      payload: {
+        message: string;
+        alertType: "info" | "success" | "error" | "warning";
+      };
+      returnedValue: boolean;
     }>;
   }
 }

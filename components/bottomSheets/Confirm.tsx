@@ -1,10 +1,15 @@
 import React from "react";
 import { View, Text } from "react-native";
-import ActionSheet, { SheetProps } from "react-native-actions-sheet";
+import ActionSheet, {
+  SheetManager,
+  SheetProps,
+} from "react-native-actions-sheet";
 import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
 import TextHeading3 from "../utils/texts/Heading3";
+import PrimaryButton from "../utils/buttons/Primary";
+import SecondaryButton from "../utils/buttons/Secondary";
 
-export default function CustomAlert(props: SheetProps<"alert">) {
+export default function ConfirmSheet(props: SheetProps<"confirm">) {
   const alertIcon = () => {
     switch (props.payload?.alertType) {
       case "warning":
@@ -45,6 +50,25 @@ export default function CustomAlert(props: SheetProps<"alert">) {
         <TextHeading3 centered extraClasses="font-extrabold text-xl">
           {props.payload?.message}
         </TextHeading3>
+        <View className="flex flex-row w-[50%] justify-around mt-5">
+          <SecondaryButton
+            label="Annuler"
+            onPressFn={() => {
+              SheetManager.hide(props.sheetId, {
+                payload: false,
+              });
+            }}
+            extraClasses="h-12 px-2"
+          />
+          <PrimaryButton
+            label="OK"
+            onPressFn={() => {
+              SheetManager.hide(props.sheetId, {
+                payload: true,
+              });
+            }}
+          />
+        </View>
       </View>
     </ActionSheet>
   );
