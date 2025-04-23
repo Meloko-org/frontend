@@ -5,40 +5,15 @@ import ActionSheet, {
   SheetProps,
 } from "react-native-actions-sheet";
 import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
-import TextHeading3 from "../utils/texts/Heading3";
 import PrimaryButton from "../utils/buttons/Primary";
 import SecondaryButton from "../utils/buttons/Secondary";
+import TextHeading4 from "../utils/texts/Heading4";
+import IconButton from "../utils/buttons/Icon";
+import CustomButton from "../utils/buttons/Custom";
 
-export default function ImageUploaderSheet(props: SheetProps<"confirm">) {
-  const alertIcon = () => {
-    switch (props.payload?.alertType) {
-      case "warning":
-        return (
-          <FontAwesome6Icon
-            name="triangle-exclamation"
-            size={70}
-            color="#ff9d00"
-          />
-        );
-      case "error":
-        return (
-          <FontAwesome6Icon
-            name="circle-exclamation"
-            size={70}
-            color="#f2170c"
-          />
-        );
-      case "success":
-        return (
-          <FontAwesome6Icon name="circle-check" size={70} color="#29db11" />
-        );
-      case "info":
-        return (
-          <FontAwesome6Icon name="circle-info" size={70} color="#008ffc" />
-        );
-    }
-  };
-
+export default function ImageUploaderSheet(
+  props: SheetProps<"image-uploader">,
+) {
   return (
     <ActionSheet
       indicatorStyle={{ backgroundColor: "#000000" }}
@@ -46,25 +21,38 @@ export default function ImageUploaderSheet(props: SheetProps<"confirm">) {
       id={props.sheetId}
     >
       <View className="p-5 min-h-min w-full flex justify-center items-center bg-white dark:bg-darkbg">
-        <View className="mb-3">{alertIcon()}</View>
-        <TextHeading3 centered extraClasses="font-extrabold text-xl">
+        <TextHeading4 centered extraClasses="font-extrabold text-xl">
           {props.payload?.message}
-        </TextHeading3>
-        <View className="flex flex-row w-[50%] justify-around mt-5">
-          <SecondaryButton
-            label="Annuler"
+        </TextHeading4>
+        <View className="flex flex-row w-[80%] justify-around mt-5">
+          <IconButton
+            iconName="arrow-rotate-left"
+            iconFamily="FontAwesome6Icon"
+            iconColor="#ffffff"
+            extraClasses="bg-danger h-14 w-14"
+            onPressFn={() => {
+              SheetManager.hide(props.sheetId);
+            }}
+          />
+          <IconButton
+            iconName="image"
+            iconFamily="FontAwesome6Icon"
+            iconColor="#ffffff"
+            extraClasses="bg-primary h-14 w-14"
             onPressFn={() => {
               SheetManager.hide(props.sheetId, {
-                payload: false,
+                payload: "image",
               });
             }}
-            extraClasses="h-12 px-2"
           />
-          <PrimaryButton
-            label="OK"
+          <IconButton
+            iconName="camera"
+            iconFamily="FontAwesome6Icon"
+            iconColor="#ffffff"
+            extraClasses="bg-primary h-14 w-14"
             onPressFn={() => {
               SheetManager.hide(props.sheetId, {
-                payload: true,
+                payload: "camera",
               });
             }}
           />

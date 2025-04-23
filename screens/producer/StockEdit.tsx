@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
+import * as FileSystem from "expo-file-system";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
@@ -332,12 +333,49 @@ export default function StocksEditScreen({ navigation }: Props) {
     }
   };
 
+  async function saveImageLocally(uri: string): Promise<string | null> {
+    try {
+      const directory = FileSystem.documentDirectory + "productImages/";
+
+      // Crée le dossier s'il n'existe pas
+      const dirInfo = await FileSystem.getInfoAsync(directory);
+      if (!dirInfo.exists) {
+        await FileSystem.makeDirectoryAsync(directory, { intermediates: true });
+      }
+
+      // Génère un nouveau nom de fichier
+      const extension = uri.split(".").pop();
+      const filename = `${Date.now()}-${Math.floor(Math.random() * 10000)}.${extension || "jpg"}`;
+      const newPath = directory + filename;
+
+      // Copie le fichier dans ce dossier
+      await FileSystem.copyAsync({
+        from: uri,
+        to: newPath,
+      });
+
+      return newPath;
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde de l’image :", error);
+      return null;
+    }
+  }
+
+  const handleImageSelected = async (uri: string) => {
+    const savedUri = await saveImageLocally(uri);
+    if (savedUri) {
+      console.log("image sauvée");
+      setImage(savedUri);
+    }
+  };
+
   // console.log("------------------------------------ STOCKSADD")
   // console.log("from:", from);
   // console.log("backLabel:", backLabel);
   // console.log("screenTitle:", screenTitle);
   console.log("stockData:", stockData);
   console.log("productData :", productData);
+  console.log("image sauvée: ", image);
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
@@ -360,7 +398,11 @@ export default function StocksEditScreen({ navigation }: Props) {
                 <View className="flex flex-row items-center">
                   <View className="flex-none w-1/4">
                     <View className="rounded-lg w-[90px] h-[90px]">
-                      <ImageUploader size={90} defaultUri={stockData?.image} />
+                      <ImageUploader
+                        size={90}
+                        defaultUri={stockData?.image}
+                        onImageSelected={handleImageSelected}
+                      />
                     </View>
                   </View>
                   <View className="grow w-3/4 pl-1">
