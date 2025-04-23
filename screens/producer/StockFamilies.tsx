@@ -41,28 +41,49 @@ export default function StockFamiliesScreen({ navigation }: Props) {
 
   const [openScreenButtons, setOpenScreenButtons] = useState<JSX.Element[]>([]);
 
-  const availableFamilies = Array.from(
-    new Set(
-      shopStore?.products
-        ?.filter((product) => product.product.family.category.name === category)
-        ?.map((product) => product.product.family.name),
-    ),
-  );
-
   useEffect(() => {
+    const availableFamilies = Array.from(
+      new Set(
+        shopStore?.products
+          ?.filter(
+            (product) => product.product.family.category.name === category,
+          )
+          ?.map((product) => product.product.family.name),
+      ),
+    );
+
+    const availableFamiliesWithCount = availableFamilies.map((family) => {
+      const count = shopStore!.products?.filter(
+        (p) => p.product.family.name === family,
+      ).length;
+      return {
+        family,
+        count,
+      };
+    });
     setOpenScreenButtons(
-      availableFamilies.map((family, index) => {
+      availableFamiliesWithCount.map((family, index) => {
+        const productsInFamily = shopStore!.products?.filter(
+          (p) => p.product.family.name === family.family,
+        );
+
+        const hasZeroStock = productsInFamily?.some((product) => {
+          return Number(product.stock.$numberDecimal) === 0;
+        });
+
         return (
           <OpenScreenButton
             key={index}
-            label={family}
+            label={family.family}
+            notice={family.count?.toString()}
+            redAlert={hasZeroStock}
             onPressFn={() =>
               navigation.navigate("Stocks", {
                 from: "StockFamilies",
                 backLabel: "Retour au choix " + category,
-                screenTitle: "STOCK\n" + family,
+                screenTitle: "STOCK\n" + family.family,
                 category: category,
-                family: family,
+                family: family.family,
               })
             }
             extraClasses="mb-1"
@@ -70,7 +91,7 @@ export default function StockFamiliesScreen({ navigation }: Props) {
         );
       }),
     );
-  }, []);
+  }, [shopStore?.products]);
 
   // console.log("------------------------------------ STOCKFAMILIES");
   // console.log("from:", from);
