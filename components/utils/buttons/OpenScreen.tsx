@@ -57,19 +57,15 @@ export default function OpenScreenButton({
         <View className="grow ml-3">
           <TextBody1>{label}</TextBody1>
         </View>
+
+        <View className="mr-5">
+          {redAlert && (
+            <FontAwesome5Icon name="exclamation" color="#ff0000" size={20} />
+          )}
+        </View>
         {notice && (
           <View className="flex items-center justify-center rounded-lg bg-primary px-1 min-w-[30px] h-8">
             <TextHeading4 centered>{notice}</TextHeading4>
-          </View>
-        )}
-
-        {redAlert && (
-          <View className="ml-5">
-            <FontAwesome5Icon
-              name="exclamation"
-              color="#ff0000"
-              size={20}
-            ></FontAwesome5Icon>
           </View>
         )}
         <View className="pr-4 ml-5">

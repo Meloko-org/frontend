@@ -7,7 +7,12 @@ import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
 import { useDispatch, useSelector } from "react-redux";
-import { addProducts, resetProducts, ShopState } from "../../reducers/shop";
+import {
+  addProducts,
+  resetProducts,
+  setProducts,
+  ShopState,
+} from "../../reducers/shop";
 import { setProductsTypes, StocksState } from "../../reducers/stocks";
 
 import stocksTools from "../../modules/stocksTools";
@@ -84,8 +89,7 @@ export default function StockCategoriesScreen({ navigation }: Props) {
       return;
     }
 
-    dispatch(resetProducts());
-    dispatch(addProducts(stocksResponse.data!));
+    dispatch(setProducts(stocksResponse.data!));
     setStocks(stocksResponse.data);
 
     setIsFetchLoading(false);
@@ -148,6 +152,17 @@ export default function StockCategoriesScreen({ navigation }: Props) {
           const productsType = stocksStore
             .find((element) => element.categoryName === cat.name)
             ?.productsTypes.toString();
+
+          // liste des produits pour une catégorie
+          const productsInCategory = shopStore!.products?.filter(
+            (p) => p.product.family.category.name === cat.name,
+          );
+
+          // vérification des stocks de chaque produit pour une catégorie
+          const hasZeroStock = productsInCategory?.some((product) => {
+            return Number(product.stock.$numberDecimal) === 0;
+          });
+
           // on force le typage de targetScreen car navigation.navigate n'accepte pas les string génériques
           // mais seulement un RootStackParamList
           let targetScreen: "StockFamilies" | "Stocks";
@@ -170,6 +185,7 @@ export default function StockCategoriesScreen({ navigation }: Props) {
               key={index}
               label={cat.name}
               notice={cat.count?.toString()}
+              redAlert={hasZeroStock}
               onPressFn={() =>
                 navigation.navigate(targetScreen, {
                   from: "StockCategories",
