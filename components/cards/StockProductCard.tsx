@@ -26,7 +26,7 @@ export default function StockProductCard({
   return (
     <TouchableOpacity
       onPress={onPress}
-      className="rounded-lg bg-lightbg dark:bg-tertiary p-2 mb-2"
+      className={`${Number(stock.stock.$numberDecimal) === 0 ? "bg-danger/80" : "bg-lightbg dark:bg-tertiary"} rounded-lg  p-2 mb-2`}
     >
       <View className="flex flex-row items-center w-full">
         <View className="rounded-lg w-1/4">
