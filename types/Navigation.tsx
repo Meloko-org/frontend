@@ -1,4 +1,7 @@
 // Navigation types
+
+import { ProductData, StockData } from "./API";
+
 // To keep synced with the Native Stack
 type RootStackParamList = {
   Home: undefined;
@@ -72,6 +75,15 @@ type RootStackParamList = {
     screenTitle?: string;
     category: string;
     family?: string;
+  };
+  StocksEdit: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    category?: string;
+    family?: string;
+    stockData?: StockData;
+    productData?: ProductData;
   };
   PremiumOptions: { from?: string; backLabel?: string; screenTitle?: string };
   PostType: { from?: string; backLabel?: string; screenTitle?: string };

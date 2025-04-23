@@ -78,6 +78,7 @@ import shop from "./reducers/shop";
 import stocks from "./reducers/stocks";
 import producer from "./reducers/producer";
 import OrderDetailsScreen from "./screens/OrderDetails";
+import StocksEditScreen from "./screens/producer/StockEdit";
 
 const reducers = combineReducers({ user, cart, mode, shop, producer, stocks });
 const persistConfig = {
@@ -319,6 +320,12 @@ const TabNavigatorProducer: React.FC = () => {
       <Tab.Screen
         name="StocksAdd"
         component={StocksAddScreen}
+        options={{ tabBarButton: () => null }}
+      />
+
+      <Tab.Screen
+        name="StocksEdit"
+        component={StocksEditScreen}
         options={{ tabBarButton: () => null }}
       />
       <Tab.Screen

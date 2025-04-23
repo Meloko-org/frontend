@@ -25,6 +25,7 @@ import SelectableTag from "../utils/badges/SelectableTag";
 import Product from "../cards/Products";
 import stocksTools from "../../modules/stocksTools";
 import { useFocusEffect } from "@react-navigation/native";
+import ImageUploader from "../utils/ImageUploader";
 
 export default function EditProductSheet(props: SheetProps<"edit-product">) {
   console.log(
@@ -258,7 +259,12 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
             {!isBulk ? (
               <View className="flex flex-row items-center">
                 <View className="flex-none w-1/4">
-                  <View className="rounded-lg bg-gray-200 w-[90px] h-[90px]"></View>
+                  <View className="rounded-lg w-[90px] h-[90px]">
+                    <ImageUploader
+                      size={90}
+                      defaultUri={props.payload?.stock?.image}
+                    />
+                  </View>
                 </View>
                 <View className="grow w-3/4 pl-1">
                   <InputText
@@ -347,9 +353,6 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
                 onPressFn={() => handleQuantityChange(-1)}
               />
               <View className="flex flex-row justify-center w-24">
-                {/* <TextHeading4 centered extraClasses="mx-2">
-                  {stock}
-                </TextHeading4> */}
                 <TextInput
                   className="bg-white rounded-lg w-14 text-right text-xl leading-5 pr-2"
                   value={stock?.toString() ?? ""}

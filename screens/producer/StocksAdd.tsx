@@ -131,25 +131,33 @@ export default function StocksAddScreen({ navigation }: Props) {
           disabled={false}
           isLoading={false}
           onPressFn={async () => {
-            await handleSheetFlow({
-              sheet: "edit-product",
-              payload: { product: product },
-              onAfter: async (action) => {
-                switch (action) {
-                  case "edit-success":
-                    await showAlert("Produit ajouté.", "success");
-                    break;
-                  case "edit-failed":
-                    await showAlert(
-                      "Erreur lors de l'ajout du produit",
-                      "error",
-                    );
-                    break;
-                  default:
-                    break;
-                }
-              },
+            navigation.navigate("StocksEdit", {
+              from: "Stocks",
+              backLabel: "Retour au stock " + (family ? family : category),
+              screenTitle: "FICHE\nPRODUIT",
+              category: category,
+              family: family,
+              productData: product,
             });
+            // await handleSheetFlow({
+            //   sheet: "edit-product",
+            //   payload: { product: product },
+            //   onAfter: async (action) => {
+            //     switch (action) {
+            //       case "edit-success":
+            //         await showAlert("Produit ajouté.", "success");
+            //         break;
+            //       case "edit-failed":
+            //         await showAlert(
+            //           "Erreur lors de l'ajout du produit",
+            //           "error",
+            //         );
+            //         break;
+            //       default:
+            //         break;
+            //     }
+            //   },
+            // });
           }}
           extraClasses="h-14 mb-3"
           textClasses="text-xl"

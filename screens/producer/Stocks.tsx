@@ -95,45 +95,56 @@ export default function StocksScreen({ navigation }: Props) {
             />
           ));
 
-  const handleOpenEdit = async (product: StockData) => {
-    await handleSheetFlow({
-      sheet: "edit-product",
-      payload: { stock: product },
-      onAfter: async (action) => {
-        switch (action) {
-          case "edit-success":
-            await showAlert("Modification effectuée.", "success");
-            break;
-          case "edit-failed":
-            await showAlert(" Echec de la modification", "error");
-            break;
-          case "delete":
-            const confirmed = await showConfirm("supprimer ce produit ?");
-            if (!confirmed) return;
-            console.log("product Id :", product._id);
-            await deleteProduct(product._id);
-            break;
-          default:
-            break;
-        }
-      },
+  const handleOpenEdit = (stockData: StockData) => {
+    navigation.navigate("StocksEdit", {
+      from: "Stocks",
+      backLabel: "Retour au stock " + (family ? family : category),
+      screenTitle: "FICHE\nPRODUIT",
+      category: category,
+      family: family,
+      stockData: stockData,
     });
   };
 
-  const deleteProduct = async (id: string) => {
-    const token = await getToken();
-    const deleteResponse = await stocksTools.deleteStocks(token, id);
+  // const handleOpenEdit = async (product: StockData) => {
+  //   await handleSheetFlow({
+  //     sheet: "edit-product",
+  //     payload: { stock: product },
+  //     onAfter: async (action) => {
+  //       switch (action) {
+  //         case "edit-success":
+  //           await showAlert("Modification effectuée.", "success");
+  //           break;
+  //         case "edit-failed":
+  //           await showAlert(" Echec de la modification", "error");
+  //           break;
+  //         case "delete":
+  //           const confirmed = await showConfirm("supprimer ce produit ?");
+  //           if (!confirmed) return;
+  //           console.log("product Id :", product._id);
+  //           await deleteProduct(product._id);
+  //           break;
+  //         default:
+  //           break;
+  //       }
+  //     },
+  //   });
+  // };
 
-    if (!deleteResponse.success) {
-      await showAlert(deleteResponse.message!, "error");
-      return false;
-    }
+  // const deleteProduct = async (id: string) => {
+  //   const token = await getToken();
+  //   const deleteResponse = await stocksTools.deleteStocks(token, id);
 
-    dispatch(setProducts(deleteResponse.data!));
+  //   if (!deleteResponse.success) {
+  //     await showAlert(deleteResponse.message!, "error");
+  //     return false;
+  //   }
 
-    await showAlert("Produit supprimé.", "success");
-    return true;
-  };
+  //   dispatch(setProducts(deleteResponse.data!));
+
+  //   await showAlert("Produit supprimé.", "success");
+  //   return true;
+  // };
 
   // console.log("------------------------------------ STOCKS")
   // console.log("from:", from);
