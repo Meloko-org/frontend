@@ -114,8 +114,10 @@ export default function StocksEditScreen({ navigation }: Props) {
 
     if (productData) {
       // mode création
+
       if (bulk) {
         setPrice(0);
+        setStock(0);
         setDescription("");
         setWeightPerUnit(
           productData.weight.measurement.$numberDecimal +
@@ -125,8 +127,10 @@ export default function StocksEditScreen({ navigation }: Props) {
         setNameAdapted(productData.name);
         setFamilyAdpated(productData.family.name);
         setImageAdapted(productData.image);
+        setTags([]);
       } else {
         setPrice(0);
+        setStock(0);
         setProductCustomName("");
         setPricePerKilo(0);
         setOrigin("");
@@ -136,6 +140,7 @@ export default function StocksEditScreen({ navigation }: Props) {
         setDescription("");
         setWeightPerUnit("");
         setImage("");
+        setTags([]);
       }
     } else if (stockData) {
       // mode modification
@@ -304,12 +309,24 @@ export default function StocksEditScreen({ navigation }: Props) {
             alertType: "error",
           },
         });
+        return;
       }
 
-      SheetManager.show("alert", {
+      dispatch(setProducts(deleteResponse.data!));
+
+      await handleSheetFlow({
+        sheet: "alert",
         payload: {
           message: "Produit supprimé.",
           alertType: "success",
+        },
+        onAfter: async (action) => {
+          navigation.navigate("Stocks", {
+            backLabel: "Retour " + (stockData ? "au choix" : "aux catégories"),
+            screenTitle: "STOCKS\n" + (family ? family : category),
+            category: category!,
+            family: family,
+          });
         },
       });
     }

@@ -150,8 +150,8 @@ export default function StocksScreen({ navigation }: Props) {
   // console.log("from:", from);
   // console.log("backLabel:", backLabel);
   // console.log("screenTitle:", screenTitle);
-  // console.log("category:", category);
-  // console.log("family :", family)
+  console.log("category:", category);
+  console.log("family :", family);
 
   return (
     <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
@@ -159,7 +159,7 @@ export default function StocksScreen({ navigation }: Props) {
         backLabel={
           backLabel || family ? "Retour au choix" : "Retour aux catégories"
         }
-        screen={from || "StockCategories"}
+        screen={from || family ? "StockFamilies" : "StockCategories"}
         screenParams={{
           category: category,
           family: family,
