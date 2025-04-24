@@ -18,6 +18,7 @@ type InputTextareaProps = {
   extraClasses?: string;
   iconName?: string;
   secureTextEntry?: boolean;
+  numberOfLines?: number;
   onIconPressFn?: ((event: GestureResponderEvent) => void) | undefined;
 };
 
@@ -43,7 +44,7 @@ export default function InputTextarea(props: InputTextareaProps): JSX.Element {
           secureTextEntry={props.secureTextEntry}
           multiline
           textAlignVertical="top"
-          numberOfLines={3}
+          numberOfLines={props.numberOfLines || 3}
           placeholderTextColor={colorScheme === "dark" ? "#FCFFF0" : "#444C3D"}
         ></TextInput>
       </View>

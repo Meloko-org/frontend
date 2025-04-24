@@ -146,12 +146,12 @@ export default function StocksScreen({ navigation }: Props) {
   //   return true;
   // };
 
-  console.log("------------------------------------ STOCKS");
-  console.log("from:", from);
-  console.log("backLabel:", backLabel);
-  console.log("screenTitle:", screenTitle);
-  console.log("category:", category);
-  console.log("family :", family);
+  // console.log("------------------------------------ STOCKS");
+  // console.log("from:", from);
+  // console.log("backLabel:", backLabel);
+  // console.log("screenTitle:", screenTitle);
+  // console.log("category:", category);
+  // console.log("family :", family);
 
   return (
     <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">

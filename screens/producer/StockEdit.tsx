@@ -87,31 +87,44 @@ export default function StocksEditScreen({ navigation }: Props) {
   const [image, setImage] = useState<string | null>(null);
   const [tags, setTags] = useState<TagData[] | undefined>([]);
 
-  const [suggestedTags, setSuggestedTags] = useState<TagData[] | undefined>();
-  const [remaingingTags, setRemainingTags] = useState<TagData[] | undefined>();
+  const [suggestedTags, setSuggestedTags] = useState<TagData[] | undefined>([]);
+  const [remaingingTags, setRemainingTags] = useState<TagData[] | undefined>(
+    [],
+  );
 
-  const fetchSuggestedTags = async (familyId: string | undefined) => {
+  const fetchAndManageTags = async (
+    familyId: string | undefined,
+    existingTags?: TagData[],
+  ) => {
     const tagResponse = await stocksTools.getSuggestedTags(familyId);
     if (!tagResponse.success) {
       console.log("impossible de récupérer les tags suggérés.");
     }
-    setSuggestedTags(tagResponse.data?.suggestedTags);
-    setRemainingTags(tagResponse.data?.remainingTags);
+    setSuggestedTags(tagResponse.data?.suggestedTags ?? []);
+    setRemainingTags(tagResponse.data?.remainingTags ?? []);
+
+    if (existingTags) {
+      setTags(existingTags);
+    } else {
+      setTags([]);
+    }
   };
 
   useEffect(() => {
     if (!stockData && !productData) return;
 
-    // const stock = props.payload?.stock;
-    // const product = props.payload?.product;
     const family = stockData?.product.family ?? productData?.family;
     const bulk = family?.productsTypes.includes("bulk");
 
     setFamilyId(family?._id);
     setBulk(bulk);
-    // setNewProductMode(!!product && !stock);
 
-    fetchSuggestedTags(family?._id);
+    if (productData) {
+      const emptyTags: TagData[] = [];
+      fetchAndManageTags(family?._id, emptyTags);
+    } else if (stockData) {
+      fetchAndManageTags(family?._id, stockData?.tags ?? []);
+    }
 
     if (productData) {
       // mode création
@@ -128,7 +141,6 @@ export default function StocksEditScreen({ navigation }: Props) {
         setNameAdapted(productData.name);
         setFamilyAdpated(productData.family.name);
         setImageAdapted(productData.image);
-        setTags([]);
       } else {
         setPrice(0);
         setStock(0);
@@ -141,10 +153,10 @@ export default function StocksEditScreen({ navigation }: Props) {
         setDescription("");
         setWeightPerUnit("");
         setImage(null);
-        setTags([]);
       }
     } else if (stockData) {
       // mode modification
+
       if (bulk) {
         setPrice(Number(stockData.price.$numberDecimal));
         setStock(Number(stockData.stock.$numberDecimal));
@@ -153,7 +165,6 @@ export default function StocksEditScreen({ navigation }: Props) {
             " " +
             stockData.product.weight.unit,
         );
-        setTags(stockData.tags);
         setNameAdapted(stockData.product.name);
         setFamilyAdpated(stockData.product.family.name);
         setImageAdapted(stockData.product.image);
@@ -171,7 +182,7 @@ export default function StocksEditScreen({ navigation }: Props) {
         setImage(stockData.image);
       }
     }
-  }, [stockData, productData]);
+  }, [stockData?._id, productData?._id]);
 
   const isTagSelected = (tagId: string) => {
     return tags?.some((t) => t._id === tagId);
@@ -382,13 +393,26 @@ export default function StocksEditScreen({ navigation }: Props) {
     }
   };
 
-  // console.log("------------------------------------ STOCKSADD")
+  console.log("------------------------------------ STOCKSADD");
   // console.log("from:", from);
   // console.log("backLabel:", backLabel);
   // console.log("screenTitle:", screenTitle);
-  console.log("stockData:", stockData);
-  console.log("productData :", productData);
-  console.log("image sauvée: ", image);
+  // console.log("stockData:", stockData);
+  // console.log("productData :", productData);
+  // console.log("image sauvée: ", image);
+
+  console.log(
+    "suggested :",
+    suggestedTags?.map((t) => t.name),
+  );
+  console.log(
+    "remaining :",
+    remaingingTags?.map((t) => t.name),
+  );
+  console.log(
+    "tags :",
+    tags?.map((t) => t.name),
+  );
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
@@ -527,7 +551,8 @@ export default function StocksEditScreen({ navigation }: Props) {
               placeholder="Saisir une description"
               value={description}
               onChangeText={(value: string) => setDescription(value)}
-              extraClasses="mb-5"
+              extraClasses="mb-5 h-64"
+              numberOfLines={9}
             />
 
             {!isBulk && (

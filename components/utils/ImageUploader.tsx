@@ -82,8 +82,6 @@ export default function ImageUploader({
     }
   };
 
-  console.log("imageUri :", imageUri);
-
   return (
     <Pressable
       onPress={handleImageSheet}
