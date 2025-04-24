@@ -2,7 +2,7 @@ import React from "react";
 import { Text } from "react-native";
 
 type TextHeading3Props = {
-  children: string;
+  children: React.ReactNode | string | number;
   extraClasses?: string;
   centered?: boolean;
 };
