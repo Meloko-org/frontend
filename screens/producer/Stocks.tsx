@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useColorScheme } from "nativewind";
 import { useAuth } from "@clerk/clerk-expo";
 
@@ -146,10 +146,10 @@ export default function StocksScreen({ navigation }: Props) {
   //   return true;
   // };
 
-  // console.log("------------------------------------ STOCKS")
-  // console.log("from:", from);
-  // console.log("backLabel:", backLabel);
-  // console.log("screenTitle:", screenTitle);
+  console.log("------------------------------------ STOCKS");
+  console.log("from:", from);
+  console.log("backLabel:", backLabel);
+  console.log("screenTitle:", screenTitle);
   console.log("category:", category);
   console.log("family :", family);
 
@@ -157,9 +157,9 @@ export default function StocksScreen({ navigation }: Props) {
     <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
       <TopBar
         backLabel={
-          backLabel || family ? "Retour au choix" : "Retour aux catégories"
+          backLabel || (family ? "Retour au choix" : "Retour aux catégories")
         }
-        screen={from || family ? "StockFamilies" : "StockCategories"}
+        screen={from || (family ? "StockFamilies" : "StockCategories")}
         screenParams={{
           category: category,
           family: family,

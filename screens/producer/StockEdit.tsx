@@ -1,7 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
-import * as FileSystem from "expo-file-system";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
@@ -12,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { updateProduct, setProducts } from "../../reducers/shop";
 
 import { SheetManager } from "react-native-actions-sheet";
+import saveImageLocally from "../../helpers/ImageHelpers";
 
 import { TextInput, View, Text, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -84,7 +84,7 @@ export default function StocksEditScreen({ navigation }: Props) {
   const [format, setFormat] = useState<string | undefined>("");
   const [portion, setPortion] = useState<string | undefined>("");
   const [bestBeforeDate, setBestBeforeDate] = useState<string | undefined>("");
-  const [image, setImage] = useState<string>();
+  const [image, setImage] = useState<string | null>(null);
   const [tags, setTags] = useState<TagData[] | undefined>([]);
 
   const [suggestedTags, setSuggestedTags] = useState<TagData[] | undefined>();
@@ -140,7 +140,7 @@ export default function StocksEditScreen({ navigation }: Props) {
         setBestBeforeDate("");
         setDescription("");
         setWeightPerUnit("");
-        setImage("");
+        setImage(null);
         setTags([]);
       }
     } else if (stockData) {
@@ -203,11 +203,25 @@ export default function StocksEditScreen({ navigation }: Props) {
 
   const handleSaveProduct = async () => {
     setSaveLoading(true);
-    const token = await getToken();
 
+    if (!price || !stock) {
+      SheetManager.show("alert", {
+        payload: {
+          message: "Le prix ou la quantité ne sont pas indiqués.",
+          alertType: "warning",
+        },
+      });
+      setSaveLoading(false);
+      return;
+    }
+
+    const token = await getToken();
     let values;
+
+    // si on est dans le cas d'un produit vrac
     if (isBulk) {
-      if (newProductMode) {
+      if (productData) {
+        // si création d'un produit
         values = {
           product: productData,
           price,
@@ -216,6 +230,7 @@ export default function StocksEditScreen({ navigation }: Props) {
           tags,
         };
       } else {
+        // si modification d'un produit
         values = {
           _id: stockData?._id,
           product: stockData?.product,
@@ -225,8 +240,22 @@ export default function StocksEditScreen({ navigation }: Props) {
           tags,
         };
       }
+
+      // si on est dans le cas d'un produit classic
     } else {
-      if (newProductMode) {
+      if (!productCustomName) {
+        SheetManager.show("alert", {
+          payload: {
+            message: "Le nom du produit n'est pas indiqué.",
+            alertType: "warning",
+          },
+        });
+        setSaveLoading(false);
+        return;
+      }
+
+      if (productData) {
+        // si création d'un produit
         values = {
           product: productData,
           productCustomName,
@@ -243,6 +272,7 @@ export default function StocksEditScreen({ navigation }: Props) {
           tags,
         };
       } else {
+        // si modification d'un produit
         values = {
           _id: stockData?._id,
           product: stockData?.product,
@@ -263,11 +293,14 @@ export default function StocksEditScreen({ navigation }: Props) {
     }
 
     let stockResponse;
+    let message;
 
-    if (newProductMode) {
+    if (productData) {
       stockResponse = await stocksTools.createStocks(token, values);
+      message = "Produit créé.";
     } else {
       stockResponse = await stocksTools.updateStocks(token, values);
+      message = "Produit modifié.";
     }
 
     setSaveLoading(false);
@@ -279,15 +312,23 @@ export default function StocksEditScreen({ navigation }: Props) {
           alertType: "error",
         },
       });
+      return;
     }
 
     dispatch(setProducts(stockResponse.data!));
 
     SheetManager.show("alert", {
       payload: {
-        message: "Produit modifié.",
+        message: message,
         alertType: "success",
       },
+    });
+
+    navigation.navigate("Stocks", {
+      backLabel: "Retour " + (isBulk ? "aux catégories" : "au choix"),
+      screenTitle: "STOCKS\n" + (family ? family : category),
+      category: category!,
+      family: family,
     });
   };
 
@@ -332,34 +373,6 @@ export default function StocksEditScreen({ navigation }: Props) {
       });
     }
   };
-
-  async function saveImageLocally(uri: string): Promise<string | null> {
-    try {
-      const directory = FileSystem.documentDirectory + "productImages/";
-
-      // Crée le dossier s'il n'existe pas
-      const dirInfo = await FileSystem.getInfoAsync(directory);
-      if (!dirInfo.exists) {
-        await FileSystem.makeDirectoryAsync(directory, { intermediates: true });
-      }
-
-      // Génère un nouveau nom de fichier
-      const extension = uri.split(".").pop();
-      const filename = `${Date.now()}-${Math.floor(Math.random() * 10000)}.${extension || "jpg"}`;
-      const newPath = directory + filename;
-
-      // Copie le fichier dans ce dossier
-      await FileSystem.copyAsync({
-        from: uri,
-        to: newPath,
-      });
-
-      return newPath;
-    } catch (error) {
-      console.error("Erreur lors de la sauvegarde de l’image :", error);
-      return null;
-    }
-  }
 
   const handleImageSelected = async (uri: string) => {
     const savedUri = await saveImageLocally(uri);
