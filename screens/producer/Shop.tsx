@@ -6,7 +6,7 @@ import typesTools from "../../modules/typesTools";
 import { useAuth } from "@clerk/clerk-expo";
 import shopTools from "../../modules/shopTools";
 import { useDispatch, useSelector } from "react-redux";
-import { setShopData, ShopState } from "../../reducers/shop";
+import { setProducts, setShopData, ShopState } from "../../reducers/shop";
 import { UserState } from "../../reducers/user";
 
 /* Eléments graphiques */
@@ -37,6 +37,7 @@ import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import StarsNotation from "../../components/utils/StarsNotation";
 import ThumbnailCarousel from "../../components/utils/ThumbnailCarousel";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import stocksTools from "../../modules/stocksTools";
 // const FontAwesome = _Fontawesome as React.ElementType;
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
@@ -60,19 +61,43 @@ export default function ShopProducteurScreen({ navigation }: Props) {
   const [description, setDescription] = useState<string>("");
 
   const { getToken } = useAuth();
+  const dispatch = useDispatch();
 
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
 
   const [shopData, setShopData] = useState(shopStore);
+  const [hasZeroStock, setHasZeroStock] = useState<boolean | undefined>(false);
+
+  const fetchStocks = async (shopId: string) => {
+    const stocksResponse = await stocksTools.getStocksByShop(shopId);
+
+    if (!stocksResponse.success) {
+      console.error(stocksResponse.message);
+      return;
+    }
+    dispatch(setProducts(stocksResponse.data!));
+  };
 
   useEffect(() => {
-    if (shopStore !== null && shopStore.description) {
-      setDescription(shopStore.description);
+    if (shopStore !== null) {
+      if (shopStore.description) {
+        setDescription(shopStore.description);
+      }
+      fetchStocks(shopStore._id);
     }
   }, []);
 
+  useEffect(() => {
+    setHasZeroStock(
+      shopStore?.products?.some((product) => {
+        return Number(product.stock.$numberDecimal) === 0;
+      }),
+    );
+  }, [shopStore?.products]);
+
+  // à déplacer dans shopDetails
   const handleSaveShop = async () => {
     try {
       setShopSaveLoading(true);
@@ -119,7 +144,8 @@ export default function ShopProducteurScreen({ navigation }: Props) {
   // console.log(
   //   "------------------------------- SHOP --------------------------------------------------------------------",
   // );
-  // console.log("SHOPSTORE -> ", shopStore);
+  console.log("SHOPSTORE -> ", shopStore);
+  console.log("zero stock :", hasZeroStock);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -224,6 +250,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
           />
           <OpenScreenButton
             label="Gestion des stocks"
+            redAlert={hasZeroStock}
             onPressFn={() =>
               navigation.navigate("StockCategories", {
                 from: "ShopProducer",
