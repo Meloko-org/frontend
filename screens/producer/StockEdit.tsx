@@ -386,7 +386,7 @@ export default function StocksEditScreen({ navigation }: Props) {
   };
 
   const handleImageSelected = async (uri: string) => {
-    const savedUri = await saveImageLocally(uri);
+    const savedUri = await saveImageLocally(uri, "productImages/");
     if (savedUri) {
       console.log("image sauvée");
       setImage(savedUri);

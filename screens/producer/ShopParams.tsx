@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 import { useSelector, useDispatch } from "react-redux";
+import { useCollapsibleSection } from "../../hooks/useCollapsibleSection";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -54,33 +55,7 @@ export default function ShopParamsScreen({ navigation }: Props) {
   const [isParamsUpdateLoading, setParamsUpdateLoading] =
     useState<boolean>(false);
 
-  // bouton menu déroulant "Type" ------------------
-  const [isOpenType, setOpenType] = useState<boolean>(false);
-  const contentType = useSharedValue(0);
-  const heightType = useSharedValue(0);
-
-  const animatedStyleType = useAnimatedStyle(() => ({
-    height: heightType.value,
-    opacity: heightType.value > 0 ? 1 : 0, // Facultatif : gérer l'opacité
-  }));
-
-  const toggleOpenType = () => {
-    setOpenType((prev) => {
-      const newState = !prev;
-      heightType.value = withTiming(newState ? contentType.value : 0, {
-        duration: 300,
-        easing: Easing.out(Easing.ease),
-      });
-      return newState;
-    });
-  };
-
-  const onContentLayout = (event: LayoutChangeEvent) => {
-    const measuredHeight = event.nativeEvent.layout.height;
-    contentType.value = measuredHeight;
-  };
-
-  // -----------------------------------------------
+  const typeSection = useCollapsibleSection();
 
   // Contient les différents types de shop
   const [shopTypes, setShopTypes] = useState<string[]>([]);
@@ -94,7 +69,7 @@ export default function ShopParamsScreen({ navigation }: Props) {
         thumbColor="#215487"
         label={item!.name}
         value={shopTypes.includes(item._id)}
-        onValueChange={(isSelected) => handleSwitchType(item._id, isSelected)}
+        onValueChange={(isSelected) => handleSwitchType(item._id)}
         extraClasses="pl-5 mb-2"
       />
     );
@@ -161,19 +136,23 @@ export default function ShopParamsScreen({ navigation }: Props) {
           <View className="w-full px-3">
             <OpenMenuButton
               label="Type de produits"
-              onPressFn={toggleOpenType}
+              onPressFn={typeSection.toggle}
+              // onPressFn={toggleOpenType}
             />
 
             <Animated.View
-              style={[animatedStyleType]}
+              style={[typeSection.animatedStyle]}
+              // style={[animatedStyleType]}
               className="overflow-hidden"
             >
               <View
-                onLayout={onContentLayout}
-                style={{
-                  opacity: isOpenType ? 1 : 0,
-                  position: isOpenType ? "relative" : "absolute",
-                }}
+                onLayout={typeSection.onLayout}
+                style={typeSection.innerContainerStyle}
+                // onLayout={onContentLayout}
+                // style={{
+                //   opacity: isOpenType ? 1 : 0,
+                //   position: isOpenType ? "relative" : "absolute",
+                // }}
               >
                 <View className="py-5">{typesList}</View>
               </View>

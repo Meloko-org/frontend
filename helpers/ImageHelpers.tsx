@@ -2,9 +2,10 @@ import * as FileSystem from "expo-file-system";
 
 export default async function saveImageLocally(
   uri: string,
+  path: string,
 ): Promise<string | null> {
   try {
-    const directory = FileSystem.documentDirectory + "productImages/";
+    const directory = FileSystem.documentDirectory + path;
 
     // Crée le dossier s'il n'existe pas
     const dirInfo = await FileSystem.getInfoAsync(directory);

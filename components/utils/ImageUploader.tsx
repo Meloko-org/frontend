@@ -3,17 +3,20 @@ import { Pressable, Image, View, Text } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
 import { SheetManager } from "react-native-actions-sheet";
+import TextHeading4 from "./texts/Heading4";
 
 type ImageUploaderProps = {
   size?: number;
   onImageSelected?: (uri: string) => void;
   defaultUri?: string | null;
+  mediaTypes?: ImagePicker.MediaType | ImagePicker.MediaType[];
 };
 
 export default function ImageUploader({
   size = 90,
   onImageSelected,
   defaultUri = null,
+  mediaTypes = "images",
 }: ImageUploaderProps) {
   const [imageUri, setImageUri] = useState<string | null>(defaultUri);
 
@@ -31,7 +34,7 @@ export default function ImageUploader({
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
+      mediaTypes: mediaTypes,
       allowsEditing: true,
       aspect: [1, 1], // carré
       quality: 0.8,
@@ -96,7 +99,7 @@ export default function ImageUploader({
       }}
       className="relative"
     >
-      {imageUri && (
+      {imageUri ? (
         <View className="absolute top-0 left-0">
           <Image
             source={{ uri: imageUri }}
@@ -104,6 +107,8 @@ export default function ImageUploader({
             resizeMode="cover"
           />
         </View>
+      ) : (
+        <TextHeading4 centered>LOGO</TextHeading4>
       )}
       <View className="absolute right-0 bottom-0 items-center justify-center p-1">
         <FontAwesome6Icon name="camera" color="#98B66E" size={30} />
