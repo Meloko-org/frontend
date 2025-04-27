@@ -10,7 +10,7 @@ import { setProducts, setShopData, ShopState } from "../../reducers/shop";
 import { UserState } from "../../reducers/user";
 
 /* Eléments graphiques */
-import { View, TouchableOpacity, Alert, Text } from "react-native";
+import { View, TouchableOpacity, Alert, Text, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import TextHeading3 from "../../components/utils/texts/Heading3";
@@ -173,12 +173,23 @@ export default function ShopProducteurScreen({ navigation }: Props) {
 
         <View className="flex flex-row items-center w-full h-[80px] mb-2">
           <View className="flex justify-center items-center w-1/4">
-            <FontAwesome
-              name="github-alt"
-              size={80}
-              color="#FFFFFF"
-              className=""
-            />
+            {shopStore?.logo ? (
+              <Image
+                source={{ uri: shopStore.logo }}
+                className="rounded-xl w-20 h-20"
+                alt={``}
+                resizeMode="cover"
+                // width={96}
+                // height={64}
+              />
+            ) : (
+              <FontAwesome
+                name="github-alt"
+                size={80}
+                color="#FFFFFF"
+                className=""
+              />
+            )}
           </View>
           <View className="w-3/4 ">
             <TextBody1 centered>{description}</TextBody1>

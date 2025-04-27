@@ -68,6 +68,7 @@ declare module "react-native-actions-sheet" {
     "image-uploader": SheetDefinition<{
       payload: {
         message: string;
+        type: string[] | string;
       };
       returnedValue: string;
     }>;

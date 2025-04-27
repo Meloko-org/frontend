@@ -10,6 +10,7 @@ type ImageUploaderProps = {
   onImageSelected?: (uri: string) => void;
   defaultUri?: string | null;
   mediaTypes?: ImagePicker.MediaType | ImagePicker.MediaType[];
+  message?: string;
 };
 
 export default function ImageUploader({
@@ -17,6 +18,7 @@ export default function ImageUploader({
   onImageSelected,
   defaultUri = null,
   mediaTypes = "images",
+  message = "Choisissez une photo",
 }: ImageUploaderProps) {
   const [imageUri, setImageUri] = useState<string | null>(defaultUri);
 
@@ -72,7 +74,8 @@ export default function ImageUploader({
   const handleImageSheet = async () => {
     const whatToDo = await SheetManager.show("image-uploader", {
       payload: {
-        message: "Choississez une image ou prenez une photo.",
+        message: message,
+        type: mediaTypes,
       },
     });
 

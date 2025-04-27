@@ -45,17 +45,19 @@ export default function ImageUploaderSheet(
               });
             }}
           />
-          <IconButton
-            iconName="camera"
-            iconFamily="FontAwesome6Icon"
-            iconColor="#ffffff"
-            extraClasses="bg-primary h-14 w-14"
-            onPressFn={() => {
-              SheetManager.hide(props.sheetId, {
-                payload: "camera",
-              });
-            }}
-          />
+          {props.payload?.type.includes("livePhotos") && (
+            <IconButton
+              iconName="camera"
+              iconFamily="FontAwesome6Icon"
+              iconColor="#ffffff"
+              extraClasses="bg-primary h-14 w-14"
+              onPressFn={() => {
+                SheetManager.hide(props.sheetId, {
+                  payload: "camera",
+                });
+              }}
+            />
+          )}
         </View>
       </View>
     </ActionSheet>

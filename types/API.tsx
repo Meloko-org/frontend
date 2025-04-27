@@ -130,9 +130,16 @@ type Note = {
 
 type ShopData = {
   _id: string;
+  producer: ProducerData;
   name: string;
+  siret: string;
   logo: string;
-  description: string;
+  shortDesc: string;
+  longDesc: string;
+  photos: string[];
+  videos: string[];
+  isOpen: boolean;
+  reopenDate: Date;
   address: AddressData;
   markets: MarketsData[];
   clickCollect: ClickCollectData;

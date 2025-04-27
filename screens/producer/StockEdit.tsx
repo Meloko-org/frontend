@@ -439,6 +439,8 @@ export default function StocksEditScreen({ navigation }: Props) {
                         size={90}
                         defaultUri={stockData?.image}
                         onImageSelected={handleImageSelected}
+                        mediaTypes={["images", "livePhotos"]}
+                        message={`Choisisssez une image\nou prenez une photo.`}
                       />
                     </View>
                   </View>

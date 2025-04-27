@@ -22,10 +22,12 @@ import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import InputText from "../../components/utils/inputs/Text";
 import InputTextarea from "../../components/utils/inputs/Textarea";
-import { useSelector } from "react-redux";
-import { ShopState } from "../../reducers/shop";
+import { useDispatch, useSelector } from "react-redux";
+import { setShopData, ShopState } from "../../reducers/shop";
 import ImageUploader from "../../components/utils/ImageUploader";
 import saveImageLocally from "../../helpers/ImageHelpers";
+import shopTools from "../../modules/shopTools";
+import { SheetManager } from "react-native-actions-sheet";
 
 type ShopDetailsScreenRouteProp = RouteProp<RootStackParamList, "ShopDetails">;
 
@@ -48,6 +50,7 @@ export default function ShopDetailsScreen({ navigation }: Props) {
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
+  const dispatch = useDispatch();
 
   const isPremium = shopStore?.isPremium;
 
@@ -105,7 +108,43 @@ export default function ShopDetailsScreen({ navigation }: Props) {
     }
   };
 
-  const handleSave = () => {};
+  const handleSave = async () => {
+    try {
+      setSaveLoading(true);
+      const token = await getToken();
+
+      const values = {
+        _id: shopStore?._id,
+        name,
+        siret,
+        shortDesc,
+        longDesc,
+        logo,
+        address,
+      };
+
+      const shopResponse = await shopTools.updateShop(token, values);
+
+      if (!shopResponse.success) {
+        SheetManager.show("alert", {
+          payload: {
+            message: "La mise à jour a échoué.",
+            alertType: "error",
+          },
+        });
+        return;
+      }
+
+      dispatch(setShopData(shopResponse.data));
+
+      SheetManager.show("alert", {
+        payload: {
+          message: "Shop mis à jour.",
+          alertType: "success",
+        },
+      });
+    } catch (error) {}
+  };
 
   console.log("premium: ", isPremium);
 
@@ -121,6 +160,34 @@ export default function ShopDetailsScreen({ navigation }: Props) {
 
         <ScrollView>
           <View className="w-fl px-3">
+            <View className="flex flex-row justify-between items-center mb-5">
+              <View className="flex flex-row justify-center items-center w-2/6">
+                <ImageUploader
+                  defaultUri={shopStore?.logo}
+                  onImageSelected={handleImageSelected}
+                  mediaTypes={["images"]}
+                  message={`Choisisssez une image\nou prenez une photo.`}
+                />
+              </View>
+
+              <View className="w-4/6">
+                <InputText
+                  label="Nom"
+                  placeholder="Saisissez le nom de la boutique"
+                  value={name}
+                  onChangeText={(value: string) => setName(value)}
+                  extraClasses="mb-2"
+                />
+                <InputText
+                  label="Siret"
+                  placeholder="Saisissez le siret de la boutique"
+                  value={siret}
+                  onChangeText={(value: string) => setSiret(value)}
+                  extraClasses="mb-2"
+                />
+              </View>
+            </View>
+
             <OpenMenuButton
               label="Description"
               onPressFn={descSection.toggle}
@@ -135,43 +202,6 @@ export default function ShopDetailsScreen({ navigation }: Props) {
                 onLayout={descSection.onLayout}
                 style={descSection.innerContainerStyle}
               >
-                <View className="flex flex-row justify-between items-center">
-                  <View className="flex flex-row justify-center items-center w-2/6">
-                    <ImageUploader
-                      defaultUri={shopStore?.logo}
-                      onImageSelected={handleImageSelected}
-                    />
-
-                    {/* <TouchableOpacity onPress={() => setLogoModalVisible(true)}>
-                      <View className="rounded-full bg-warning flex flex-row justify-center items-center mb-5 w-[100px] h-[100px]">
-                        <FontAwesome
-                          name="github-alt"
-                          size={80}
-                          color="#FFFFFF"
-                          className="absolute"
-                        />
-                      </View>
-                    </TouchableOpacity> */}
-                  </View>
-
-                  <View className="w-4/6">
-                    <InputText
-                      label="Nom"
-                      placeholder="Saisissez le nom de la boutique"
-                      value={name}
-                      onChangeText={(value: string) => setName(value)}
-                      extraClasses="mb-2"
-                    />
-                    <InputText
-                      label="Siret"
-                      placeholder="Saisissez le siret de la boutique"
-                      value={siret}
-                      onChangeText={(value: string) => setSiret(value)}
-                      extraClasses="mb-2"
-                    />
-                  </View>
-                </View>
-
                 <InputTextarea
                   label="Courte description"
                   placeholder="Saisissez une courte description de votre boutique"
