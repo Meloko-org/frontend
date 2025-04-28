@@ -12,7 +12,10 @@ import { setShopData, ShopState } from "../../reducers/shop";
 import shopTools from "../../modules/shopTools";
 
 import { SheetManager } from "react-native-actions-sheet";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+import globalTools from "../../modules/globalTools";
 
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -94,21 +97,36 @@ export default function ShopOfflineScreen({ navigation }: Props) {
     }
   }, []);
 
-  const handleDateChange = ({ type }, selectedDate) => {
-    if (type == "set") {
+  const handleDateChange = (
+    event: DateTimePickerEvent,
+    selectedDate?: Date,
+  ) => {
+    if (event.type === "set" && selectedDate) {
       const currentDate = selectedDate;
       setDate(currentDate);
       toggleDatePicker();
       setReopenDate(currentDate.toISOString());
-      // if (Platform.OS === "android") {
-      //   toggleDatePicker()
-      //   setReopenDate(currentDate.toDateString())
-      // }
       setDisabled(false);
     } else {
       toggleDatePicker();
     }
   };
+
+  // const handleDateChange = ({ type }, selectedDate) => {
+  //   if (type == "set") {
+  //     const currentDate = selectedDate;
+  //     setDate(currentDate);
+  //     toggleDatePicker();
+  //     setReopenDate(currentDate.toISOString());
+  //     // if (Platform.OS === "android") {
+  //     //   toggleDatePicker()
+  //     //   setReopenDate(currentDate.toDateString())
+  //     // }
+  //     setDisabled(false);
+  //   } else {
+  //     toggleDatePicker();
+  //   }
+  // };
 
   const toggleDatePicker = () => {
     setShowPicker(!showPicker);
@@ -148,11 +166,6 @@ export default function ShopOfflineScreen({ navigation }: Props) {
     setDisabled(true);
   };
 
-  console.log("----------------------------------");
-  console.log("disabled :", isDisabled);
-  console.log("isReopenDateVisible :", isReopenDateVisible);
-  console.log("----------------------------------");
-
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
       <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
@@ -183,7 +196,9 @@ export default function ShopOfflineScreen({ navigation }: Props) {
                   label="Date de réouverture"
                   editable={false}
                   onChangeText={(value: Date) => setReopenDate(value)}
-                  value={reopenDate}
+                  value={
+                    reopenDate ? globalTools.formatDateToFr(reopenDate) : ""
+                  }
                   iconName="calendar"
                   onIconPressFn={toggleDatePicker}
                   size="large"
