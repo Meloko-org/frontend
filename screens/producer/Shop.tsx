@@ -97,56 +97,6 @@ export default function ShopProducteurScreen({ navigation }: Props) {
     );
   }, [shopStore?.products]);
 
-  // à déplacer dans shopDetails
-  const handleSaveShop = async () => {
-    try {
-      setShopSaveLoading(true);
-      const token = await getToken();
-      const values = reopenDate
-        ? {
-            name,
-            description,
-            siret,
-            address,
-            types,
-            reopenDate,
-            isOpen: false,
-          }
-        : {
-            name,
-            description,
-            siret,
-            address,
-            types,
-            isOpen: true,
-            reopenDate: null,
-          };
-      const data = await shopTools.createOrUpdateShop(token, values);
-      console.log("data de retour :", data);
-
-      if (data.error) {
-        Alert.alert("Profil non mis à jour", data.error);
-      } else {
-        Alert.alert(
-          "Mise à jour de votre profil",
-          "Votre profil à bien été mis à jour.",
-        );
-        dispatch(setShopData(data));
-        setButtonLabel("Mettre à jour");
-      }
-      setShopSaveLoading(false);
-    } catch (error) {
-      console.log(error);
-      setShopSaveLoading(false);
-    }
-  };
-
-  // console.log(
-  //   "------------------------------- SHOP --------------------------------------------------------------------",
-  // );
-  console.log("SHOPSTORE -> ", shopStore);
-  console.log("zero stock :", hasZeroStock);
-
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <ScrollView
