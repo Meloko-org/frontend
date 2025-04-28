@@ -94,6 +94,43 @@ const updateShopTypes = async (token: string | null, types: string[]) => {
   }
 };
 
+const updateShopOffline = async (
+  token: string | null,
+  values: { isOpen: boolean | undefined; reopenDate: Date | undefined },
+): Promise<ApiResponse<ShopData>> => {
+  try {
+    const response = await fetch(`${API_ROOT}/shops/offline`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        mode: "cors",
+      },
+      body: JSON.stringify(values),
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible de mettre à jour.`,
+      };
+    }
+
+    const data = await response.json();
+
+    return data.success
+      ? { success: true, data: data.shop }
+      : { success: false, data: null, message: data.message };
+  } catch (error) {
+    return {
+      success: false,
+      data: null,
+      message: "Une erreur s'est produite lors de la mise à jour.",
+    };
+  }
+};
+
 type Period = {
   openingTime: string | null;
   closingTime: string | null;
@@ -285,6 +322,7 @@ const getMarketById = async (marketId: string): Promise<MarketData> => {
 export default {
   updateShop,
   createOrUpdateShop,
+  updateShopOffline,
   updateShopTypes,
   getShopInfos,
   updateClickCollect,

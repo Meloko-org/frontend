@@ -1,11 +1,17 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import { useAuth } from "@clerk/clerk-expo";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 import { useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
+import { useSelector, useDispatch } from "react-redux";
+import { setShopData, ShopState } from "../../reducers/shop";
+import shopTools from "../../modules/shopTools";
+
+import { SheetManager } from "react-native-actions-sheet";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { View } from "react-native";
@@ -16,8 +22,6 @@ import SwitchInput from "../../components/utils/inputs/Switch";
 import TextBody1 from "../../components/utils/texts/Body1";
 import InputText from "../../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
-import { useSelector } from "react-redux";
-import { ShopState } from "../../reducers/shop";
 
 type ShopOfflineScreenRouteProp = RouteProp<RootStackParamList, "ShopOffline">;
 
@@ -34,13 +38,16 @@ export default function ShopOfflineScreen({ navigation }: Props) {
   const route = useRoute<ShopOfflineScreenRouteProp>();
   const { from, backLabel, screenTitle } = route.params || {};
 
+  const { getToken } = useAuth();
+
+  const dispatch = useDispatch();
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
 
   /* gestion du switch de désactivation de la boutique */
   const [isReopenDateVisible, setReopenDateVisible] = useState(false);
-  const [reopenDate, setReopenDate] = useState();
+  const [reopenDate, setReopenDate] = useState<Date>();
   const [showPicker, setShowPicker] = useState(false);
   const [date, setDate] = useState(new Date());
 
@@ -53,12 +60,36 @@ export default function ShopOfflineScreen({ navigation }: Props) {
   };
 
   useEffect(() => {
-    if (!isReopenDateVisible) setDisabled(true);
-  }, [isReopenDateVisible]);
+    if (!shopStore) return;
+
+    const wasShopOpen = shopStore.isOpen;
+    const originalReopenDate = shopStore.reopenDate;
+
+    const isShopOpenNow = !isReopenDateVisible;
+
+    const isStatusChanged = wasShopOpen !== isShopOpenNow;
+    const isDateChanged = reopenDate !== originalReopenDate;
+
+    if (isShopOpenNow) {
+      // Cas où la boutique est ré-ouverte (switch OFF)
+      if (isStatusChanged) {
+        setDisabled(false);
+      } else {
+        setDisabled(true);
+      }
+    } else {
+      // Cas où la boutique est désactivée (switch ON)
+      if (reopenDate && (isStatusChanged || isDateChanged)) {
+        setDisabled(false);
+      } else {
+        setDisabled(true);
+      }
+    }
+  }, [isReopenDateVisible, reopenDate, shopStore]);
 
   useEffect(() => {
     if (shopStore !== null && shopStore.reopenDate !== null) {
-      setReopenDate(shopStore.reopen);
+      setReopenDate(shopStore.reopenDate);
       setReopenDateVisible(true);
     }
   }, []);
@@ -68,7 +99,7 @@ export default function ShopOfflineScreen({ navigation }: Props) {
       const currentDate = selectedDate;
       setDate(currentDate);
       toggleDatePicker();
-      setReopenDate(currentDate.toDateString());
+      setReopenDate(currentDate.toISOString());
       // if (Platform.OS === "android") {
       //   toggleDatePicker()
       //   setReopenDate(currentDate.toDateString())
@@ -83,7 +114,44 @@ export default function ShopOfflineScreen({ navigation }: Props) {
     setShowPicker(!showPicker);
   };
 
-  const handleSaveShop = () => {};
+  const handleSaveShop = async () => {
+    setShopSaveLoading(true);
+
+    const token = await getToken();
+
+    const isOpen = !isReopenDateVisible;
+
+    const values = { isOpen, reopenDate };
+
+    const shopResponse = await shopTools.updateShopOffline(token, values);
+
+    if (!shopResponse.success) {
+      SheetManager.show("alert", {
+        payload: {
+          message: "Impossible de mettre à jour.",
+          alertType: "error",
+        },
+      });
+      return;
+    }
+
+    dispatch(setShopData(shopResponse.data));
+
+    SheetManager.show("alert", {
+      payload: {
+        message: "Mise à jour effectuée.",
+        alertType: "success",
+      },
+    });
+
+    setShopSaveLoading(false);
+    setDisabled(true);
+  };
+
+  console.log("----------------------------------");
+  console.log("disabled :", isDisabled);
+  console.log("isReopenDateVisible :", isReopenDateVisible);
+  console.log("----------------------------------");
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
@@ -114,7 +182,7 @@ export default function ShopOfflineScreen({ navigation }: Props) {
                   placeholder="Choisissez une date"
                   label="Date de réouverture"
                   editable={false}
-                  onChangeText={(value: string) => setReopenDate(value)}
+                  onChangeText={(value: Date) => setReopenDate(value)}
                   value={reopenDate}
                   iconName="calendar"
                   onIconPressFn={toggleDatePicker}
@@ -134,13 +202,11 @@ export default function ShopOfflineScreen({ navigation }: Props) {
 
             <View className="px-3 w-full mt-5">
               <ButtonPrimaryEnd
-                label="Valider"
-                iconName="check"
+                label="Sauvegarder"
+                iconName="sync-alt"
                 iconFamily="FontAwesome5Icon"
-                disabled={
-                  isShopSaveLoading === true ? isShopSaveLoading : isDisabled
-                }
-                extraClasses="mb-3"
+                disabled={isDisabled}
+                extraClasses="mb-3 h-14"
                 onPressFn={() => handleSaveShop()}
                 isLoading={isShopSaveLoading}
               />

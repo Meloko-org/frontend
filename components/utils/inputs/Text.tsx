@@ -15,7 +15,7 @@ type InputTextProps = {
   onChangeText: Function;
   onBlur?: Function;
   editable?: boolean;
-  value?: string;
+  value?: string | Date;
   size?: string;
   extraClasses?: string;
   iconName?: string;
