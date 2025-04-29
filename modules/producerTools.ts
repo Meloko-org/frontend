@@ -1,4 +1,4 @@
-import { ApiResponse, ProducerData } from "../types/API";
+import { ApiResponse, OrderData, ProducerData } from "../types/API";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -117,7 +117,9 @@ const createProducer = async (token: string | null, values: {}) => {
   }
 };
 
-const getAllOrders = async (token: string) => {
+const getAllOrders = async (
+  token: string | null,
+): Promise<ApiResponse<OrderData[]>> => {
   try {
     const response = await fetch(`${API_ROOT}/business/all`, {
       method: "GET",
@@ -128,10 +130,26 @@ const getAllOrders = async (token: string) => {
       },
     });
 
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible de récupérer les données.`,
+      };
+    }
+
     const data = await response.json();
-    return data;
+
+    return data.success
+      ? { success: true, data: data.orders }
+      : { success: false, data: null, message: data.message };
   } catch (error) {
     console.log(error);
+    return {
+      success: false,
+      data: null,
+      message: "Une erreur s'est produite lors de la récupération des données.",
+    };
   }
 };
 

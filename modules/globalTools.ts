@@ -1,8 +1,13 @@
 import { ApiResponse, ProductCategoryData } from "../types/API";
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
-const formatDateToFr = (isoDate: Date) => {
-  const date = new Date(isoDate);
+const formatDateToFr = (isoDate: Date | string | undefined) => {
+  if (!isoDate) return;
+
+  const date = typeof isoDate === "string" ? new Date(isoDate) : isoDate;
+
+  if (isNaN(date.getTime())) return "";
+
   return new Intl.DateTimeFormat("fr-Fr", {
     day: "2-digit",
     month: "2-digit",

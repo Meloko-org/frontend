@@ -5,7 +5,7 @@ import { ClerkProvider, ClerkLoaded } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
-import { ModalProvider } from "./context/ModalContext";
+// import { ModalProvider } from "./context/ModalContext";
 import { SheetProvider } from "react-native-actions-sheet";
 import "./components/bottomSheets/sheets";
 import {
@@ -29,6 +29,7 @@ import UserProfileInformationsScreen from "./screens/customer/ProfileInformation
 import UserProfileAddressesScreen from "./screens/customer/ProfileAddresses";
 import ShopProducerScreen from "./screens/producer/Shop";
 import BusinessScreen from "./screens/Business";
+import BusinessCenterScreen from "./screens/producer/BusinessCenter";
 import ProducerProfileScreen from "./screens/producer/Profile";
 import StocksOldScreen from "./screens/Stocks";
 import SearchCustomerScreen from "./screens/customer/Search";
@@ -77,10 +78,19 @@ import mode from "./reducers/mode";
 import shop from "./reducers/shop";
 import stocks from "./reducers/stocks";
 import producer from "./reducers/producer";
+import orders from "./reducers/orders";
 import OrderDetailsScreen from "./screens/OrderDetails";
 import StocksEditScreen from "./screens/producer/StockEdit";
 
-const reducers = combineReducers({ user, cart, mode, shop, producer, stocks });
+const reducers = combineReducers({
+  user,
+  cart,
+  mode,
+  shop,
+  producer,
+  stocks,
+  orders,
+});
 const persistConfig = {
   key: "meloko",
   storage: AsyncStorage,
@@ -388,7 +398,8 @@ const TabNavigatorProducer: React.FC = () => {
         component={PostHashtagsScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen name="BusinessCenter" component={BusinessScreen} />
+      {/* <Tab.Screen name="BusinessCenter" component={BusinessScreen} /> */}
+      <Tab.Screen name="BusinessCenter" component={BusinessCenterScreen} />
       <Tab.Screen name="ProducerProfile" component={ProducerProfileScreen} />
 
       <Tab.Screen

@@ -16,6 +16,7 @@ type OpenScreenButtonProps = {
   bgColor?: string;
   redAlert?: boolean;
   notice?: string;
+  noticeColor?: string;
   switchProps?: {
     label: string;
     value: boolean;
@@ -34,6 +35,7 @@ export default function OpenScreenButton({
   bgColor,
   redAlert,
   notice,
+  noticeColor,
   switchProps = null,
   extraClasses,
   onPressFn,
@@ -64,7 +66,11 @@ export default function OpenScreenButton({
           )}
         </View>
         {notice && (
-          <View className="flex items-center justify-center rounded-lg bg-primary px-1 min-w-[30px] h-8">
+          <View
+            className={`flex items-center justify-center rounded-lg px-1 min-w-[30px] h-8
+            ${noticeColor ? noticeColor : "bg-primary"}
+          `}
+          >
             <TextHeading4 centered>{notice}</TextHeading4>
           </View>
         )}

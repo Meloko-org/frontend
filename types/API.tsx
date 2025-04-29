@@ -15,13 +15,13 @@ type OrderData = {
       withdrawDay: string;
       market: MarketData;
       shop: ShopData;
-      shopTotalPrice: number;
+      shopTotalPrice: { $numberDecimal: string };
       status: string;
     },
   ];
   isWithdraw: boolean;
   isPaid: boolean;
-  totalPrice: number;
+  totalPrice: { $numberDecimal: string };
   createdAt: Date;
 };
 

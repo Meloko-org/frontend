@@ -2,43 +2,25 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
-import typesTools from "../../modules/typesTools";
 import { useAuth } from "@clerk/clerk-expo";
-import shopTools from "../../modules/shopTools";
 import { useDispatch, useSelector } from "react-redux";
 import { setProducts, setShopData, ShopState } from "../../reducers/shop";
-import { UserState } from "../../reducers/user";
 
 /* Eléments graphiques */
 import { View, TouchableOpacity, Alert, Text, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
-import TextHeading3 from "../../components/utils/texts/Heading3";
-import InputText from "../../components/utils/inputs/Text";
-import InputTextarea from "../../components/utils/inputs/Textarea";
-import SwitchInput from "../../components/utils/inputs/Switch";
-import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
-import IconButton from "../../components/utils/buttons/Icon";
 import TextBody1 from "../../components/utils/texts/Body1";
-import ButtonBack from "../../components/utils/buttons/Back";
-
-import LogoModal from "../../components/modals/producer/Logo";
-import PhotoModal from "../../components/modals/producer/Photo";
-import VideoModal from "../../components/modals/producer/Video";
-import ClickCollectModal from "../../components/modals/producer/ClickCollect";
-import MarketsModal from "../../components/modals/producer/Markets";
-import { ProducerState } from "../../reducers/producer";
 
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import BadgeSecondary from "../../components/utils/badges/Secondary";
-import OpenMenuButton from "../../components/utils/buttons/OpenMenu";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import StarsNotation from "../../components/utils/StarsNotation";
 import ThumbnailCarousel from "../../components/utils/ThumbnailCarousel";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import stocksTools from "../../modules/stocksTools";
-// const FontAwesome = _Fontawesome as React.ElementType;
+import TextHeading3 from "../../components/utils/texts/Heading3";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -106,7 +88,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
         <View className="flex flex-row justify-center items-center mb-1 mt-1">
           <View>
             <View className="flex-grow">
-              <TextHeading4 centered>{`MA BOUTIQUE`}</TextHeading4>
+              <TextHeading3 centered>{shopStore?.name}</TextHeading3>
             </View>
             <View className="flex flex-row justify-center">
               <StarsNotation
