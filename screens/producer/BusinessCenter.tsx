@@ -6,6 +6,15 @@ import { RootStackParamList } from "../../types/Navigation";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 
+import { Picker } from "@react-native-picker/picker";
+import {
+  startOfDay,
+  startOfWeek,
+  startOfMonth,
+  startOfYear,
+  isWithinInterval,
+} from "date-fns";
+
 import { View, TouchableOpacity, Alert, Text, Image } from "react-native";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import TextBody1 from "../../components/utils/texts/Body1";
@@ -51,6 +60,37 @@ export default function BusinessCenterScreen({ navigation }: Props) {
   const [canceledOrders, setCanceledOrders] = useState<OrderData[]>([]);
 
   const [isScannerVisible, setScannerVisible] = useState<boolean>(false);
+
+  const [selectedPeriod, setSelectedPeriod] = useState<
+    "day" | "week" | "month" | "year"
+  >("week");
+  type Financials = {
+    revenus: number;
+    commission: number;
+    tva: number;
+  };
+
+  const [financials, setFinancials] = useState<Financials>({
+    revenus: 0,
+    commission: 0,
+    tva: 0,
+  });
+
+  const getStartDate = (period: string) => {
+    const now = new Date();
+    switch (period) {
+      case "day":
+        return startOfDay(now);
+      case "week":
+        return startOfWeek(now, { weekStartsOn: 1 }); // lundi
+      case "month":
+        return startOfMonth(now);
+      case "year":
+        return startOfYear(now);
+      default:
+        return now;
+    }
+  };
 
   const fetchOrders = async () => {
     const token = await getToken();
@@ -119,6 +159,36 @@ export default function BusinessCenterScreen({ navigation }: Props) {
     setCanceledOrders(grouped.canceled);
   }, [ordersStore]);
 
+  useEffect(() => {
+    if (!ordersStore) return;
+
+    const startDate = getStartDate(selectedPeriod);
+    const now = new Date();
+
+    let revenus = 0;
+
+    ordersStore.forEach((order) => {
+      const orderDate = new Date(order.createdAt);
+
+      if (
+        isWithinInterval(orderDate, {
+          start: startDate,
+          end: now,
+        })
+      ) {
+        const price = parseFloat(
+          order.details[0].shopTotalPrice?.$numberDecimal || "0",
+        );
+        revenus += price;
+      }
+    });
+
+    const commission = revenus * 0.15;
+    const tva = revenus * 0.055; // ou adapte selon ta règle TVA
+
+    setFinancials({ revenus, commission, tva });
+  }, [ordersStore, selectedPeriod]);
+
   const handleScan = (orderId: string) => {
     console.log("orderId : ", orderId);
     setScannerVisible(false);
@@ -127,6 +197,8 @@ export default function BusinessCenterScreen({ navigation }: Props) {
     //   params: { orderId },
     // });
   };
+
+  console.log("financials :", financials);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -212,14 +284,25 @@ export default function BusinessCenterScreen({ navigation }: Props) {
               />
             </View>
 
-            <View className="mt-2">
-              <View className="flex flex-row items-center">
+            <View className="mt-5">
+              <View className="flex flex-row items-center mb-3">
                 <View className="w-[50%]">
-                  <TextHeading3 extraClasses="my-1">Finances</TextHeading3>
+                  <TextHeading3 centered extraClasses="my-1">
+                    Finances
+                  </TextHeading3>
                 </View>
                 <View className="w-[50%]">
                   <View className="flex justify-center rounded-lg p-1 bg-gray-400 h-[40px]">
-                    <TextBody2 centered>7 derniers jours</TextBody2>
+                    {/* <TextBody2 centered>7 derniers jours</TextBody2> */}
+                    <Picker
+                      selectedValue={selectedPeriod}
+                      onValueChange={(value) => setSelectedPeriod(value)}
+                    >
+                      <Picker.Item label="Aujourd'hui" value="day" />
+                      <Picker.Item label="Cette semaine" value="week" />
+                      <Picker.Item label="Ce mois" value="month" />
+                      <Picker.Item label="Cette année" value="year" />
+                    </Picker>
                   </View>
                 </View>
               </View>
@@ -232,7 +315,9 @@ export default function BusinessCenterScreen({ navigation }: Props) {
                 </View>
                 <View className="w-[50%]">
                   <View className="flex items-end">
-                    <TextBody2>000 €</TextBody2>
+                    <TextHeading4 extraClasses="text-right">
+                      {financials.revenus.toFixed(2)} €
+                    </TextHeading4>
                   </View>
                 </View>
               </View>
@@ -243,7 +328,9 @@ export default function BusinessCenterScreen({ navigation }: Props) {
                 </View>
                 <View className="w-[50%]">
                   <View className="flex items-end">
-                    <TextBody2>000 €</TextBody2>
+                    <TextHeading4 extraClasses="text-right">
+                      {financials.commission.toFixed(2)} €
+                    </TextHeading4>
                   </View>
                 </View>
               </View>
@@ -254,12 +341,14 @@ export default function BusinessCenterScreen({ navigation }: Props) {
                 </View>
                 <View className="w-[50%]">
                   <View className="flex items-end">
-                    <TextBody2>000 €</TextBody2>
+                    <TextHeading4 extraClasses="text-right">
+                      {financials.tva.toFixed(2)} €
+                    </TextHeading4>
                   </View>
                 </View>
               </View>
 
-              <View className="flex flex-row items-center justify-center mb-3">
+              {/* <View className="flex flex-row items-center justify-center mb-3">
                 <View>
                   <FontAwesome6Icon
                     name="clock"
@@ -271,7 +360,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
                 <View className="pl-3">
                   <TextBody1>Prochain virement le 01/10/2025</TextBody1>
                 </View>
-              </View>
+              </View> */}
             </View>
           </>
         )}
