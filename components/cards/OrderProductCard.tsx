@@ -16,21 +16,25 @@ type OrderProductCardProps = {
   status?: string;
 };
 
-export default function OrderProductCard(
-  props: OrderProductCardProps,
-): JSX.Element {
+export default function OrderProductCard({
+  orderProductData,
+  onPressFn,
+  extraClasses,
+  showImage,
+  status,
+}: OrderProductCardProps): JSX.Element {
   const [isCanceled, setIsCanceled] = useState<boolean>(false);
 
   useEffect(() => {
-    if (props.status === "validated" || props.status === "withdrawn") {
-      if (props.orderProductData?.isConfirmed === false) {
+    if (status === "validated" || status === "withdrawn") {
+      if (orderProductData?.isConfirmed === false) {
         setIsCanceled(true);
       }
     }
-    if (props.status === "canceled") {
+    if (status === "canceled") {
       setIsCanceled(true);
     }
-  }, [props.status]);
+  }, [status]);
 
   const toggleCancel = () => {
     setIsCanceled((prev) => !prev);
@@ -54,51 +58,48 @@ export default function OrderProductCard(
   };
 
   const tags =
-    props.orderProductData?.product.tags &&
-    props.orderProductData?.product.tags.map((tag) => {
+    orderProductData?.product.tags &&
+    orderProductData?.product.tags.map((tag) => {
       // console.log("s", s)
       return (
         <BadgeSecondary
           key={tag._id}
-          uppercase
-          extraClasses="mt-1"
+          extraClasses="mb-1 mr-1 px-1"
         >{`${tag.name}`}</BadgeSecondary>
       );
     });
 
   const unit =
-    props.orderProductData?.product.product.weight.unit === "gr"
-      ? "kg"
-      : "pièce";
+    orderProductData?.product.product.weight.unit === "gr" ? "kg" : "pièce";
 
-  console.log("      --> ORDERPRODUCTCARDS");
-  console.log("      -->  canceled: ", isCanceled);
-  console.log("      -->  props status: ", props.status);
-  // console.log("      -->  props orderProductData: ", props.orderProductData);
+  console.log(
+    "      -->  props orderProductData: ",
+    JSON.stringify(orderProductData, null, 2),
+  );
 
   return (
     <TouchableOpacity
       onPress={() => {
-        if (props.onPressFn && props.status === "pending") {
-          props.onPressFn(props.orderProductData?.product._id);
+        if (onPressFn && status === "pending") {
+          onPressFn(orderProductData?.product._id);
           toggleCancel();
         }
       }}
     >
-      <View className={`${props.extraClasses} relative`}>
+      <View className={`${extraClasses} relative`}>
         <View className="rounded-lg border shadow-sm bg-white p-2 dark:bg-tertiary w-full">
           <View className="flex flex-row items-center w-full">
             <View className="flex flex-row items-center rounded-lg w-1/5">
               <Image
                 source={
-                  props.orderProductData?.product.product.image
+                  orderProductData?.product.product.image
                     ? {
-                        uri: props.orderProductData?.product.product.image,
+                        uri: orderProductData?.product.product.image,
                       }
                     : require("../../assets/icon.png")
                 }
-                className="rounded-full w-20 h-20"
-                alt={`Illustration du produit ${props.orderProductData?.product.product.name}`}
+                className="rounded-lg w-20 h-20"
+                alt={`Illustration du produit ${orderProductData?.product.product.name}`}
                 resizeMode="cover"
                 width={96}
                 height={64}
@@ -110,11 +111,11 @@ export default function OrderProductCard(
                 <TextHeading4
                   centered
                   extraClasses="mb-1"
-                >{`${props.orderProductData?.product.product.family.name} ${props.orderProductData?.product.product.name}`}</TextHeading4>
+                >{`${orderProductData?.product.product.family.name + " " + orderProductData?.product.product.name}`}</TextHeading4>
               </View>
               <View className="flex flex-row">
-                <PricePer>{`${props.orderProductData?.product.price.$numberDecimal} € / ${unit}`}</PricePer>
-                {tags}
+                <PricePer extraClasses="h-7 mr-2">{`${orderProductData?.product.price.$numberDecimal + " € / " + unit}`}</PricePer>
+                <View className="flex-row flex-wrap">{tags}</View>
               </View>
               <View className="flex flex-row w-full justify-between mt-2">
                 <View className="flex flex-row items-center">
@@ -124,8 +125,8 @@ export default function OrderProductCard(
                   <View>
                     <TextBody1>
                       {formatQuantity(
-                        props.orderProductData?.quantity,
-                        props.orderProductData?.product.product.weight.unit,
+                        orderProductData?.quantity,
+                        orderProductData?.product.product.weight.unit,
                       )}
                     </TextBody1>
                   </View>
@@ -137,9 +138,9 @@ export default function OrderProductCard(
                   <View>
                     <TextBody1>
                       {getPrice(
-                        props.orderProductData.product.price.$numberDecimal,
-                        props.orderProductData.quantity,
-                        props.orderProductData?.product.product.weight.unit,
+                        orderProductData?.product.price.$numberDecimal,
+                        orderProductData?.quantity,
+                        orderProductData?.product.product.weight.unit,
                       )}{" "}
                       €
                     </TextBody1>
@@ -153,7 +154,7 @@ export default function OrderProductCard(
         {isCanceled && (
           <View className="absolute w-full h-full inset-0">
             <View className="absolute inset-0 opacity-70 w-full h-full bg-black rounded-lg" />
-            {props.status !== "canceled" && (
+            {status !== "canceled" && (
               <View className="absolute inset-0 flex items-center justify-center h-full w-full">
                 <Text className="text-danger font-bold text-lg rounded-lg bg-lightbg p-1">
                   Produit annulé

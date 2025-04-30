@@ -70,6 +70,8 @@ import PostPreviewScreen from "./screens/producer/PostPreview";
 import PostNetworksScreen from "./screens/producer/PostNetworks";
 import PostFrequencyScreen from "./screens/producer/PostFrequency";
 import PostHashtagsScreen from "./screens/producer/PostHashtags";
+import OrderDetailsScreen from "./screens/producer/OrderDetails";
+import StocksEditScreen from "./screens/producer/StockEdit";
 
 import { Provider } from "react-redux";
 import { persistStore, persistReducer } from "redux-persist";
@@ -84,8 +86,6 @@ import shop from "./reducers/shop";
 import stocks from "./reducers/stocks";
 import producer from "./reducers/producer";
 import orders from "./reducers/orders";
-import OrderDetailsScreen from "./screens/OrderDetails";
-import StocksEditScreen from "./screens/producer/StockEdit";
 
 const reducers = combineReducers({
   user,

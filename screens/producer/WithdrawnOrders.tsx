@@ -12,6 +12,7 @@ import OrderStatus from "../../components/cards/OrderStatus";
 import { useSelector } from "react-redux";
 import { OrdersState } from "../../reducers/orders";
 import { OrderData } from "../../types/API";
+import { SheetManager } from "react-native-actions-sheet";
 
 type WithdrawnOrdersScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -40,9 +41,20 @@ export default function WithdrawnOrdersScreen({ navigation }: Props) {
   useEffect(() => {
     if (!ordersStore) return;
 
-    setWithdrawnOrders(
-      ordersStore.filter((order) => order.details[0].status === "withdrawn"),
+    const withdrawns = ordersStore.filter(
+      (order) => order.details[0].status === "withdrawn",
     );
+
+    if (withdrawns.length === 0) {
+      SheetManager.show("alert", {
+        payload: {
+          message: "Aucune commande en attente.",
+          alertType: "warning",
+        },
+      });
+    } else {
+      setWithdrawnOrders(withdrawns);
+    }
   }, []);
 
   const withdrawnOrderCards = withdrawnOrders.map((order) => {
@@ -59,13 +71,20 @@ export default function WithdrawnOrdersScreen({ navigation }: Props) {
     );
   });
 
-  const handlePressCard = (order) => {};
+  const handlePressCard = (order: OrderData) => {
+    navigation.navigate("OrderDetails", {
+      from: "WithdrawnOrders",
+      backLabel: "Retour retirées",
+      screenTitle: "DETAIL\nCOMMANDE",
+      orderId: order._id,
+    });
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <TopBar
         backLabel={backLabel || "Retour au tableau"}
-        screen={from || "businessCenter"}
+        screen={from || "BusinessCenter"}
         label={screenTitle || "COMMANDES\nRETIREES"}
         extraClasses="mt-2"
       />

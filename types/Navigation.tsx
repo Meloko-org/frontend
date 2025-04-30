@@ -109,7 +109,12 @@ type RootStackParamList = {
   AllOrders: { from?: string; backLabel?: string; screenTitle?: string };
   ProducerProfile: undefined;
   StocksOld: undefined;
-  OrderDetails: undefined;
+  OrderDetails: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    orderId: string;
+  };
   Sales: undefined;
 };
 

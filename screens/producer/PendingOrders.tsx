@@ -14,6 +14,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { View } from "react-native";
 import TopBar from "../../components/TopBar";
 import OrderStatus from "../../components/cards/OrderStatus";
+import { SheetManager } from "react-native-actions-sheet";
 
 type PendingOrdersScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -42,9 +43,20 @@ export default function PendingOrdersScreen({ navigation }: Props) {
   useEffect(() => {
     if (!ordersStore) return;
 
-    setPendingOrders(
-      ordersStore.filter((order) => order.details[0].status === "pending"),
+    const pendings = ordersStore.filter(
+      (order) => order.details[0].status === "pending",
     );
+
+    if (pendings.length === 0) {
+      SheetManager.show("alert", {
+        payload: {
+          message: "Aucune commande en attente.",
+          alertType: "warning",
+        },
+      });
+    } else {
+      setPendingOrders(pendings);
+    }
   }, []);
 
   const pendingOrderCards = pendingOrders.map((order) => {
@@ -61,13 +73,20 @@ export default function PendingOrdersScreen({ navigation }: Props) {
     );
   });
 
-  const handlePressCard = (order) => {};
+  const handlePressCard = (order: OrderData) => {
+    navigation.navigate("OrderDetails", {
+      from: "PendingOrders",
+      backLabel: "Retour en attente",
+      screenTitle: "DETAIL\nCOMMANDE",
+      orderId: order._id,
+    });
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <TopBar
         backLabel={backLabel || "Retour au tableau"}
-        screen={from || "businessCenter"}
+        screen={from || "BusinessCenter"}
         label={screenTitle || "COMMANDES\nEN ATTENTE"}
         extraClasses="mt-2"
       />

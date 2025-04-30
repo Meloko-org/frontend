@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { OrdersState } from "../../reducers/orders";
 import { OrderData } from "../../types/API";
 import OrderStatus from "../../components/cards/OrderStatus";
+import { SheetManager } from "react-native-actions-sheet";
 
 type ValidatedOrdersScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -40,9 +41,20 @@ export default function ValidatedOrdersScreen({ navigation }: Props) {
   useEffect(() => {
     if (!ordersStore) return;
 
-    setValidateOrders(
-      ordersStore.filter((order) => order.details[0].status === "validated"),
+    const validateds = ordersStore.filter(
+      (order) => order.details[0].status === "validated",
     );
+
+    if (validateds.length === 0) {
+      SheetManager.show("alert", {
+        payload: {
+          message: "Aucune commande en attente.",
+          alertType: "warning",
+        },
+      });
+    } else {
+      setValidateOrders(validateds);
+    }
   }, []);
 
   const validateOrderCards = validateOrders.map((order) => {
@@ -59,13 +71,20 @@ export default function ValidatedOrdersScreen({ navigation }: Props) {
     );
   });
 
-  const handlePressCard = (order) => {};
+  const handlePressCard = (order: OrderData) => {
+    navigation.navigate("OrderDetails", {
+      from: "ValidatedOrders",
+      backLabel: "Retour validées",
+      screenTitle: "DETAIL\nCOMMANDE",
+      orderId: order._id,
+    });
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <TopBar
         backLabel={backLabel || "Retour au tableau"}
-        screen={from || "businessCenter"}
+        screen={from || "BusinessCenter"}
         label={screenTitle || "COMMANDES\nVALIDEES"}
         extraClasses="mt-2"
       />

@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { OrdersState } from "../../reducers/orders";
 import { OrderData } from "../../types/API";
 import OrderStatus from "../../components/cards/OrderStatus";
+import { SheetManager } from "react-native-actions-sheet";
 
 type AllOrdersScreenRouteProp = RouteProp<RootStackParamList, "AllOrders">;
 
@@ -35,9 +36,16 @@ export default function AllOrdersScreen({ navigation }: Props) {
   const [orders, setOrders] = useState<OrderData[]>([]);
 
   useEffect(() => {
-    if (!ordersStore) return;
-
-    setOrders(ordersStore);
+    if (!ordersStore) {
+      SheetManager.show("alert", {
+        payload: {
+          message: "Aucune commande en attente.",
+          alertType: "warning",
+        },
+      });
+    } else {
+      setOrders(ordersStore);
+    }
   }, []);
 
   const orderCards = orders.map((order) => {
@@ -54,13 +62,20 @@ export default function AllOrdersScreen({ navigation }: Props) {
     );
   });
 
-  const handlePressCard = (order) => {};
+  const handlePressCard = (order: OrderData) => {
+    navigation.navigate("OrderDetails", {
+      from: "AllOrders",
+      backLabel: "Retour aux commandes",
+      screenTitle: "DETAIL\nCOMMANDE",
+      orderId: order._id,
+    });
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <TopBar
         backLabel={backLabel || "Retour au tableau"}
-        screen={from || "businessCenter"}
+        screen={from || "BusinessCenter"}
         label={screenTitle || "TOUTES LES\nCOMMANDES"}
         extraClasses="mt-2"
       />

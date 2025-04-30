@@ -36,7 +36,7 @@ const weekDayLabels = [
   "Dimanche",
 ];
 
-const getWeekDayLabel = (day: number): String => {
+const getWeekDayLabel = (day: number): string => {
   return weekDayLabels[day - 1];
 };
 

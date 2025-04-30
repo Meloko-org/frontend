@@ -3,8 +3,10 @@ type OrderData = {
   user: UserData;
   details: [
     {
+      _id: string;
       products: [
         {
+          _id: string;
           product: [StockData];
           quantity: number;
           isConfirmed: boolean;
