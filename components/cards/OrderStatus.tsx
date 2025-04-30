@@ -57,7 +57,7 @@ export default function OrderStatus({
           </View>
           <View>
             <TextBody1 extraClasses="pr-3">
-              {globalTools.formatDateToFr(orderData.createdAt)}
+              {globalTools.formatDateToFr(orderData?.createdAt)}
             </TextBody1>
           </View>
           <View>

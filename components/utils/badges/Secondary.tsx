@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View } from "react-native";
 
 type BadgeSecondaryProps = {
-  children: string;
+  children: React.ReactNode | string | number;
   uppercase?: boolean;
   extraClasses?: string;
   textClasses?: string;
