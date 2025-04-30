@@ -1,0 +1,73 @@
+import React, { useEffect, useState } from "react";
+import { useAuth } from "@clerk/clerk-expo";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../types/Navigation";
+import { RouteProp, useRoute } from "@react-navigation/native";
+
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-gesture-handler";
+import { View } from "react-native";
+import TopBar from "../../components/TopBar";
+import { useSelector } from "react-redux";
+import { OrdersState } from "../../reducers/orders";
+import { OrderData } from "../../types/API";
+import OrderStatus from "../../components/cards/OrderStatus";
+
+type AllOrdersScreenRouteProp = RouteProp<RootStackParamList, "AllOrders">;
+
+type AllOrdersScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "AllOrders"
+>;
+
+type Props = {
+  navigation: AllOrdersScreenNavigationProp;
+};
+
+export default function AllOrdersScreen({ navigation }: Props) {
+  const route = useRoute<AllOrdersScreenRouteProp>();
+  const { from, backLabel, screenTitle } = route.params || {};
+
+  const ordersStore = useSelector(
+    (state: { orders: OrdersState }) => state.orders.value,
+  );
+
+  const [orders, setOrders] = useState<OrderData[]>([]);
+
+  useEffect(() => {
+    if (!ordersStore) return;
+
+    setOrders(ordersStore);
+  }, []);
+
+  const orderCards = orders.map((order) => {
+    return (
+      <OrderStatus
+        key={order?._id}
+        orderData={order}
+        extraClasses="mb-2"
+        onPressFn={() => {
+          console.log("clicked order: ", order?._id);
+          handlePressCard(order);
+        }}
+      />
+    );
+  });
+
+  const handlePressCard = (order) => {};
+
+  return (
+    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
+      <TopBar
+        backLabel={backLabel || "Retour au tableau"}
+        screen={from || "businessCenter"}
+        label={screenTitle || "TOUTES LES\nCOMMANDES"}
+        extraClasses="mt-2"
+      />
+
+      <ScrollView>
+        <View className="px-3">{orderCards}</View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}

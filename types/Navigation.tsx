@@ -102,6 +102,11 @@ type RootStackParamList = {
   PostFrequency: { from?: string; backLabel?: string; screenTitle?: string };
   PostHashtags: { from?: string; backLabel?: string; screenTitle?: string };
   BusinessCenter: undefined;
+  PendingOrders: { from?: string; backLabel?: string; screenTitle?: string };
+  ValidatedOrders: { from?: string; backLabel?: string; screenTitle?: string };
+  WithdrawnOrders: { from?: string; backLabel?: string; screenTitle?: string };
+  CanceledOrders: { from?: string; backLabel?: string; screenTitle?: string };
+  AllOrders: { from?: string; backLabel?: string; screenTitle?: string };
   ProducerProfile: undefined;
   StocksOld: undefined;
   OrderDetails: undefined;

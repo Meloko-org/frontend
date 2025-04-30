@@ -30,6 +30,11 @@ import UserProfileAddressesScreen from "./screens/customer/ProfileAddresses";
 import ShopProducerScreen from "./screens/producer/Shop";
 import BusinessScreen from "./screens/Business";
 import BusinessCenterScreen from "./screens/producer/BusinessCenter";
+import PendingOrdersScreen from "./screens/producer/PendingOrders";
+import ValidatedOrdersScreen from "./screens/producer/ValidatedOrders";
+import WithdrawnOrdersScreen from "./screens/producer/WithdrawnOrders";
+import CanceledOrdersScreen from "./screens/producer/CanceledOrders";
+import AllOrdersScreen from "./screens/producer/AllOrders";
 import ProducerProfileScreen from "./screens/producer/Profile";
 import StocksOldScreen from "./screens/Stocks";
 import SearchCustomerScreen from "./screens/customer/Search";
@@ -400,6 +405,31 @@ const TabNavigatorProducer: React.FC = () => {
       />
       {/* <Tab.Screen name="BusinessCenter" component={BusinessScreen} /> */}
       <Tab.Screen name="BusinessCenter" component={BusinessCenterScreen} />
+      <Tab.Screen
+        name="PendingOrders"
+        component={PendingOrdersScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="ValidatedOrders"
+        component={ValidatedOrdersScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="WithdrawnOrders"
+        component={WithdrawnOrdersScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="CanceledOrders"
+        component={CanceledOrdersScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="AllOrders"
+        component={AllOrdersScreen}
+        options={{ tabBarButton: () => null }}
+      />
       <Tab.Screen name="ProducerProfile" component={ProducerProfileScreen} />
 
       <Tab.Screen

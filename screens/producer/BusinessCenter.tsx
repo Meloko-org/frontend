@@ -63,7 +63,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
 
   const [selectedPeriod, setSelectedPeriod] = useState<
     "day" | "week" | "month" | "year"
-  >("week");
+  >("month");
   type Financials = {
     revenus: number;
     commission: number;
@@ -243,34 +243,64 @@ export default function BusinessCenterScreen({ navigation }: Props) {
                 label="Commandes en attente"
                 notice={pendingOrders.length.toString()}
                 noticeColor="bg-stone-800"
-                onPressFn={() => {}}
+                onPressFn={() =>
+                  navigation.navigate("PendingOrders", {
+                    from: "BusinessCenter",
+                    backLabel: "Retour au tableau",
+                    screenTitle: "COMMANDES\nEN ATTENTE",
+                  })
+                }
                 extraClasses="mb-1"
               />
               <OpenScreenButton
                 label="Commandes validées"
                 notice={validatedOrders.length.toString()}
                 noticeColor="bg-emerald-800"
-                onPressFn={() => {}}
+                onPressFn={() =>
+                  navigation.navigate("ValidatedOrders", {
+                    from: "BusinessCenter",
+                    backLabel: "Retour au tableau",
+                    screenTitle: "COMMANDES\nVALIDÉES",
+                  })
+                }
                 extraClasses="mb-1"
               />
               <OpenScreenButton
                 label="Commandes retirées"
                 notice={withdrawnOrders.length.toString()}
                 noticeColor="bg-success"
-                onPressFn={() => {}}
+                onPressFn={() =>
+                  navigation.navigate("WithdrawnOrders", {
+                    from: "BusinessCenter",
+                    backLabel: "Retour au tableau",
+                    screenTitle: "COMMANDES\nRETIRÉES",
+                  })
+                }
                 extraClasses="mb-1"
               />
               <OpenScreenButton
                 label="Commandes annulées"
                 notice={canceledOrders.length.toString()}
                 noticeColor="bg-danger"
-                onPressFn={() => {}}
+                onPressFn={() =>
+                  navigation.navigate("CanceledOrders", {
+                    from: "BusinessCenter",
+                    backLabel: "Retour au tableau",
+                    screenTitle: "COMMANDES\nANNULÉES",
+                  })
+                }
                 extraClasses="mb-1"
               />
               <OpenScreenButton
                 label="Toutes les commandes"
                 notice={ordersStore.length.toString()}
-                onPressFn={() => {}}
+                onPressFn={() =>
+                  navigation.navigate("AllOrders", {
+                    from: "BusinessCenter",
+                    backLabel: "Retour à la boutique",
+                    screenTitle: "TOUTES LES\nCOMMANDES",
+                  })
+                }
                 extraClasses="mb-1"
               />
             </View>
@@ -286,12 +316,12 @@ export default function BusinessCenterScreen({ navigation }: Props) {
 
             <View className="mt-5">
               <View className="flex flex-row items-center mb-3">
-                <View className="w-[50%]">
+                <View className="w-[40%]">
                   <TextHeading3 centered extraClasses="my-1">
                     Finances
                   </TextHeading3>
                 </View>
-                <View className="w-[50%]">
+                <View className="w-[60%]">
                   <View className="flex justify-center rounded-lg p-1 bg-gray-400 h-[40px]">
                     {/* <TextBody2 centered>7 derniers jours</TextBody2> */}
                     <Picker

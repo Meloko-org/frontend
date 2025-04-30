@@ -17,42 +17,47 @@ import TextBody2 from "../utils/texts/Body2";
 
 type OrderStatusProps = {
   orderData: OrderData | undefined;
-  status?: "pending" | "validated" | "withdrawn" | "canceled";
+  status?: string | "pending" | "validated" | "withdrawn" | "canceled";
   onPressFn?: () => void;
   extraClasses?: string;
 };
 
-export default function OrderStatus(props: OrderStatusProps): JSX.Element {
+export default function OrderStatus({
+  orderData,
+  status,
+  onPressFn,
+  extraClasses,
+}: OrderStatusProps): JSX.Element {
   const { colorScheme, toggleColorScheme } = useColorScheme();
 
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
 
-  const shopDetails = props.orderData?.details.find(
+  const shopDetails = orderData?.details.find(
     (detail) => detail?.shop === shopStore?._id,
   );
 
-  // console.log("      --> ORDERSTATUS - subId : ", shopDetails._id);
+  console.log("orderData :", orderData);
 
   return (
-    <TouchableOpacity onPress={() => props.onPressFn && props.onPressFn()}>
+    <TouchableOpacity onPress={() => onPressFn && onPressFn()}>
       <View
-        className={`${props.extraClasses} rounded-lg border bg-white dark:bg-tertiary p-2`}
+        className={`${extraClasses} rounded-lg border bg-white dark:bg-tertiary p-2`}
       >
         <View className="mb-1">
           <TextHeading4>
-            {props.orderData?.user.lastname} {props.orderData?.user.firstname}
+            {orderData?.user.lastname} {orderData?.user.firstname}
           </TextHeading4>
         </View>
 
         <View className="flex flex-row items-center justify-between w-full mb-1">
           <View>
-            <BlackBadge extraClasses="py-1 px-2">{`N°${props.orderData?._id.slice(0, 7)}`}</BlackBadge>
+            <BlackBadge extraClasses="py-1 px-2">{`N°${orderData?._id.slice(0, 7)}`}</BlackBadge>
           </View>
           <View>
             <TextBody1 extraClasses="pr-3">
-              {globalTools.formatDateToFr(props.orderData.createdAt)}
+              {globalTools.formatDateToFr(orderData.createdAt)}
             </TextBody1>
           </View>
           <View>
@@ -75,7 +80,9 @@ export default function OrderStatus(props: OrderStatusProps): JSX.Element {
               <View className="ml-2">
                 <TextBody1>{shopDetails?.withdrawMarket}</TextBody1>
                 <TextBody2>
-                  {globalTools.getWeekDayLabel(shopDetails?.withdrawDay)}
+                  {globalTools.getWeekDayLabel(
+                    Number(shopDetails?.withdrawDay),
+                  )}
                 </TextBody2>
               </View>
             )}
@@ -85,7 +92,7 @@ export default function OrderStatus(props: OrderStatusProps): JSX.Element {
             <OrderStatusBadge
               extraClasses="ml-2 py-1 px-1"
               // a revoir
-              status={props.status ? props.status : shopDetails?.status}
+              status={status ? status : shopDetails?.status}
             />
           </View>
         </View>
