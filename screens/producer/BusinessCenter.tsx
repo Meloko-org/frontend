@@ -21,7 +21,7 @@ import TextBody1 from "../../components/utils/texts/Body1";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
-import { OrderData } from "../../types/API";
+import { OrderData, OrderSummary } from "../../types/API";
 import { OrdersState, setOrders } from "../../reducers/orders";
 import producerTools from "../../modules/producerTools";
 import { SheetManager } from "react-native-actions-sheet";
@@ -33,6 +33,8 @@ import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextBody2 from "../../components/utils/texts/Body2";
 import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
 import Spinner from "../../components/utils/Spinner";
+import orderTools from "../../modules/orderTools";
+import businessTools from "../../modules/businessTools";
 
 type BusinessCenterScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -52,12 +54,12 @@ export default function BusinessCenterScreen({ navigation }: Props) {
 
   const [isFetchLoading, setFetchLoading] = useState<boolean>(true);
 
-  const [lastOrder, setLastOrder] = useState<OrderData>();
+  const [lastOrder, setLastOrder] = useState<OrderSummary>();
 
-  const [pendingOrders, setPendingOrders] = useState<OrderData[]>([]);
-  const [validatedOrders, setValidatedOrders] = useState<OrderData[]>([]);
-  const [withdrawnOrders, setWithdrawnOrders] = useState<OrderData[]>([]);
-  const [canceledOrders, setCanceledOrders] = useState<OrderData[]>([]);
+  const [pendingOrders, setPendingOrders] = useState<OrderSummary[]>([]);
+  const [validatedOrders, setValidatedOrders] = useState<OrderSummary[]>([]);
+  const [withdrawnOrders, setWithdrawnOrders] = useState<OrderSummary[]>([]);
+  const [canceledOrders, setCanceledOrders] = useState<OrderSummary[]>([]);
 
   const [isScannerVisible, setScannerVisible] = useState<boolean>(false);
 
@@ -94,7 +96,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
 
   const fetchOrders = async () => {
     const token = await getToken();
-    const ordersResponse = await producerTools.getAllOrders(token);
+    const ordersResponse = await businessTools.getOrderSummary(token);
 
     if (!ordersResponse.success) {
       SheetManager.show("alert", {
@@ -105,6 +107,8 @@ export default function BusinessCenterScreen({ navigation }: Props) {
       });
       return;
     }
+
+    console.log("result :", JSON.stringify(ordersResponse.data, null, 2));
 
     dispatch(setOrders(ordersResponse.data || []));
 
@@ -122,14 +126,14 @@ export default function BusinessCenterScreen({ navigation }: Props) {
     if (!ordersStore) return;
 
     const grouped = {
-      pending: [] as OrderData[],
-      validated: [] as OrderData[],
-      withdrawn: [] as OrderData[],
-      canceled: [] as OrderData[],
+      pending: [] as OrderSummary[],
+      validated: [] as OrderSummary[],
+      withdrawn: [] as OrderSummary[],
+      canceled: [] as OrderSummary[],
     };
 
     ordersStore.forEach((order) => {
-      const status = order.details[0]?.status;
+      const status = order.detail?.status;
 
       switch (status) {
         case "pending":
@@ -177,7 +181,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
         })
       ) {
         const price = parseFloat(
-          order.details[0].shopTotalPrice?.$numberDecimal || "0",
+          order.detail.shopTotalPrice?.$numberDecimal || "0",
         );
         revenus += price;
       }
@@ -198,7 +202,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
     // });
   };
 
-  console.log("financials :", financials);
+  console.log("lastOrder :", lastOrder);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -232,7 +236,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
                 </View>
                 <View className="flex-none">
                   <TextBody1>
-                    {lastOrder?.details[0].shopTotalPrice.$numberDecimal + " €"}
+                    {lastOrder?.detail.shopTotalPrice.$numberDecimal + " €"}
                   </TextBody1>
                 </View>
               </View>
@@ -242,7 +246,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
               <OpenScreenButton
                 label="Commandes en attente"
                 notice={pendingOrders.length.toString()}
-                noticeColor="bg-stone-800"
+                noticeColor="bg-warning"
                 onPressFn={() =>
                   navigation.navigate("PendingOrders", {
                     from: "BusinessCenter",
@@ -268,7 +272,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
               <OpenScreenButton
                 label="Commandes retirées"
                 notice={withdrawnOrders.length.toString()}
-                noticeColor="bg-success"
+                noticeColor="bg-primary"
                 onPressFn={() =>
                   navigation.navigate("WithdrawnOrders", {
                     from: "BusinessCenter",
@@ -291,7 +295,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
                 }
                 extraClasses="mb-1"
               />
-              <OpenScreenButton
+              {/* <OpenScreenButton
                 label="Toutes les commandes"
                 notice={ordersStore.length.toString()}
                 onPressFn={() =>
@@ -302,7 +306,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
                   })
                 }
                 extraClasses="mb-1"
-              />
+              /> */}
             </View>
 
             <View className="px-3">

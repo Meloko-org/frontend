@@ -230,6 +230,19 @@ type ApiResponse<T> = {
   message?: string;
 };
 
+type OrderSummary = {
+  _id: string;
+  createdAt: string;
+  user: {
+    firstname: string;
+    lastname: string;
+  };
+  detail: {
+    status: string;
+    shopTotalPrice: { $numberDecimal: string };
+  };
+};
+
 export type {
   UserAddressData,
   ProductData,
@@ -254,4 +267,5 @@ export type {
   WeightData,
   ApiResponse,
   Note,
+  OrderSummary,
 };

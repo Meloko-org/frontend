@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { OrderData } from "../types/API";
+import { OrderSummary } from "../types/API";
 
 export type OrdersState = {
-  value: OrderData[];
+  value: OrderSummary[];
 };
 
 const initialState: OrdersState = {
@@ -15,7 +15,7 @@ export const ordersSlice = createSlice({
   reducers: {
     setOrders: (
       state: OrdersState,
-      action: PayloadAction<OrderData[]>,
+      action: PayloadAction<OrderSummary[]>,
     ): void => {
       state.value = action.payload;
     },

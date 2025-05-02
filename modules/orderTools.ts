@@ -1,4 +1,10 @@
-import { ApiResponse, OrderData, ProductDetail, StockData } from "../types/API";
+import {
+  ApiResponse,
+  OrderData,
+  OrderSummary,
+  ProductDetail,
+  StockData,
+} from "../types/API";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 

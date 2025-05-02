@@ -35,10 +35,10 @@ export default function OrderStatus({
   );
 
   const shopDetails = orderData?.details.find(
-    (detail) => detail?.shop === shopStore?._id,
+    (detail) => detail?.shop?.toString() === shopStore?._id.toString(),
   );
 
-  console.log("orderData :", orderData);
+  console.log("orderData :", JSON.stringify(orderData, null, 2));
 
   return (
     <TouchableOpacity onPress={() => onPressFn && onPressFn()}>
