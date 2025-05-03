@@ -40,6 +40,14 @@ export default function ValidatedOrdersScreen({ navigation }: Props) {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchPendingOrders(1); // recharge la première page
+    setIsRefreshing(false);
+  };
+
   const fetchPendingOrders = async (page = 1) => {
     setIsLoading(true);
     const token = await getToken();
@@ -121,6 +129,8 @@ export default function ValidatedOrdersScreen({ navigation }: Props) {
           }}
           onEndReachedThreshold={0.5}
           ListFooterComponent={isLoading && <ActivityIndicator />}
+          refreshing={isRefreshing}
+          onRefresh={onRefresh}
         />
       </View>
     </SafeAreaView>

@@ -35,6 +35,7 @@ import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
 import Spinner from "../../components/utils/Spinner";
 import orderTools from "../../modules/orderTools";
 import businessTools from "../../modules/businessTools";
+import { ShopState } from "../../reducers/shop";
 
 type BusinessCenterScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -51,6 +52,9 @@ export default function BusinessCenterScreen({ navigation }: Props) {
   const ordersStore = useSelector(
     (state: { orders: OrdersState }) => state.orders.value,
   );
+  const shopStore = useSelector(
+    (state: { shop: ShopState }) => state.shop.value,
+  );
 
   const [isFetchLoading, setFetchLoading] = useState<boolean>(true);
 
@@ -64,8 +68,10 @@ export default function BusinessCenterScreen({ navigation }: Props) {
   const [isScannerVisible, setScannerVisible] = useState<boolean>(false);
 
   const [selectedPeriod, setSelectedPeriod] = useState<
-    "day" | "week" | "month" | "year"
+    "day" | "week" | "month" | "year" | "total"
   >("month");
+  const [orderCount, setOrederCount] = useState(0);
+
   type Financials = {
     revenus: number;
     commission: number;
@@ -89,6 +95,8 @@ export default function BusinessCenterScreen({ navigation }: Props) {
         return startOfMonth(now);
       case "year":
         return startOfYear(now);
+      case "total":
+        return shopStore?.createdAt;
       default:
         return now;
     }
@@ -169,6 +177,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
     const startDate = getStartDate(selectedPeriod);
     const now = new Date();
 
+    let count = 0;
     let revenus = 0;
 
     ordersStore.forEach((order) => {
@@ -184,7 +193,9 @@ export default function BusinessCenterScreen({ navigation }: Props) {
           order.detail.shopTotalPrice?.$numberDecimal || "0",
         );
         revenus += price;
+        count++;
       }
+      setOrederCount(count);
     });
 
     const commission = revenus * 0.15;
@@ -202,13 +213,13 @@ export default function BusinessCenterScreen({ navigation }: Props) {
     // });
   };
 
-  console.log("lastOrder :", lastOrder);
+  console.log("createdAt shop :", shopStore?.createdAt);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <TextHeading3
         centered
-        extraClasses="mb-2"
+        extraClasses="mb-5"
       >{`Tableau de bord`}</TextHeading3>
 
       <ScrollView
@@ -219,7 +230,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
           <Spinner />
         ) : (
           <>
-            <View className="">
+            <View className="mb-3">
               <TextBody1 centered extraClasses="mb-2">
                 Dernière commande :
               </TextBody1>
@@ -242,7 +253,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
               </View>
             </View>
 
-            <View className="mb-3">
+            <View className="mb-5">
               <OpenScreenButton
                 label="Commandes en attente"
                 notice={pendingOrders.length.toString()}
@@ -336,7 +347,21 @@ export default function BusinessCenterScreen({ navigation }: Props) {
                       <Picker.Item label="Cette semaine" value="week" />
                       <Picker.Item label="Ce mois" value="month" />
                       <Picker.Item label="Cette année" value="year" />
+                      <Picker.Item label="Total" value="total" />
                     </Picker>
+                  </View>
+                </View>
+              </View>
+
+              <View className="flex flex-row items-center px-4">
+                <View className="w-[70%]">
+                  <TextBody1 extraClasses="my-1">Nombre de commandes</TextBody1>
+                </View>
+                <View className="w-[30%]">
+                  <View className="flex items-end">
+                    <TextHeading4 extraClasses="text-right">
+                      {orderCount}
+                    </TextHeading4>
                   </View>
                 </View>
               </View>
