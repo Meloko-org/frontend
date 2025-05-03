@@ -128,7 +128,7 @@ export default function ValidatedOrdersScreen({ navigation }: Props) {
             }
           }}
           onEndReachedThreshold={0.5}
-          ListFooterComponent={isLoading && <ActivityIndicator />}
+          ListFooterComponent={isLoading ? <ActivityIndicator /> : null}
           refreshing={isRefreshing}
           onRefresh={onRefresh}
         />
