@@ -14,6 +14,7 @@ import { OrdersState } from "../../reducers/orders";
 import { OrderData } from "../../types/API";
 import { SheetManager } from "react-native-actions-sheet";
 import businessTools from "../../modules/businessTools";
+import Spinner from "../../components/utils/Spinner";
 
 type WithdrawnOrdersScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -128,7 +129,7 @@ export default function WithdrawnOrdersScreen({ navigation }: Props) {
             }
           }}
           onEndReachedThreshold={0.5}
-          ListFooterComponent={isLoading ? <ActivityIndicator /> : null}
+          ListFooterComponent={isLoading ? <Spinner /> : null}
           refreshing={isRefreshing}
           onRefresh={onRefresh}
         />
