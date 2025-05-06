@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import * as Location from "expo-location";
 import { Animated, View, Text, Pressable, StyleSheet } from "react-native";
+import { useCollapsibleSection } from "../../hooks/useCollapsibleSection";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 import InputText from "../utils/inputs/Text";
 import ButtonPrimaryEnd from "../utils/buttons/PrimaryEnd";
@@ -9,6 +11,8 @@ import { Slider } from "@miblanchard/react-native-slider";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import InputButtonGroup from "../utils/inputs/radioGroup";
+import Spinner from "../utils/Spinner";
 
 type userPosition = {
   latitude: number;
@@ -22,17 +26,20 @@ type searchOptions = {
     value: number[];
   };
   userPosition: userPosition;
+  searchType: "shop" | "market";
 };
 
 type Props = {
   search?: searchOptions;
   refrechResultsFn?: Function;
-  displayMode: "fullview" | "widget";
-  navigation?: object;
+  // navigation?: object;
 };
 
 export default function MapSearchBox(props: Props): JSX.Element {
-  const size = useRef(new Animated.Value(110)).current;
+  const searchSection = useCollapsibleSection();
+
+  const [searchType, setSearchType] = useState<string>("shop");
+
   const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [searchOptions, setSearchOptions] = useState<searchOptions>({
     query: "",
@@ -44,6 +51,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
       latitude: 0.0,
       longitude: 0.0,
     },
+    searchType: "shop",
   });
 
   const [performSearch, setPerformSearch] = useState(false);
@@ -52,28 +60,12 @@ export default function MapSearchBox(props: Props): JSX.Element {
   // Import the public api root address
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
-  useEffect(() => {
-    if (openSearchBox) {
-      Animated.timing(size, {
-        toValue: 330,
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
-    } else {
-      Animated.timing(size, {
-        toValue: 110,
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
-    }
-  }, [openSearchBox]);
-
-  useEffect(() => {
-    if (props.search) {
-      // console.log("search", props.search)
-      setSearchOptions(props.search);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (props.search) {
+  //     // console.log("search", props.search)
+  //     setSearchOptions(props.search);
+  //   }
+  // }, []);
 
   useEffect(() => {
     (async () => {
@@ -93,30 +85,40 @@ export default function MapSearchBox(props: Props): JSX.Element {
             query: searchOptions.query,
             radius: searchOptions.radius.value[0],
             userPosition: searchOptions.userPosition,
+            searchType: searchType,
           }),
         });
         const data = await response.json();
-        setIsSearchLoading(false);
-        if (props.displayMode === "widget") {
-          props.refrechResultsFn && props.refrechResultsFn(data.searchResults);
-        }
 
-        if (props.navigation) {
-          props.navigation.navigate("TabNavigatorUser", {
-            screen: "Search",
-            params: {
-              search: {
-                address: searchOptions.address,
-                query: searchOptions.query,
-                radius: searchOptions.radius,
-                userPosition: searchOptions.userPosition,
-              },
-              searchResults: data.searchResults,
-            },
-          });
-        }
+        console.log("databack :", data);
+        setIsSearchLoading(false);
+        // if (props.displayMode === "widget") {
+        //   props.refrechResultsFn && props.refrechResultsFn(data.searchResults);
+        // }
+
+        props.refrechResultsFn &&
+          searchType === "shop" &&
+          props.refrechResultsFn("shop", data.producerResults);
+        props.refrechResultsFn &&
+          searchType === "market" &&
+          props.refrechResultsFn("market", data.marketResults);
+
+        // if (props.navigation) {
+        //   props.navigation.navigate("TabNavigatorUser", {
+        //     screen: "Search",
+        //     params: {
+        //       search: {
+        //         address: searchOptions.address,
+        //         query: searchOptions.query,
+        //         radius: searchOptions.radius,
+        //         userPosition: searchOptions.userPosition,
+        //       },
+        //       searchResults: data.searchResults,
+        //     },
+        //   });
+        // }
       }
-      setOpenSearchBox(false);
+      // setOpenSearchBox(false);
       setPerformSearch(false);
     })();
   }, [searchOptions.userPosition, performSearch]);
@@ -180,40 +182,70 @@ export default function MapSearchBox(props: Props): JSX.Element {
   };
   return (
     <>
-      {props.displayMode === "widget" ? (
-        <Pressable onPress={() => setOpenSearchBox(!openSearchBox)}>
-          <Animated.View
-            className={`rounded-lg w-100 mx-3 bg-lightbg p-2 shadow-sm dark:bg-tertiary`}
-            style={{ height: size, overflow: "hidden" }}
-          >
-            <View className="w-full flex flex-row justify-between">
-              <InputText
-                value={searchOptions.query}
-                onChangeText={(newQuery: string) =>
-                  setSearchOptions((prevState) => ({
-                    ...prevState,
-                    query: newQuery,
-                  }))
-                }
-                placeholder="ex: tomates, oignons..."
-                label="Votre recherche"
-                autoCapitalize="none"
-                extraClasses="w-full"
-                size="large"
-                iconName="search"
-                onIconPressFn={onSearchPress}
-              />
-            </View>
+      <Pressable
+        className={`rounded-lg bg-lightbg p-2 shadow-sm dark:bg-tertiary`}
+        onPress={searchSection.toggle}
+      >
+        <View>
+          <InputText
+            value={searchOptions.query}
+            onChangeText={(newQuery: string) =>
+              setSearchOptions((prevState) => ({
+                ...prevState,
+                query: newQuery,
+              }))
+            }
+            placeholder="ex: tomates, oignons..."
+            label="Votre recherche"
+            autoCapitalize="none"
+            extraClasses="w-full"
+            size="large"
+            iconName="search"
+            onIconPressFn={() => {
+              onSearchPress();
+              searchSection.toggle();
+            }}
+          />
 
-            <View className="h-7">
+          {!searchSection.isOpen && (
+            <View className="h-7 mt-2">
               <Text
                 className={`${openSearchBox && "hidden"} text-sm w-full text-center font-bold text-secondary/40 my-1 dark:text-lightbg`}
               >
                 Cliquez pour plus d'options !
               </Text>
             </View>
+          )}
+        </View>
 
-            <TextHeading3 extraClasses="mb-4" centered>
+        <Animated.View
+          style={[searchSection.animatedStyle]}
+          className="overflow-hidden"
+        >
+          <View
+            onLayout={searchSection.onLayout}
+            style={searchSection.innerContainerStyle}
+          >
+            <View className="mt-5">
+              <InputButtonGroup
+                data={[
+                  {
+                    label: "Producteurs",
+                    value: "shop",
+                    selected: true,
+                  },
+                  {
+                    label: "Points de vente",
+                    value: "market",
+                    selected: false,
+                  },
+                ]}
+                onPressFn={(value) => setSearchType(value)}
+                size="base"
+              />
+            </View>
+
+            <TextHeading3 extraClasses="mt-5" centered>
               Localisation
             </TextHeading3>
             <View className="w-full flex flex-row justify-between">
@@ -241,10 +273,10 @@ export default function MapSearchBox(props: Props): JSX.Element {
               </View>
             </View>
 
-            <TextHeading3 extraClasses="mt-4 mb-2" centered>
+            <TextHeading3 extraClasses="mt-5" centered>
               Distance
             </TextHeading3>
-            <View style={{ width: "100%" }} className="px-3 flex-row">
+            <View style={{ width: "100%" }} className="px-3 flex-row mb-5">
               <Slider
                 containerStyle={{ width: "80%" }}
                 value={searchOptions.radius ? searchOptions.radius.value : [20]}
@@ -268,97 +300,15 @@ export default function MapSearchBox(props: Props): JSX.Element {
                 </Text>
               </View>
             </View>
-          </Animated.View>
-        </Pressable>
-      ) : (
-        <SafeAreaView style={{ flex: 1 }} className="bg-lightbg dark:bg-darkbg">
-          <View className="p-3 flex-1 w-full">
-            <TextHeading2 extraClasses="mb-6">Que cherchez-vous ?</TextHeading2>
-            <InputText
-              value={searchOptions.query}
-              onChangeText={(newQuery: string) =>
-                setSearchOptions((prevState) => ({
-                  ...prevState,
-                  query: newQuery,
-                }))
-              }
-              placeholder="ex: Fruits moches, légume bio, pomme, banane..."
-              label="Votre recherche"
-              autoCapitalize="none"
-              extraClasses="w-full"
-              size="large"
-            />
-            <TextHeading3 extraClasses="my-4" centered>
-              Localisation
-            </TextHeading3>
-            <View className="w-full flex flex-row justify-between">
-              <InputText
-                value={searchOptions.address}
-                onChangeText={(newAddress: string) =>
-                  setSearchOptions((prevState) => ({
-                    ...prevState,
-                    address: newAddress,
-                  }))
-                }
-                placeholder="Adresse, code postal, ville..."
-                label="Adresse"
-                autoCapitalize="none"
-                extraClasses="w-72"
-              />
-              <IconButton
-                iconName="map-marker"
-                extraClasses="w-20 bg-secondary dark:bg-primary"
-                onPressFn={useMyPosition}
-              />
-            </View>
-
-            <TextHeading3 extraClasses="mt-4 mb-2" centered>
-              Distance
-            </TextHeading3>
-
-            <View className="flex-row w-full mb-6">
-              <Slider
-                containerStyle={{ width: "80%" }}
-                value={searchOptions.radius.value}
-                step={5}
-                minimumValue={0}
-                maximumValue={100}
-                onValueChange={(newRadius) => {
-                  setSearchOptions((prevState) => ({
-                    ...prevState,
-                    radius: {
-                      value: [...newRadius],
-                    },
-                  }));
-                }}
-                minimumTrackTintColor="#98B66E"
-                thumbTintColor="#98B66E"
-              />
-              <View className="flex flex-row items-center justify-center w-20">
-                <Text className="dark:text-lightbg">
-                  {searchOptions.radius.value[0]} km
-                </Text>
-              </View>
-            </View>
-
-            <ButtonPrimaryEnd
-              disabled={searchOptions.address === "" || isSearchLoading}
-              label="Chercher"
-              iconName="search"
-              onPressFn={onSearchPress}
-              isLoading={isSearchLoading}
-            />
           </View>
-        </SafeAreaView>
+        </Animated.View>
+      </Pressable>
+
+      {isSearchLoading && (
+        <View className="flex-1 justify-center align-center h-64">
+          <Spinner />
+        </View>
       )}
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "flex-start",
-  },
-});

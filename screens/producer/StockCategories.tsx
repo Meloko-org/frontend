@@ -103,7 +103,6 @@ export default function StockCategoriesScreen({ navigation }: Props) {
       return;
     }
 
-    // console.log("les types de products :", productsTypesResponse.data);
     if (productsTypesResponse.success && productsTypesResponse.data) {
       const formatted: ProductsTypesByCategory[] = Object.entries(
         productsTypesResponse.data,
@@ -201,9 +200,6 @@ export default function StockCategoriesScreen({ navigation }: Props) {
       );
     }
   }, [shopStore?.products, globalCategories, stocksStore]);
-
-  // console.log("shopTypes :", JSON.stringify(shopStore.products, null, 2))
-  // console.log(JSON.stringify(openScreenButtons, null, 2))
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">

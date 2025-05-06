@@ -3,6 +3,7 @@ import { View, ScrollView } from "react-native";
 import ActionSheet, { SheetProps } from "react-native-actions-sheet";
 import { useColorScheme } from "nativewind";
 import TextHeading3 from "../utils/texts/Heading3";
+import TextHeading4 from "../utils/texts/Heading4";
 
 export default function MapSearchResults(
   props: SheetProps<"map-search-results">,
@@ -17,11 +18,11 @@ export default function MapSearchResults(
       gestureEnabled={true}
       id={props.sheetId}
     >
-      <View className="h-full">
+      <View className="h-full bg-lightbg dark:bg-darkbg">
         <View className="px-3 w-full">
-          <TextHeading3 extraClasses="mt-2 mb-4 h-10">
-            {`${props.payload?.producersList.length.toString()} Résultats `}
-          </TextHeading3>
+          <TextHeading4 centered extraClasses="my-3 h-10">
+            {`${props.payload?.resultsList.length.toString()} ${props.payload?.searchType === "shop" ? "Producteur(s)" : "Point(s) de vente"}`}
+          </TextHeading4>
         </View>
 
         <ScrollView
@@ -29,7 +30,7 @@ export default function MapSearchResults(
           style={{ flex: 0.3, width: "100%" }}
           className="px-3"
         >
-          {props.payload?.producersList}
+          {props.payload?.resultsList}
         </ScrollView>
       </View>
     </ActionSheet>

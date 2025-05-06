@@ -42,7 +42,8 @@ declare module "react-native-actions-sheet" {
     }>;
     "map-search-results": SheetDefinition<{
       payload: {
-        producersList: React.ReactNode[];
+        resultsList: React.ReactNode[];
+        searchType: "shop" | "market";
       };
     }>;
     "become-premium": SheetDefinition;

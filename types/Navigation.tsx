@@ -11,10 +11,17 @@ type RootStackParamList = {
   TabNavigatorProducer: undefined;
 
   Search: undefined;
+  MapCustomer: undefined;
   Cart: undefined;
   Bookmarks: undefined;
   UserProfile: undefined;
-  ShopUser: undefined;
+  ShopUser: {
+    params: {
+      shopId: string | undefined;
+      distance: Number;
+      relevantProducts: StockData[];
+    };
+  };
   WithdrawModesUser: undefined;
   OrdersCustomer: undefined;
   PaymentCustomer: undefined;

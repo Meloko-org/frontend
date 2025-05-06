@@ -66,6 +66,8 @@ type address = {
   address2: string;
   postalCode: string;
   city: string;
+  latitude: { $numberDecimal: string };
+  longitude: { $numberDecimal: string };
 };
 
 type MarketData = {
@@ -73,7 +75,7 @@ type MarketData = {
   name: string;
   image: string;
   description: string;
-  address: address;
+  address: AddressData;
 };
 
 type MarketsData = {
@@ -81,6 +83,12 @@ type MarketsData = {
   isActive: boolean;
   openingHours: OpeningHoursData[];
 }[];
+
+type MarketResultData = {
+  market: MarketData;
+  shops: ShopData[];
+  distance: number;
+};
 
 type StockData = {
   _id: string;
@@ -150,6 +158,12 @@ type ShopData = {
   [key: string]: any;
 } | null;
 
+type ShopResultData = {
+  shop: ShopData;
+  relevantProducts: StockData[];
+  distance: number;
+};
+
 type ClickCollectData =
   | {
       instructions: string;
@@ -181,8 +195,8 @@ type AddressData = {
   postalCode: Number | null;
   city: String | null;
   country: String | null;
-  latitude?: Number | null;
-  longitude?: Number | null;
+  latitude?: { $numberDecimal: string };
+  longitude?: { $numberDecimal: string };
 };
 
 type UserAddressData = {
@@ -247,6 +261,7 @@ export type {
   UserAddressData,
   ProductData,
   ShopData,
+  ShopResultData,
   UserData,
   StockData,
   TagData,
@@ -254,6 +269,7 @@ export type {
   CartData,
   MarketData,
   MarketsData,
+  MarketResultData,
   OrderData,
   ProducerData,
   ProductFamilyData,

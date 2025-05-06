@@ -15,7 +15,7 @@ type InputRadioGroupProps = {
   data: InputRadioGroupData[];
   extraClasses?: string;
   size: "base" | "large";
-  onPressFn: ((event: GestureResponderEvent) => void) | undefined;
+  onPressFn: ((value: string) => void) | undefined;
 };
 
 export default function InputButtonGroup(

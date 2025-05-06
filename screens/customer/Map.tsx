@@ -11,10 +11,16 @@ import TextHeading3 from "../../components/utils/texts/Heading3";
 import CardProducer from "../../components/cards/ProducerSearchResult";
 import ShopMarkerCard from "../../components/cards/ShopMarkerCard";
 import MapSearchBox from "../../components/map/MapSearchBox";
-import { ShopData } from "../../types/API";
+import {
+  MarketData,
+  MarketResultData,
+  ShopData,
+  ShopResultData,
+} from "../../types/API";
 import { useColorScheme } from "nativewind";
 import BadgeSecondary from "../../components/utils/badges/Secondary";
 import { Svg, Image as ImageSvg } from "react-native-svg";
+import MarketSearchResultCard from "../../components/cards/MarketSearchResult";
 
 type userPosition = {
   latitude: number;
@@ -37,7 +43,9 @@ export default function MapCustomerScreen({
   const { colorScheme, toggleColorScheme } = useColorScheme();
 
   const [currentPosition, setCurrentPosition] = useState<userPosition>(null);
-  const [searchResults, setSearchResults] = useState<ShopData[]>([]);
+  // const [searchResults, setSearchResults] = useState<ShopData[]>([]);
+  const [producerResults, setProducerResults] = useState<ShopResultData[]>([]);
+  const [marketResults, setMarketResults] = useState<MarketResultData[]>([]);
   const [region, setRegion] = useState<Region | undefined>(undefined);
 
   useEffect(() => {
@@ -57,75 +65,141 @@ export default function MapCustomerScreen({
       }
     })();
 
-    if (route.params && route.params.searchResults) {
-      setSearchResults(route.params.searchResults);
-    }
+    // if (route.params && route.params.searchResults) {
+    //   setSearchResults(route.params.searchResults);
+    // }
   }, [route.params]);
 
   const producersList =
-    searchResults &&
-    searchResults.map((sr: ShopData) => (
-      <CardProducer
-        shopData={sr}
-        onPressFn={() => {
-          navigation.navigate("TabNavigatorUser", {
-            screen: "ShopUser",
-            params: {
-              shopId: sr?._id,
-              distance: sr?.searchData.distance,
-              relevantProducts: sr?.searchData.relevantProducts
-                ? sr?.searchData.relevantProducts
-                : [],
-            },
-          });
-        }}
-        key={sr?._id}
-        extraClasses="mb-1"
-        displayMode="bottomSheet"
-      />
-    ));
+    producerResults &&
+    producerResults.map((sr: ShopResultData) => {
+      console.log("sr :", sr);
+      return (
+        <CardProducer
+          shopData={sr.shop}
+          results={sr.relevantProducts.length}
+          distance={sr.distance}
+          onPressFn={() => {
+            navigation.navigate("ShopUser", {
+              params: {
+                shopId: sr?.shop?._id,
+                distance: sr?.distance,
+                relevantProducts: sr?.relevantProducts
+                  ? sr?.relevantProducts
+                  : [],
+              },
+            });
+          }}
+          key={sr?.shop?._id}
+          extraClasses="mb-1"
+          displayMode="bottomSheet"
+        />
+      );
+    });
+
+  const marketsList =
+    marketResults &&
+    marketResults.map((sr: MarketResultData) => {
+      console.log("sr :", sr);
+      return (
+        <MarketSearchResultCard
+          marketData={sr.market}
+          results={sr.shops}
+          distance={sr.distance}
+          onPressFn={() => {
+            navigation.navigate("ShopUser", {
+              params: {
+                shopId: sr?.shop?._id,
+                distance: sr?.distance,
+                relevantProducts: sr?.relevantProducts
+                  ? sr?.relevantProducts
+                  : [],
+              },
+            });
+          }}
+          key={sr?.market?._id}
+          extraClasses="mb-1"
+        />
+      );
+    });
 
   useEffect(() => {
     if (producersList.length > 0) {
       SheetManager.show("map-search-results", {
         payload: {
-          producersList: producersList,
+          resultsList: producersList,
+          searchType: "shop",
         },
       });
     }
-  }, [producersList]);
+    if (marketsList.length > 0) {
+      SheetManager.show("map-search-results", {
+        payload: {
+          resultsList: marketsList,
+          searchType: "market",
+        },
+      });
+    }
+  }, [producersList, marketsList]);
 
-  const markers =
-    searchResults &&
-    searchResults.map((data: ShopData, i) => {
-      return (
-        <Marker
-          key={i}
-          coordinate={{
-            latitude: Number(data?.address.latitude?.$numberDecimal),
-            longitude: Number(data?.address.longitude?.$numberDecimal),
-          }}
-        >
-          <Callout
-            tooltip={true}
-            onPress={() => {
-              navigation.navigate("TabNavigatorUser", {
-                screen: "ShopUser",
-                params: {
-                  shopId: data?._id,
-                  distance: data?.searchData.distance,
-                  relevantProducts: data?.searchData.relevantProducts
-                    ? data.searchData.relevantProducts
-                    : [],
-                },
-              });
+  const markers = producerResults
+    ? producerResults.map((data: ShopResultData, i) => {
+        return (
+          <Marker
+            key={i}
+            coordinate={{
+              latitude: Number(data?.shop?.address.latitude?.$numberDecimal),
+              longitude: Number(data?.shop?.address.longitude?.$numberDecimal),
             }}
           >
-            <ShopMarkerCard key={data?._id} shopData={data} />
-          </Callout>
-        </Marker>
-      );
-    });
+            <Callout
+              tooltip={true}
+              onPress={() => {
+                navigation.navigate("ShopUser", {
+                  params: {
+                    shopId: data?.shop?._id,
+                    distance: data?.distance,
+                    relevantProducts: data?.relevantProducts
+                      ? data.relevantProducts
+                      : [],
+                  },
+                });
+              }}
+            >
+              <ShopMarkerCard key={data?.shop?._id} shopData={data.shop} />
+            </Callout>
+          </Marker>
+        );
+      })
+    : marketResults.map((data, i) => {
+        return (
+          <Marker
+            key={i}
+            coordinate={{
+              latitude: Number(data?.address.latitude?.$numberDecimal),
+              longitude: Number(data?.address.longitude?.$numberDecimal),
+            }}
+          >
+            <Callout
+              tooltip={true}
+              onPress={() => {
+                navigation.navigate("TabNavigatorUser", {
+                  screen: "ShopUser",
+                  params: {
+                    shopId: data?._id,
+                    distance: data?.searchData.distance,
+                    relevantProducts: data?.searchData.relevantProducts
+                      ? data.searchData.relevantProducts
+                      : [],
+                  },
+                });
+              }}
+            >
+              <ShopMarkerCard key={data?._id} shopData={data} />
+            </Callout>
+          </Marker>
+        );
+      });
 
   const handleSheetChanges = useCallback((index: number) => {}, []);
 
@@ -147,7 +221,7 @@ export default function MapCustomerScreen({
         {markers}
       </MapView>
       <View
-        className="flex flex-row justify-center"
+        className="px-2"
         style={{ position: "absolute", top: 50, width: "100%" }}
       >
         <MapSearchBox
@@ -156,10 +230,14 @@ export default function MapCustomerScreen({
               ? route.params.search
               : undefined
           }
-          refrechResultsFn={(newSearchResults: ShopData[]) =>
-            setSearchResults(newSearchResults)
-          }
-          displayMode="widget"
+          refrechResultsFn={(type: string, newSearchResults: string[]) => {
+            if (type === "shop") {
+              setProducerResults(newSearchResults);
+            } else {
+              setMarketResults(newSearchResults);
+            }
+          }}
+          // displayMode="widget"
         />
       </View>
     </View>
