@@ -67,61 +67,61 @@ export default function MapSearchBox(props: Props): JSX.Element {
   //   }
   // }, []);
 
-  useEffect(() => {
-    (async () => {
-      if (
-        searchOptions.userPosition.latitude !== 0 &&
-        searchOptions.userPosition.longitude !== 0 &&
-        performSearch
-      ) {
-        setIsSearchLoading(true);
-        const response = await fetch(`${API_ROOT}/shops/search`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            mode: "cors",
-          },
-          body: JSON.stringify({
-            query: searchOptions.query,
-            radius: searchOptions.radius.value[0],
-            userPosition: searchOptions.userPosition,
-            searchType: searchType,
-          }),
-        });
-        const data = await response.json();
+  // useEffect(() => {
+  //   (async () => {
+  //     if (
+  //       searchOptions.userPosition.latitude !== 0 &&
+  //       searchOptions.userPosition.longitude !== 0 &&
+  //       performSearch
+  //     ) {
+  //       setIsSearchLoading(true);
+  //       const response = await fetch(`${API_ROOT}/shops/search`, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           mode: "cors",
+  //         },
+  //         body: JSON.stringify({
+  //           query: searchOptions.query,
+  //           radius: searchOptions.radius.value[0],
+  //           userPosition: searchOptions.userPosition,
+  //           searchType: searchType,
+  //         }),
+  //       });
+  //       const data = await response.json();
 
-        console.log("databack :", data);
-        setIsSearchLoading(false);
-        // if (props.displayMode === "widget") {
-        //   props.refrechResultsFn && props.refrechResultsFn(data.searchResults);
-        // }
+  //       console.log("databack :", data);
+  //       setIsSearchLoading(false);
+  //       // if (props.displayMode === "widget") {
+  //       //   props.refrechResultsFn && props.refrechResultsFn(data.searchResults);
+  //       // }
 
-        props.refrechResultsFn &&
-          searchType === "shop" &&
-          props.refrechResultsFn("shop", data.producerResults);
-        props.refrechResultsFn &&
-          searchType === "market" &&
-          props.refrechResultsFn("market", data.marketResults);
+  //       props.refrechResultsFn &&
+  //         searchType === "shop" &&
+  //         props.refrechResultsFn("shop", data.producerResults);
+  //       props.refrechResultsFn &&
+  //         searchType === "market" &&
+  //         props.refrechResultsFn("market", data.marketResults);
 
-        // if (props.navigation) {
-        //   props.navigation.navigate("TabNavigatorUser", {
-        //     screen: "Search",
-        //     params: {
-        //       search: {
-        //         address: searchOptions.address,
-        //         query: searchOptions.query,
-        //         radius: searchOptions.radius,
-        //         userPosition: searchOptions.userPosition,
-        //       },
-        //       searchResults: data.searchResults,
-        //     },
-        //   });
-        // }
-      }
-      // setOpenSearchBox(false);
-      setPerformSearch(false);
-    })();
-  }, [searchOptions.userPosition, performSearch]);
+  //       // if (props.navigation) {
+  //       //   props.navigation.navigate("TabNavigatorUser", {
+  //       //     screen: "Search",
+  //       //     params: {
+  //       //       search: {
+  //       //         address: searchOptions.address,
+  //       //         query: searchOptions.query,
+  //       //         radius: searchOptions.radius,
+  //       //         userPosition: searchOptions.userPosition,
+  //       //       },
+  //       //       searchResults: data.searchResults,
+  //       //     },
+  //       //   });
+  //       // }
+  //     }
+  //     // setOpenSearchBox(false);
+  //     setPerformSearch(false);
+  //   })();
+  // }, [searchOptions.userPosition, performSearch]);
 
   const useMyPosition = async (): Promise<void> => {
     const result = await Location.requestForegroundPermissionsAsync();
@@ -164,22 +164,64 @@ export default function MapSearchBox(props: Props): JSX.Element {
     }
   };
 
+  // const onSearchPress = async (): Promise<void> => {
+  //   try {
+  //     // setIsSearchLoading(true);
+  //     if (
+  //       searchOptions.address !== "Ma Position" &&
+  //       searchOptions.address !== ""
+  //     ) {
+  //       await searchAddress();
+  //     }
+  //     setPerformSearch(true);
+  //     // setIsSearchLoading(false);
+  //   } catch (err) {
+  //     // setIsSearchLoading(false);
+  //     console.error(err);
+  //   }
+  // };
+
   const onSearchPress = async (): Promise<void> => {
     try {
-      // setIsSearchLoading(true);
       if (
         searchOptions.address !== "Ma Position" &&
         searchOptions.address !== ""
       ) {
         await searchAddress();
       }
-      setPerformSearch(true);
-      // setIsSearchLoading(false);
+      setIsSearchLoading(true);
+      const response = await fetch(`${API_ROOT}/shops/search`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          mode: "cors",
+        },
+        body: JSON.stringify({
+          query: searchOptions.query,
+          radius: searchOptions.radius.value[0],
+          userPosition: searchOptions.userPosition,
+          searchType: searchType,
+        }),
+      });
+      const data = await response.json();
+
+      console.log("databack :", data);
+      setIsSearchLoading(false);
+
+      props.refrechResultsFn &&
+        searchType === "shop" &&
+        props.refrechResultsFn("shop", data.producerResults);
+      props.refrechResultsFn &&
+        searchType === "market" &&
+        props.refrechResultsFn("market", data.marketResults);
     } catch (err) {
       // setIsSearchLoading(false);
       console.error(err);
     }
   };
+
+  console.log("searchType :", searchType);
+
   return (
     <>
       <Pressable

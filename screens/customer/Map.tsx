@@ -21,6 +21,7 @@ import { useColorScheme } from "nativewind";
 import BadgeSecondary from "../../components/utils/badges/Secondary";
 import { Svg, Image as ImageSvg } from "react-native-svg";
 import MarketSearchResultCard from "../../components/cards/MarketSearchResult";
+import MarketMarkerCard from "../../components/cards/MarketMarker";
 
 type userPosition = {
   latitude: number;
@@ -106,17 +107,7 @@ export default function MapCustomerScreen({
           marketData={sr.market}
           results={sr.shops}
           distance={sr.distance}
-          onPressFn={() => {
-            navigation.navigate("ShopUser", {
-              params: {
-                shopId: sr?.shop?._id,
-                distance: sr?.distance,
-                relevantProducts: sr?.relevantProducts
-                  ? sr?.relevantProducts
-                  : [],
-              },
-            });
-          }}
+          onPressFn={() => {}}
           key={sr?.market?._id}
           extraClasses="mb-1"
         />
@@ -176,8 +167,8 @@ export default function MapCustomerScreen({
           <Marker
             key={i}
             coordinate={{
-              latitude: Number(data?.address.latitude?.$numberDecimal),
-              longitude: Number(data?.address.longitude?.$numberDecimal),
+              latitude: Number(data?.market.address.latitude?.$numberDecimal),
+              longitude: Number(data?.market.address.longitude?.$numberDecimal),
             }}
           >
             <Callout
@@ -195,7 +186,12 @@ export default function MapCustomerScreen({
                 });
               }}
             >
-              <ShopMarkerCard key={data?._id} shopData={data} />
+              <MarketMarkerCard
+                key={data?.market._id}
+                marketData={data.market}
+                shops={data?.shops}
+                distance={data?.distance}
+              />
             </Callout>
           </Marker>
         );

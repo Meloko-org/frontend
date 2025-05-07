@@ -104,7 +104,7 @@ export default function WithdrawModesScreen({ navigation }) {
           // market: null,
         }),
       );
-      setSelectedShop(selectedShop.shop);
+      setSelectedShop(selectedShop?.shop);
       setSelectMarketModalVisible(true);
     } else {
       dispatch(
@@ -135,7 +135,8 @@ export default function WithdrawModesScreen({ navigation }) {
 
       const withdrawModeButtonData = [];
 
-      cart.shop?.markets.length > 0 &&
+      cart.shop?.markets &&
+        cart.shop?.markets.length > 0 &&
         withdrawModeButtonData.push({
           label: "Marchés locaux",
           value: "market",
@@ -150,7 +151,7 @@ export default function WithdrawModesScreen({ navigation }) {
         });
 
       return (
-        <View className="mb-3" key={cart.shop._id}>
+        <View className="mb-3" key={cart.shop?._id}>
           <View className="flex-row justify-center items-center mb-1">
             <View className="flex flex-row w-3/12 justify-end items-end h-full">
               <TextBody1 extraClasses="">Vendeur: </TextBody1>

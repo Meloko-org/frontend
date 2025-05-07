@@ -27,10 +27,10 @@ export default function MarketSearchResultCard({
   return (
     <TouchableOpacity onPress={onPressFn}>
       <View
-        className={`${extraClasses} rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary flex flex-row w-full`}
+        className={`${extraClasses} rounded-lg border border-primary bg-white p-2 dark:border-none dark:bg-tertiary flex flex-row w-full`}
       >
-        <View className="flex flex-row items-center w-4/5">
-          <View className="flex flex-row items-center rounded-sm w-24 h-full">
+        <View className="flex flex-row items-center">
+          <View className="flex flex-row items-center rounded-sm w-1/4">
             <Image
               source={
                 marketData?.image
@@ -45,8 +45,8 @@ export default function MarketSearchResultCard({
             />
           </View>
 
-          <View className="h-full pl-2 items-start">
-            <View className="flex flex-row items-center">
+          <View className="h-full pl-2 items-start pl-4 w-3/4">
+            <View className="flex flex-row items-center w-full">
               <View className="grow">
                 <Text className="text-lg font-bold text-darkbg dark:text-lightbg">
                   {marketData?.name}
