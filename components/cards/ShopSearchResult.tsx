@@ -28,6 +28,10 @@ export default function ShopSearchResultCard({
   displayMode,
   showDirectionButton,
 }: ShopSearchResultCardProps): JSX.Element {
+  // console.log("shopData :", shopData)
+  // console.log("results :", results)
+  // console.log("distance :", distance)
+
   return (
     <TouchableOpacity onPress={onPressFn}>
       <View
@@ -43,7 +47,6 @@ export default function ShopSearchResultCard({
                     : require("../../assets/icon.png")
                 }
                 className="rounded-lg border border-primary w-24 h-24"
-                alt={`logo de la boutique ${shopData?.name}`}
                 resizeMode="cover"
                 width={96}
                 height={64}
@@ -61,7 +64,7 @@ export default function ShopSearchResultCard({
               <View className="mr-2">
                 {distance && (
                   <Text className="text-xs text-darkbg dark:text-lightbg">
-                    {distance.toFixed(2)} km
+                    {`${distance.toFixed(2)} km`}
                   </Text>
                 )}
               </View>
@@ -74,13 +77,13 @@ export default function ShopSearchResultCard({
             {results && (
               <BadgeSecondary extraClasses="px-2 mb-1">{`${results} produit(s) que vous recherchez`}</BadgeSecondary>
             )}
-            {displayMode === "order" && (
+            {displayMode === "order" && withdrawData && (
               <BadgeSecondary extraClasses="px-2">{`${withdrawData?.length} produit${withdrawData?.length && withdrawData?.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
             )}
-            {displayMode === "mapCallout" ||
-              (displayMode === "bottomSheet" && (
-                <BadgeSecondary extraClasses="px-1">{`${shopData?.stocks?.length} produit${shopData?.stocks?.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
-              ))}
+            {(displayMode === "mapCallout" ||
+              displayMode === "bottomSheet") && (
+              <BadgeSecondary extraClasses="px-1">{`${shopData?.stocks?.length} produit${shopData?.stocks?.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
+            )}
           </View>
         </View>
         {showDirectionButton && (

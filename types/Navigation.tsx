@@ -16,11 +16,9 @@ type RootStackParamList = {
   Bookmarks: undefined;
   UserProfile: undefined;
   ShopUser: {
-    params: {
-      shopId: string | undefined;
-      distance: Number;
-      relevantProducts: StockData[];
-    };
+    shopId: string | undefined;
+    distance: number | undefined;
+    relevantProducts: StockData[];
   };
   WithdrawModesUser: undefined;
   OrdersCustomer: undefined;

@@ -55,7 +55,7 @@ export default function MarketSearchResultCard({
               <View className="mr-2">
                 {distance && (
                   <Text className="text-xs text-darkbg dark:text-lightbg">
-                    {distance.toFixed(2)} km
+                    {`${distance.toFixed(2)} km`}
                   </Text>
                 )}
               </View>

@@ -22,6 +22,7 @@ type IconButtonProps = {
   iconName: string;
   iconFamily?: keyof typeof iconLibraries;
   iconColor?: string;
+  buttonColor?: string;
   extraClasses?: string;
   onPressFn: ((event: GestureResponderEvent) => void) | undefined;
   animated?: boolean;
@@ -49,6 +50,7 @@ export default function IconButton({
   iconName,
   iconFamily,
   iconColor,
+  buttonColor,
   extraClasses,
   onPressFn,
   animated,
@@ -91,7 +93,7 @@ export default function IconButton({
 
   return (
     <TouchableOpacity
-      className={`${extraClasses} flex flex-row rounded-lg p-1 justify-center items-center`}
+      className={`${extraClasses} flex flex-row rounded-lg ${buttonColor} p-1 justify-center items-center`}
       onPress={handlePress}
     >
       {/* Applique la rotation à l'icône via transform */}

@@ -86,7 +86,7 @@ type MarketsData = {
 
 type MarketResultData = {
   market: MarketData;
-  shops: ShopData[];
+  shops: (ShopData & { matchedStocks: StockData[] })[];
   distance: number;
 };
 
@@ -161,7 +161,7 @@ type ShopData = {
 type ShopResultData = {
   shop: ShopData;
   relevantProducts: StockData[];
-  distance: number;
+  distance?: number;
 };
 
 type ClickCollectData =

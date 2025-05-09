@@ -4,6 +4,7 @@ import { Animated, View, Text, Pressable, StyleSheet } from "react-native";
 import { useCollapsibleSection } from "../../hooks/useCollapsibleSection";
 
 import { SafeAreaView } from "react-native-safe-area-context";
+import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
 import InputText from "../utils/inputs/Text";
 import ButtonPrimaryEnd from "../utils/buttons/PrimaryEnd";
 import IconButton from "../utils/buttons/Icon";
@@ -13,6 +14,7 @@ import TextHeading3 from "../../components/utils/texts/Heading3";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import InputButtonGroup from "../utils/inputs/radioGroup";
 import Spinner from "../utils/Spinner";
+import { SheetManager } from "react-native-actions-sheet";
 
 type userPosition = {
   latitude: number;
@@ -30,17 +32,17 @@ type searchOptions = {
 };
 
 type Props = {
-  search?: searchOptions;
+  // search?: searchOptions;
   refrechResultsFn?: Function;
   // navigation?: object;
 };
 
-export default function MapSearchBox(props: Props): JSX.Element {
+export default function MapSearchBox({ refrechResultsFn }: Props): JSX.Element {
   const searchSection = useCollapsibleSection();
 
-  const [searchType, setSearchType] = useState<string>("shop");
-
   const [isSearchLoading, setIsSearchLoading] = useState(false);
+  const [isSearchAddressLoading, setIsSearchAddressLoading] =
+    useState<Boolean>(false);
   const [searchOptions, setSearchOptions] = useState<searchOptions>({
     query: "",
     address: "",
@@ -48,106 +50,74 @@ export default function MapSearchBox(props: Props): JSX.Element {
       value: [40],
     },
     userPosition: {
-      latitude: 0.0,
-      longitude: 0.0,
+      latitude: 0,
+      longitude: 0,
     },
     searchType: "shop",
   });
 
-  const [performSearch, setPerformSearch] = useState(false);
-  const [openSearchBox, setOpenSearchBox] = useState(false);
-
   // Import the public api root address
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
-  // useEffect(() => {
-  //   if (props.search) {
-  //     // console.log("search", props.search)
-  //     setSearchOptions(props.search);
-  //   }
-  // }, []);
+  // gestion du inputRadioGroup
+  const radioData = [
+    {
+      label: "Producteurs",
+      value: "shop",
+      selected: searchOptions.searchType === "shop",
+    },
+    {
+      label: "Points de vente",
+      value: "market",
+      selected: searchOptions.searchType === "market",
+    },
+  ];
 
-  // useEffect(() => {
-  //   (async () => {
-  //     if (
-  //       searchOptions.userPosition.latitude !== 0 &&
-  //       searchOptions.userPosition.longitude !== 0 &&
-  //       performSearch
-  //     ) {
-  //       setIsSearchLoading(true);
-  //       const response = await fetch(`${API_ROOT}/shops/search`, {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           mode: "cors",
-  //         },
-  //         body: JSON.stringify({
-  //           query: searchOptions.query,
-  //           radius: searchOptions.radius.value[0],
-  //           userPosition: searchOptions.userPosition,
-  //           searchType: searchType,
-  //         }),
-  //       });
-  //       const data = await response.json();
-
-  //       console.log("databack :", data);
-  //       setIsSearchLoading(false);
-  //       // if (props.displayMode === "widget") {
-  //       //   props.refrechResultsFn && props.refrechResultsFn(data.searchResults);
-  //       // }
-
-  //       props.refrechResultsFn &&
-  //         searchType === "shop" &&
-  //         props.refrechResultsFn("shop", data.producerResults);
-  //       props.refrechResultsFn &&
-  //         searchType === "market" &&
-  //         props.refrechResultsFn("market", data.marketResults);
-
-  //       // if (props.navigation) {
-  //       //   props.navigation.navigate("TabNavigatorUser", {
-  //       //     screen: "Search",
-  //       //     params: {
-  //       //       search: {
-  //       //         address: searchOptions.address,
-  //       //         query: searchOptions.query,
-  //       //         radius: searchOptions.radius,
-  //       //         userPosition: searchOptions.userPosition,
-  //       //       },
-  //       //       searchResults: data.searchResults,
-  //       //     },
-  //       //   });
-  //       // }
-  //     }
-  //     // setOpenSearchBox(false);
-  //     setPerformSearch(false);
-  //   })();
-  // }, [searchOptions.userPosition, performSearch]);
-
-  const useMyPosition = async (): Promise<void> => {
-    const result = await Location.requestForegroundPermissionsAsync();
-    const status = result?.status;
-
-    if (status === "granted") {
-      Location.watchPositionAsync({ distanceInterval: 10 }, (location) => {
-        setSearchOptions((prevState) => ({
-          ...prevState,
-          address: "Ma Position",
-          userPosition: {
-            ...prevState.userPosition,
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          },
-        }));
-      });
-    }
+  const handleSearchTypeChange = (value: string) => {
+    setSearchOptions((prev) => ({
+      ...prev,
+      searchType: value as "shop" | "market",
+    }));
   };
 
-  const searchAddress = async (): Promise<void> => {
+  const useMyPosition = async (): Promise<void> => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+
+    if (status === "granted") {
+      const location = await Location.getCurrentPositionAsync({});
+      setSearchOptions((prev) => ({
+        ...prev,
+        address: "Ma Position",
+        userPosition: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        },
+      }));
+    }
+    setIsSearchAddressLoading(false);
+  };
+
+  const searchAddress = async (): Promise<boolean> => {
     try {
+      setIsSearchAddressLoading(true);
       const response = await fetch(
         `https://api-adresse.data.gouv.fr/search/?q=${searchOptions.address}`,
       );
+
       const data = await response.json();
+
+      if (!response.ok || !data.features || data.features.length === 0) {
+        SheetManager.show("alert", {
+          payload: {
+            message:
+              "Les coordonnées de cette adresse n'ont pas pu être trouvées. L'adresse est elle correcte ?",
+            alertType: "warning",
+          },
+        });
+        setIsSearchAddressLoading(false);
+        return false;
+      }
+
       const latitude: number = data.features[0].geometry.coordinates[1];
       const longitude: number = data.features[0].geometry.coordinates[0];
 
@@ -159,37 +129,60 @@ export default function MapSearchBox(props: Props): JSX.Element {
           longitude: longitude,
         },
       }));
+
+      setIsSearchAddressLoading(false);
+      return true;
     } catch (error) {
       console.error(error);
+      return false;
     }
   };
 
-  // const onSearchPress = async (): Promise<void> => {
-  //   try {
-  //     // setIsSearchLoading(true);
-  //     if (
-  //       searchOptions.address !== "Ma Position" &&
-  //       searchOptions.address !== ""
-  //     ) {
-  //       await searchAddress();
-  //     }
-  //     setPerformSearch(true);
-  //     // setIsSearchLoading(false);
-  //   } catch (err) {
-  //     // setIsSearchLoading(false);
-  //     console.error(err);
-  //   }
-  // };
-
   const onSearchPress = async (): Promise<void> => {
+    if (!searchOptions.query.trim()) {
+      SheetManager.show("alert", {
+        payload: {
+          message: "Indiquez votre recherche",
+          alertType: "warning",
+        },
+      });
+      return;
+    }
+
+    setIsSearchLoading(true);
+    let canSearch = true;
+
+    // si une adresse est saisie, on cherche les coordonnées
+    if (
+      searchOptions.address !== "Ma Position" &&
+      searchOptions.address.trim() !== ""
+    ) {
+      canSearch = await searchAddress();
+    }
+
+    if (
+      searchOptions.userPosition.latitude === 0 ||
+      searchOptions.userPosition.longitude === 0
+    ) {
+      SheetManager.show("alert", {
+        payload: {
+          message:
+            "Indiquez une adresse ou géolocalisez vous en appuyant sur le bouton à côté de l'adresse.",
+          alertType: "warning",
+        },
+      });
+      setIsSearchLoading(false);
+      return;
+    }
+
+    if (!canSearch) {
+      setIsSearchLoading(false);
+      return;
+    }
+
     try {
-      if (
-        searchOptions.address !== "Ma Position" &&
-        searchOptions.address !== ""
-      ) {
-        await searchAddress();
-      }
-      setIsSearchLoading(true);
+      searchSection.toggle();
+
       const response = await fetch(`${API_ROOT}/shops/search`, {
         method: "POST",
         headers: {
@@ -200,32 +193,38 @@ export default function MapSearchBox(props: Props): JSX.Element {
           query: searchOptions.query,
           radius: searchOptions.radius.value[0],
           userPosition: searchOptions.userPosition,
-          searchType: searchType,
+          searchType: searchOptions.searchType,
         }),
       });
       const data = await response.json();
 
-      console.log("databack :", data);
-      setIsSearchLoading(false);
+      // console.log("databack :", data);
 
-      props.refrechResultsFn &&
-        searchType === "shop" &&
-        props.refrechResultsFn("shop", data.producerResults);
-      props.refrechResultsFn &&
-        searchType === "market" &&
-        props.refrechResultsFn("market", data.marketResults);
+      if (refrechResultsFn) {
+        if (searchOptions.searchType === "shop") {
+          refrechResultsFn("shop", data.shopResults, null);
+        } else {
+          refrechResultsFn("market", null, data.marketResults);
+        }
+      }
+
+      setIsSearchLoading(false);
     } catch (err) {
-      // setIsSearchLoading(false);
+      setIsSearchLoading(false);
       console.error(err);
     }
   };
 
-  console.log("searchType :", searchType);
+  useEffect(() => {
+    if (!searchSection.isOpen) {
+      searchSection.toggle();
+    }
+  }, []);
 
   return (
     <>
       <Pressable
-        className={`rounded-lg bg-lightbg p-2 shadow-sm dark:bg-tertiary`}
+        className={`rounded-lg bg-lightbg p-2 dark:bg-tertiary`}
         onPress={searchSection.toggle}
       >
         <View>
@@ -245,19 +244,8 @@ export default function MapSearchBox(props: Props): JSX.Element {
             iconName="search"
             onIconPressFn={() => {
               onSearchPress();
-              searchSection.toggle();
             }}
           />
-
-          {!searchSection.isOpen && (
-            <View className="h-7 mt-2">
-              <Text
-                className={`${openSearchBox && "hidden"} text-sm w-full text-center font-bold text-secondary/40 my-1 dark:text-lightbg`}
-              >
-                Cliquez pour plus d'options !
-              </Text>
-            </View>
-          )}
         </View>
 
         <Animated.View
@@ -270,19 +258,8 @@ export default function MapSearchBox(props: Props): JSX.Element {
           >
             <View className="mt-5">
               <InputButtonGroup
-                data={[
-                  {
-                    label: "Producteurs",
-                    value: "shop",
-                    selected: true,
-                  },
-                  {
-                    label: "Points de vente",
-                    value: "market",
-                    selected: false,
-                  },
-                ]}
-                onPressFn={(value) => setSearchType(value)}
+                data={radioData}
+                onPressFn={handleSearchTypeChange}
                 size="base"
               />
             </View>
@@ -291,7 +268,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
               Localisation
             </TextHeading3>
             <View className="w-full flex flex-row justify-between">
-              <View className="w-3/4">
+              <View className="w-3/4 relative">
                 <InputText
                   value={searchOptions.address}
                   onChangeText={(newAddress: string) =>
@@ -305,12 +282,22 @@ export default function MapSearchBox(props: Props): JSX.Element {
                   autoCapitalize="none"
                   extraClasses="w-full"
                 />
+                {isSearchAddressLoading && (
+                  <View className="absolute top-0 left-0 flex justify-center align-center w-full h-full">
+                    <Spinner />
+                  </View>
+                )}
               </View>
               <View className="w-1/4 flex flex-row justify-end">
                 <IconButton
                   iconName="map-marker"
+                  iconColor="white"
+                  buttonColor="bg-primary"
                   extraClasses="w-20 bg-secondary dark:bg-primary"
-                  onPressFn={useMyPosition}
+                  onPressFn={() => {
+                    useMyPosition();
+                    setIsSearchAddressLoading(true);
+                  }}
                 />
               </View>
             </View>
@@ -318,7 +305,7 @@ export default function MapSearchBox(props: Props): JSX.Element {
             <TextHeading3 extraClasses="mt-5" centered>
               Distance
             </TextHeading3>
-            <View style={{ width: "100%" }} className="px-3 flex-row mb-5">
+            <View style={{ width: "100%" }} className="px-3 flex-row mb-2">
               <Slider
                 containerStyle={{ width: "80%" }}
                 value={searchOptions.radius ? searchOptions.radius.value : [20]}
@@ -344,6 +331,14 @@ export default function MapSearchBox(props: Props): JSX.Element {
             </View>
           </View>
         </Animated.View>
+
+        <View className="h-7 mt-2">
+          <Text
+            className={` text-sm w-full text-center font-bold text-secondary/40 my-1 dark:text-lightbg`}
+          >
+            {`Appuyez pour ${searchSection.isOpen ? "moins" : "plus"} d'options !`}
+          </Text>
+        </View>
       </Pressable>
 
       {isSearchLoading && (

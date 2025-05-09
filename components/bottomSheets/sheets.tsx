@@ -7,8 +7,16 @@ import {
 import CustomAlert from "./CustomAlert";
 import ProductDetails from "./ProductDetails";
 import MapSearchResults from "./MapSearchResults";
+import MapShopResults from "./MapShopResults";
+import MapMarketResults from "./MapMarketResults";
 import BecomePremium from "./BecomePremium";
-import { ProductData, StockData } from "../../types/API";
+import {
+  MarketData,
+  ProductData,
+  ShopData,
+  ShopResultData,
+  StockData,
+} from "../../types/API";
 import EditProductSheet from "./EditProductSheet";
 import ProductFamiliesSheet from "./ProductFamilies";
 import ConfirmSheet from "./Confirm";
@@ -16,6 +24,8 @@ import ImageUploaderSheet from "./ImageUploader";
 
 registerSheet("alert", CustomAlert);
 registerSheet("product-details", ProductDetails);
+registerSheet("map-shop-results", MapShopResults);
+registerSheet("map-market-results", MapMarketResults);
 registerSheet("map-search-results", MapSearchResults);
 registerSheet("become-premium", BecomePremium);
 registerSheet("edit-product", EditProductSheet);
@@ -38,6 +48,17 @@ declare module "react-native-actions-sheet" {
         stockData?: StockData;
         cartButton: React.ReactNode;
         unit: string;
+      };
+    }>;
+    "map-shop-results": SheetDefinition<{
+      payload: {
+        resultsList: JSX.Element[];
+        onBackFn?: () => void;
+      };
+    }>;
+    "map-market-results": SheetDefinition<{
+      payload: {
+        resultsList: JSX.Element[];
       };
     }>;
     "map-search-results": SheetDefinition<{

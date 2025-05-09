@@ -1,14 +1,21 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { View, Text } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 import { Region } from "react-native-maps";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
-import { SheetManager } from "react-native-actions-sheet";
-import TextHeading3 from "../../components/utils/texts/Heading3";
-import CardProducer from "../../components/cards/ProducerSearchResult";
+
+import {
+  SheetManager,
+  useSheetRef,
+  ActionSheetRef,
+  Sheets,
+  getSheetStack,
+} from "react-native-actions-sheet";
+
+import ShopSearchResultCard from "../../components/cards/ShopSearchResult";
+import MarketSearchResultCard from "../../components/cards/MarketSearchResult";
 import ShopMarkerCard from "../../components/cards/ShopMarkerCard";
 import MapSearchBox from "../../components/map/MapSearchBox";
 import {
@@ -17,11 +24,10 @@ import {
   ShopData,
   ShopResultData,
 } from "../../types/API";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "nativewind";
-import BadgeSecondary from "../../components/utils/badges/Secondary";
-import { Svg, Image as ImageSvg } from "react-native-svg";
-import MarketSearchResultCard from "../../components/cards/MarketSearchResult";
 import MarketMarkerCard from "../../components/cards/MarketMarker";
+import { handleSheetFlow } from "../../helpers/sheetHelpers";
 
 type userPosition = {
   latitude: number;
@@ -38,16 +44,17 @@ type MapProps = {
 };
 
 export default function MapCustomerScreen({
-  route,
   navigation,
 }: MapProps): JSX.Element {
-  const { colorScheme, toggleColorScheme } = useColorScheme();
-
   const [currentPosition, setCurrentPosition] = useState<userPosition>(null);
-  // const [searchResults, setSearchResults] = useState<ShopData[]>([]);
-  const [producerResults, setProducerResults] = useState<ShopResultData[]>([]);
-  const [marketResults, setMarketResults] = useState<MarketResultData[]>([]);
   const [region, setRegion] = useState<Region | undefined>(undefined);
+
+  const [shopResults, setShopResults] = useState<ShopResultData[] | null>([]);
+  const [marketResults, setMarketResults] = useState<MarketResultData[] | null>(
+    [],
+  );
+  // const [stockedMarketResults, setStockedMarketResults] = useState<MarketResultData[]>([]);
+  const stockedMarketResultsRef = useRef<MarketResultData[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -69,72 +76,93 @@ export default function MapCustomerScreen({
     // if (route.params && route.params.searchResults) {
     //   setSearchResults(route.params.searchResults);
     // }
-  }, [route.params]);
+  }, []);
 
-  const producersList =
-    producerResults &&
-    producerResults.map((sr: ShopResultData) => {
-      console.log("sr :", sr);
-      return (
-        <CardProducer
-          shopData={sr.shop}
-          results={sr.relevantProducts.length}
-          distance={sr.distance}
-          onPressFn={() => {
-            navigation.navigate("ShopUser", {
-              params: {
-                shopId: sr?.shop?._id,
-                distance: sr?.distance,
-                relevantProducts: sr?.relevantProducts
-                  ? sr?.relevantProducts
-                  : [],
-              },
-            });
-          }}
-          key={sr?.shop?._id}
-          extraClasses="mb-1"
-          displayMode="bottomSheet"
-        />
-      );
+  const buildShopComponents = (shops: ShopResultData[]): JSX.Element[] => {
+    return shops.map((sr) => (
+      <ShopSearchResultCard
+        shopData={sr.shop}
+        results={sr.relevantProducts.length}
+        distance={sr.distance}
+        onPressFn={() => {
+          navigation.navigate("ShopUser", {
+            shopId: sr?.shop?._id,
+            distance: sr?.distance,
+            relevantProducts: sr?.relevantProducts ? sr?.relevantProducts : [],
+          });
+        }}
+        key={sr?.shop?._id}
+        extraClasses="mb-1"
+        displayMode="bottomSheet"
+      />
+    ));
+  };
+
+  const buildMarketComponents = (
+    markets: MarketResultData[],
+  ): JSX.Element[] => {
+    return markets.map((mr) => (
+      <MarketSearchResultCard
+        marketData={mr.market}
+        results={mr.shops}
+        distance={mr.distance}
+        onPressFn={() => onMarketPress(mr.shops)}
+        key={mr?.market?._id}
+        extraClasses="mb-1"
+      />
+    ));
+  };
+
+  const onMarketPress = async (shops: any[]) => {
+    // reconstruction d'un objet de type ShopResultData
+    const transformedShops: ShopResultData[] = shops.map((shop, index) => {
+      const { matchedStocks, ...cleanShop } = shop;
+      return {
+        shop: cleanShop,
+        relevantProducts: shop.matchedStocks ?? [],
+        distance: 0,
+      };
     });
 
-  const marketsList =
-    marketResults &&
-    marketResults.map((sr: MarketResultData) => {
-      console.log("sr :", sr);
-      return (
-        <MarketSearchResultCard
-          marketData={sr.market}
-          results={sr.shops}
-          distance={sr.distance}
-          onPressFn={() => {}}
-          key={sr?.market?._id}
-          extraClasses="mb-1"
-        />
-      );
+    await handleSheetFlow({
+      sheet: "map-shop-results",
+      payload: {
+        resultsList: buildShopComponents(transformedShops),
+        onBackFn: () => {
+          handleSheetFlow({
+            sheet: "map-market-results",
+            payload: {
+              resultsList: buildMarketComponents(
+                stockedMarketResultsRef.current,
+              ),
+            },
+          });
+        },
+      },
     });
+  };
 
   useEffect(() => {
-    if (producersList.length > 0) {
-      SheetManager.show("map-search-results", {
-        payload: {
-          resultsList: producersList,
-          searchType: "shop",
-        },
+    if (shopResults && shopResults?.length > 0) {
+      handleSheetFlow({
+        sheet: "map-shop-results",
+        payload: { resultsList: buildShopComponents(shopResults) },
       });
     }
-    if (marketsList.length > 0) {
-      SheetManager.show("map-search-results", {
-        payload: {
-          resultsList: marketsList,
-          searchType: "market",
-        },
-      });
-    }
-  }, [producersList, marketsList]);
+  }, [shopResults]);
 
-  const markers = producerResults
-    ? producerResults.map((data: ShopResultData, i) => {
+  useEffect(() => {
+    if (marketResults && marketResults.length > 0) {
+      stockedMarketResultsRef.current = marketResults;
+      handleSheetFlow({
+        sheet: "map-market-results",
+        payload: { resultsList: buildMarketComponents(marketResults) },
+      });
+    }
+  }, [marketResults]);
+
+  const markers = shopResults
+    ? shopResults.map((data: ShopResultData, i) => {
         return (
           <Marker
             key={i}
@@ -144,25 +172,25 @@ export default function MapCustomerScreen({
             }}
           >
             <Callout
-              tooltip={true}
+              tooltip={false}
               onPress={() => {
                 navigation.navigate("ShopUser", {
-                  params: {
-                    shopId: data?.shop?._id,
-                    distance: data?.distance,
-                    relevantProducts: data?.relevantProducts
-                      ? data.relevantProducts
-                      : [],
-                  },
+                  shopId: data?.shop?._id,
+                  distance: data?.distance,
+                  relevantProducts: data?.relevantProducts
+                    ? data.relevantProducts
+                    : [],
                 });
               }}
             >
-              <ShopMarkerCard key={data?.shop?._id} shopData={data.shop} />
+              <View>
+                <ShopMarkerCard key={data?.shop?._id} shopData={data.shop} />
+              </View>
             </Callout>
           </Marker>
         );
       })
-    : marketResults.map((data, i) => {
+    : marketResults?.map((data: MarketResultData, i) => {
         return (
           <Marker
             key={i}
@@ -170,86 +198,60 @@ export default function MapCustomerScreen({
               latitude: Number(data?.market.address.latitude?.$numberDecimal),
               longitude: Number(data?.market.address.longitude?.$numberDecimal),
             }}
+            pinColor="green"
           >
             <Callout
-              tooltip={true}
+              // tooltip={true}
               onPress={() => {
-                navigation.navigate("TabNavigatorUser", {
-                  screen: "ShopUser",
-                  params: {
-                    shopId: data?._id,
-                    distance: data?.searchData.distance,
-                    relevantProducts: data?.searchData.relevantProducts
-                      ? data.searchData.relevantProducts
-                      : [],
-                  },
-                });
+                console.log("youpi");
               }}
             >
-              <MarketMarkerCard
-                key={data?.market._id}
-                marketData={data.market}
-                shops={data?.shops}
-                distance={data?.distance}
-              />
+              <View>
+                <MarketMarkerCard
+                  key={data?.market._id}
+                  marketData={data.market}
+                  shops={data?.shops}
+                  distance={data?.distance}
+                />
+              </View>
             </Callout>
           </Marker>
         );
       });
 
-  const handleSheetChanges = useCallback((index: number) => {}, []);
-
-  console.log(
-    "------------------------------- MAP --------------------------------------------------------------------",
-  );
-  // console.log("SEARCHRESULT -> ", JSON.stringify(searchResults, null, 2));
+  // console.log("shopResults :", shopResults)
+  // console.log("marketResults :", marketResults)
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView className="flex-1">
       <MapView
         mapType="hybrid"
         showsUserLocation={true}
-        style={styles.map}
+        // style={styles.map}
+        className="flex-1"
         region={region}
         userInterfaceStyle="dark"
       >
-        {/* {currentPosition && <Marker coordinate={currentPosition} title="My position" pinColor="#fecb2d" />} */}
         {markers}
       </MapView>
-      <View
-        className="px-2"
-        style={{ position: "absolute", top: 50, width: "100%" }}
-      >
+
+      <View className="absolute top-[90px] px-3 w-full">
         <MapSearchBox
-          search={
-            route.params && route.params.search
-              ? route.params.search
-              : undefined
-          }
-          refrechResultsFn={(type: string, newSearchResults: string[]) => {
+          refrechResultsFn={(
+            type: string,
+            newShopResults: ShopResultData[],
+            newMarketResults: MarketResultData[],
+          ) => {
             if (type === "shop") {
-              setProducerResults(newSearchResults);
+              setShopResults(newShopResults);
+              setMarketResults(null);
             } else {
-              setMarketResults(newSearchResults);
+              setMarketResults(newMarketResults);
+              setShopResults(null);
             }
           }}
-          // displayMode="widget"
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    flex: 1,
-    position: "relative",
-  },
-  contentContainer: {
-    flex: 1,
-    alignItems: "center",
-  },
-});

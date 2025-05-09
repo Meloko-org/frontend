@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useRef } from "react";
 import { View, ScrollView } from "react-native";
-import ActionSheet, { SheetProps } from "react-native-actions-sheet";
+import ActionSheet, {
+  ActionSheetRef,
+  SheetManager,
+  SheetProps,
+} from "react-native-actions-sheet";
 import { useColorScheme } from "nativewind";
 import TextHeading3 from "../utils/texts/Heading3";
 import TextHeading4 from "../utils/texts/Heading4";
 
-export default function MapSearchResults(
-  props: SheetProps<"map-search-results">,
+export default function MapMarketResults(
+  props: SheetProps<"map-market-results">,
 ) {
-  const { colorScheme, toggleColorScheme } = useColorScheme();
+  console.log("list :", props.payload?.resultsList);
 
   return (
     <ActionSheet
@@ -19,11 +23,18 @@ export default function MapSearchResults(
       indicatorStyle={{ backgroundColor: "#000000" }}
       gestureEnabled={true}
       id={props.sheetId}
+      ref={(ref) => {
+        if (ref) {
+          SheetManager.registerRef("map-market-results", "global", {
+            current: ref,
+          });
+        }
+      }}
     >
       <View className="h-full bg-lightbg dark:bg-darkbg">
         <View className="px-3 w-full">
           <TextHeading4 centered extraClasses="my-3 h-10">
-            {`${props.payload?.resultsList.length.toString()} ${props.payload?.searchType === "shop" ? "Producteur(s)" : "Point(s) de vente"}`}
+            {`${props.payload?.resultsList.length.toString()} Point(s) de vente`}
           </TextHeading4>
         </View>
 

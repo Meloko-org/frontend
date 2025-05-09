@@ -18,8 +18,8 @@ export default function BackLabelButton(
       <View
         className={`${props.extraClasses} flex flex-row w-auto py-1 items-center rounded-lg bg-darkbg/20 dark:bg-lightbg/25`}
       >
-        <View className="">
-          <FontAwesome5Icon name="arrow-left" size={30} color="#98B66E" />
+        <View className="pl-2">
+          <FontAwesome5Icon name="angle-left" size={30} color="#98B66E" />
         </View>
         <View className="flex-grow">
           <TextBody1 extraClasses="pl-2">{props.backLabel}</TextBody1>

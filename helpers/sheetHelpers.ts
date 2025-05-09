@@ -1,4 +1,9 @@
-import { SheetManager, Sheets } from "react-native-actions-sheet";
+import {
+  ActionSheetRef,
+  getSheetStack,
+  SheetManager,
+  Sheets,
+} from "react-native-actions-sheet";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -39,13 +44,25 @@ type SheetFlowOptions<TSheet extends keyof Sheets> = {
 export async function handleSheetFlow<TSheet extends keyof Sheets>(
   options: SheetFlowOptions<TSheet>,
 ) {
+  await closeIfOpen("map-shop-results");
+  await closeIfOpen("map-market-results");
+
+  await wait(200);
+
+  // Ouvrir la nouvelle
   const result = await SheetManager.show(options.sheet, {
     payload: options.payload,
   });
 
-  wait(50);
-
   if (options.onAfter) {
     await options.onAfter(result);
+  }
+}
+
+export async function closeIfOpen(id: string) {
+  const ref = SheetManager.get(id);
+  if (ref?.current?.hide) {
+    await ref.current.hide();
+    await wait(50);
   }
 }
