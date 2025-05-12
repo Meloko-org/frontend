@@ -12,8 +12,6 @@ import TextHeading4 from "../utils/texts/Heading4";
 export default function MapMarketResults(
   props: SheetProps<"map-market-results">,
 ) {
-  console.log("list :", props.payload?.resultsList);
-
   return (
     <ActionSheet
       backgroundInteractionEnabled={true}

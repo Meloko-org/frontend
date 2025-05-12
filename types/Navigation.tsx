@@ -19,6 +19,7 @@ type RootStackParamList = {
     shopId: string | undefined;
     distance: number | undefined;
     relevantProducts: StockData[];
+    sheetId: string;
   };
   WithdrawModesUser: undefined;
   OrdersCustomer: undefined;

@@ -27,7 +27,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "nativewind";
 import MarketMarkerCard from "../../components/cards/MarketMarker";
-import { handleSheetFlow } from "../../helpers/sheetHelpers";
+import { closeIfOpen, handleSheetFlow } from "../../helpers/sheetHelpers";
 
 type userPosition = {
   latitude: number;
@@ -53,7 +53,6 @@ export default function MapCustomerScreen({
   const [marketResults, setMarketResults] = useState<MarketResultData[] | null>(
     [],
   );
-  // const [stockedMarketResults, setStockedMarketResults] = useState<MarketResultData[]>([]);
   const stockedMarketResultsRef = useRef<MarketResultData[]>([]);
 
   useEffect(() => {
@@ -85,10 +84,13 @@ export default function MapCustomerScreen({
         results={sr.relevantProducts.length}
         distance={sr.distance}
         onPressFn={() => {
+          const sheetId = getSheetStack()[0].id;
+          closeIfOpen(sheetId);
           navigation.navigate("ShopUser", {
             shopId: sr?.shop?._id,
             distance: sr?.distance,
             relevantProducts: sr?.relevantProducts ? sr?.relevantProducts : [],
+            sheetId: sheetId,
           });
         }}
         key={sr?.shop?._id}

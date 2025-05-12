@@ -11,6 +11,7 @@ import { updateUser, UserState } from "../../reducers/user";
 import { useAuth } from "@clerk/clerk-expo";
 
 import StarsNotation from "../../components/utils/StarsNotation";
+import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import TextBody1 from "../../components/utils/texts/Body1";
@@ -22,31 +23,25 @@ import ButtonBack from "../../components/utils/buttons/Back";
 import ProductCategory from "../../components/cards/ProductCategory";
 import CardNote from "../../components/cards/Note";
 import BackLabelButton from "../../components/utils/buttons/BackLabel";
+import { RouteProp, useRoute } from "@react-navigation/native";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
-type StocksScreenNavigationProp = NativeStackNavigationProp<
+type ShopUserScreenRouteProp = RouteProp<RootStackParamList, "ShopUser">;
+
+type ShopUserScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "TabNavigatorUser"
+  "ShopUser"
 >;
 
 type Props = {
-  navigation: StocksScreenNavigationProp;
-  route: Route;
+  navigation: ShopUserScreenNavigationProp;
 };
 
-type Params = {
-  params: {
-    shopId: string;
-    relevantProducts: ProductData[];
-  };
-};
+export default function ShopUserScreen({ navigation }: Props) {
+  const route = useRoute<ShopUserScreenRouteProp>();
+  const { shopId, relevantProducts, distance, sheetId } = route.params;
 
-type Route = {
-  params: Params;
-};
-
-export default function ShopUserScreen({ route, navigation }: Props) {
   const dispatch = useDispatch();
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
@@ -63,10 +58,10 @@ export default function ShopUserScreen({ route, navigation }: Props) {
   const [isSearchResultsModalVisible, setIsSearchResultsModalVisible] =
     useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+
   // Shop recovery
   useEffect(() => {
-    const { shopId, relevantProducts, distance }: Route = route.params;
-    distance ? setShopDistance(distance.toFixed(2)) : null;
+    distance ? setShopDistance(Number(distance.toFixed(2))) : null;
 
     if (relevantProducts.length > 0) {
       setSearchProducts(relevantProducts);
@@ -210,11 +205,6 @@ export default function ShopUserScreen({ route, navigation }: Props) {
     );
   });
 
-  console.log(
-    "------------------------------- SHOPUSER --------------------------------------------------------------------",
-  );
-  console.log("USERSTORE -> ", userStore);
-
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <Modal
@@ -226,11 +216,10 @@ export default function ShopUserScreen({ route, navigation }: Props) {
         <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
           <View className="flex flex-row mb-5 mt-3">
             <BackLabelButton
+              backLabel="Retour"
               onPressFn={() => setIsModalVisible(false)}
               extraClasses="ml-5 p-1"
-            >
-              Retour à la boutique
-            </BackLabelButton>
+            />
           </View>
           <TextHeading4 centered extraClasses="mb-1">
             Tous les produits
@@ -272,18 +261,33 @@ export default function ShopUserScreen({ route, navigation }: Props) {
 
       <View className="flex flex-row mb-5 mt-3">
         <BackLabelButton
+          backLabel="Retour aux résultats"
           onPressFn={() => navigation.goBack()}
-          extraClasses="ml-5 p-1"
-        >
-          Retour aux Résultats
-        </BackLabelButton>
+          extraClasses="ml-5 pr-2"
+        />
       </View>
+
       <View className="flex-1">
         <ScrollView showsVerticalScrollIndicator={false} className="px-3">
           {shopData && (
             <View className="flex-1">
               <View>
-                <TextHeading2 centered>{shopData.name}</TextHeading2>
+                <View className="flex flex-row item-center justify-center">
+                  <TextHeading2 extraClasses="w-min-auto bg-danger" centered>
+                    {shopData.name}
+                  </TextHeading2>
+
+                  {shopData.isPremium && (
+                    <FontAwesome5Icon
+                      name="crown"
+                      size={25}
+                      color="#FAA200"
+                      className=""
+                      style={{ right: 20 }}
+                    />
+                  )}
+                </View>
+
                 <StarsNotation
                   iconNames={["star", "star-half", "star-o"]}
                   shopData={shopData}
@@ -292,23 +296,18 @@ export default function ShopUserScreen({ route, navigation }: Props) {
 
                 <View className="flex flex-row items-center mb-3">
                   <View className="w-2/6 h-full">
-                    {shopData.logo ? (
-                      <Image
-                        source={{ uri: shopData.logo }}
-                        resizeMode="cover"
-                        width={112}
-                        height={112}
-                        className="rounded-full border border-primary"
-                      />
-                    ) : (
-                      <Image
-                        source={require("../../assets/icon.png")}
-                        resizeMode="cover"
-                        width={112}
-                        height={112}
-                        className="w-28 h-28 rounded-full border border-primary"
-                      />
-                    )}
+                    <Image
+                      source={
+                        shopData?.logo
+                          ? { uri: shopData?.logo }
+                          : require("../../assets/icon.png")
+                      }
+                      className="rounded-lg border border-primary w-24 h-24"
+                      alt={`photo du point de vente ${shopData?.name}`}
+                      resizeMode="cover"
+                      width={112}
+                      height={112}
+                    />
                   </View>
                   <View
                     className={`${isSignedIn ? "w-3/6" : "w-4/6"} flex flex-row justify-start h-full pr-1`}
@@ -335,11 +334,11 @@ export default function ShopUserScreen({ route, navigation }: Props) {
                 )}
                 {shopData.markets.length > 0 && (
                   <BadgeSecondary extraClasses="p-1" uppercase>
-                    Marché local
+                    Point de vente
                   </BadgeSecondary>
                 )}
                 {shopDistance && (
-                  <BadgeSecondary extraClasses="p-1">{`${shopDistance}km`}</BadgeSecondary>
+                  <BadgeSecondary extraClasses="p-1">{`${shopDistance} km`}</BadgeSecondary>
                 )}
               </View>
             </View>

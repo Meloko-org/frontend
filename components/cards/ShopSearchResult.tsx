@@ -28,10 +28,6 @@ export default function ShopSearchResultCard({
   displayMode,
   showDirectionButton,
 }: ShopSearchResultCardProps): JSX.Element {
-  // console.log("shopData :", shopData)
-  // console.log("results :", results)
-  // console.log("distance :", distance)
-
   return (
     <TouchableOpacity onPress={onPressFn}>
       <View
