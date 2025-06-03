@@ -1,20 +1,22 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import * as Location from "expo-location";
-import { Animated, View, Text, Pressable, StyleSheet } from "react-native";
 import { useCollapsibleSection } from "../../hooks/useCollapsibleSection";
 
-import { SafeAreaView } from "react-native-safe-area-context";
-import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
+import { MarketResultData, ShopResultData } from "../../types/API";
+import { SheetManager } from "react-native-actions-sheet";
+
+import { Animated, View, Text, Pressable, StyleSheet } from "react-native";
 import InputText from "../utils/inputs/Text";
-import ButtonPrimaryEnd from "../utils/buttons/PrimaryEnd";
 import IconButton from "../utils/buttons/Icon";
 import { Slider } from "@miblanchard/react-native-slider";
-import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import InputButtonGroup from "../utils/inputs/radioGroup";
 import Spinner from "../utils/Spinner";
-import { SheetManager } from "react-native-actions-sheet";
 
 type userPosition = {
   latitude: number;
@@ -32,13 +34,26 @@ type searchOptions = {
 };
 
 type Props = {
-  // search?: searchOptions;
-  refrechResultsFn?: Function;
-  // navigation?: object;
+  refrechResultsFn?: (
+    type: string,
+    newShopResults: ShopResultData[],
+    newMarketResults: MarketResultData[],
+  ) => void;
 };
 
-export default function MapSearchBox({ refrechResultsFn }: Props): JSX.Element {
+// export default function MapSearchBox({ refrechResultsFn }: Props) {
+
+const MapSearchBox = forwardRef(function MapSearchBox(
+  { refrechResultsFn }: Props,
+  ref: React.Ref<{ toggleSearch: () => void }>,
+) {
   const searchSection = useCollapsibleSection();
+
+  useImperativeHandle(ref, () => ({
+    toggleSearch: () => {
+      searchSection.toggle();
+    },
+  }));
 
   const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [isSearchAddressLoading, setIsSearchAddressLoading] =
@@ -198,7 +213,7 @@ export default function MapSearchBox({ refrechResultsFn }: Props): JSX.Element {
       });
       const data = await response.json();
 
-      // console.log("databack :", data);
+      console.log("databack :", data);
 
       if (refrechResultsFn) {
         if (searchOptions.searchType === "shop") {
@@ -348,4 +363,6 @@ export default function MapSearchBox({ refrechResultsFn }: Props): JSX.Element {
       )}
     </>
   );
-}
+});
+
+export default MapSearchBox;

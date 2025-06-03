@@ -43,9 +43,7 @@ type MapProps = {
   navigation: MapScreenNavigationProp;
 };
 
-export default function MapCustomerScreen({
-  navigation,
-}: MapProps): JSX.Element {
+export default function MapCustomerScreen({ navigation }: MapProps) {
   const [currentPosition, setCurrentPosition] = useState<userPosition>(null);
   const [region, setRegion] = useState<Region | undefined>(undefined);
 
@@ -54,6 +52,8 @@ export default function MapCustomerScreen({
     [],
   );
   const stockedMarketResultsRef = useRef<MarketResultData[]>([]);
+
+  const mapSearchBoxRef = useRef<{ toggleSearch: () => void }>(null);
 
   useEffect(() => {
     (async () => {
@@ -77,7 +77,7 @@ export default function MapCustomerScreen({
     // }
   }, []);
 
-  const buildShopComponents = (shops: ShopResultData[]): JSX.Element[] => {
+  const buildShopComponents = (shops: ShopResultData[]) => {
     return shops.map((sr) => (
       <ShopSearchResultCard
         shopData={sr.shop}
@@ -100,9 +100,7 @@ export default function MapCustomerScreen({
     ));
   };
 
-  const buildMarketComponents = (
-    markets: MarketResultData[],
-  ): JSX.Element[] => {
+  const buildMarketComponents = (markets: MarketResultData[]) => {
     return markets.map((mr) => (
       <MarketSearchResultCard
         marketData={mr.market}
@@ -239,17 +237,41 @@ export default function MapCustomerScreen({
 
       <View className="absolute top-[90px] px-3 w-full">
         <MapSearchBox
+          ref={mapSearchBoxRef}
           refrechResultsFn={(
             type: string,
             newShopResults: ShopResultData[],
             newMarketResults: MarketResultData[],
           ) => {
+            const hasShopResults = newShopResults && newShopResults.length > 0;
+            const hasMarketResults =
+              newMarketResults && newMarketResults.length > 0;
+
             if (type === "shop") {
-              setShopResults(newShopResults);
-              setMarketResults(null);
+              if (!hasShopResults) {
+                handleSheetFlow({
+                  sheet: "map-empty-search-results",
+                  payload: {
+                    searchType: "producteur",
+                    onRetry: () => {
+                      mapSearchBoxRef.current?.toggleSearch();
+                    },
+                  },
+                });
+              } else {
+                setShopResults(newShopResults);
+                setMarketResults(null);
+              }
             } else {
-              setMarketResults(newMarketResults);
-              setShopResults(null);
+              if (!hasMarketResults) {
+                handleSheetFlow({
+                  sheet: "map-empty-search-results",
+                  payload: { searchType: "point de vente" },
+                });
+              } else {
+                setMarketResults(newMarketResults);
+                setShopResults(null);
+              }
             }
           }}
         />

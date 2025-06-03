@@ -12,15 +12,16 @@ export function useCollapsibleSection(duration: number = 300) {
   const contentHeight = useSharedValue(0);
   const animatedHeight = useSharedValue(0);
 
-  const toggle = () => {
-    setIsOpen((prev) => {
-      const next = !prev;
-      animatedHeight.value = withTiming(next ? contentHeight.value : 0, {
-        duration,
-        easing: Easing.out(Easing.ease),
-      });
-      return next;
+  const animate = (open: boolean) => {
+    animatedHeight.value = withTiming(open ? contentHeight.value : 0, {
+      duration,
+      easing: Easing.out(Easing.ease),
     });
+  };
+  const toggle = () => {
+    const next = !isOpen;
+    setIsOpen(next);
+    animate(next);
   };
 
   const onLayout = (event: LayoutChangeEvent) => {

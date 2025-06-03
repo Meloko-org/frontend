@@ -21,12 +21,14 @@ import EditProductSheet from "./EditProductSheet";
 import ProductFamiliesSheet from "./ProductFamilies";
 import ConfirmSheet from "./Confirm";
 import ImageUploaderSheet from "./ImageUploader";
+import MapEmptySearchResults from "./MapEmptySearchResults";
 
 registerSheet("alert", CustomAlert);
 registerSheet("product-details", ProductDetails);
 registerSheet("map-shop-results", MapShopResults);
 registerSheet("map-market-results", MapMarketResults);
 registerSheet("map-search-results", MapSearchResults);
+registerSheet("map-empty-search-results", MapEmptySearchResults);
 registerSheet("become-premium", BecomePremium);
 registerSheet("edit-product", EditProductSheet);
 registerSheet("product-families", ProductFamiliesSheet);
@@ -59,6 +61,12 @@ declare module "react-native-actions-sheet" {
     "map-market-results": SheetDefinition<{
       payload: {
         resultsList: JSX.Element[];
+      };
+    }>;
+    "map-empty-search-results": SheetDefinition<{
+      payload: {
+        searchType: "producteur" | "point de vente";
+        onRetry: () => void;
       };
     }>;
     "map-search-results": SheetDefinition<{

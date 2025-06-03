@@ -37,7 +37,6 @@ import CanceledOrdersScreen from "./screens/producer/CanceledOrders";
 import AllOrdersScreen from "./screens/producer/AllOrders";
 import ProducerProfileScreen from "./screens/producer/Profile";
 import StocksOldScreen from "./screens/Stocks";
-import SearchCustomerScreen from "./screens/customer/Search";
 import ComponentsScreen from "./screens/Components";
 import ShopUserScreen from "./screens/customer/Shop";
 import WithdrawModesUserScreen from "./screens/customer/WithdrawModes";
@@ -187,7 +186,7 @@ const TabNavigatorUser: React.FC = () => {
         },
       })}
     >
-      <Tab.Screen name="Search" component={MapCustomerScreen} />
+      <Tab.Screen name="MapCustomer" component={MapCustomerScreen} />
       <Tab.Screen name="Cart" component={CartScreen} />
       <Tab.Screen
         name="BookmarksCustomer"
@@ -201,7 +200,7 @@ const TabNavigatorUser: React.FC = () => {
         options={{ tabBarButton: () => null }}
       />
       <Tab.Screen
-        name="UserProfileAddressesScreen"
+        name="UserProfileAddresses"
         component={UserProfileAddressesScreen}
         options={{ tabBarButton: () => null }}
       />
@@ -451,7 +450,7 @@ const TabNavigatorProducer: React.FC = () => {
   );
 };
 
-export default function App(): JSX.Element {
+export default function App() {
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
@@ -467,14 +466,6 @@ export default function App(): JSX.Element {
                     <Stack.Screen name="Home" component={HomeScreen} />
                     <Stack.Screen name="SignUp" component={SignUpScreen} />
                     <Stack.Screen name="SignIn" component={SignInScreen} />
-                    <Stack.Screen
-                      name="SearchCustomer"
-                      component={SearchCustomerScreen}
-                    />
-                    {/* <Stack.Screen
-                        name="Components"
-                        component={ComponentsScreen}
-                        /> */}
                     <Stack.Screen
                       name="TabNavigatorUser"
                       component={TabNavigatorUser}

@@ -139,7 +139,7 @@ export default function HomeScreen({ navigation }: Props) {
         <View className="flex-1">
           <View className="flex-[0.4] my-5">
             <Image
-              source={LogoCoq}
+              source={require("../assets/images/logo_lacharrue.png")}
               alt={`Logo MELOKO`}
               resizeMode="contain"
               className="w-full h-full"
@@ -153,7 +153,9 @@ export default function HomeScreen({ navigation }: Props) {
                 iconName="search"
                 disabled={false}
                 onPressFn={() =>
-                  navigation.navigate("TabNavigatorUser", { screen: "Search" })
+                  navigation.navigate("TabNavigatorUser", {
+                    screen: "MapCustomer",
+                  })
                 }
                 extraClasses="mb-3 h-14"
               />

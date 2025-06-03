@@ -10,11 +10,12 @@ type RootStackParamList = {
   TabNavigatorUser: undefined;
   TabNavigatorProducer: undefined;
 
-  Search: undefined;
   MapCustomer: undefined;
   Cart: undefined;
   Bookmarks: undefined;
   UserProfile: undefined;
+  UserProfileInformations: undefined;
+  UserProfileAddresses: undefined;
   ShopUser: {
     shopId: string | undefined;
     distance: number | undefined;
