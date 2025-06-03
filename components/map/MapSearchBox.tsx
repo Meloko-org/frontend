@@ -238,10 +238,7 @@ const MapSearchBox = forwardRef(function MapSearchBox(
 
   return (
     <>
-      <Pressable
-        className={`rounded-lg bg-lightbg p-2 dark:bg-tertiary`}
-        onPress={searchSection.toggle}
-      >
+      <View className={`rounded-lg bg-lightbg p-2 dark:bg-tertiary`}>
         <View>
           <InputText
             value={searchOptions.query}
@@ -347,14 +344,16 @@ const MapSearchBox = forwardRef(function MapSearchBox(
           </View>
         </Animated.View>
 
-        <View className="h-7 mt-2">
-          <Text
-            className={` text-sm w-full text-center font-bold text-secondary/40 my-1 dark:text-lightbg`}
-          >
-            {`Appuyez pour ${searchSection.isOpen ? "moins" : "plus"} d'options !`}
-          </Text>
-        </View>
-      </Pressable>
+        <Pressable onPress={searchSection.toggle}>
+          <View className="h-7 mt-2">
+            <Text
+              className={` text-sm w-full text-center font-bold text-secondary/40 my-1 dark:text-lightbg`}
+            >
+              {`Appuyez pour ${searchSection.isOpen ? "moins" : "plus"} d'options !`}
+            </Text>
+          </View>
+        </Pressable>
+      </View>
 
       {isSearchLoading && (
         <View className="flex-1 justify-center align-center h-64">
