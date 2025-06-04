@@ -1,33 +1,23 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { View, Text } from "react-native";
+
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
+
 import { Region } from "react-native-maps";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
 
-import {
-  SheetManager,
-  useSheetRef,
-  ActionSheetRef,
-  Sheets,
-  getSheetStack,
-} from "react-native-actions-sheet";
+import { getSheetStack } from "react-native-actions-sheet";
+import { MarketResultData, ShopResultData } from "../../types/API";
+import { closeIfOpen, handleSheetFlow } from "../../helpers/sheetHelpers";
 
+import { View, Text } from "react-native";
 import ShopSearchResultCard from "../../components/cards/ShopSearchResult";
 import MarketSearchResultCard from "../../components/cards/MarketSearchResult";
 import ShopMarkerCard from "../../components/cards/ShopMarkerCard";
 import MapSearchBox from "../../components/map/MapSearchBox";
-import {
-  MarketData,
-  MarketResultData,
-  ShopData,
-  ShopResultData,
-} from "../../types/API";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme } from "nativewind";
 import MarketMarkerCard from "../../components/cards/MarketMarker";
-import { closeIfOpen, handleSheetFlow } from "../../helpers/sheetHelpers";
 
 type userPosition = {
   latitude: number;
@@ -266,7 +256,12 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
               if (!hasMarketResults) {
                 handleSheetFlow({
                   sheet: "map-empty-search-results",
-                  payload: { searchType: "point de vente" },
+                  payload: {
+                    searchType: "point de vente",
+                    onRetry: () => {
+                      mapSearchBoxRef.current?.toggleSearch();
+                    },
+                  },
                 });
               } else {
                 setMarketResults(newMarketResults);

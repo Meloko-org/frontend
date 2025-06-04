@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import BadgeSecondary from "../utils/badges/Secondary";
 import StarsNotation from "../utils/StarsNotation";

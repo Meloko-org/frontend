@@ -259,7 +259,7 @@ export default function ShopUserScreen({ navigation }: Props) {
         </Modal>
       )}
 
-      <View className="flex flex-row mb-5 mt-3">
+      <View className="flex flex-row mb-2 mt-2">
         <BackLabelButton
           backLabel="Retour aux résultats"
           onPressFn={() => navigation.goBack()}
@@ -273,26 +273,33 @@ export default function ShopUserScreen({ navigation }: Props) {
             <View className="flex-1">
               <View>
                 <View className="flex flex-row item-center justify-center">
-                  <TextHeading2 extraClasses="w-min-auto bg-danger" centered>
-                    {shopData.name}
-                  </TextHeading2>
+                  <View className="flex flex-row items-center">
+                    <TextHeading2 extraClasses="" centered>
+                      {shopData.name}
+                    </TextHeading2>
 
-                  {shopData.isPremium && (
-                    <FontAwesome5Icon
-                      name="crown"
-                      size={25}
-                      color="#FAA200"
-                      className=""
-                      style={{ right: 20 }}
-                    />
-                  )}
+                    {shopData.isPremium && (
+                      <FontAwesome5Icon
+                        name="crown"
+                        size={25}
+                        color="#FAA200"
+                        className=""
+                        style={{ left: 5 }}
+                      />
+                    )}
+                  </View>
                 </View>
 
-                <StarsNotation
-                  iconNames={["star", "star-half", "star-o"]}
-                  shopData={shopData}
-                  extraClasses="mb-4"
-                />
+                <View className="flex flex-row justify-center">
+                  <StarsNotation
+                    iconNames={["star", "star-half", "star-o"]}
+                    shopData={shopData}
+                    extraClasses="mb-4"
+                  />
+                  {shopDistance && (
+                    <TextBody1>{` - ${shopDistance} km`}</TextBody1>
+                  )}
+                </View>
 
                 <View className="flex flex-row items-center mb-3">
                   <View className="w-2/6 h-full">
@@ -314,15 +321,25 @@ export default function ShopUserScreen({ navigation }: Props) {
                   >
                     <TextBody1>{shopData.description}</TextBody1>
                   </View>
-                  {isSignedIn && (
-                    <View className="w-1/6 h-full">
+
+                  <View className="w-1/6 h-full">
+                    {isSignedIn && (
                       <IconButton
                         iconName={isBookmarked ? "heart" : "heart-o"}
-                        extraClasses="h-16"
+                        iconFamily="FontAwesomeIcon"
+                        iconColor="#98B66E"
+                        extraClasses="h-10"
                         onPressFn={handleBookmarkPress}
                       />
-                    </View>
-                  )}
+                    )}
+                    <IconButton
+                      iconName="eye"
+                      iconFamily="FontAwesome5Icon"
+                      buttonColor="bg-primary"
+                      extraClasses="h-10"
+                      onPressFn={() => {}}
+                    />
+                  </View>
                 </View>
               </View>
 
@@ -337,9 +354,7 @@ export default function ShopUserScreen({ navigation }: Props) {
                     Point de vente
                   </BadgeSecondary>
                 )}
-                {shopDistance && (
-                  <BadgeSecondary extraClasses="p-1">{`${shopDistance} km`}</BadgeSecondary>
-                )}
+                {/* ajouter la livraison */}
               </View>
             </View>
           )}

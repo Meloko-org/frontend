@@ -13,7 +13,10 @@ const getProducerInfos = async (
         Authorization: `Bearer ${token}`,
         mode: "cors",
       },
+      cache: "no-store",
     });
+
+    console.log("status :", response.status);
 
     if (!response.ok) {
       return {

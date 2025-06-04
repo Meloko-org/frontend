@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { useState, useRef } from "react";
 import { TouchableOpacity, Animated, Easing } from "react-native";
 import { GestureResponderEvent } from "react-native";

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { JSX, useRef } from "react";
 import { Text, View, TouchableOpacity, Animated, Easing } from "react-native";
 
 import EntypoIcon from "@expo/vector-icons/Entypo";

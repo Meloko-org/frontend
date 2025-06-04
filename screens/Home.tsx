@@ -70,7 +70,7 @@ export default function HomeScreen({ navigation }: Props) {
       const userResponse = await userTools.getUserInfos(token);
 
       if (!userResponse.success) {
-        console.error(userResponse.message);
+        console.warn(userResponse.message);
         return;
       }
 
@@ -79,7 +79,7 @@ export default function HomeScreen({ navigation }: Props) {
       const producerResponse = await producerTools.getProducerInfos(token);
 
       if (!producerResponse.success) {
-        console.error(producerResponse.message);
+        console.warn(producerResponse.message);
         return;
       }
 
@@ -89,7 +89,7 @@ export default function HomeScreen({ navigation }: Props) {
       const shopResponse = await shopTools.getShopInfos(token, producer?._id);
 
       if (!shopResponse.success) {
-        console.error(shopResponse.message);
+        console.warn(shopResponse.message);
       }
 
       const shop = shopResponse.data;

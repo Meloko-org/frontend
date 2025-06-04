@@ -12,6 +12,7 @@ const getUserInfos = async (
         Authorization: `Bearer ${token}`,
         mode: "cors",
       },
+      cache: "no-store",
     });
 
     if (!response.ok) {
