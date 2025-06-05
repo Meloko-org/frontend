@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import {
   registerSheet,
   RouteDefinition,
@@ -48,7 +48,6 @@ declare module "react-native-actions-sheet" {
     "product-details": SheetDefinition<{
       payload: {
         stockData?: StockData;
-        cartButton: React.ReactNode;
         unit: string;
       };
     }>;

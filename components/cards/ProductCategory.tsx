@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { Image, Text, View, TouchableOpacity } from "react-native";
 import { GestureResponderEvent } from "react-native";
 import { ProductData } from "../../types/API";

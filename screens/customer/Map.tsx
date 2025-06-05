@@ -11,7 +11,7 @@ import { getSheetStack } from "react-native-actions-sheet";
 import { MarketResultData, ShopResultData } from "../../types/API";
 import { closeIfOpen, handleSheetFlow } from "../../helpers/sheetHelpers";
 
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet, Platform } from "react-native";
 import ShopSearchResultCard from "../../components/cards/ShopSearchResult";
 import MarketSearchResultCard from "../../components/cards/MarketSearchResult";
 import ShopMarkerCard from "../../components/cards/ShopMarkerCard";
@@ -217,7 +217,7 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
       <MapView
         mapType="hybrid"
         showsUserLocation={true}
-        // style={styles.map}
+        style={{ flex: 1, marginBottom: Platform.OS === "android" ? -50 : 0 }}
         className="flex-1"
         region={region}
         userInterfaceStyle="dark"
@@ -274,3 +274,11 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  map: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+});

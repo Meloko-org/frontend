@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import {
   Image,
   Text,
@@ -23,6 +23,7 @@ import BadgeGrey from "../utils/badges/Grey";
 import { useColorScheme } from "nativewind";
 import orderTools from "../../modules/orderTools";
 import { SheetManager } from "react-native-actions-sheet";
+import CartControlButton from "../utils/buttons/CartControlButton";
 
 type CardProductProps = {
   stockData?: StockData & {
@@ -46,104 +47,10 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
     SheetManager.show("product-details", {
       payload: {
         stockData: props.stockData,
-        cartButton: cartButton,
         unit: unit,
       },
     });
   };
-
-  const formatQuantity = (quantity: number, unit?: string) => {
-    if (unit === "gr") {
-      return quantity < 1000
-        ? `${quantity} gr`
-        : `${(quantity / 1000).toFixed(1)} kg`;
-    }
-    return `${quantity}`;
-  };
-
-  const handleAddCartPress = async (): Promise<void> => {
-    if (props.stockData?.shop && props.stockData) {
-      dispatch(
-        addProductToCart({
-          shop: props.stockData.shop,
-          stockData: props.stockData,
-          quantity: props.stockData.product.weight.unit === "gr" ? 100 : 1,
-        }),
-      );
-    }
-  };
-
-  const isInCart = () => {
-    return (
-      cartStore.find((c) => c.shop?._id === props.stockData?.shop?._id) &&
-      cartStore
-        .find((c) => c.shop?._id == props.stockData?.shop?._id)
-        ?.products.find((p) => p.stockData._id === props.stockData?._id)
-    );
-  };
-
-  const cartButton = isInCart() ? (
-    <>
-      {props.quantityControllable && (
-        <TouchableOpacity
-          onPress={() => {
-            if (props.stockData?.shop) {
-              dispatch(
-                increaseCartQuantity({
-                  shopId: props.stockData.shop._id,
-                  stockId: props.stockData._id,
-                  increment:
-                    props.stockData.product.weight.unit === "gr" ? 100 : 1,
-                }),
-              );
-            }
-          }}
-        >
-          <Text className="text-3xl dark:text-lightbg">+</Text>
-        </TouchableOpacity>
-      )}
-      <BadgeGrey extraClasses="px-2">
-        {formatQuantity(
-          cartStore
-            .find((c) => c.shop?._id == props.stockData?.shop?._id)
-            ?.products.find((p) => p.stockData?._id === props.stockData?._id)
-            ?.quantity || 0,
-          props.stockData?.product?.weight?.unit,
-        )}
-      </BadgeGrey>
-      {props.quantityControllable && (
-        <TouchableOpacity
-          onPress={() => {
-            if (props.stockData?.shop) {
-              dispatch(
-                decreaseCartQuantity({
-                  shopId: props.stockData.shop._id,
-                  stockId: props.stockData._id,
-                  decrement:
-                    props.stockData.product.weight.unit === "gr" ? 100 : 1,
-                }),
-              );
-            }
-          }}
-        >
-          <Text className="text-3xl dark:text-lightbg">-</Text>
-        </TouchableOpacity>
-      )}
-    </>
-  ) : props.stockData?.quantity ? (
-    <BadgeGrey extraClasses="px-1">
-      {formatQuantity(
-        props.stockData.quantity,
-        props.stockData.product.weight.unit,
-      )}
-    </BadgeGrey>
-  ) : (
-    <IconButton
-      iconName="cart-plus"
-      onPressFn={() => handleAddCartPress()}
-      extraClasses="h-20 w-full bg-primary"
-    />
-  );
 
   const unit =
     props.stockData?.product.weight.unit === "gr" ? "kg" : "la pièce";
@@ -206,7 +113,10 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
           </View>
 
           <View className="w-1/5 flex flex-column justify-center items-center">
-            {cartButton}
+            <CartControlButton
+              stockData={props.stockData}
+              quantityControllable={props.quantityControllable}
+            />
           </View>
         </View>
       </TouchableOpacity>

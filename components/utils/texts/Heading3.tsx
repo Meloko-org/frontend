@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { Text } from "react-native";
 
 type TextHeading3Props = {
@@ -11,7 +11,7 @@ export default function TextHeading3(props: TextHeading3Props): JSX.Element {
   return (
     <>
       <Text
-        className={`${props.extraClasses} ${props.centered && "text-center"} font-bold text-secondary text-[24px] w-full dark:text-lightbg`}
+        className={`${props.extraClasses} ${props.centered && "text-center"} font-bold text-secondary text-[24px] dark:text-lightbg`}
       >
         {props.children}
       </Text>

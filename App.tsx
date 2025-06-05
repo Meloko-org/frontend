@@ -162,7 +162,7 @@ const TabNavigatorUser: React.FC = () => {
         tabBarIcon: ({ color, size }) => {
           let iconName: string = "";
 
-          if (route.name === "Search") {
+          if (route.name === "MapCustomer") {
             iconName = "search";
           } else if (route.name === "Cart") {
             iconName = "shopping-basket";

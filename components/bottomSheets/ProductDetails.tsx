@@ -4,10 +4,9 @@ import ActionSheet, { SheetProps } from "react-native-actions-sheet";
 import { useColorScheme } from "nativewind";
 import TextHeading2 from "../utils/texts/Heading2";
 import PricePer from "../utils/badges/Dark";
+import CartControlButton from "../utils/buttons/CartControlButton";
 
 export default function ProductDetails(props: SheetProps<"product-details">) {
-  const { colorScheme, toggleColorScheme } = useColorScheme();
-
   return (
     <ActionSheet
       snapPoints={[90]}
@@ -24,7 +23,10 @@ export default function ProductDetails(props: SheetProps<"product-details">) {
           </View>
 
           <View className="w-1/5 flex flex-column justify-center items-center">
-            {props.payload?.cartButton}
+            <CartControlButton
+              stockData={props.payload?.stockData}
+              quantityControllable={true}
+            />
           </View>
         </View>
         <ScrollView

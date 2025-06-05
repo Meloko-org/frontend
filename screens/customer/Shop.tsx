@@ -5,7 +5,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
-import { ShopData, ProductData, StockData } from "../../types/API";
+import {
+  ShopData,
+  ProductData,
+  StockData,
+  ProductCategoryData,
+} from "../../types/API";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser, UserState } from "../../reducers/user";
 import { useAuth } from "@clerk/clerk-expo";
@@ -19,11 +24,11 @@ import BadgeSecondary from "../../components/utils/badges/Secondary";
 import IconButton from "../../components/utils/buttons/Icon";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import CardProduct from "../../components/cards/Product";
-import ButtonBack from "../../components/utils/buttons/Back";
 import ProductCategory from "../../components/cards/ProductCategory";
 import CardNote from "../../components/cards/Note";
 import BackLabelButton from "../../components/utils/buttons/BackLabel";
 import { RouteProp, useRoute } from "@react-navigation/native";
+import TextHeading3 from "../../components/utils/texts/Heading3";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -58,6 +63,7 @@ export default function ShopUserScreen({ navigation }: Props) {
   const [isSearchResultsModalVisible, setIsSearchResultsModalVisible] =
     useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   // Shop recovery
   useEffect(() => {
@@ -137,16 +143,20 @@ export default function ShopUserScreen({ navigation }: Props) {
   };
 
   const handleAllResultsPress = async (): Promise<void> => {
-    setIsSearchResultsModalVisible(true);
+    // setIsSearchResultsModalVisible(true);
+    setIsModalVisible(true);
   };
 
   // Sorting products from categories by clicking
   const handleCategoryClick = (categoryName: string) => {
     const categoryData =
       shopData &&
-      shopData.categories.find((category) => category.name === categoryName);
+      shopData.categories.find(
+        (category: ProductCategoryData) => category.name === categoryName,
+      );
     const filteredProducts = categoryData ? categoryData.products : [];
     setSelectedCategoryProducts(filteredProducts);
+    setSelectedCategory(categoryName);
     setIsModalVisible(true);
   };
 
@@ -166,7 +176,7 @@ export default function ShopUserScreen({ navigation }: Props) {
   const categories =
     shopData &&
     shopData.notes &&
-    shopData.categories.map((category) => {
+    shopData.categories.map((category: ProductCategoryData) => {
       return (
         <ProductCategory
           category={category}
@@ -205,69 +215,19 @@ export default function ShopUserScreen({ navigation }: Props) {
     );
   });
 
+  console.log("shopData :", shopData);
+
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <Modal
-        isVisible={isModalVisible}
-        coverScreen={false}
-        onModalHide={() => setIsSearchResultsModalVisible(false)}
-        style={{ margin: 0 }}
-      >
-        <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-          <View className="flex flex-row mb-5 mt-3">
-            <BackLabelButton
-              backLabel="Retour"
-              onPressFn={() => setIsModalVisible(false)}
-              extraClasses="ml-5 p-1"
-            />
-          </View>
-          <TextHeading4 centered extraClasses="mb-1">
-            Tous les produits
-          </TextHeading4>
-          <View className="flex-1 p-3">
-            <ScrollView showsVerticalScrollIndicator={false} className="w-full">
-              {categoryProducts}
-            </ScrollView>
-          </View>
-        </SafeAreaView>
-      </Modal>
-
-      {searchProduct.length > 0 && (
-        <Modal
-          isVisible={isSearchResultsModalVisible}
-          coverScreen={false}
-          onModalHide={() => setIsSearchResultsModalVisible(false)}
-          style={{ margin: 0 }}
-        >
-          <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-            <View className="p-3">
-              <ButtonBack
-                onPressFn={() => setIsSearchResultsModalVisible(false)}
-              />
-
-              <TextHeading2 extraClasses="mb-4">
-                Tous vos résultats
-              </TextHeading2>
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                className="w-full"
-              >
-                {searchProduct}
-              </ScrollView>
-            </View>
-          </SafeAreaView>
-        </Modal>
-      )}
-
       <View className="flex flex-row mb-2 mt-2">
         <BackLabelButton
           backLabel="Retour aux résultats"
           onPressFn={() => navigation.goBack()}
-          extraClasses="ml-5 pr-2"
+          extraClasses="ml-3 pr-2"
         />
       </View>
 
-      <View className="flex-1">
+      <View className="">
         <ScrollView showsVerticalScrollIndicator={false} className="px-3">
           {shopData && (
             <View className="flex-1">
@@ -375,18 +335,21 @@ export default function ShopUserScreen({ navigation }: Props) {
 
           {searchProduct.length > 0 && (
             <View>
-              <TextHeading2>Votre recherche</TextHeading2>
-              <View className="my-4">{searchProduct.slice(0, 4)}</View>
+              <TextHeading3 centered>Votre recherche</TextHeading3>
+              <View className="my-3">{searchProduct.slice(0, 4)}</View>
               <ButtonPrimaryEnd
                 label={`Tous les résultats (${searchProduct.length})`}
                 iconName="arrow-right"
-                onPressFn={handleAllResultsPress}
-              ></ButtonPrimaryEnd>
+                extraClasses="h-14"
+                onPressFn={() => setIsSearchResultsModalVisible(true)}
+              />
             </View>
           )}
 
-          <View className="my-3">
-            <TextHeading2>Rayons</TextHeading2>
+          <View className="mt-5">
+            <TextHeading3 centered extraClasses="w-full">
+              Rayons
+            </TextHeading3>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -399,6 +362,73 @@ export default function ShopUserScreen({ navigation }: Props) {
           </View>
         </ScrollView>
       </View>
+
+      {/* Modal Résultats de recherche */}
+      {searchProduct.length > 0 && (
+        <Modal
+          isVisible={isSearchResultsModalVisible}
+          coverScreen={false}
+          onModalHide={() => setIsSearchResultsModalVisible(false)}
+          style={{ margin: 0 }}
+        >
+          <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+            <View className="flex flex-row justify-between items-center">
+              <BackLabelButton
+                backLabel="Retour"
+                onPressFn={() => setIsSearchResultsModalVisible(false)}
+                extraClasses="ml-3 pr-2"
+              />
+              <View className="grow">
+                <TextHeading3 centered extraClasses="">
+                  Tous vos résultats
+                </TextHeading3>
+              </View>
+            </View>
+
+            <View className="p-3">
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                className="w-full"
+              >
+                {searchProduct}
+              </ScrollView>
+            </View>
+          </SafeAreaView>
+        </Modal>
+      )}
+
+      {/* Modal Produits de la catégorie */}
+      <Modal
+        isVisible={isModalVisible}
+        coverScreen={false}
+        onModalHide={() => {
+          setIsModalVisible(false);
+          setSelectedCategory(null);
+        }}
+        style={{ margin: 0 }}
+      >
+        <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+          <View className="flex flex-row justify-between items-center">
+            <BackLabelButton
+              backLabel="Retour"
+              onPressFn={() => setIsModalVisible(false)}
+              extraClasses="ml-3 pr-2"
+            />
+            <View className="mr-3">
+              <TextHeading3 extraClasses="">{selectedCategory}</TextHeading3>
+            </View>
+          </View>
+
+          <TextHeading4 centered extraClasses="mb-1">
+            Tous les produits
+          </TextHeading4>
+          <View className="p-3">
+            <ScrollView showsVerticalScrollIndicator={false} className="w-full">
+              {categoryProducts}
+            </ScrollView>
+          </View>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
