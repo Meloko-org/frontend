@@ -26,9 +26,8 @@ import { SheetManager } from "react-native-actions-sheet";
 import CartControlButton from "../utils/buttons/CartControlButton";
 
 type CardProductProps = {
-  stockData?: StockData & {
-    quantity: number;
-  };
+  stockData?: StockData;
+  quantity?: number;
   onPressFn?: ((event: GestureResponderEvent) => void) | undefined;
   extraClasses?: string;
   displayMode: "cart" | "shop" | "withdraw" | "validation" | "detail";
@@ -36,7 +35,15 @@ type CardProductProps = {
   showImage?: boolean;
 };
 
-export default function CardProduct(props: CardProductProps): JSX.Element {
+export default function CardProduct({
+  stockData,
+  quantity,
+  onPressFn,
+  extraClasses,
+  displayMode,
+  quantityControllable,
+  showImage,
+}: CardProductProps): JSX.Element {
   const dispatch = useDispatch();
   const cartStore = useSelector(
     (state: { cart: CartState }) => state.cart.value,
@@ -46,36 +53,47 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
   const showProductDetailsBottomSheet = () => {
     SheetManager.show("product-details", {
       payload: {
-        stockData: props.stockData,
+        stockData: stockData,
         unit: unit,
       },
     });
   };
 
-  const unit =
-    props.stockData?.product.weight.unit === "gr" ? "kg" : "la pièce";
+  console.log(
+    "CARDPRODUCT: stockData :",
+    stockData?.product.family.productsTypes,
+  );
+
+  const isBulk =
+    stockData?.product.family.productsTypes.includes("bulk") ?? false;
+
+  const productName = !isBulk
+    ? stockData?.productCustomName
+    : stockData?.product.family.name + " " + stockData?.product.name;
+
+  const productImage = !isBulk ? stockData?.image : stockData?.product.image;
+
+  const unit = stockData?.product.weight.unit === "gr" ? "kg" : "la pièce";
 
   return (
     <>
       <TouchableOpacity
         onPress={showProductDetailsBottomSheet}
         activeOpacity={0.8}
-        className={`${props.extraClasses} rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary flex flex-row w-full`}
+        className={`${extraClasses} rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary flex flex-row w-full`}
       >
         <View className="flex flex-row items-center w-full">
           <View className="flex flex-row w-4/5">
-            {props.showImage && (
-              <View className="flex flex-row items-center rounded-lg w-auto h-full">
+            {showImage && (
+              <View className="flex flex-row items-center rounded-sm w-auto h-full">
                 <Image
                   source={
-                    props.stockData?.product.image
-                      ? {
-                          uri: props.stockData.product.image,
-                        }
+                    productImage
+                      ? { uri: productImage }
                       : require("../../assets/icon.png")
                   }
-                  className="rounded-full w-20 h-20"
-                  alt={`Illustration du produit ${props.stockData?.product.name}`}
+                  className="rounded-lg w-20 h-20"
+                  alt={`Illustration du produit ${stockData?.product.name}`}
                   resizeMode="cover"
                   width={72}
                   height={48}
@@ -85,37 +103,37 @@ export default function CardProduct(props: CardProductProps): JSX.Element {
 
             <View
               className={`${
-                props.showImage ? "w-3/5" : "w-4/5"
+                showImage ? "w-3/5" : "w-4/5"
               } h-full px-2 items-start`}
             >
-              <TextBody1 extraClasses="mb-1">{`${props.stockData?.product.family.name} ${props.stockData?.product.name}`}</TextBody1>
+              <TextBody1 extraClasses="mb-1">{productName}</TextBody1>
 
-              {props.displayMode === "detail" ? (
+              {displayMode === "detail" ? (
                 <PriceBadge
                   colour="bg-secondary"
                   extraClasses="px-2 py-1"
                   textClasses="font-bold"
                 >
-                  {props.stockData && props.stockData.quantity
+                  {stockData && quantity
                     ? orderTools
                         .getProductCost(
-                          props.stockData?.price.$numberDecimal,
-                          props.stockData?.quantity,
-                          props.stockData?.product.weight.unit,
+                          stockData?.price.$numberDecimal,
+                          quantity,
+                          stockData?.product.weight.unit,
                         )
                         .toFixed(2)
                     : "null"}
                 </PriceBadge>
               ) : (
-                <PricePer>{`${props.stockData?.price.$numberDecimal} € / ${unit}`}</PricePer>
+                <PricePer>{`${stockData?.price.$numberDecimal} € / ${unit}`}</PricePer>
               )}
             </View>
           </View>
 
           <View className="w-1/5 flex flex-column justify-center items-center">
             <CartControlButton
-              stockData={props.stockData}
-              quantityControllable={props.quantityControllable}
+              stockData={stockData!}
+              quantityControllable={quantityControllable}
             />
           </View>
         </View>

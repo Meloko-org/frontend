@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -49,7 +49,7 @@ export default function OpenScreenButton({
       onPress={() => onPressFn()}
     >
       <View
-        className={`${extraClasses} flex flex-row w-auto h-[60px] items-center rounded-lg ${bgColor ? bgColor : "bg-darkbg/20 dark:bg-lightbg/25"}`}
+        className={`${extraClasses} flex flex-row w-auto h-[60px] items-center rounded-lg ${bgColor ? bgColor : "bg-darkbg/10 dark:bg-lightbg/25"}`}
       >
         {switchProps && (
           <View className="w-[60px]">

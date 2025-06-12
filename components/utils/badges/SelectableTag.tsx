@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { JSX, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { TagData } from "../../../types/API";
 
@@ -35,7 +35,7 @@ export default function SelectableTag({
       <View
         className={`
 				${extraClasses} 
-				${toggleOn ? "bg-gray-500 dark:bg-primary" : "bg-gray-300 dark:bg-tertiary"}
+				${toggleOn ? "bg-primary" : "bg-gray-300 dark:bg-tertiary"}
 				rounded-lg border border-primary p-1`}
       >
         <Text

@@ -415,285 +415,286 @@ export default function StocksEditScreen({ navigation }: Props) {
   );
 
   return (
-    <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
-      <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-        <TopBar
-          backLabel={backLabel || "Retour aux stocks"}
-          screen={from || "StockCategories"}
-          label={screenTitle || ""}
-          screenParams={{
-            category: category,
-            family: family,
-          }}
-          extraClasses="mt-2"
-        />
+    <SafeAreaView
+      className="bg-lightbg flex-1 dark:bg-darkbg"
+      edges={["right", "left", "top"]}
+    >
+      <TopBar
+        backLabel={backLabel || "Retour aux stocks"}
+        screen={from || "StockCategories"}
+        label={screenTitle || ""}
+        screenParams={{
+          category: category,
+          family: family,
+        }}
+        extraClasses="mt-2"
+      />
 
-        <ScrollView>
-          <View className="bg-lightbg dark:bg-darkbg p-3">
-            <View className="mb-3">
-              {!isBulk ? (
-                <View className="flex flex-row items-center">
-                  <View className="flex-none w-1/4">
-                    <View className="rounded-lg w-[90px] h-[90px]">
-                      <ImageUploader
-                        size={90}
-                        defaultUri={stockData?.image}
-                        onImageSelected={handleImageSelected}
-                        mediaTypes={["images", "livePhotos"]}
-                        message={`Choisisssez une image\nou prenez une photo.`}
-                      />
-                    </View>
-                  </View>
-                  <View className="grow w-3/4 pl-1">
-                    <InputText
-                      label="NOM DU PRODUIT"
-                      placeholder="Saisissez le nom de votre produit"
-                      value={productCustomName}
-                      twoLines={true}
-                      onChangeText={(value: string) =>
-                        setProductCustomName(value)
-                      }
-                      extraClasses="h-[90px]"
+      <ScrollView>
+        <View className="bg-lightbg dark:bg-darkbg p-3">
+          <View className="mb-3">
+            {!isBulk ? (
+              <View className="flex flex-row items-center">
+                <View className="flex-none w-1/4">
+                  <View className="rounded-lg w-[90px] h-[90px]">
+                    <ImageUploader
+                      size={90}
+                      defaultUri={stockData?.image}
+                      onImageSelected={handleImageSelected}
+                      mediaTypes={["images", "livePhotos"]}
+                      message={`Choisisssez une image\nou prenez une photo.`}
                     />
                   </View>
                 </View>
-              ) : (
-                <View className="flex flex-row">
-                  <View className="flex-none">
-                    <Image
-                      source={
-                        imageAdapted
-                          ? { uri: imageAdapted }
-                          : require("../../assets/icon.png")
-                      }
-                      className="rounded-xl w-20 h-20 mr-3"
-                      alt={`Illustration du produit ${nameAdapted}`}
-                      resizeMode="stretch"
-                      width={96}
-                      height={64}
-                    />
-                  </View>
-                  <View className="flex flex-row grow">
-                    <TextHeading3>
-                      {familyAdpated + " " + nameAdapted}
-                    </TextHeading3>
-                  </View>
+                <View className="grow w-3/4 pl-1">
+                  <InputText
+                    label="NOM DU PRODUIT"
+                    placeholder="Saisissez le nom de votre produit"
+                    value={productCustomName}
+                    twoLines={true}
+                    onChangeText={(value: string) =>
+                      setProductCustomName(value)
+                    }
+                    extraClasses="h-[90px]"
+                  />
                 </View>
-              )}
-            </View>
-
-            <View className="flex flex-row items-center space-x-2 mb-1">
-              <View className="flex-1">
-                <TextBody1 extraClasses="font-bold">VENDU PAR</TextBody1>
               </View>
-              {isBulk ? (
-                <View className="flex flex-row justify-end w-36 mr-2">
-                  <Text className="font-bold text-xl text-secondray dark:text-lightbg">
-                    {weightPerUnit}
-                  </Text>
+            ) : (
+              <View className="flex flex-row">
+                <View className="flex-none">
+                  <Image
+                    source={
+                      imageAdapted
+                        ? { uri: imageAdapted }
+                        : require("../../assets/icon.png")
+                    }
+                    className="rounded-xl w-20 h-20 mr-3"
+                    alt={`Illustration du produit ${nameAdapted}`}
+                    resizeMode="stretch"
+                    width={96}
+                    height={64}
+                  />
                 </View>
-              ) : (
-                <TextInput
-                  className="bg-white rounded-lg w-36 text-right text-xl leading-5 pr-2"
-                  value={weightPerUnit}
-                  onChangeText={(value: string) => setWeightPerUnit(value)}
-                />
-              )}
-            </View>
-
-            <View className="flex flex-row items-center space-x-2 mb-1">
-              <View className="flex-1">
-                <TextBody1 extraClasses="font-bold">PRIX</TextBody1>
+                <View className="flex flex-row grow">
+                  <TextHeading3>
+                    {familyAdpated + " " + nameAdapted}
+                  </TextHeading3>
+                </View>
               </View>
-              <View className="flex flex-row justify-end items-center mr-2">
-                <TextInput
-                  className="bg-white rounded-lg w-36 text-right text-xl leading-5 pr-2"
-                  value={price?.toString() ?? ""}
-                  onChangeText={(value: string) => setPrice(Number(value))}
-                  keyboardType="numeric"
-                />
-                <Text className="font-bold text-xl text-secondary dark:text-lightbg ml-2">
-                  €
+            )}
+          </View>
+
+          <View className="flex flex-row items-center space-x-2 mb-1">
+            <View className="flex-1">
+              <TextBody1 extraClasses="font-bold">VENDU PAR</TextBody1>
+            </View>
+            {isBulk ? (
+              <View className="flex flex-row justify-end w-36 mr-2">
+                <Text className="font-bold text-xl text-secondray dark:text-lightbg">
+                  {weightPerUnit}
                 </Text>
               </View>
-            </View>
-
-            <View className="flex flex-row items-center space-x-2 mb-1">
-              <View className="flex-1">
-                <TextBody1 extraClasses="font-bold">QUANTITÉ</TextBody1>
-              </View>
-              <View className="flex flex-row items-center justify-end w-48 my-3">
-                <IconButton
-                  iconName="minus"
-                  iconColor="#ffffff"
-                  extraClasses="bg-primary px-2 ml-2"
-                  size={30}
-                  onPressFn={() => handleQuantityChange(-1)}
-                />
-                <View className="flex flex-row justify-center w-24">
-                  <TextInput
-                    className="bg-white rounded-lg w-14 text-right text-xl leading-5 pr-2"
-                    value={stock?.toString() ?? ""}
-                    onChangeText={(value: string) => setStock(Number(value))}
-                    keyboardType="numeric"
-                  />
-                </View>
-                <IconButton
-                  iconName="plus"
-                  iconColor="#ffffff"
-                  extraClasses="bg-primary px-2"
-                  size={30}
-                  onPressFn={() => handleQuantityChange(+1)}
-                />
-              </View>
-            </View>
-
-            <InputTextarea
-              label="DESCRIPTION"
-              placeholder="Saisir une description"
-              value={description}
-              onChangeText={(value: string) => setDescription(value)}
-              extraClasses="mb-5 h-64"
-              numberOfLines={9}
-            />
-
-            {!isBulk && (
-              <>
-                <View className="flex flex-row items-center space-x-2 mb-1">
-                  <View className="flex-1">
-                    <TextBody1 extraClasses="font-bold">PRIX AU KILO</TextBody1>
-                  </View>
-                  <View className="flex flex-row justify-end items-center mr-2">
-                    <TextInput
-                      className="bg-white rounded-lg w-36 text-right text-xl leading-5 pr-2"
-                      value={pricePerKilo?.toString() ?? ""}
-                      onChangeText={(value: string) =>
-                        setPricePerKilo(Number(value))
-                      }
-                      keyboardType="numeric"
-                    />
-                    <Text className="font-bold text-xl text-secondary dark:text-lightbg ml-2">
-                      €
-                    </Text>
-                  </View>
-                </View>
-
-                <View className="flex flex-row items-center space-x-2 mb-1">
-                  <View className="flex-1">
-                    <TextBody1 extraClasses="font-bold">ORIGINE</TextBody1>
-                  </View>
-                  <TextInput
-                    className="bg-white rounded-xl w-60 text-right text-xl leading-5 pr-2"
-                    value={origin}
-                    onChangeText={(value: string) => setOrigin(value)}
-                  />
-                </View>
-
-                <View className="flex flex-row items-center space-x-2 mb-1">
-                  <View className="flex-1">
-                    <TextBody1 extraClasses="font-bold">FORMAT</TextBody1>
-                  </View>
-                  <TextInput
-                    className="bg-white rounded-lg w-60 text-right text-xl leading-5 pr-2"
-                    value={format}
-                    onChangeText={(value: string) => setFormat(value)}
-                  />
-                </View>
-
-                <View className="flex flex-row items-center space-x-2 mb-1">
-                  <View className="flex-1">
-                    <TextBody1 extraClasses="font-bold">PORTION</TextBody1>
-                  </View>
-                  <TextInput
-                    className="bg-white rounded-lg w-60 text-right text-xl leading-5 pr-2"
-                    value={portion}
-                    onChangeText={(value: string) => setPortion(value)}
-                  />
-                </View>
-
-                <View className="flex flex-row items-center space-x-2 mb-1">
-                  <View className="flex-1">
-                    <TextBody1 extraClasses="font-bold">{`DLC A\nRECEPTION`}</TextBody1>
-                  </View>
-                  <TextInput
-                    className="bg-white rounded-lg w-60 text-right text-xl leading-5 pr-2"
-                    value={bestBeforeDate}
-                    onChangeText={(value: string) => setBestBeforeDate(value)}
-                  />
-                </View>
-              </>
+            ) : (
+              <TextInput
+                className="bg-white rounded-lg w-36 text-right text-xl leading-5 pr-2"
+                value={weightPerUnit}
+                onChangeText={(value: string) => setWeightPerUnit(value)}
+              />
             )}
+          </View>
 
-            <TextBody1 extraClasses="font-bold mt-5 mb-2">
-              TAGS SUGGÉRÉS
-            </TextBody1>
-            <View className="flex flex-row flex-wrap">
-              {suggestedTags?.map((tag) => (
-                <SelectableTag
-                  key={tag._id}
-                  tag={tag}
-                  onPressFn={() => toggleTag(tag)}
-                  extraClasses="mr-2 mb-2"
-                  selected={isTagSelected(tag._id)}
-                />
-              ))}
+          <View className="flex flex-row items-center space-x-2 mb-1">
+            <View className="flex-1">
+              <TextBody1 extraClasses="font-bold">PRIX</TextBody1>
             </View>
-            <TextBody1 extraClasses="font-bold mt-5 mb-2">
-              TOUS LES TAGS
-            </TextBody1>
-            <View className="flex flex-row flex-wrap">
-              {remaingingTags?.map((tag) => (
-                <SelectableTag
-                  key={tag._id}
-                  tag={tag}
-                  onPressFn={() => toggleTag(tag)}
-                  extraClasses="mr-2 mb-2"
-                  selected={isTagSelected(tag._id)}
-                />
-              ))}
+            <View className="flex flex-row justify-end items-center mr-2">
+              <TextInput
+                className="bg-white rounded-lg w-36 text-right text-xl leading-5 pr-2"
+                value={price?.toString() ?? ""}
+                onChangeText={(value: string) => setPrice(Number(value))}
+                keyboardType="numeric"
+              />
+              <Text className="font-bold text-xl text-secondary dark:text-lightbg ml-2">
+                €
+              </Text>
             </View>
           </View>
-        </ScrollView>
 
-        <View className="flex flex-row px-3 py-2 bg-lightbg dark:bg-darkbg">
-          {!newProductMode && (
-            <>
-              <View className="w-1/6">
-                <IconButton
-                  iconName="trash"
-                  iconFamily="FontAwesome5Icon"
-                  iconColor="white"
-                  onPressFn={() => handleDeleteProduct(stockData?._id!)}
-                  size={25}
-                  extraClasses="bg-danger h-14 mr-1"
+          <View className="flex flex-row items-center space-x-2 mb-1">
+            <View className="flex-1">
+              <TextBody1 extraClasses="font-bold">QUANTITÉ</TextBody1>
+            </View>
+            <View className="flex flex-row items-center justify-end w-48 my-3">
+              <IconButton
+                iconName="minus"
+                iconColor="#ffffff"
+                extraClasses="bg-primary px-2 ml-2"
+                size={30}
+                onPressFn={() => handleQuantityChange(-1)}
+              />
+              <View className="flex flex-row justify-center w-24">
+                <TextInput
+                  className="bg-white rounded-lg w-14 text-right text-xl leading-5 pr-2"
+                  value={stock?.toString() ?? ""}
+                  onChangeText={(value: string) => setStock(Number(value))}
+                  keyboardType="numeric"
                 />
               </View>
-              <View className="w-2/6">
-                <SecondaryButton
-                  label={`Dupliquer\nproduit`}
-                  extraClasses="h-14 mr-1"
-                  textClasses="text-sm"
-                  onPressFn={() => {}}
-                  disabled={false}
-                  isLoading={false}
+              <IconButton
+                iconName="plus"
+                iconColor="#ffffff"
+                extraClasses="bg-primary px-2"
+                size={30}
+                onPressFn={() => handleQuantityChange(+1)}
+              />
+            </View>
+          </View>
+
+          <InputTextarea
+            label="DESCRIPTION"
+            placeholder="Saisir une description"
+            value={description}
+            onChangeText={(value: string) => setDescription(value)}
+            extraClasses="mb-5 h-64"
+            numberOfLines={9}
+          />
+
+          {!isBulk && (
+            <>
+              <View className="flex flex-row items-center space-x-2 mb-1">
+                <View className="flex-1">
+                  <TextBody1 extraClasses="font-bold">PRIX AU KILO</TextBody1>
+                </View>
+                <View className="flex flex-row justify-end items-center mr-2">
+                  <TextInput
+                    className="bg-white rounded-lg w-36 text-right text-xl leading-5 pr-2"
+                    value={pricePerKilo?.toString() ?? ""}
+                    onChangeText={(value: string) =>
+                      setPricePerKilo(Number(value))
+                    }
+                    keyboardType="numeric"
+                  />
+                  <Text className="font-bold text-xl text-secondary dark:text-lightbg ml-2">
+                    €
+                  </Text>
+                </View>
+              </View>
+
+              <View className="flex flex-row items-center space-x-2 mb-1">
+                <View className="flex-1">
+                  <TextBody1 extraClasses="font-bold">ORIGINE</TextBody1>
+                </View>
+                <TextInput
+                  className="bg-white rounded-xl w-60 text-right text-xl leading-5 pr-2"
+                  value={origin}
+                  onChangeText={(value: string) => setOrigin(value)}
+                />
+              </View>
+
+              <View className="flex flex-row items-center space-x-2 mb-1">
+                <View className="flex-1">
+                  <TextBody1 extraClasses="font-bold">FORMAT</TextBody1>
+                </View>
+                <TextInput
+                  className="bg-white rounded-lg w-60 text-right text-xl leading-5 pr-2"
+                  value={format}
+                  onChangeText={(value: string) => setFormat(value)}
+                />
+              </View>
+
+              <View className="flex flex-row items-center space-x-2 mb-1">
+                <View className="flex-1">
+                  <TextBody1 extraClasses="font-bold">PORTION</TextBody1>
+                </View>
+                <TextInput
+                  className="bg-white rounded-lg w-60 text-right text-xl leading-5 pr-2"
+                  value={portion}
+                  onChangeText={(value: string) => setPortion(value)}
+                />
+              </View>
+
+              <View className="flex flex-row items-center space-x-2 mb-1">
+                <View className="flex-1">
+                  <TextBody1 extraClasses="font-bold">{`DLC A\nRECEPTION`}</TextBody1>
+                </View>
+                <TextInput
+                  className="bg-white rounded-lg w-60 text-right text-xl leading-5 pr-2"
+                  value={bestBeforeDate}
+                  onChangeText={(value: string) => setBestBeforeDate(value)}
                 />
               </View>
             </>
           )}
 
-          <View
-            className={`${newProductMode ? "flex flex-row justify-center w-full" : "w-3/6"}`}
-          >
-            <PrimaryButton
-              label="Sauvegarder"
-              disabled={isSaveLoading}
-              onPressFn={handleSaveProduct}
-              isLoading={isSaveLoading}
-              extraClasses="h-14"
-            />
+          <TextBody1 extraClasses="font-bold mt-5 mb-2">
+            TAGS SUGGÉRÉS
+          </TextBody1>
+          <View className="flex flex-row flex-wrap">
+            {suggestedTags?.map((tag) => (
+              <SelectableTag
+                key={tag._id}
+                tag={tag}
+                onPressFn={() => toggleTag(tag)}
+                extraClasses="mr-2 mb-2"
+                selected={isTagSelected(tag._id)}
+              />
+            ))}
+          </View>
+          <TextBody1 extraClasses="font-bold mt-5 mb-2">
+            TOUS LES TAGS
+          </TextBody1>
+          <View className="flex flex-row flex-wrap">
+            {remaingingTags?.map((tag) => (
+              <SelectableTag
+                key={tag._id}
+                tag={tag}
+                onPressFn={() => toggleTag(tag)}
+                extraClasses="mr-2 mb-2"
+                selected={isTagSelected(tag._id)}
+              />
+            ))}
           </View>
         </View>
-      </SafeAreaView>
-    </View>
+      </ScrollView>
+
+      <View className="flex flex-row px-3 py-2 bg-lightbg dark:bg-darkbg">
+        {!newProductMode && (
+          <>
+            <View className="w-1/6">
+              <IconButton
+                iconName="trash"
+                iconFamily="FontAwesome5Icon"
+                iconColor="white"
+                onPressFn={() => handleDeleteProduct(stockData?._id!)}
+                size={25}
+                extraClasses="bg-danger h-14 mr-1"
+              />
+            </View>
+            <View className="w-2/6">
+              <SecondaryButton
+                label={`Dupliquer\nproduit`}
+                extraClasses="h-14 mr-1"
+                textClasses="text-sm"
+                onPressFn={() => {}}
+                disabled={false}
+                isLoading={false}
+              />
+            </View>
+          </>
+        )}
+
+        <View
+          className={`${newProductMode ? "flex flex-row justify-center w-full" : "w-3/6"}`}
+        >
+          <PrimaryButton
+            label="Sauvegarder"
+            disabled={isSaveLoading}
+            onPressFn={handleSaveProduct}
+            isLoading={isSaveLoading}
+            extraClasses="h-14"
+          />
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }

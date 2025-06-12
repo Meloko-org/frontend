@@ -85,6 +85,7 @@ import shop from "./reducers/shop";
 import stocks from "./reducers/stocks";
 import producer from "./reducers/producer";
 import orders from "./reducers/orders";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const reducers = combineReducers({
   user,
@@ -461,21 +462,23 @@ export default function App() {
           >
             <ClerkLoaded>
               <SheetProvider>
-                <NavigationContainer>
-                  <Stack.Navigator screenOptions={options}>
-                    <Stack.Screen name="Home" component={HomeScreen} />
-                    <Stack.Screen name="SignUp" component={SignUpScreen} />
-                    <Stack.Screen name="SignIn" component={SignInScreen} />
-                    <Stack.Screen
-                      name="TabNavigatorUser"
-                      component={TabNavigatorUser}
-                    />
-                    <Stack.Screen
-                      name="TabNavigatorProducer"
-                      component={TabNavigatorProducer}
-                    />
-                  </Stack.Navigator>
-                </NavigationContainer>
+                <SafeAreaProvider>
+                  <NavigationContainer>
+                    <Stack.Navigator screenOptions={options}>
+                      <Stack.Screen name="Home" component={HomeScreen} />
+                      <Stack.Screen name="SignUp" component={SignUpScreen} />
+                      <Stack.Screen name="SignIn" component={SignInScreen} />
+                      <Stack.Screen
+                        name="TabNavigatorUser"
+                        component={TabNavigatorUser}
+                      />
+                      <Stack.Screen
+                        name="TabNavigatorProducer"
+                        component={TabNavigatorProducer}
+                      />
+                    </Stack.Navigator>
+                  </NavigationContainer>
+                </SafeAreaProvider>
               </SheetProvider>
             </ClerkLoaded>
           </ClerkProvider>

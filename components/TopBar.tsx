@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { JSX, useEffect } from "react";
 
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -26,17 +26,9 @@ export default function TopBar({
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  // useEffect(() => {
-  //   console.log("-- TOPBAR ------")
-  //   console.log("label:", label);
-  //   console.log("backLabel:", backLabel);
-  //   console.log("screen:", screen);
-  //   console.log("screenParams:", screenParams);
-  // }, [])
-
   return (
     <View
-      className={`${extraClasses} flex flex-row justify-between items-center px-2 mb-5`}
+      className={`h-10 flex flex-row justify-between items-center px-2 ${extraClasses}`}
     >
       <View>
         <BackLabelButton

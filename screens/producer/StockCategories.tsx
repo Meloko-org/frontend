@@ -85,7 +85,7 @@ export default function StockCategoriesScreen({ navigation }: Props) {
     const stocksResponse = await stocksTools.getStocksByShop(shopId);
 
     if (!stocksResponse.success) {
-      console.error(stocksResponse.message);
+      console.warn(stocksResponse.message);
       return;
     }
 
@@ -202,22 +202,23 @@ export default function StockCategoriesScreen({ navigation }: Props) {
   }, [shopStore?.products, globalCategories, stocksStore]);
 
   return (
-    <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
-      <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-        <TopBar
-          backLabel={backLabel || "Retour à la boutique"}
-          screen={from || "ShopProducer"}
-          label={screenTitle || "GESTION\nDES STOCKS"}
-          extraClasses="mt-2"
-        />
-        <ScrollView>
-          {isFetchLoading ? (
-            <Spinner />
-          ) : (
-            <View className="px-3">{openScreenButtons}</View>
-          )}
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+    <SafeAreaView
+      className="bg-lightbg flex-1 dark:bg-darkbg"
+      edges={["right", "left", "top"]}
+    >
+      <TopBar
+        backLabel={backLabel || "Retour à la boutique"}
+        screen={from || "ShopProducer"}
+        label={screenTitle || "GESTION\nDES STOCKS"}
+        extraClasses="my-2"
+      />
+      <ScrollView>
+        {isFetchLoading ? (
+          <Spinner />
+        ) : (
+          <View className="px-3">{openScreenButtons}</View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }

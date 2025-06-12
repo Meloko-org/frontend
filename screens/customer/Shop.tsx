@@ -10,6 +10,8 @@ import {
   ProductData,
   StockData,
   ProductCategoryData,
+  ProductCategoryCardData,
+  CardProductData,
 } from "../../types/API";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser, UserState } from "../../reducers/user";
@@ -29,6 +31,7 @@ import CardNote from "../../components/cards/Note";
 import BackLabelButton from "../../components/utils/buttons/BackLabel";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import TextHeading3 from "../../components/utils/texts/Heading3";
+import shopTools from "../../modules/shopTools";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -148,14 +151,20 @@ export default function ShopUserScreen({ navigation }: Props) {
   };
 
   // Sorting products from categories by clicking
-  const handleCategoryClick = (categoryName: string) => {
-    const categoryData =
-      shopData &&
-      shopData.categories.find(
-        (category: ProductCategoryData) => category.name === categoryName,
-      );
-    const filteredProducts = categoryData ? categoryData.products : [];
-    setSelectedCategoryProducts(filteredProducts);
+  const handleCategoryClick = async (categoryName: string) => {
+    const stocksResponse = await shopTools.getStocksByshopAndCategory(
+      shopId,
+      categoryName,
+    );
+
+    if (!stocksResponse.success) {
+      console.warn(stocksResponse.message);
+      return;
+    }
+
+    console.log("SHOPUSER: stocksResponse :", stocksResponse.data);
+
+    setSelectedCategoryProducts(stocksResponse.data);
     setSelectedCategory(categoryName);
     setIsModalVisible(true);
   };
@@ -176,7 +185,7 @@ export default function ShopUserScreen({ navigation }: Props) {
   const categories =
     shopData &&
     shopData.notes &&
-    shopData.categories.map((category: ProductCategoryData) => {
+    shopData.categories.map((category: ProductCategoryCardData) => {
       return (
         <ProductCategory
           category={category}
@@ -188,7 +197,7 @@ export default function ShopUserScreen({ navigation }: Props) {
     });
 
   // Formatting search product
-  const searchProduct = searchProducts.map((stockData, i) => {
+  const searchProduct = searchProducts?.map((stockData, i) => {
     return (
       <CardProduct
         stockData={stockData}
@@ -215,7 +224,7 @@ export default function ShopUserScreen({ navigation }: Props) {
     );
   });
 
-  console.log("shopData :", shopData);
+  // console.log("SHOPUSER: selectedCategoryProducts :", JSON.stringify(selectedCategoryProducts, null, 2))
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -228,7 +237,7 @@ export default function ShopUserScreen({ navigation }: Props) {
       </View>
 
       <View className="">
-        <ScrollView showsVerticalScrollIndicator={false} className="px-3">
+        <ScrollView showsVerticalScrollIndicator={false} className="px-3 mb-5">
           {shopData && (
             <View className="flex-1">
               <View>

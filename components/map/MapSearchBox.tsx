@@ -154,15 +154,15 @@ const MapSearchBox = forwardRef(function MapSearchBox(
   };
 
   const onSearchPress = async (): Promise<void> => {
-    if (!searchOptions.query.trim()) {
-      SheetManager.show("alert", {
-        payload: {
-          message: "Indiquez votre recherche",
-          alertType: "warning",
-        },
-      });
-      return;
-    }
+    // if (!searchOptions.query.trim()) {
+    //   SheetManager.show("alert", {
+    //     payload: {
+    //       message: "Indiquez votre recherche",
+    //       alertType: "warning",
+    //     },
+    //   });
+    //   return;
+    // }
 
     setIsSearchLoading(true);
     let canSearch = true;
@@ -213,7 +213,7 @@ const MapSearchBox = forwardRef(function MapSearchBox(
       });
       const data = await response.json();
 
-      console.log("databack :", data);
+      // console.log("databack :", JSON.stringify(data, null, 2));
 
       if (refrechResultsFn) {
         if (searchOptions.searchType === "shop") {

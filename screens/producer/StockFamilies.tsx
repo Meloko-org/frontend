@@ -101,12 +101,15 @@ export default function StockFamiliesScreen({ navigation }: Props) {
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
-      <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+      <SafeAreaView
+        className="bg-lightbg flex-1 dark:bg-darkbg"
+        edges={["right", "left", "top"]}
+      >
         <TopBar
           backLabel={backLabel || "Retour aux catégories"}
           screen={from || "StockCategories"}
           label={screenTitle || "CHOIX\n" + category}
-          extraClasses="mt-2"
+          extraClasses="my-2"
         />
 
         <ScrollView>
@@ -116,7 +119,7 @@ export default function StockFamiliesScreen({ navigation }: Props) {
         <View className="px-3 my-3">
           <OpenScreenButton
             label={`Ajouter une catégorie de ${category}`}
-            bgColor="bg-tertiary"
+            // bgColor="bg-tertiary"
             onPressFn={() => {
               SheetManager.show("product-families", {
                 payload: {

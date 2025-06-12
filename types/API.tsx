@@ -36,6 +36,11 @@ type ProductData = {
   weight: WeightData;
 };
 
+type CardProductData = {
+  stockData: StockData;
+  quantity: number;
+};
+
 type ProductType = "bulk" | "classic" | "both";
 
 type ProductFamilyData = {
@@ -54,6 +59,10 @@ type ProductCategoryData = {
   description: string;
   image: string;
   type: string;
+};
+
+type ProductCategoryCardData = ProductCategoryData & {
+  products?: ProductData[];
 };
 
 type ProductsTypesByCategory = {
@@ -260,6 +269,7 @@ type OrderSummary = {
 export type {
   UserAddressData,
   ProductData,
+  CardProductData,
   ShopData,
   ShopResultData,
   UserData,
@@ -274,6 +284,7 @@ export type {
   ProducerData,
   ProductFamilyData,
   ProductCategoryData,
+  ProductCategoryCardData,
   ProductsTypesByCategory,
   AddressData,
   ClickCollectData,

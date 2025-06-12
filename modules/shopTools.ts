@@ -131,6 +131,44 @@ const updateShopOffline = async (
   }
 };
 
+const getStocksByshopAndCategory = async (
+  shopId: string | undefined,
+  categoryName: string,
+) => {
+  try {
+    const response = await fetch(
+      `${API_ROOT}/shops/${shopId}/stocks-by-category/${encodeURIComponent(categoryName)}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          mode: "cors",
+        },
+      },
+    );
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible de récupérer les stocks.`,
+      };
+    }
+
+    const data = await response.json();
+
+    return data.success
+      ? { success: true, data: data.stocks }
+      : { success: false, data: null, message: data.message };
+  } catch (error) {
+    return {
+      success: false,
+      data: null,
+      message: "Une erreur s'est produite lors de la récupération des stocks.",
+    };
+  }
+};
+
 type Period = {
   openingTime: string | null;
   closingTime: string | null;
@@ -325,6 +363,7 @@ export default {
   updateShopOffline,
   updateShopTypes,
   getShopInfos,
+  getStocksByshopAndCategory,
   updateClickCollect,
   getMarkets,
   addShopMarkets,

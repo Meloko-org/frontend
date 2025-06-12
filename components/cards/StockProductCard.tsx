@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { JSX, useState } from "react";
 import { TouchableOpacity, View, Image } from "react-native";
 import { StockData, TagData } from "../../types/API";
 import TextBody1 from "../utils/texts/Body1";
@@ -26,7 +26,7 @@ export default function StockProductCard({
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`${Number(stock.stock.$numberDecimal) === 0 ? "bg-danger/80" : "bg-lightbg dark:bg-tertiary"} rounded-lg  p-2 mb-2`}
+      className={`${Number(stock.stock.$numberDecimal) === 0 ? "bg-danger/80" : "bg-white dark:bg-tertiary"} shadow-lg rounded-lg  p-2 mb-2`}
     >
       <View className="flex flex-row items-center w-full">
         <View className="rounded-lg w-1/4">
