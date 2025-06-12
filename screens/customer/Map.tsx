@@ -164,12 +164,14 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
             <Callout
               tooltip={false}
               onPress={() => {
+                const sheetId = getSheetStack()[0].id;
                 navigation.navigate("ShopUser", {
                   shopId: data?.shop?._id,
                   distance: data?.distance,
                   relevantProducts: data?.relevantProducts
                     ? data.relevantProducts
                     : [],
+                  sheetId: sheetId,
                 });
               }}
             >
@@ -230,8 +232,8 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
           ref={mapSearchBoxRef}
           refrechResultsFn={(
             type: string,
-            newShopResults: ShopResultData[],
-            newMarketResults: MarketResultData[],
+            newShopResults: ShopResultData[] | null,
+            newMarketResults: MarketResultData[] | null,
           ) => {
             const hasShopResults = newShopResults && newShopResults.length > 0;
             const hasMarketResults =
@@ -274,11 +276,3 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  map: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-  },
-});

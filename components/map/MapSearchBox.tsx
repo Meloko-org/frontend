@@ -36,8 +36,8 @@ type searchOptions = {
 type Props = {
   refrechResultsFn?: (
     type: string,
-    newShopResults: ShopResultData[],
-    newMarketResults: MarketResultData[],
+    newShopResults: ShopResultData[] | null,
+    newMarketResults: MarketResultData[] | null,
   ) => void;
 };
 
@@ -154,16 +154,6 @@ const MapSearchBox = forwardRef(function MapSearchBox(
   };
 
   const onSearchPress = async (): Promise<void> => {
-    // if (!searchOptions.query.trim()) {
-    //   SheetManager.show("alert", {
-    //     payload: {
-    //       message: "Indiquez votre recherche",
-    //       alertType: "warning",
-    //     },
-    //   });
-    //   return;
-    // }
-
     setIsSearchLoading(true);
     let canSearch = true;
 
