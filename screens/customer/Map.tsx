@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
@@ -151,65 +157,116 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
     }
   }, [marketResults]);
 
-  const markers = shopResults
-    ? shopResults.map((data: ShopResultData, i) => {
-        return (
-          <Marker
-            key={i}
-            coordinate={{
-              latitude: Number(data?.shop?.address.latitude?.$numberDecimal),
-              longitude: Number(data?.shop?.address.longitude?.$numberDecimal),
+  const markers = useMemo(() => {
+    if (shopResults && shopResults.length > 0) {
+      return shopResults.map((data, i) => (
+        <Marker
+          key={`shop-${data?.shop?._id}`}
+          coordinate={{
+            latitude: Number(data?.shop?.address.latitude?.$numberDecimal),
+            longitude: Number(data?.shop?.address.longitude?.$numberDecimal),
+          }}
+        >
+          <Callout
+            onPress={() => {
+              const sheetId = getSheetStack()[0].id;
+              navigation.navigate("ShopUser", {
+                shopId: data?.shop?._id,
+                distance: data?.distance,
+                relevantProducts: data?.relevantProducts || [],
+                sheetId,
+              });
             }}
           >
-            <Callout
-              tooltip={false}
-              onPress={() => {
-                const sheetId = getSheetStack()[0].id;
-                navigation.navigate("ShopUser", {
-                  shopId: data?.shop?._id,
-                  distance: data?.distance,
-                  relevantProducts: data?.relevantProducts
-                    ? data.relevantProducts
-                    : [],
-                  sheetId: sheetId,
-                });
-              }}
-            >
-              <View>
-                <ShopMarkerCard key={data?.shop?._id} shopData={data.shop} />
-              </View>
-            </Callout>
-          </Marker>
-        );
-      })
-    : marketResults?.map((data: MarketResultData, i) => {
-        return (
-          <Marker
-            key={i}
-            coordinate={{
-              latitude: Number(data?.market.address.latitude?.$numberDecimal),
-              longitude: Number(data?.market.address.longitude?.$numberDecimal),
-            }}
-            pinColor="green"
-          >
-            <Callout
-              // tooltip={true}
-              onPress={() => {
-                console.log("youpi");
-              }}
-            >
-              <View>
-                <MarketMarkerCard
-                  key={data?.market._id}
-                  marketData={data.market}
-                  shops={data?.shops}
-                  distance={data?.distance}
-                />
-              </View>
-            </Callout>
-          </Marker>
-        );
-      });
+            <ShopMarkerCard shopData={data.shop} />
+          </Callout>
+        </Marker>
+      ));
+    }
+
+    if (marketResults && marketResults.length > 0) {
+      return marketResults.map((data, i) => (
+        <Marker
+          key={`market-${data?.market?._id}`}
+          coordinate={{
+            latitude: Number(data?.market.address.latitude?.$numberDecimal),
+            longitude: Number(data?.market.address.longitude?.$numberDecimal),
+          }}
+          pinColor="green"
+        >
+          <Callout onPress={() => console.log("youpi")}>
+            <MarketMarkerCard
+              marketData={data.market}
+              shops={data?.shops}
+              distance={data?.distance}
+            />
+          </Callout>
+        </Marker>
+      ));
+    }
+
+    return null;
+  }, [shopResults, marketResults]);
+
+  // const markers = shopResults
+  //   ? shopResults.map((data: ShopResultData, i) => {
+  //       return (
+  //         <Marker
+  //           key={i}
+  //           coordinate={{
+  //             latitude: Number(data?.shop?.address.latitude?.$numberDecimal),
+  //             longitude: Number(data?.shop?.address.longitude?.$numberDecimal),
+  //           }}
+  //         >
+  //           <Callout
+  //             tooltip={false}
+  //             onPress={() => {
+  //               const sheetId = getSheetStack()[0].id;
+  //               navigation.navigate("ShopUser", {
+  //                 shopId: data?.shop?._id,
+  //                 distance: data?.distance,
+  //                 relevantProducts: data?.relevantProducts
+  //                   ? data.relevantProducts
+  //                   : [],
+  //                 sheetId: sheetId,
+  //               });
+  //             }}
+  //           >
+  //             <View>
+  //               <ShopMarkerCard key={data?.shop?._id} shopData={data.shop} />
+  //             </View>
+  //           </Callout>
+  //         </Marker>
+  //       );
+  //     })
+  //   : marketResults?.map((data: MarketResultData, i) => {
+  //       return (
+  //         <Marker
+  //           key={i}
+  //           coordinate={{
+  //             latitude: Number(data?.market.address.latitude?.$numberDecimal),
+  //             longitude: Number(data?.market.address.longitude?.$numberDecimal),
+  //           }}
+  //           pinColor="green"
+  //         >
+  //           <Callout
+  //             // tooltip={true}
+  //             onPress={() => {
+  //               console.log("youpi");
+  //             }}
+  //           >
+  //             <View>
+  //               <MarketMarkerCard
+  //                 key={data?.market._id}
+  //                 marketData={data.market}
+  //                 shops={data?.shops}
+  //                 distance={data?.distance}
+  //               />
+  //             </View>
+  //           </Callout>
+  //         </Marker>
+  //       );
+  //     });
 
   // console.log("shopResults :", shopResults)
   // console.log("marketResults :", marketResults)
@@ -241,6 +298,7 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
 
             if (type === "shop") {
               if (!hasShopResults) {
+                setShopResults([]);
                 handleSheetFlow({
                   sheet: "map-empty-search-results",
                   payload: {
@@ -255,6 +313,7 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
                 setMarketResults(null);
               }
             } else {
+              setShopResults(null);
               if (!hasMarketResults) {
                 handleSheetFlow({
                   sheet: "map-empty-search-results",

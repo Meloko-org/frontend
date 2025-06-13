@@ -62,7 +62,7 @@ const MapSearchBox = forwardRef(function MapSearchBox(
     query: "",
     address: "",
     radius: {
-      value: [40],
+      value: [20],
     },
     userPosition: {
       latitude: 0,
