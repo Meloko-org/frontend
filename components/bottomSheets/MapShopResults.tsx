@@ -1,9 +1,10 @@
 import React, { useRef, useState } from "react";
-import { View, ScrollView } from "react-native";
+import { View } from "react-native";
 import ActionSheet, {
   ActionSheetRef,
   SheetManager,
   SheetProps,
+  ScrollView,
 } from "react-native-actions-sheet";
 import { useColorScheme } from "nativewind";
 import TextHeading3 from "../utils/texts/Heading3";
