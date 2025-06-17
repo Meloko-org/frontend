@@ -13,7 +13,11 @@ import { Region } from "react-native-maps";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
 
-import { getSheetStack } from "react-native-actions-sheet";
+import {
+  ActionSheetRef,
+  getSheetStack,
+  SheetManager,
+} from "react-native-actions-sheet";
 import { MarketResultData, ShopResultData } from "../../types/API";
 import { closeIfOpen, handleSheetFlow } from "../../helpers/sheetHelpers";
 
@@ -24,31 +28,34 @@ import ShopMarkerCard from "../../components/cards/ShopMarkerCard";
 import MapSearchBox from "../../components/map/MapSearchBox";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MarketMarkerCard from "../../components/cards/MarketMarker";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setSelectedShopId,
+  setShopResultsVisibility,
+} from "../../reducers/mapShopResults";
 
 type userPosition = {
   latitude: number;
   longitude: number;
 } | null;
 
-type MapScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "MapCustomer"
->;
-
 type MapProps = {
-  navigation: MapScreenNavigationProp;
+  navigation: NativeStackNavigationProp<RootStackParamList>;
 };
 
 export default function MapCustomerScreen({ navigation }: MapProps) {
+  const dispatch = useDispatch();
+
   const [currentPosition, setCurrentPosition] = useState<userPosition>(null);
   const [region, setRegion] = useState<Region | undefined>(undefined);
 
+  // stockage des résultats venant de mapSearchBox
   const [shopResults, setShopResults] = useState<ShopResultData[] | null>([]);
   const [marketResults, setMarketResults] = useState<MarketResultData[] | null>(
     [],
   );
+  // nécessaire pour le retour de map-shop-results à map-markets-results
   const stockedMarketResultsRef = useRef<MarketResultData[]>([]);
-
   const mapSearchBoxRef = useRef<{ toggleSearch: () => void }>(null);
 
   useEffect(() => {
@@ -73,76 +80,14 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
     // }
   }, []);
 
-  const buildShopComponents = (shops: ShopResultData[]) => {
-    return shops.map((sr) => (
-      <ShopSearchResultCard
-        shopData={sr.shop}
-        results={sr.relevantProducts.length}
-        distance={sr.distance}
-        onPressFn={() => {
-          const sheetId = getSheetStack()[0].id;
-          closeIfOpen(sheetId);
-          navigation.navigate("ShopUser", {
-            shopId: sr?.shop?._id,
-            distance: sr?.distance,
-            relevantProducts: sr?.relevantProducts ? sr?.relevantProducts : [],
-            sheetId: sheetId,
-          });
-        }}
-        key={sr?.shop?._id}
-        extraClasses="mb-1"
-        displayMode="bottomSheet"
-      />
-    ));
-  };
-
-  const buildMarketComponents = (markets: MarketResultData[]) => {
-    return markets.map((mr) => (
-      <MarketSearchResultCard
-        marketData={mr.market}
-        results={mr.shops}
-        distance={mr.distance}
-        onPressFn={() => onMarketPress(mr.shops)}
-        key={mr?.market?._id}
-        extraClasses="mb-1"
-      />
-    ));
-  };
-
-  const onMarketPress = async (shops: any[]) => {
-    // reconstruction d'un objet de type ShopResultData
-    const transformedShops: ShopResultData[] = shops.map((shop, index) => {
-      const { matchedStocks, ...cleanShop } = shop;
-      return {
-        shop: cleanShop,
-        relevantProducts: shop.matchedStocks ?? [],
-        distance: 0,
-      };
-    });
-
-    await handleSheetFlow({
-      sheet: "map-shop-results",
-      payload: {
-        resultsList: buildShopComponents(transformedShops),
-        onBackFn: () => {
-          handleSheetFlow({
-            sheet: "map-market-results",
-            payload: {
-              resultsList: buildMarketComponents(
-                stockedMarketResultsRef.current,
-              ),
-            },
-          });
-        },
-      },
-    });
-  };
-
   useEffect(() => {
     if (shopResults && shopResults?.length > 0) {
       handleSheetFlow({
         sheet: "map-shop-results",
-        payload: { resultsList: buildShopComponents(shopResults) },
+        payload: {
+          resultsList: shopResults,
+          navigation: navigation,
+        },
       });
     }
   }, [shopResults]);
@@ -152,10 +97,28 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
       stockedMarketResultsRef.current = marketResults;
       handleSheetFlow({
         sheet: "map-market-results",
-        payload: { resultsList: buildMarketComponents(marketResults) },
+        payload: { resultsList: marketResults, navigation: navigation },
       });
     }
   }, [marketResults]);
+
+  const handleShopMarkerPress = async (shopId: string) => {
+    console.log("marker pressed");
+    dispatch(setSelectedShopId(shopId));
+
+    const ref = SheetManager.get("map-shop-results", "global") as
+      | React.RefObject<ActionSheetRef>
+      | undefined;
+
+    // console.log("la ref :", ref)
+
+    if (ref?.current) {
+      console.log("isOpen :", ref?.current.isOpen());
+      if (!ref?.current.isOpen()) {
+        ref?.current.show();
+      }
+    }
+  };
 
   const markers = useMemo(() => {
     if (shopResults && shopResults.length > 0) {
@@ -166,8 +129,10 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
             latitude: Number(data?.shop?.address.latitude?.$numberDecimal),
             longitude: Number(data?.shop?.address.longitude?.$numberDecimal),
           }}
+          onPress={() => handleShopMarkerPress(data.shop!._id)}
         >
-          <Callout
+          {/* à supprimer ? */}
+          {/* <Callout
             onPress={() => {
               const sheetId = getSheetStack()[0].id;
               navigation.navigate("ShopUser", {
@@ -179,7 +144,7 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
             }}
           >
             <ShopMarkerCard shopData={data.shop} />
-          </Callout>
+          </Callout> */}
         </Marker>
       ));
     }
@@ -194,6 +159,7 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
           }}
           pinColor="green"
         >
+          {/* à supprimer ? */}
           <Callout onPress={() => console.log("youpi")}>
             <MarketMarkerCard
               marketData={data.market}
@@ -208,68 +174,7 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
     return null;
   }, [shopResults, marketResults]);
 
-  // const markers = shopResults
-  //   ? shopResults.map((data: ShopResultData, i) => {
-  //       return (
-  //         <Marker
-  //           key={i}
-  //           coordinate={{
-  //             latitude: Number(data?.shop?.address.latitude?.$numberDecimal),
-  //             longitude: Number(data?.shop?.address.longitude?.$numberDecimal),
-  //           }}
-  //         >
-  //           <Callout
-  //             tooltip={false}
-  //             onPress={() => {
-  //               const sheetId = getSheetStack()[0].id;
-  //               navigation.navigate("ShopUser", {
-  //                 shopId: data?.shop?._id,
-  //                 distance: data?.distance,
-  //                 relevantProducts: data?.relevantProducts
-  //                   ? data.relevantProducts
-  //                   : [],
-  //                 sheetId: sheetId,
-  //               });
-  //             }}
-  //           >
-  //             <View>
-  //               <ShopMarkerCard key={data?.shop?._id} shopData={data.shop} />
-  //             </View>
-  //           </Callout>
-  //         </Marker>
-  //       );
-  //     })
-  //   : marketResults?.map((data: MarketResultData, i) => {
-  //       return (
-  //         <Marker
-  //           key={i}
-  //           coordinate={{
-  //             latitude: Number(data?.market.address.latitude?.$numberDecimal),
-  //             longitude: Number(data?.market.address.longitude?.$numberDecimal),
-  //           }}
-  //           pinColor="green"
-  //         >
-  //           <Callout
-  //             // tooltip={true}
-  //             onPress={() => {
-  //               console.log("youpi");
-  //             }}
-  //           >
-  //             <View>
-  //               <MarketMarkerCard
-  //                 key={data?.market._id}
-  //                 marketData={data.market}
-  //                 shops={data?.shops}
-  //                 distance={data?.distance}
-  //               />
-  //             </View>
-  //           </Callout>
-  //         </Marker>
-  //       );
-  //     });
-
-  // console.log("shopResults :", shopResults)
-  // console.log("marketResults :", marketResults)
+  console.log("MAPCUSTOMER: marketResults :", marketResults);
 
   return (
     <SafeAreaView className="flex-1">

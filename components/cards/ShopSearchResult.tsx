@@ -15,6 +15,7 @@ type ShopSearchResultCardProps = {
   onPressFn?: ((event: GestureResponderEvent) => void) | undefined;
   extraClasses?: string;
   displayMode?: "bottomSheet" | "mapCallout" | "order";
+  isHighlighted: boolean;
   showDirectionButton?: boolean;
 };
 
@@ -26,16 +27,15 @@ export default function ShopSearchResultCard({
   onPressFn,
   extraClasses,
   displayMode,
+  isHighlighted,
   showDirectionButton,
 }: ShopSearchResultCardProps): JSX.Element {
-  // console.log("SHOPSEARCHRESULTCARD")
-  // console.log(shopData)
-  // console.log(results)
+  if (isHighlighted) console.log("highlighted true");
 
   return (
     <TouchableOpacity onPress={onPressFn}>
       <View
-        className={`${extraClasses} ${displayMode === "bottomSheet" || displayMode === "order" ? "rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary" : "p-2"} flex flex-row w-full`}
+        className={`${extraClasses} ${displayMode === "bottomSheet" || displayMode === "order" ? "rounded-lg shadow-sm p-1" : "p-2"} ${isHighlighted ? "bg-primary/50" : " bg-white p-2 dark:bg-tertiary"} flex flex-row w-full`}
       >
         <View className="flex flex-row items-center w-4/5">
           {displayMode !== "order" && (
@@ -75,7 +75,7 @@ export default function ShopSearchResultCard({
               extraClasses="pb-1"
             />
             {results && (
-              <BadgeSecondary extraClasses="px-2 mb-1">{`${results} produit(s) que vous recherchez`}</BadgeSecondary>
+              <BadgeSecondary extraClasses="px-1 mb-1">{`${results} produit${results > 1 ? "s" : ""} que vous recherchez`}</BadgeSecondary>
             )}
             {displayMode === "order" && withdrawData && (
               <BadgeSecondary extraClasses="px-2">{`${withdrawData?.length} produit${withdrawData?.length && withdrawData?.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>

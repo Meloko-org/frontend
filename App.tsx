@@ -85,6 +85,7 @@ import shop from "./reducers/shop";
 import stocks from "./reducers/stocks";
 import producer from "./reducers/producer";
 import orders from "./reducers/orders";
+import mapShopResults from "./reducers/mapShopResults";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const reducers = combineReducers({
@@ -95,6 +96,7 @@ const reducers = combineReducers({
   producer,
   stocks,
   orders,
+  mapShopResults,
 });
 const persistConfig = {
   key: "meloko",

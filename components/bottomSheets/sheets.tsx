@@ -1,4 +1,6 @@
 import React, { JSX } from "react";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../../types/Navigation";
 import {
   registerSheet,
   RouteDefinition,
@@ -12,6 +14,7 @@ import MapMarketResults from "./MapMarketResults";
 import BecomePremium from "./BecomePremium";
 import {
   MarketData,
+  MarketResultData,
   ProductData,
   ShopData,
   ShopResultData,
@@ -53,13 +56,15 @@ declare module "react-native-actions-sheet" {
     }>;
     "map-shop-results": SheetDefinition<{
       payload: {
-        resultsList: JSX.Element[];
+        resultsList: ShopResultData[];
+        navigation: NativeStackNavigationProp<RootStackParamList>;
         onBackFn?: () => void;
       };
     }>;
     "map-market-results": SheetDefinition<{
       payload: {
-        resultsList: JSX.Element[];
+        resultsList: MarketResultData[];
+        navigation: NativeStackNavigationProp<RootStackParamList>;
       };
     }>;
     "map-empty-search-results": SheetDefinition<{

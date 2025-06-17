@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { View } from "react-native";
+import { FlatList, View } from "react-native";
 import ActionSheet, {
   ActionSheetRef,
   SheetManager,
@@ -9,10 +9,47 @@ import ActionSheet, {
 import { useColorScheme } from "nativewind";
 import TextHeading3 from "../utils/texts/Heading3";
 import TextHeading4 from "../utils/texts/Heading4";
+import MarketSearchResultCard from "../cards/MarketSearchResult";
+import { MarketResultData, ShopResultData } from "../../types/API";
+import { handleSheetFlow } from "../../helpers/sheetHelpers";
 
 export default function MapMarketResults(
   props: SheetProps<"map-market-results">,
 ) {
+  const markets: MarketResultData[] = props.payload?.resultsList ?? [];
+  const navigation = props.payload?.navigation;
+
+  if (!navigation) return;
+
+  const onMarketPress = async (shops: any[]) => {
+    // reconstruction d'un objet de type ShopResultData
+    const transformedShops: ShopResultData[] = shops.map((shop, index) => {
+      const { matchedStocks, ...cleanShop } = shop;
+      return {
+        shop: cleanShop,
+        relevantProducts: shop.matchedStocks ?? [],
+        distance: 0,
+      };
+    });
+
+    await handleSheetFlow({
+      sheet: "map-shop-results",
+      payload: {
+        resultsList: transformedShops,
+        navigation,
+        onBackFn: () => {
+          handleSheetFlow({
+            sheet: "map-market-results",
+            payload: {
+              resultsList: markets,
+              navigation,
+            },
+          });
+        },
+      },
+    });
+  };
+
   return (
     <ActionSheet
       backgroundInteractionEnabled={true}
@@ -37,13 +74,31 @@ export default function MapMarketResults(
           </TextHeading4>
         </View>
 
-        <ScrollView
+        <FlatList
+          data={markets}
+          keyExtractor={(item) => item.market!._id}
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 0.3, width: "100%" }}
+          contentContainerStyle={{ paddingHorizontal: 12 }}
+          renderItem={({ item }) => (
+            <MarketSearchResultCard
+              marketData={item.market}
+              results={item.shops}
+              distance={item.distance}
+              onPressFn={() => onMarketPress(item.shops)}
+              key={item?.market?._id}
+              extraClasses="mb-1"
+            />
+          )}
+        />
+
+        {/* <ScrollView
           showsVerticalScrollIndicator={false}
           style={{ flex: 0.3, width: "100%" }}
           className="px-3"
         >
           {props.payload?.resultsList}
-        </ScrollView>
+        </ScrollView> */}
       </View>
     </ActionSheet>
   );
