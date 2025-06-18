@@ -59,6 +59,10 @@ declare module "react-native-actions-sheet" {
         resultsList: ShopResultData[];
         navigation: NativeStackNavigationProp<RootStackParamList>;
         onBackFn?: () => void;
+        mapSearchBoxRef: React.RefObject<{
+          toggleSearch: () => void;
+          openSearch: () => void;
+        } | null>;
       };
     }>;
     "map-market-results": SheetDefinition<{

@@ -17,6 +17,8 @@ import { Slider } from "@miblanchard/react-native-slider";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import InputButtonGroup from "../utils/inputs/radioGroup";
 import Spinner from "../utils/Spinner";
+import { useSelector } from "react-redux";
+import { mapShopResultsState } from "../../reducers/mapShopResults";
 
 type userPosition = {
   latitude: number;
@@ -41,11 +43,9 @@ type Props = {
   ) => void;
 };
 
-// export default function MapSearchBox({ refrechResultsFn }: Props) {
-
 const MapSearchBox = forwardRef(function MapSearchBox(
   { refrechResultsFn }: Props,
-  ref: React.Ref<{ toggleSearch: () => void }>,
+  ref: React.Ref<{ toggleSearch: () => void; openSearch: () => void }>,
 ) {
   const searchSection = useCollapsibleSection();
 
@@ -53,7 +53,17 @@ const MapSearchBox = forwardRef(function MapSearchBox(
     toggleSearch: () => {
       searchSection.toggle();
     },
+    openSearch: () => {
+      if (!searchSection.isOpen) {
+        searchSection.toggle();
+      }
+    },
   }));
+
+  const isSearchActive = useSelector(
+    (state: { mapShopResults: mapShopResultsState }) =>
+      state.mapShopResults.isSearchActive,
+  );
 
   const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [isSearchAddressLoading, setIsSearchAddressLoading] =
@@ -225,6 +235,8 @@ const MapSearchBox = forwardRef(function MapSearchBox(
       searchSection.toggle();
     }
   }, []);
+
+  if (isSearchActive) return null;
 
   return (
     <>

@@ -8,6 +8,7 @@ import React, {
 import { useDispatch, useSelector } from "react-redux";
 import {
   mapShopResultsState,
+  setIsSearchActive,
   setSelectedShopId,
 } from "../../reducers/mapShopResults";
 import { closeIfOpen } from "../../helpers/sheetHelpers";
@@ -29,6 +30,7 @@ import { withSpring } from "react-native-reanimated";
 
 export default function MapShopResults(props: SheetProps<"map-shop-results">) {
   const actionSheetRef = useRef<ActionSheetRef>(null);
+  const mapSearchBoxRef = useRef<{ toggleSearch: () => void }>(null);
 
   const shops: ShopResultData[] = props.payload?.resultsList ?? [];
 
@@ -106,6 +108,11 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
       enableGesturesInScrollView={true}
       overdrawEnabled={false}
       closeOnPressBack={true}
+      onClose={() => {
+        dispatch(setIsSearchActive(false));
+        props.payload?.mapSearchBoxRef.current?.openSearch();
+      }}
+      onOpen={() => dispatch(setIsSearchActive(true))}
       id={props.sheetId}
       ref={actionSheetRef}
     >

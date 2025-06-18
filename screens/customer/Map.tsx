@@ -30,8 +30,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MarketMarkerCard from "../../components/cards/MarketMarker";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  mapShopResultsState,
   setSelectedShopId,
-  setShopResultsVisibility,
 } from "../../reducers/mapShopResults";
 
 type userPosition = {
@@ -49,6 +49,11 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
   const [currentPosition, setCurrentPosition] = useState<userPosition>(null);
   const [region, setRegion] = useState<Region | undefined>(undefined);
 
+  const isSearchActive = useSelector(
+    (state: { mapShopResults: mapShopResultsState }) =>
+      state.mapShopResults.isSearchActive,
+  );
+
   // stockage des résultats venant de mapSearchBox
   const [shopResults, setShopResults] = useState<ShopResultData[] | null>([]);
   const [marketResults, setMarketResults] = useState<MarketResultData[] | null>(
@@ -56,7 +61,10 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
   );
   // nécessaire pour le retour de map-shop-results à map-markets-results
   const stockedMarketResultsRef = useRef<MarketResultData[]>([]);
-  const mapSearchBoxRef = useRef<{ toggleSearch: () => void }>(null);
+  const mapSearchBoxRef = useRef<{
+    toggleSearch: () => void;
+    openSearch: () => void;
+  } | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -80,6 +88,13 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
     // }
   }, []);
 
+  // s'il n'y a plus de recherche en cours, on efface les potentiels résultats précédents
+  useEffect(() => {
+    if (!isSearchActive) {
+      setShopResults(null);
+    }
+  }, [isSearchActive]);
+
   useEffect(() => {
     if (shopResults && shopResults?.length > 0) {
       handleSheetFlow({
@@ -87,6 +102,7 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
         payload: {
           resultsList: shopResults,
           navigation: navigation,
+          mapSearchBoxRef,
         },
       });
     }
