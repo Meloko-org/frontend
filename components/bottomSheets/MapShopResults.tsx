@@ -14,12 +14,11 @@ import {
 import { closeIfOpen } from "../../helpers/sheetHelpers";
 
 import { ShopResultData } from "../../types/API";
-import { Animated, FlatList, View } from "react-native";
+import { FlatList, View } from "react-native";
 
 import ActionSheet, {
   SheetManager,
   SheetProps,
-  ScrollView,
   getSheetStack,
   ActionSheetRef,
 } from "react-native-actions-sheet";
@@ -29,17 +28,16 @@ import ShopSearchResultCard from "../cards/ShopSearchResult";
 import { withSpring } from "react-native-reanimated";
 
 export default function MapShopResults(props: SheetProps<"map-shop-results">) {
-  const actionSheetRef = useRef<ActionSheetRef>(null);
-  const mapSearchBoxRef = useRef<{ toggleSearch: () => void }>(null);
-
-  const shops: ShopResultData[] = props.payload?.resultsList ?? [];
-
   const dispatch = useDispatch();
   const selectedShopId = useSelector(
     (state: { mapShopResults: mapShopResultsState }) =>
       state.mapShopResults.selectedShopId,
   );
+
+  const actionSheetRef = useRef<ActionSheetRef>(null);
   const flatListRef = useRef<FlatList>(null);
+
+  const shops: ShopResultData[] = props.payload?.resultsList ?? [];
 
   const [snapIndex, setSnapIndex] = useState(0);
 
@@ -135,10 +133,9 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
             keyExtractor={(item) => item.shop!._id}
             showsVerticalScrollIndicator={false}
             scrollEnabled={true}
-            // style={{ flex: 0.3, width: "100%" }}
             style={{ height: getFlatListHeight(), width: "100%" }}
             contentContainerStyle={{ paddingHorizontal: 12 }}
-            ListFooterComponent={<View style={{ height: 30 }} />}
+            ListFooterComponent={<View style={{ height: 100 }} />}
             ref={flatListRef}
             renderItem={({ item }) => (
               <ShopSearchResultCard

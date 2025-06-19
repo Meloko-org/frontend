@@ -33,6 +33,10 @@ import {
   mapShopResultsState,
   setSelectedShopId,
 } from "../../reducers/mapShopResults";
+import {
+  mapMarketResultsState,
+  setSelectedMarketId,
+} from "../../reducers/mapMarketResults";
 
 type userPosition = {
   latitude: number;
@@ -49,9 +53,14 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
   const [currentPosition, setCurrentPosition] = useState<userPosition>(null);
   const [region, setRegion] = useState<Region | undefined>(undefined);
 
-  const isSearchActive = useSelector(
+  const isShopSearchActive = useSelector(
     (state: { mapShopResults: mapShopResultsState }) =>
       state.mapShopResults.isSearchActive,
+  );
+
+  const isMarketSearchActive = useSelector(
+    (state: { mapMarketResults: mapMarketResultsState }) =>
+      state.mapMarketResults.isSearchActive,
   );
 
   // stockage des résultats venant de mapSearchBox
@@ -90,10 +99,13 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
 
   // s'il n'y a plus de recherche en cours, on efface les potentiels résultats précédents
   useEffect(() => {
-    if (!isSearchActive) {
+    if (!isShopSearchActive) {
       setShopResults(null);
     }
-  }, [isSearchActive]);
+    if (!isMarketSearchActive) {
+      setMarketResults(null);
+    }
+  }, [isShopSearchActive, isMarketSearchActive]);
 
   useEffect(() => {
     if (shopResults && shopResults?.length > 0) {
@@ -113,27 +125,22 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
       stockedMarketResultsRef.current = marketResults;
       handleSheetFlow({
         sheet: "map-market-results",
-        payload: { resultsList: marketResults, navigation: navigation },
+        payload: {
+          resultsList: marketResults,
+          navigation: navigation,
+          mapSearchBoxRef,
+        },
       });
     }
   }, [marketResults]);
 
-  const handleShopMarkerPress = async (shopId: string) => {
-    console.log("marker pressed");
+  const handleShopMarkerPress = (shopId: string) => {
     dispatch(setSelectedShopId(shopId));
+  };
 
-    const ref = SheetManager.get("map-shop-results", "global") as
-      | React.RefObject<ActionSheetRef>
-      | undefined;
-
-    // console.log("la ref :", ref)
-
-    if (ref?.current) {
-      console.log("isOpen :", ref?.current.isOpen());
-      if (!ref?.current.isOpen()) {
-        ref?.current.show();
-      }
-    }
+  const handleMarketMarkerPress = (marketId: string) => {
+    console.log("marker pressed");
+    dispatch(setSelectedMarketId(marketId));
   };
 
   const markers = useMemo(() => {
@@ -146,22 +153,7 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
             longitude: Number(data?.shop?.address.longitude?.$numberDecimal),
           }}
           onPress={() => handleShopMarkerPress(data.shop!._id)}
-        >
-          {/* à supprimer ? */}
-          {/* <Callout
-            onPress={() => {
-              const sheetId = getSheetStack()[0].id;
-              navigation.navigate("ShopUser", {
-                shopId: data?.shop?._id,
-                distance: data?.distance,
-                relevantProducts: data?.relevantProducts || [],
-                sheetId,
-              });
-            }}
-          >
-            <ShopMarkerCard shopData={data.shop} />
-          </Callout> */}
-        </Marker>
+        />
       ));
     }
 
@@ -174,16 +166,11 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
             longitude: Number(data?.market.address.longitude?.$numberDecimal),
           }}
           pinColor="green"
-        >
-          {/* à supprimer ? */}
-          <Callout onPress={() => console.log("youpi")}>
-            <MarketMarkerCard
-              marketData={data.market}
-              shops={data?.shops}
-              distance={data?.distance}
-            />
-          </Callout>
-        </Marker>
+          onPress={() => {
+            console.log(data.market._id);
+            handleMarketMarkerPress(data.market._id);
+          }}
+        />
       ));
     }
 

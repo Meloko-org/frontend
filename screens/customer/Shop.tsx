@@ -286,12 +286,12 @@ export default function ShopUserScreen({ navigation }: Props) {
                     />
                   </View>
                   <View
-                    className={`${isSignedIn ? "w-3/6" : "w-4/6"} flex flex-row justify-start h-full pr-1`}
+                    className={`w-3/6 flex flex-row justify-start h-full pr-1`}
                   >
-                    <TextBody1>{shopData.description}</TextBody1>
+                    <TextBody1>{shopData.shortDesc}</TextBody1>
                   </View>
 
-                  <View className="w-1/6 h-full">
+                  <View className="w-1/6 h-full flex flex-column justify-center">
                     {isSignedIn && (
                       <IconButton
                         iconName={isBookmarked ? "heart" : "heart-o"}

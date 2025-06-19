@@ -69,6 +69,10 @@ declare module "react-native-actions-sheet" {
       payload: {
         resultsList: MarketResultData[];
         navigation: NativeStackNavigationProp<RootStackParamList>;
+        mapSearchBoxRef: React.RefObject<{
+          toggleSearch: () => void;
+          openSearch: () => void;
+        } | null>;
       };
     }>;
     "map-empty-search-results": SheetDefinition<{

@@ -19,6 +19,7 @@ import InputButtonGroup from "../utils/inputs/radioGroup";
 import Spinner from "../utils/Spinner";
 import { useSelector } from "react-redux";
 import { mapShopResultsState } from "../../reducers/mapShopResults";
+import { mapMarketResultsState } from "../../reducers/mapMarketResults";
 
 type userPosition = {
   latitude: number;
@@ -60,9 +61,14 @@ const MapSearchBox = forwardRef(function MapSearchBox(
     },
   }));
 
-  const isSearchActive = useSelector(
+  const isShopSearchActive = useSelector(
     (state: { mapShopResults: mapShopResultsState }) =>
       state.mapShopResults.isSearchActive,
+  );
+
+  const isMarketSearchActive = useSelector(
+    (state: { mapMarketResults: mapMarketResultsState }) =>
+      state.mapMarketResults.isSearchActive,
   );
 
   const [isSearchLoading, setIsSearchLoading] = useState(false);
@@ -236,7 +242,9 @@ const MapSearchBox = forwardRef(function MapSearchBox(
     }
   }, []);
 
-  if (isSearchActive) return null;
+  console.log("MAPSEARCHBOX: marketActive :", isMarketSearchActive);
+
+  if (isShopSearchActive || isMarketSearchActive) return null;
 
   return (
     <>

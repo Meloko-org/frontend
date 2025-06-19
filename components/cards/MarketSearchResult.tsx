@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import BadgeSecondary from "../utils/badges/Secondary";
 import StarsNotation from "../utils/StarsNotation";
@@ -13,6 +13,7 @@ type MarketSearchResultCardProps = {
   distance?: number;
   onPressFn?: ((event: GestureResponderEvent) => void) | undefined;
   extraClasses?: string;
+  isHighlighted: boolean;
   showDirectionButton?: boolean;
 };
 
@@ -22,12 +23,15 @@ export default function MarketSearchResultCard({
   distance,
   onPressFn,
   extraClasses,
+  isHighlighted,
   showDirectionButton,
 }: MarketSearchResultCardProps): JSX.Element {
+  console.log("highlighted :", isHighlighted);
+
   return (
     <TouchableOpacity onPress={onPressFn}>
       <View
-        className={`${extraClasses} rounded-lg border border-primary bg-white p-2 dark:border-none dark:bg-tertiary flex flex-row w-full`}
+        className={`${extraClasses} rounded-lg ${isHighlighted ? "bg-primary/50" : " bg-white dark:bg-tertiary"} p-1 flex flex-row w-full`}
       >
         <View className="flex flex-row items-center">
           <View className="flex flex-row items-center rounded-sm w-1/4">
