@@ -465,8 +465,8 @@ export default function App() {
             publishableKey={publishableKey}
           >
             <ClerkLoaded>
-              <SheetProvider>
-                <SafeAreaProvider>
+              <SafeAreaProvider>
+                <SheetProvider>
                   <NavigationContainer>
                     <Stack.Navigator screenOptions={options}>
                       <Stack.Screen name="Home" component={HomeScreen} />
@@ -482,8 +482,8 @@ export default function App() {
                       />
                     </Stack.Navigator>
                   </NavigationContainer>
-                </SafeAreaProvider>
-              </SheetProvider>
+                </SheetProvider>
+              </SafeAreaProvider>
             </ClerkLoaded>
           </ClerkProvider>
         </GestureHandlerRootView>

@@ -43,7 +43,7 @@ export default function ProductDetails(props: SheetProps<"product-details">) {
       gestureEnabled={true}
       id={props.sheetId}
     >
-      <View className="px-3 pt-5 w-full h-full">
+      <View className="px-3 pt-5 w-full h-full bg-lightbg dark:bg-darkbg">
         <View className="flex flex-row items-center">
           <View className="w-4/5">
             <TextHeading3>{productName}</TextHeading3>

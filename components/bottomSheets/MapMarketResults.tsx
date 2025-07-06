@@ -32,23 +32,22 @@ export default function MapMarketResults(
   const flatListRef = useRef<FlatList>(null);
   const [snapIndex, setSnapIndex] = useState(0);
 
+  const isMarketSheetActiveRef = useRef(false);
+
   const getFlatListHeight = () => {
     switch (snapIndex) {
       case 0:
-        return "30%"; // 25%
+        return "35%"; // 25%
       case 1:
         return "40%"; // 50%
       case 2:
         return "100%"; // 100%
       default:
-        return "40%";
+        return "35%";
     }
   };
 
-  const mapSearchBoxRef = useRef<{
-    toggleSearch: () => void;
-    openSearch: () => void;
-  } | null>(null);
+  const mapSearchBoxRef = props.payload!.mapSearchBoxRef;
 
   const markets: MarketResultData[] = props.payload?.resultsList ?? [];
   const navigation = props.payload?.navigation;
@@ -66,7 +65,7 @@ export default function MapMarketResults(
     }
   }, []);
 
-  // on vide selectedShopId
+  // on vide selectedMarketId
   useEffect(() => {
     return () => {
       dispatch(setSelectedMarketId(null));
@@ -75,17 +74,11 @@ export default function MapMarketResults(
 
   useEffect(() => {
     if (selectedMarketId) {
-      console.log("isOpen :", actionSheetRef.current?.isOpen());
-      console.log("flatlist ref :", flatListRef);
-
       const index = props.payload?.resultsList.findIndex(
         (result) => result.market?._id === selectedMarketId,
       );
 
-      console.log("index :", index);
-
       if (index !== -1) {
-        console.log("youpi", index);
         flatListRef.current?.scrollToIndex({
           index: Number(index),
           animated: true,
@@ -96,6 +89,7 @@ export default function MapMarketResults(
   }, [selectedMarketId]);
 
   const onMarketPress = async (shops: any[]) => {
+    isMarketSheetActiveRef.current = true;
     // reconstruction d'un objet de type ShopResultData
     const transformedShops: ShopResultData[] = shops.map((shop, index) => {
       const { matchedStocks, ...cleanShop } = shop;
@@ -139,8 +133,19 @@ export default function MapMarketResults(
       overdrawEnabled={false}
       closeOnPressBack={true}
       onClose={() => {
-        dispatch(setIsSearchActive(false));
-        props.payload?.mapSearchBoxRef.current?.openSearch();
+        console.log(
+          "MAPMARKETRESULTS : onClose marketSheetActive :",
+          isMarketSheetActiveRef,
+        );
+        if (isMarketSheetActiveRef.current === false) {
+          console.log("youpi");
+          dispatch(setIsSearchActive(false));
+          console.log(
+            "marketsheet : mapsearchboxRef :",
+            props.payload?.mapSearchBoxRef.current,
+          );
+          props.payload?.mapSearchBoxRef.current?.openSearch();
+        }
       }}
       onOpen={() => dispatch(setIsSearchActive(true))}
       id={props.sheetId}

@@ -5,10 +5,11 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
 
 import TextHeading4 from "./utils/texts/Heading4";
-import { View, Text } from "react-native";
+import { View, Text, LayoutChangeEvent } from "react-native";
 import BackLabelButton from "./utils/buttons/BackLabel";
 
 type TopBarProps = {
+  onLayout?: (event: LayoutChangeEvent) => void;
   backLabel: string;
   label: string;
   screen: keyof RootStackParamList | string;
@@ -17,6 +18,7 @@ type TopBarProps = {
 };
 
 export default function TopBar({
+  onLayout,
   backLabel,
   label,
   screen,
@@ -29,6 +31,7 @@ export default function TopBar({
   return (
     <View
       className={`h-10 flex flex-row justify-between items-center px-2 ${extraClasses}`}
+      onLayout={onLayout}
     >
       <View>
         <BackLabelButton

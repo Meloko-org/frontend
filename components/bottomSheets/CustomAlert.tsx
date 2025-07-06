@@ -37,7 +37,9 @@ export default function CustomAlert(props: SheetProps<"alert">) {
   return (
     <ActionSheet
       indicatorStyle={{ backgroundColor: "#000000" }}
+      containerStyle={{ paddingBottom: 50 }}
       gestureEnabled={true}
+      isModal={false}
       id={props.sheetId}
     >
       <View className="p-5 min-h-min w-full flex justify-center items-center bg-white dark:bg-darkbg">

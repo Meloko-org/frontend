@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
 const FontAwesome = _Fontawesome as React.ElementType;

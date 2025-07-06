@@ -1,16 +1,20 @@
 import { useState } from "react";
-import { LayoutChangeEvent, ViewStyle } from "react-native";
+import { LayoutChangeEvent, View, ViewStyle } from "react-native";
 import {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
   Easing,
+  useAnimatedRef,
+  measure,
+  runOnUI,
 } from "react-native-reanimated";
 
 export function useCollapsibleSection(duration: number = 300) {
   const [isOpen, setIsOpen] = useState(false);
   const contentHeight = useSharedValue(0);
   const animatedHeight = useSharedValue(0);
+  const [lastLayoutHeight, setLastLayoutHeight] = useState(0);
 
   const animate = (open: boolean) => {
     animatedHeight.value = withTiming(open ? contentHeight.value : 0, {
@@ -18,8 +22,11 @@ export function useCollapsibleSection(duration: number = 300) {
       easing: Easing.out(Easing.ease),
     });
   };
+
   const toggle = () => {
+    console.log("toggle - isOpen :", isOpen);
     const next = !isOpen;
+    console.log("toggle - next :", next);
     setIsOpen(next);
     animate(next);
   };
@@ -27,6 +34,18 @@ export function useCollapsibleSection(duration: number = 300) {
   const onLayout = (event: LayoutChangeEvent) => {
     const height = event.nativeEvent.layout.height;
     contentHeight.value = height;
+    setLastLayoutHeight(height);
+  };
+
+  const refresh = () => {
+    console.log("refresh");
+    console.log("isOpen :", isOpen);
+    if (lastLayoutHeight > 0) {
+      contentHeight.value = lastLayoutHeight;
+      if (isOpen) {
+        animate(true); // relance l'animation vers la nouvelle hauteur
+      }
+    }
   };
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -45,5 +64,6 @@ export function useCollapsibleSection(duration: number = 300) {
     animatedStyle,
     innerContainerStyle,
     onLayout,
+    refresh,
   };
 }

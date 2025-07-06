@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
+import { StyleSheet } from "react-native";
 import {
   ShopData,
   ProductData,
@@ -32,6 +33,7 @@ import BackLabelButton from "../../components/utils/buttons/BackLabel";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import shopTools from "../../modules/shopTools";
+import { SheetManager } from "react-native-actions-sheet";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -270,8 +272,8 @@ export default function ShopUserScreen({ navigation }: Props) {
                   )}
                 </View>
 
-                <View className="flex flex-row items-center mb-3">
-                  <View className="w-2/6 h-full">
+                <View className="flex flex-row items-center mb-2">
+                  <View className="w-2/6">
                     <Image
                       source={
                         shopData?.logo
@@ -285,13 +287,14 @@ export default function ShopUserScreen({ navigation }: Props) {
                       height={112}
                     />
                   </View>
+
                   <View
-                    className={`w-3/6 flex flex-row justify-start h-full pr-1`}
+                    className={`w-3/6 flex flex-row justify-start pr-1 h-full`}
                   >
                     <TextBody1>{shopData.shortDesc}</TextBody1>
                   </View>
 
-                  <View className="w-1/6 h-full flex flex-column justify-center">
+                  <View className="w-1/6 flex flex-column justify-center">
                     {isSignedIn && (
                       <IconButton
                         iconName={isBookmarked ? "heart" : "heart-o"}
@@ -306,7 +309,14 @@ export default function ShopUserScreen({ navigation }: Props) {
                       iconFamily="FontAwesome5Icon"
                       buttonColor="bg-primary"
                       extraClasses="h-10"
-                      onPressFn={() => {}}
+                      onPressFn={() => {
+                        SheetManager.show("shop-details", {
+                          payload: {
+                            shop: shopData,
+                            showButtons: true,
+                          },
+                        });
+                      }}
                     />
                   </View>
                 </View>
@@ -328,19 +338,17 @@ export default function ShopUserScreen({ navigation }: Props) {
             </View>
           )}
 
-          {topComments && (
+          {/* {topComments && (
             <View className="mb-3">
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                contentContainerStyle={[
-                  "my-3 flex flex-row justify-start items-center",
-                ]}
+                contentContainerStyle={styles.contentContainer}
               >
                 <View className="p-2 flex flex-row">{topComments}</View>
               </ScrollView>
             </View>
-          )}
+          )} */}
 
           {searchProduct.length > 0 && (
             <View>
@@ -441,3 +449,12 @@ export default function ShopUserScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  contentContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+});

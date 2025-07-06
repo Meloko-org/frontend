@@ -25,6 +25,7 @@ import ProductFamiliesSheet from "./ProductFamilies";
 import ConfirmSheet from "./Confirm";
 import ImageUploaderSheet from "./ImageUploader";
 import MapEmptySearchResults from "./MapEmptySearchResults";
+import ShopDetails from "./ShopDetails";
 
 registerSheet("alert", CustomAlert);
 registerSheet("product-details", ProductDetails);
@@ -37,6 +38,7 @@ registerSheet("edit-product", EditProductSheet);
 registerSheet("product-families", ProductFamiliesSheet);
 registerSheet("confirm", ConfirmSheet);
 registerSheet("image-uploader", ImageUploaderSheet);
+registerSheet("shop-details", ShopDetails);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -52,6 +54,12 @@ declare module "react-native-actions-sheet" {
       payload: {
         stockData?: StockData;
         unit: string;
+      };
+    }>;
+    "shop-details": SheetDefinition<{
+      payload: {
+        shop?: ShopData;
+        showButtons: boolean;
       };
     }>;
     "map-shop-results": SheetDefinition<{

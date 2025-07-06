@@ -139,7 +139,6 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
   };
 
   const handleMarketMarkerPress = (marketId: string) => {
-    console.log("marker pressed");
     dispatch(setSelectedMarketId(marketId));
   };
 
@@ -167,7 +166,6 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
           }}
           pinColor="green"
           onPress={() => {
-            console.log(data.market._id);
             handleMarketMarkerPress(data.market._id);
           }}
         />
@@ -177,7 +175,7 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
     return null;
   }, [shopResults, marketResults]);
 
-  console.log("MAPCUSTOMER: marketResults :", marketResults);
+  // console.log("MAPCUSTOMER: marketResults :", marketResults);
 
   return (
     <SafeAreaView className="flex-1">

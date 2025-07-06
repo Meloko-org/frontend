@@ -6,6 +6,7 @@ import { SheetManager } from "react-native-actions-sheet";
 import TextHeading4 from "./texts/Heading4";
 
 type ImageUploaderProps = {
+  label?: string;
   size?: number;
   onImageSelected?: (uri: string) => void;
   defaultUri?: string | null;
@@ -14,6 +15,7 @@ type ImageUploaderProps = {
 };
 
 export default function ImageUploader({
+  label = "LOGO",
   size = 90,
   onImageSelected,
   defaultUri = null,
@@ -111,7 +113,7 @@ export default function ImageUploader({
           />
         </View>
       ) : (
-        <TextHeading4 centered>LOGO</TextHeading4>
+        <TextHeading4 centered>{label}</TextHeading4>
       )}
       <View className="absolute right-0 bottom-0 items-center justify-center p-1">
         <FontAwesome6Icon name="camera" color="#98B66E" size={30} />

@@ -64,8 +64,8 @@ export default function ShopProducteurScreen({ navigation }: Props) {
 
   useEffect(() => {
     if (shopStore !== null) {
-      if (shopStore.description) {
-        setDescription(shopStore.description);
+      if (shopStore.shortDesc) {
+        setDescription(shopStore.shortDesc);
       }
       fetchStocks(shopStore._id);
     }
@@ -154,7 +154,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
 
         <View className="flex flex-row mb-3">
           {/* {pictures} */}
-          <ThumbnailCarousel images={fakeImages} />
+          <ThumbnailCarousel images={shopStore!.photos} />
         </View>
 
         <View>

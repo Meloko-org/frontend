@@ -16,8 +16,11 @@ export default function ImageUploaderSheet(
 ) {
   return (
     <ActionSheet
+      snapPoints={[100]}
       indicatorStyle={{ backgroundColor: "#000000" }}
       gestureEnabled={true}
+      containerStyle={{ backgroundColor: "#ffffff", paddingBottom: 50 }}
+      isModal={false}
       id={props.sheetId}
     >
       <View className="p-5 min-h-min w-full flex justify-center items-center bg-white dark:bg-darkbg">

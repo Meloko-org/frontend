@@ -130,18 +130,24 @@ export default function ButtonPrimaryEnd({
         </View>
       ) : (
         <>
-          <Text className="text-lightbg text-center font-bold text-[24px]">
-            {label}
-          </Text>
-          {IconComponent && (
-            <IconComponent
-              name={iconName}
-              size={25}
-              color="#FFFFFF"
-              className="absolute"
-              style={{ right: 20 }}
-            />
-          )}
+          <View className="flex flex-row items-center">
+            <View className="flex-grow">
+              <Text className="text-lightbg text-center font-bold text-[24px]">
+                {label}
+              </Text>
+            </View>
+            <View>
+              {IconComponent && (
+                <IconComponent
+                  name={iconName}
+                  size={25}
+                  color="#FFFFFF"
+                  // className="absolute"
+                  // style={{ right: 20 }}
+                />
+              )}
+            </View>
+          </View>
         </>
       )}
     </TouchableOpacity>

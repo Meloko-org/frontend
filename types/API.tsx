@@ -72,7 +72,7 @@ type ProductsTypesByCategory = {
 
 type address = {
   address1: string;
-  address2: string;
+  address2: string | null;
   postalCode: string;
   city: string;
   latitude: { $numberDecimal: string };
@@ -143,6 +143,7 @@ type CartData = {
 };
 
 type Note = {
+  _id: string;
   note: { $numberDecimal: string } | number | any;
   comment: string;
 };
@@ -163,9 +164,18 @@ type ShopData = {
   markets: MarketsData[];
   clickCollect: ClickCollectData;
   notes: Note[];
+  isPremium: boolean;
+  crew: CrewMember[];
   products?: StockData[];
   [key: string]: any;
 } | null;
+
+type CrewMember = {
+  forname: string;
+  role: string;
+  description: string;
+  photo: string;
+};
 
 type ShopResultData = {
   shop: ShopData;
@@ -201,7 +211,7 @@ type PeriodData = {
 type AddressData = {
   address1: string | null;
   address2: String | null;
-  postalCode: Number | null;
+  postalCode: String | null;
   city: String | null;
   country: String | null;
   latitude?: { $numberDecimal: string };
@@ -271,6 +281,7 @@ export type {
   ProductData,
   CardProductData,
   ShopData,
+  CrewMember,
   ShopResultData,
   UserData,
   StockData,

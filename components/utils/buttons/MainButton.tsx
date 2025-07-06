@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { useState, useRef } from "react";
 import {
   TouchableOpacity,
@@ -111,7 +111,7 @@ export default function MainButton({
 
   const labelIconTop = (
     <TouchableOpacity
-      className={`${extraClasses} flex rounded-lg p-1 justify-center items-center bg-primary/90 mb-2 h-full`}
+      className={`${extraClasses} flex rounded-lg justify-center items-center bg-primary/90 mb-2`}
       onPress={handlePress}
     >
       {/* Applique la rotation à l'icône via transform */}
@@ -124,7 +124,7 @@ export default function MainButton({
           />
         )}
       </Animated.View>
-      <Text className="text-white text-lg text-center">{label}</Text>
+      <Text className="text-white text-lg/5 text-center">{label}</Text>
     </TouchableOpacity>
   );
 
@@ -176,10 +176,10 @@ export default function MainButton({
   const labelIconEnd = (
     <TouchableOpacity
       className={`
-                    ${extraClasses} 
-                    ${disabled ? "bg-primary/60" : "bg-primary/90"}
-                    relative flex flex-row rounded-lg shadow-sm py-1 justify-center items-center px-2 w-min
-                `}
+        ${extraClasses} 
+        ${disabled ? "bg-primary/60" : "bg-primary/90"}
+        relative flex flex-row rounded-lg shadow-sm py-1 justify-center items-center px-2 w-min
+      `}
       onPress={handlePress}
       disabled={disabled}
     >
@@ -244,6 +244,8 @@ export default function MainButton({
         return icon;
     }
   };
+
+  console.log(buttonType);
 
   return <>{selectedButton()}</>;
 }

@@ -24,7 +24,10 @@ type IconButtonProps = {
   iconColor?: string;
   buttonColor?: string;
   extraClasses?: string;
-  onPressFn: ((event: GestureResponderEvent) => void) | undefined;
+  onPressFn:
+    | ((event: GestureResponderEvent) => void)
+    | ((uri: string) => void)
+    | undefined;
   animated?: boolean;
   size?: number;
 };

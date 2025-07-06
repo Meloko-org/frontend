@@ -55,6 +55,7 @@ const MapSearchBox = forwardRef(function MapSearchBox(
       searchSection.toggle();
     },
     openSearch: () => {
+      console.log("MAPSEARCHBOX isOpen :", searchSection.isOpen);
       if (!searchSection.isOpen) {
         searchSection.toggle();
       }
@@ -242,7 +243,8 @@ const MapSearchBox = forwardRef(function MapSearchBox(
     }
   }, []);
 
-  console.log("MAPSEARCHBOX: marketActive :", isMarketSearchActive);
+  console.log("MAPSEARCHBOX: shopSearchActive :", isShopSearchActive);
+  console.log("MAPSEARCHBOX: marketsearchActive :", isMarketSearchActive);
 
   if (isShopSearchActive || isMarketSearchActive) return null;
 

@@ -26,12 +26,18 @@ import TextHeading4 from "../utils/texts/Heading4";
 import BackLabelButton from "../utils/buttons/BackLabel";
 import ShopSearchResultCard from "../cards/ShopSearchResult";
 import { withSpring } from "react-native-reanimated";
+import { mapMarketResultsState } from "../../reducers/mapMarketResults";
 
 export default function MapShopResults(props: SheetProps<"map-shop-results">) {
   const dispatch = useDispatch();
   const selectedShopId = useSelector(
     (state: { mapShopResults: mapShopResultsState }) =>
       state.mapShopResults.selectedShopId,
+  );
+
+  const isMarketSearchActive = useSelector(
+    (state: { mapMarketResults: mapMarketResultsState }) =>
+      state.mapMarketResults.isSearchActive,
   );
 
   const actionSheetRef = useRef<ActionSheetRef>(null);
@@ -41,16 +47,18 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
 
   const [snapIndex, setSnapIndex] = useState(0);
 
+  // const [ activeSheet, setActiveSheet ] = useState<"shop" | "market" | null>(null)
+
   const getFlatListHeight = () => {
     switch (snapIndex) {
       case 0:
-        return "30%"; // 25%
+        return "35%"; // 25%
       case 1:
-        return "40%"; // 50%
+        return "50%"; // 50%
       case 2:
         return "100%"; // 100%
       default:
-        return "40%";
+        return "35%";
     }
   };
 
@@ -74,14 +82,9 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
 
   useEffect(() => {
     if (selectedShopId) {
-      console.log("isOpen :", actionSheetRef.current?.isOpen());
-      console.log("flatlist ref :", flatListRef);
-
       const index = props.payload?.resultsList.findIndex(
         (result) => result.shop?._id === selectedShopId,
       );
-
-      console.log("index :", index);
 
       if (index !== -1) {
         console.log("youpi", index);
@@ -107,8 +110,11 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
       overdrawEnabled={false}
       closeOnPressBack={true}
       onClose={() => {
+        console.log("SHOP onClose: marketSearchActive :", isMarketSearchActive);
         dispatch(setIsSearchActive(false));
-        props.payload?.mapSearchBoxRef.current?.openSearch();
+        if (!isMarketSearchActive) {
+          props.payload?.mapSearchBoxRef.current?.openSearch();
+        }
       }}
       onOpen={() => dispatch(setIsSearchActive(true))}
       id={props.sheetId}

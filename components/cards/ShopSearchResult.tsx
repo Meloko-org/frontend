@@ -30,8 +30,6 @@ export default function ShopSearchResultCard({
   isHighlighted,
   showDirectionButton,
 }: ShopSearchResultCardProps): JSX.Element {
-  if (isHighlighted) console.log("highlighted true");
-
   return (
     <TouchableOpacity onPress={onPressFn}>
       <View
