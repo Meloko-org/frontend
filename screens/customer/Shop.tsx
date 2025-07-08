@@ -313,7 +313,7 @@ export default function ShopUserScreen({ navigation }: Props) {
                         SheetManager.show("shop-details", {
                           payload: {
                             shop: shopData,
-                            showButtons: true,
+                            showButtons: false,
                           },
                         });
                       }}

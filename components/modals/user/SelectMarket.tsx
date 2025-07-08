@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { useDispatch, useSelector } from "react-redux";
 import { CartState, setWithdrawMarket } from "../../../reducers/cart";

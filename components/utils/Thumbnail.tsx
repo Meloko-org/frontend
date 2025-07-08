@@ -16,7 +16,7 @@ type ThumbnailProps = {
   style?: StyleProp<ImageStyle>;
   extraClasses?: string;
   onDelete?: (uri: string) => void;
-  onPress?: (uri: string) => void;
+  onPress?: () => void;
   clickable?: boolean;
 };
 
@@ -61,7 +61,7 @@ export default function Thumbnail({
   return (
     <View className={extraClasses}>
       {clickable && onPress ? (
-        <Pressable onPress={() => onPress?.(source)}>{image}</Pressable>
+        <Pressable onPress={onPress}>{image}</Pressable>
       ) : (
         image
       )}

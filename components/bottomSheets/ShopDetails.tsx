@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 
+// import ImageView from "react-native-image-viewing"
 import { useVideoPlayer, VideoView } from "expo-video";
 
 import { View, Image, Dimensions } from "react-native";
 import ActionSheet, {
   SheetProps,
   ScrollView,
+  FlatList,
 } from "react-native-actions-sheet";
 import TextHeading3 from "../utils/texts/Heading3";
 import IconButton from "../utils/buttons/Icon";
@@ -18,6 +20,8 @@ import StarsNotation from "../utils/StarsNotation";
 import CardNote from "../cards/Note";
 import CrewMemberCard from "../cards/CrewMember";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import ThumbnailCarousel from "../utils/ThumbnailCarousel";
+import ImageViewerModal from "../modals/user/ImageViewer";
 
 export default function ShopDetails(props: SheetProps<"shop-details">) {
   const insets = useSafeAreaInsets();
@@ -29,11 +33,21 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
   const isPremium = props.payload?.shop?.isPremium;
 
   // temporaire
-  const localSource = require("../../assets/videos/video1.mp4");
+  // const localSource = require("../../assets/videos/video1.mp4");
 
-  // const localMemberPic = [ "../../assets/images/michmich.jpg", "../../assets/images/petunia.jpg"]
+  // gestion de l'image Viewer
+  // const [ isImageViewerVisible, setIsImageViewerVisible ] = useState<boolean>(false)
+  // const [ currentIndex, setCurrentIndex ] = useState(0)
+  const [isViewerVisible, setViewerVisible] = useState<boolean>(false);
+  const [initialIndex, setInitialIndex] = useState(0);
 
-  const player = useVideoPlayer(localSource, (player) => {
+  const handleImagePress = (index: number) => {
+    setInitialIndex(index);
+    setViewerVisible(true);
+  };
+
+  // gestion de la video
+  const player = useVideoPlayer(shop!.video[0], (player) => {
     player.staysActiveInBackground = false;
   });
 
@@ -107,13 +121,23 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
 
           {isPremium && (
             <View className="w-full mb-5">
-              <VideoView
-                player={player}
-                style={{
-                  width: Dimensions.get("window").width,
-                  height: Dimensions.get("window").width * (9 / 16),
-                }}
-              />
+              {shop!.video[0] && (
+                <VideoView
+                  player={player}
+                  style={{
+                    width: Dimensions.get("window").width,
+                    height: Dimensions.get("window").width * (9 / 16),
+                  }}
+                />
+              )}
+
+              <View className="w-full mt-3">
+                <ThumbnailCarousel
+                  images={shop!.photos}
+                  onImagePress={handleImagePress}
+                  extraClasses="mb-5"
+                />
+              </View>
             </View>
           )}
 
@@ -175,13 +199,23 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
 
           {topComments && (
             <View className="mb-3">
-              <ScrollView
+              {/* <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 // contentContainerStyle={styles.contentContainer}
               >
                 <View className="p-2 flex flex-row">{topComments}</View>
-              </ScrollView>
+              </ScrollView> */}
+
+              <View className="px-2">
+                <FlatList
+                  data={topComments}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item, index) => `${index}`}
+                  renderItem={({ item }) => item}
+                />
+              </View>
             </View>
           )}
 
@@ -205,7 +239,7 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
           )}
 
           {isPremium && members!.length > 0 && (
-            <View className="px-3 mb-5">
+            <View className="px-3 my-5">
               <TextHeading3 centered extraClasses="text-bold mb-3">
                 Notre équipe
               </TextHeading3>
@@ -214,6 +248,13 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
           )}
         </ScrollView>
       </View>
+
+      <ImageViewerModal
+        isVisible={isViewerVisible}
+        onClose={() => setViewerVisible(false)}
+        images={shop!.photos}
+        initialIndex={initialIndex}
+      />
     </ActionSheet>
   );
 }

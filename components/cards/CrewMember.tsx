@@ -8,12 +8,10 @@ type CrewMemberProps = {
 };
 
 export default function CrewMemberCard({ crewMember }: CrewMemberProps) {
-  console.log(crewMember);
-
   return (
     <View className="mb-5">
       <View className="flex flex-row">
-        <View className="w-1/2 bg-primary">
+        <View className="w-1/2">
           <Image
             source={
               crewMember.photo
