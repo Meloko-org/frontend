@@ -167,6 +167,8 @@ type ShopData = {
   isPremium: boolean;
   crew: CrewMember[];
   products?: StockData[];
+  socials: NetworksData;
+  socialPostSettings?: SocialPostSettingsData;
   [key: string]: any;
 } | null;
 
@@ -175,6 +177,34 @@ type CrewMember = {
   role: string;
   description: string;
   photo: string;
+};
+
+type SocialNetworkData = {
+  connected: boolean;
+  isEnabled: boolean;
+  accessToken?: string;
+  refreshToken?: string;
+  userId?: string;
+  username?: string;
+  pageId?: string; // utile pour Facebook
+  pageName?: string; // utile pour Facebook
+  expiresAt?: string | null; // Date sous forme de string ISO
+};
+
+type NetworksData = {
+  instagram: SocialNetworkData;
+  facebook: SocialNetworkData;
+  tiktok: SocialNetworkData;
+};
+
+type SocialPostSettingsData = {
+  frequency: {
+    mode: "manual" | "reminder";
+    timesPerWeek: number;
+    preferredDays: string[]; // ex: ["monday", "friday"]
+  };
+  customHashtags: string[];
+  customMentions: string[];
 };
 
 type ShopResultData = {
@@ -282,6 +312,9 @@ export type {
   CardProductData,
   ShopData,
   CrewMember,
+  SocialNetworkData,
+  NetworksData,
+  SocialPostSettingsData,
   ShopResultData,
   UserData,
   StockData,

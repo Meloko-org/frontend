@@ -28,6 +28,7 @@ type OpenScreenButtonProps = {
   } | null;
   extraClasses?: string;
   onPressFn: () => void;
+  disabled?: boolean;
 };
 
 export default function OpenScreenButton({
@@ -39,6 +40,7 @@ export default function OpenScreenButton({
   switchProps = null,
   extraClasses,
   onPressFn,
+  disabled,
 }: OpenScreenButtonProps): JSX.Element {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -46,7 +48,10 @@ export default function OpenScreenButton({
   return (
     <TouchableOpacity
       className={`${extraClasses} `}
-      onPress={() => onPressFn()}
+      disabled={disabled}
+      onPress={() => {
+        if (!disabled) onPressFn();
+      }}
     >
       <View
         className={`${extraClasses} flex flex-row w-auto h-[60px] items-center rounded-lg ${bgColor ? bgColor : "bg-darkbg/10 dark:bg-lightbg/25"}`}

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { JSX, useRef, useState } from "react";
 
 import { TouchableOpacity, View, Animated, Easing } from "react-native";
 import TextBody1 from "../texts/Body1";
@@ -17,6 +17,7 @@ import MaterialIcon from "@expo/vector-icons/MaterialIcons";
 import OctIcon from "@expo/vector-icons/Octicons";
 import SimpleLineIcon from "@expo/vector-icons/SimpleLineIcons";
 import ZocialIcon from "@expo/vector-icons/Zocial";
+import SwitchInput from "../inputs/Switch";
 
 type OpenScreenButtonProps = {
   label: string;
@@ -26,6 +27,17 @@ type OpenScreenButtonProps = {
   extraClasses?: string;
   bgColor?: string;
   onPressFn: () => void;
+  switchProps?: {
+    label: string;
+    value: boolean;
+    onValueChange: (isEnabled: boolean) => void;
+    trackColor?: { false: string; true: string };
+    thumbColor?: string;
+    ios_backgroundColor?: string;
+    extraClasses?: string;
+  } | null;
+  redAlert: boolean;
+  greenAlert?: boolean;
 };
 
 const iconLibraries = {
@@ -53,6 +65,9 @@ export default function OpenMenuButton({
   extraClasses,
   bgColor,
   onPressFn,
+  switchProps,
+  redAlert,
+  greenAlert,
 }: OpenScreenButtonProps): JSX.Element {
   const rotationValue = useRef(new Animated.Value(0)).current; // Valeur animée pour la rotation
   const [rotated, setRotated] = useState(false); // État pour savoir si l'icône est déjà pivotée
@@ -87,6 +102,11 @@ export default function OpenMenuButton({
       <View
         className={`flex flex-row w-auto py-4 items-center rounded-lg ${bgColor ? bgColor : "bg-darkbg/20 dark:bg-lightbg/25"}`}
       >
+        {switchProps && (
+          <View className="w-[60px]">
+            <SwitchInput {...switchProps} />
+          </View>
+        )}
         <View className="flex flex-row flex-grow ml-3">
           <TextBody1>{label}</TextBody1>
           {icon && IconComponent && (
@@ -96,6 +116,15 @@ export default function OpenMenuButton({
               color="#FFFFFF"
               className={`ml-2 ${iconColor ? `text-${iconColor}` : ""}`}
             />
+          )}
+        </View>
+        <View className="mr-5">
+          {redAlert && (
+            <View className="bg-danger h-4 w-4 rounded-lg"></View>
+            // <FontAwesome5Icon name="exclamation" color="#ff0000" size={20} />
+          )}
+          {greenAlert && (
+            <View className="bg-primary h-4 w-4 rounded-lg"></View>
           )}
         </View>
         <View className="pr-4">

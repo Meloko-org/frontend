@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, JSX } from "react";
 import { TouchableOpacity, Text, View } from "react-native";
 
 type InputRadioGroupData = {

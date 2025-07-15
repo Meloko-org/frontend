@@ -21,6 +21,7 @@ import ThumbnailCarousel from "../../components/utils/ThumbnailCarousel";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import stocksTools from "../../modules/stocksTools";
 import TextHeading3 from "../../components/utils/texts/Heading3";
+import { useCanPost } from "../../hooks/useCanPost";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -32,14 +33,6 @@ type Props = {
 };
 
 export default function ShopProducteurScreen({ navigation }: Props) {
-  // à remplacer par les images du producteur
-  const fakeImages = [
-    require("../../assets/images/image1.jpg"),
-    require("../../assets/images/image2.png"),
-    require("../../assets/images/image3.jpg"),
-    require("../../assets/images/image4.jpg"),
-  ];
-
   const [description, setDescription] = useState<string>("");
 
   const { getToken } = useAuth();
@@ -48,6 +41,8 @@ export default function ShopProducteurScreen({ navigation }: Props) {
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
+
+  const canPost = useCanPost();
 
   const [shopData, setShopData] = useState(shopStore);
   const [hasZeroStock, setHasZeroStock] = useState<boolean | undefined>(false);
@@ -218,7 +213,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
             label="Options Premium"
             bgColor="bg-premium"
             notice="2"
-            redAlert={true}
+            redAlert={!canPost}
             onPressFn={() =>
               navigation.navigate("PremiumOptions", {
                 from: "ShopProducer",

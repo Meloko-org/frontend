@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { Text } from "react-native";
 
 type TextBody2Props = {

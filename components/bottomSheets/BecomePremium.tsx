@@ -16,7 +16,7 @@ export default function BecomePremium(props: SheetProps<"product-details">) {
       gestureEnabled={true}
       id={props.sheetId}
     >
-      <View className="flex justify-center items-center p-3 w-full h-full">
+      <View className="flex justify-center items-center p-3 w-full h-full bg-lightbg dark:bg-darkbg">
         <View>
           <TextBody1 centered>
             En devenant membre Premium, bla bla bla. Cet abonnement est au prix

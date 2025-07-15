@@ -1,14 +1,11 @@
-import { View, Alert, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import React from "react";
-import { useColorScheme } from "nativewind";
-
-import Text from "../../components/utils/inputs/Text";
-import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
-import ButtonSecondaryEnd from "../../components/utils/buttons/SecondaryEnd";
-import CustomButton from "../../components/utils/buttons/Custom";
 import { useAuth } from "@clerk/clerk-expo";
 import { useState, useEffect } from "react";
+import { useColorScheme } from "nativewind";
+
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../types/Navigation";
+
 import { useSelector, useDispatch } from "react-redux";
 import { UserState, updateUser, resetUser } from "../../reducers/user";
 import {
@@ -20,23 +17,25 @@ import { ShopState, setShopData, resetShopData } from "../../reducers/shop";
 import { ModeState, changeMode } from "../../reducers/mode";
 import { emptyCart } from "../../reducers/cart";
 
-// import SignInScreen from "../Signin";
-import SignInScreen from "../Signin";
-import TextHeading2 from "../../components/utils/texts/Heading2";
-import TextBody1 from "../../components/utils/texts/Body1";
-import TextBody2 from "../../components/utils/texts/Body2";
+import producerTools from "../../modules/producerTools";
 import userTools from "../../modules/userTools";
+import shopTools from "../../modules/shopTools";
+
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-gesture-handler";
+
+import { View, Alert, StyleSheet } from "react-native";
+import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
+import ButtonSecondaryEnd from "../../components/utils/buttons/SecondaryEnd";
+import CustomButton from "../../components/utils/buttons/Custom";
+import TextHeading2 from "../../components/utils/texts/Heading2";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import MainButton from "../../components/utils/buttons/MainButton";
-import producerTools from "../../modules/producerTools";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
-const FontAwesome = _Fontawesome as React.ElementType;
-
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
+import ColorSchemeButton from "../../components/utils/buttons/ColorScheme";
 import TextHeading4 from "../../components/utils/texts/Heading4";
-import { ScrollView } from "react-native-gesture-handler";
-import shopTools from "../../modules/shopTools";
+import IconButton from "../../components/utils/buttons/Icon";
+const FontAwesome = _Fontawesome as React.ElementType;
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -200,30 +199,55 @@ export default function UserProfileScreen({ navigation }: Props) {
   console.log("");
 
   return (
-    <SafeAreaView className="flex bg-lightbg dark:bg-darkbg">
-      <View className="p-3 ">
-        {isSignedIn ? (
-          <View className="h-full relative flex">
-            <TextHeading2 extraClasses="mb-5" centered>
-              Mon compte
-            </TextHeading2>
-            <ScrollView>
-              <View>
+    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
+      <View className="flex-1">
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          showsVerticalScrollIndicator={false}
+          className="flex h-full w-full p-3"
+        >
+          {isSignedIn ? (
+            <>
+              <View className="flex flex-row items-center mb-5">
+                <View className="">
+                  <ColorSchemeButton
+                    iconName={colorScheme === "dark" ? "sun" : "moon"}
+                    iconFamily="FontAwesome5Icon"
+                    size={40}
+                    onPressFn={toggleMode}
+                  />
+                </View>
+                <View className="flex-grow">
+                  <TextHeading4 centered>{`MON COMPTE`}</TextHeading4>
+                </View>
+                <View className="">
+                  <IconButton
+                    iconName="sign-in-alt"
+                    iconFamily="FontAwesome5Icon"
+                    iconColor="#98B66E"
+                    size={40}
+                    onPressFn={onSignoutPress}
+                    extraClasses="border border-primary"
+                  />
+                </View>
+              </View>
+
+              <View className="mt-5">
                 <OpenScreenButton
                   label="Mes commandes"
                   onPressFn={handleOrdersPress}
                   extraClasses="mb-1"
-                ></OpenScreenButton>
+                />
 
                 <OpenScreenButton
                   label="Mes alertes"
                   onPressFn={() => console.log("pressed button")}
                   extraClasses="mb-1"
-                ></OpenScreenButton>
+                />
 
-                <View style={styles.app} className="mb-4">
-                  <View style={styles.row}>
-                    <View style={styles[`1col`]}>
+                <View className="my-4">
+                  <View className="flex flex-row justify-around">
+                    <View>
                       <MainButton
                         iconName="magnifying-glass"
                         iconSize={50}
@@ -233,9 +257,10 @@ export default function UserProfileScreen({ navigation }: Props) {
                         buttonType="label-icon-top"
                         label="Rechercher"
                         buttonBackground={true}
+                        extraClasses="py-2 w-24"
                       ></MainButton>
                     </View>
-                    <View style={styles[`1col`]}>
+                    <View>
                       <MainButton
                         iconName="car"
                         iconSize={50}
@@ -244,9 +269,10 @@ export default function UserProfileScreen({ navigation }: Props) {
                         buttonType="label-icon-top"
                         label="Visiter"
                         buttonBackground={true}
+                        extraClasses="py-2 w-24"
                       ></MainButton>
                     </View>
-                    <View style={styles[`1col`]}>
+                    <View>
                       <MainButton
                         iconName="heart"
                         iconSize={50}
@@ -255,6 +281,7 @@ export default function UserProfileScreen({ navigation }: Props) {
                         buttonType="label-icon-top"
                         label="Favoris"
                         buttonBackground={true}
+                        extraClasses="py-2 w-24"
                       ></MainButton>
                     </View>
                   </View>
@@ -264,53 +291,42 @@ export default function UserProfileScreen({ navigation }: Props) {
                   label="Mes informations"
                   onPressFn={handlePersonalInfoPress}
                   extraClasses="mb-1"
-                ></OpenScreenButton>
+                />
                 <OpenScreenButton
                   label="Nous contacter"
                   onPressFn={() => console.log("pressed button")}
                   extraClasses="mb-1"
-                ></OpenScreenButton>
-
-                <ButtonPrimaryEnd
-                  label={colorScheme === "dark" ? "Mode clair" : "Mode sombre"}
-                  iconName={colorScheme === "dark" ? "sun-o" : "moon-o"}
-                  disabled={false}
-                  onPressFn={toggleMode}
-                  extraClasses="mb-3"
-                />
-                <ButtonSecondaryEnd
-                  label="Déconnexion"
-                  iconName="arrow-right"
-                  onPressFn={onSignoutPress}
-                  extraClasses="mb-3"
-                  disabled={false}
-                  isLoading={false}
                 />
               </View>
-            </ScrollView>
-            <CustomButton
-              label="Basculer en mode Producteur"
-              extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-5 px-5 h-[60px]"
-              textClasses="text-lightbg dark:text-tertiary text-lg font-bold"
-              onPressFn={switchProducer}
-            ></CustomButton>
-          </View>
-        ) : (
-          <View className="flex justify-center items-center h-full">
-            <TextHeading2 extraClasses="mb-3">
-              Connectez-vous pour voir votre profil.
-            </TextHeading2>
-            <ButtonPrimaryEnd
-              label="Connexion"
-              iconName="sign-in"
-              disabled={isUserSaveLoading}
-              extraClasses="w-full"
-              onPressFn={() => setIsSigninModalVisible(true)}
-              isLoading={isUserSaveLoading}
-            />
-          </View>
-        )}
+            </>
+          ) : (
+            <View className="flex justify-center items-center h-full">
+              <TextHeading2 extraClasses="mb-3">
+                Connectez-vous pour voir votre profil.
+              </TextHeading2>
+              <ButtonPrimaryEnd
+                label="Connexion"
+                iconName="sign-in"
+                disabled={isUserSaveLoading}
+                extraClasses="w-full"
+                onPressFn={() => setIsSigninModalVisible(true)}
+                isLoading={isUserSaveLoading}
+              />
+            </View>
+          )}
+        </ScrollView>
       </View>
+
+      {isSignedIn && (
+        <View className="absolute bottom-0 flex items-center w-full">
+          <CustomButton
+            label="Basculer en mode Producteur"
+            extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-5 px-5 h-[60px]"
+            textClasses="text-lightbg dark:text-tertiary text-lg font-bold"
+            onPressFn={switchProducer}
+          />
+        </View>
+      )}
 
       {/* <SignInScreen
         showModal={isSigninModalVisible}
@@ -319,27 +335,3 @@ export default function UserProfileScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  app: {
-    flex: 4, // the number of columns you want to devide the screen into
-    marginHorizontal: "auto",
-    width: "100%",
-  },
-  row: {
-    flexDirection: "row",
-  },
-  "1col": {
-    flex: 1,
-    padding: 5,
-  },
-  "2col": {
-    flex: 2,
-  },
-  "3col": {
-    flex: 3,
-  },
-  "4col": {
-    flex: 4,
-  },
-});

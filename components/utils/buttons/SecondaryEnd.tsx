@@ -1,23 +1,60 @@
-import React, { useRef } from "react";
+import React, { JSX, useRef } from "react";
 import { Text, View, TouchableOpacity, Animated, Easing } from "react-native";
-import _Fontawesome from "react-native-vector-icons/FontAwesome";
+
+import EntypoIcon from "@expo/vector-icons/Entypo";
+import EvilIcon from "@expo/vector-icons/EvilIcons";
+import FeatherIcon from "@expo/vector-icons/Feather";
+import FontAwesomeIcon from "@expo/vector-icons/FontAwesome";
+import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
+import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
+import FontistoIcon from "@expo/vector-icons/Fontisto";
+import FoundationIcon from "@expo/vector-icons/Foundation";
+import IonIcon from "@expo/vector-icons/Ionicons";
+import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons";
+import MaterialIcon from "@expo/vector-icons/MaterialIcons";
+import OctIcon from "@expo/vector-icons/Octicons";
+import SimpleLineIcon from "@expo/vector-icons/SimpleLineIcons";
+import ZocialIcon from "@expo/vector-icons/Zocial";
+
 import { GestureResponderEvent } from "react-native";
-const FontAwesome = _Fontawesome as React.ElementType;
-import { useColorScheme } from "nativewind";
 
 type ButtonSecondaryEndProps = {
   label: string;
+  iconFamily?: keyof typeof iconLibraries;
   iconName: string;
   extraClasses?: string;
-  disabled: boolean;
+  disabled?: boolean;
   onPressFn: ((event: GestureResponderEvent) => void) | undefined;
   isLoading: boolean;
 };
 
-export default function ButtonSecondaryEnd(
-  props: ButtonSecondaryEndProps,
-): JSX.Element {
-  const { colorScheme } = useColorScheme();
+const iconLibraries = {
+  EntypoIcon,
+  EvilIcon,
+  FeatherIcon,
+  FontAwesomeIcon,
+  FontAwesome5Icon,
+  FontAwesome6Icon,
+  FontistoIcon,
+  FoundationIcon,
+  IonIcon,
+  MaterialCommunityIcon,
+  MaterialIcon,
+  OctIcon,
+  SimpleLineIcon,
+  ZocialIcon,
+};
+
+export default function ButtonSecondaryEnd({
+  label,
+  iconFamily,
+  iconName,
+  extraClasses,
+  disabled,
+  onPressFn,
+  isLoading,
+}: ButtonSecondaryEndProps): JSX.Element {
+  // const { colorScheme } = useColorScheme();
 
   const ball1 = useRef(new Animated.Value(0)).current;
   const ball2 = useRef(new Animated.Value(0)).current;
@@ -64,17 +101,21 @@ export default function ButtonSecondaryEnd(
     ]),
   ).start();
 
+  const IconComponent = iconFamily
+    ? iconLibraries[iconFamily]
+    : FontAwesome5Icon;
+
   return (
     <TouchableOpacity
       className={`
-					${props.extraClasses} 
-					${props.disabled ? "bg-lightbg/60" : "bg-lightbg/90 dark:bg-transparent"}
-					 border border-primary relative flex flex-row rounded-lg shadow-sm py-1 justify-center items-center px-4 w-min
+					${extraClasses} 
+					${disabled ? "bg-lightbg/60" : "bg-lightbg/90 dark:bg-transparent"}
+					 border border-primary relative flex flex-row rounded-lg shadow-sm py-1 justify-center items-center px-2 w-min
 				`}
-      onPress={props.onPressFn}
-      disabled={props.disabled}
+      onPress={onPressFn}
+      disabled={disabled}
     >
-      {props.isLoading ? (
+      {isLoading ? (
         <View className="flex flex-row space-x-2 justify-center items-center h-12">
           <Animated.View
             className="h-4 w-4 bg-lightbg rounded-full"
@@ -91,16 +132,34 @@ export default function ButtonSecondaryEnd(
         </View>
       ) : (
         <>
-          <Text className="text-darkbg text-center m-2 font-bold text-[24px] dark:text-lightbg">
-            {props.label}
+          <View className="flex flex-row items-center">
+            <View className="flex-grow">
+              <Text className="text-lightbg text-center font-bold text-[24px]">
+                {label}
+              </Text>
+            </View>
+            <View>
+              {IconComponent && (
+                <IconComponent
+                  name={iconName}
+                  size={25}
+                  color="#FFFFFF"
+                  // className="absolute"
+                  // style={{ right: 20 }}
+                />
+              )}
+            </View>
+          </View>
+          {/* <Text className="text-darkbg text-center m-2 font-bold text-[24px] dark:text-lightbg">
+            {label}
           </Text>
           <FontAwesome
-            name={props.iconName}
+            name={iconName}
             size={25}
             color={colorScheme === "dark" ? "#FCFFF0" : "#262E20"}
             className="absolute"
             style={{ right: 20 }}
-          />
+          /> */}
         </>
       )}
     </TouchableOpacity>

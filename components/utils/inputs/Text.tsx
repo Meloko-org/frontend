@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   NativeSyntheticEvent,
   TextInputFocusEventData,
+  KeyboardTypeOptions,
+  TextInputProps,
 } from "react-native";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
 const FontAwesome = _Fontawesome as React.ElementType;
@@ -16,9 +18,9 @@ type InputTextProps = {
   placeholder: string;
   label: string;
   autoCapitalize?: "none" | "sentences" | "words" | "characters" | undefined;
-  keyboardType?: null | string;
-  textContentType?: string;
-  autoComplete?: string;
+  keyboardType?: undefined | KeyboardTypeOptions;
+  textContentType?: TextInputProps["textContentType"];
+  autoComplete?: TextInputProps["autoComplete"];
   onChangeText: (value: string) => void;
   onBlur?: () => void;
   editable?: boolean;
@@ -85,9 +87,12 @@ export default function InputText({
           placeholderTextColor={colorScheme === "dark" ? "#FCFFF0" : "#444C3D"}
           onChangeText={(value) => onChangeText(value)}
           onBlur={() => onBlur?.()}
-          autoCapitalize={autoCapitalize ? "none" : autoCapitalize}
+          autoCapitalize={autoCapitalize}
           secureTextEntry={secureTextEntry}
           editable={editable}
+          keyboardType={keyboardType}
+          textContentType={textContentType}
+          autoComplete={autoComplete}
           multiline={twoLines ?? false}
         ></TextInput>
       </View>

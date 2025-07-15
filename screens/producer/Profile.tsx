@@ -392,27 +392,33 @@ export default function ProducerProfileScreen({ navigation }: Props) {
             </View>
           </View>
 
-          <View className="px-3 items-center">
-            <Text className="text-premium text-lg font-bold">
-              Membre PREMIUM
-            </Text>
-            <Text className="text-secondary dark:text-lightbg text-md">
-              jusqu'au 21/12/25
-            </Text>
-          </View>
-
-          <View className="px-5">
-            <CustomButton
-              label="Devenir membre Premium"
-              icon="crown"
-              iconFamily="FontAwesome5Icon"
-              extraClasses="bg-premium rounded-full my-4 h-[60px]"
-              textClasses="text-lightbg text-lg font-bold"
-              onPressFn={async () => await SheetManager.show("become-premium")}
-            />
-          </View>
+          {shopStore?.isPremium ? (
+            <View className="px-3 items-center">
+              <Text className="text-premium text-lg font-bold">
+                Membre PREMIUM
+              </Text>
+              <Text className="text-secondary dark:text-lightbg text-md">
+                jusqu'au 21/12/25
+              </Text>
+            </View>
+          ) : (
+            <View className="px-5">
+              <CustomButton
+                label="Devenir membre Premium"
+                icon="crown"
+                iconFamily="FontAwesome5Icon"
+                extraClasses="bg-premium rounded-full my-4 h-[60px]"
+                textClasses="text-lightbg text-lg font-bold"
+                onPressFn={async () =>
+                  await SheetManager.show("become-premium")
+                }
+              />
+            </View>
+          )}
         </ScrollView>
+      </View>
 
+      <View className="absolute bottom-0 flex items-center w-full">
         <CustomButton
           label="Basculer en mode Utilisateur"
           extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-4 px-5 h-[60px]"

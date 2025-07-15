@@ -28,51 +28,49 @@ export default function PostTypeScreen({ navigation }: Props) {
   const { from, backLabel, screenTitle } = route.params || {};
 
   return (
-    <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
-      <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-        <TopBar
-          backLabel={backLabel || "Retour au premium"}
-          screen={from || "PremiumOptions"}
-          label={screenTitle || "OPTIONS\nPREMIUM"}
-          extraClasses="mt-2"
-        />
+    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
+      <TopBar
+        backLabel={backLabel || "Retour au premium"}
+        screen={from || "PremiumOptions"}
+        label={screenTitle || "CRÉER un\nPOST"}
+        extraClasses="mt-2"
+      />
 
-        <View className="px-3">
-          <OpenScreenButton
-            label="Produit"
-            onPressFn={() => {
-              navigation.navigate("ProductPostChoice", {
-                from: "PostType",
-                backLabel: "Retour au type",
-                screenTitle: "CHOISIR\nUN PRODUIT",
-              });
-            }}
-            extraClasses="mb-1"
-          />
-          <OpenScreenButton
-            label="Avis"
-            onPressFn={() => {
-              navigation.navigate("NoticePostChoice", {
-                from: "PostType",
-                backLabel: "Retour au type",
-                screenTitle: "CHOISIR\nUN AVIS",
-              });
-            }}
-            extraClasses="mb-1"
-          />
-          <OpenScreenButton
-            label="Activité"
-            onPressFn={() => {
-              navigation.navigate("ActivityPost", {
-                from: "PostType",
-                backLabel: "Retour au type",
-                screenTitle: "POSTER UNE\nACTIVITE",
-              });
-            }}
-            extraClasses="mb-1"
-          />
-        </View>
-      </SafeAreaView>
-    </View>
+      <View className="px-3 pt-5">
+        <OpenScreenButton
+          label="Produit"
+          onPressFn={() => {
+            navigation.navigate("ProductPostChoice", {
+              from: "PostType",
+              backLabel: "Retour au type",
+              screenTitle: "CHOISIR\nUN PRODUIT",
+            });
+          }}
+          extraClasses="mb-1"
+        />
+        <OpenScreenButton
+          label="Avis"
+          onPressFn={() => {
+            navigation.navigate("NoticePostChoice", {
+              from: "PostType",
+              backLabel: "Retour au type",
+              screenTitle: "CHOISIR\nUN AVIS",
+            });
+          }}
+          extraClasses="mb-1"
+        />
+        <OpenScreenButton
+          label="Activité"
+          onPressFn={() => {
+            navigation.navigate("ActivityPost", {
+              from: "PostType",
+              backLabel: "Retour au type",
+              screenTitle: "POSTER UNE\nACTIVITE",
+            });
+          }}
+          extraClasses="mb-1"
+        />
+      </View>
+    </SafeAreaView>
   );
 }
