@@ -106,52 +106,7 @@ export default function StocksScreen({ navigation }: Props) {
     });
   };
 
-  // const handleOpenEdit = async (product: StockData) => {
-  //   await handleSheetFlow({
-  //     sheet: "edit-product",
-  //     payload: { stock: product },
-  //     onAfter: async (action) => {
-  //       switch (action) {
-  //         case "edit-success":
-  //           await showAlert("Modification effectuée.", "success");
-  //           break;
-  //         case "edit-failed":
-  //           await showAlert(" Echec de la modification", "error");
-  //           break;
-  //         case "delete":
-  //           const confirmed = await showConfirm("supprimer ce produit ?");
-  //           if (!confirmed) return;
-  //           console.log("product Id :", product._id);
-  //           await deleteProduct(product._id);
-  //           break;
-  //         default:
-  //           break;
-  //       }
-  //     },
-  //   });
-  // };
-
-  // const deleteProduct = async (id: string) => {
-  //   const token = await getToken();
-  //   const deleteResponse = await stocksTools.deleteStocks(token, id);
-
-  //   if (!deleteResponse.success) {
-  //     await showAlert(deleteResponse.message!, "error");
-  //     return false;
-  //   }
-
-  //   dispatch(setProducts(deleteResponse.data!));
-
-  //   await showAlert("Produit supprimé.", "success");
-  //   return true;
-  // };
-
-  // console.log("------------------------------------ STOCKS");
-  // console.log("from:", from);
-  // console.log("backLabel:", backLabel);
-  // console.log("screenTitle:", screenTitle);
-  // console.log("category:", category);
-  // console.log("family :", family);
+  console.log(stocksStore);
 
   return (
     <SafeAreaView

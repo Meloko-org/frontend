@@ -58,70 +58,73 @@ export default function ShopWithdrawModesScreen({ navigation }: Props) {
   }, []);
 
   return (
-    <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
-      <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+    <SafeAreaView
+      className="flex-1 bg-lightbg dark:bg-darkbg"
+      edges={["right", "left", "top"]}
+    >
+      <View style={{ flex: 1 }}>
         <TopBar
           backLabel={backLabel || "Retour à la boutique"}
           screen={from || "ShopProducer"}
           label={screenTitle || "MODES DE\nRETRAIT"}
           extraClasses="mt-2"
         />
+      </View>
 
+      <View className="px-3 mt-5" style={{ flex: 11 }}>
         <ScrollView>
-          <View className="px-3">
-            <OpenScreenButton
-              label="Click & Collect"
-              switchProps={{
-                label: "",
-                value: isClickCollectEnable,
-                onValueChange: setClickCollectEnable,
-                extraClasses: "ml-2",
-              }}
-              onPressFn={() =>
-                navigation.navigate("ShopWithdrawClickcollect", {
-                  from: "ShopWithdrawModes",
-                  backLabel: "Retour modes de retrait",
-                  screenTitle: "CLICK &\nCOLLECT",
-                })
-              }
-              extraClasses="mb-2"
-            />
-            <OpenScreenButton
-              label="Poins de vente"
-              switchProps={{
-                label: "",
-                value: isShopMarketsEnable,
-                onValueChange: setShopMarketsEnable,
-                extraClasses: "ml-2",
-              }}
-              onPressFn={() =>
-                navigation.navigate("ShopWithdrawShopMarkets", {
-                  from: "ShopWithdrawModes",
-                  backLabel: "Retour modes de retrait",
-                  screenTitle: "POINTS\nDE VENTE",
-                })
-              }
-              extraClasses="mb-2"
-            />
-            <OpenScreenButton
-              label="Livraison"
-              switchProps={{
-                label: "",
-                value: isDeliveryEnable,
-                onValueChange: setDeliveryEnable,
-                extraClasses: "ml-2",
-              }}
-              onPressFn={() =>
-                navigation.navigate("ShopWithdrawDelivery", {
-                  from: "ShopWithdrawModes",
-                  backLabel: "Retour modes de retrait",
-                  screenTitle: "LIVRAISON",
-                })
-              }
-            />
-          </View>
+          <OpenScreenButton
+            label="Click & Collect"
+            switchProps={{
+              label: "",
+              value: isClickCollectEnable,
+              onValueChange: setClickCollectEnable,
+              extraClasses: "ml-2",
+            }}
+            onPressFn={() =>
+              navigation.navigate("ShopWithdrawClickcollect", {
+                from: "ShopWithdrawModes",
+                backLabel: "Retour modes de retrait",
+                screenTitle: "CLICK &\nCOLLECT",
+              })
+            }
+            extraClasses="mb-2"
+          />
+          <OpenScreenButton
+            label="Poins de vente"
+            switchProps={{
+              label: "",
+              value: isShopMarketsEnable,
+              onValueChange: setShopMarketsEnable,
+              extraClasses: "ml-2",
+            }}
+            onPressFn={() =>
+              navigation.navigate("ShopWithdrawShopMarkets", {
+                from: "ShopWithdrawModes",
+                backLabel: "Retour modes de retrait",
+                screenTitle: "POINTS\nDE VENTE",
+              })
+            }
+            extraClasses="mb-2"
+          />
+          <OpenScreenButton
+            label="Livraison"
+            switchProps={{
+              label: "",
+              value: isDeliveryEnable,
+              onValueChange: setDeliveryEnable,
+              extraClasses: "ml-2",
+            }}
+            onPressFn={() =>
+              navigation.navigate("ShopWithdrawDelivery", {
+                from: "ShopWithdrawModes",
+                backLabel: "Retour modes de retrait",
+                screenTitle: "LIVRAISON",
+              })
+            }
+          />
         </ScrollView>
-      </SafeAreaView>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }

@@ -36,7 +36,7 @@ type OpenScreenButtonProps = {
     ios_backgroundColor?: string;
     extraClasses?: string;
   } | null;
-  redAlert: boolean;
+  redAlert?: boolean;
   greenAlert?: boolean;
 };
 

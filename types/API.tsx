@@ -158,6 +158,7 @@ type ShopData = {
   longDesc: string;
   photos: string[];
   videos: string[];
+  types: TypeData[];
   isOpen: boolean;
   reopenDate: Date;
   address: AddressData;
@@ -171,6 +172,13 @@ type ShopData = {
   socialPostSettings?: SocialPostSettingsData;
   [key: string]: any;
 } | null;
+
+type TypeData = {
+  _id: string;
+  name: string;
+  image: string;
+  description: string;
+};
 
 type CrewMember = {
   forname: string;
@@ -268,6 +276,7 @@ type UserData = {
 };
 
 type ProducerData = {
+  _id: string;
   socialReason: string | null;
   siren: number | null;
   owner: UserData;
@@ -306,6 +315,21 @@ type OrderSummary = {
   };
 };
 
+type ShopCategoriesWithFamiliesData = {
+  category: ProductCategoryData;
+  families: {
+    family: ProductFamilyData;
+    isClassic: boolean;
+  }[];
+};
+
+type PostThemeData = {
+  id: string;
+  title: string;
+  promptKey: string;
+  promptContext: string;
+};
+
 export type {
   UserAddressData,
   ProductData,
@@ -339,4 +363,6 @@ export type {
   ApiResponse,
   Note,
   OrderSummary,
+  ShopCategoriesWithFamiliesData,
+  PostThemeData,
 };

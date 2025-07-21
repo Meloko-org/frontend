@@ -123,15 +123,20 @@ export default function ShopParamsScreen({ navigation }: Props) {
   console.log(shopTypes);
 
   return (
-    <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
-      <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+    <SafeAreaView
+      className="bg-lightbg flex-1 dark:bg-darkbg"
+      edges={["right", "left", "top"]}
+    >
+      <View style={{ flex: 1 }}>
         <TopBar
           backLabel={backLabel || "Retour à l'accueil"}
           screen={from || "Home"}
           label={screenTitle || "CONNEXION\nINSCRIPTION"}
           extraClasses="mt-2"
         />
+      </View>
 
+      <View style={{ flex: 10 }}>
         <ScrollView>
           <View className="w-full px-3">
             <OpenMenuButton
@@ -158,20 +163,20 @@ export default function ShopParamsScreen({ navigation }: Props) {
               </View>
             </Animated.View>
           </View>
-
-          <View className="px-5">
-            <ButtonPrimaryEnd
-              label="Sauvegarder"
-              iconFamily="FontAwesome5Icon"
-              iconName="sync-alt"
-              disabled={isParamsUpdateLoading}
-              onPressFn={() => handleParamsUpdate()}
-              isLoading={isParamsUpdateLoading}
-              extraClasses="mt-5 mb-5 h-14"
-            />
-          </View>
         </ScrollView>
-      </SafeAreaView>
-    </View>
+      </View>
+
+      <View className="px-5 bg-lightbg dark:bg-darkbg" style={{ flex: 1 }}>
+        <ButtonPrimaryEnd
+          label="Sauvegarder"
+          iconFamily="FontAwesome5Icon"
+          iconName="sync-alt"
+          disabled={isParamsUpdateLoading}
+          onPressFn={() => handleParamsUpdate()}
+          isLoading={isParamsUpdateLoading}
+          extraClasses="h-14"
+        />
+      </View>
+    </SafeAreaView>
   );
 }

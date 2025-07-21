@@ -1,6 +1,11 @@
 // Navigation types
 
-import { ProductData, StockData } from "./API";
+import {
+  ProductCategoryData,
+  ProductData,
+  ShopCategoriesWithFamiliesData,
+  StockData,
+} from "./API";
 
 // To keep synced with the Native Stack
 type RootStackParamList = {
@@ -100,10 +105,17 @@ type RootStackParamList = {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
+    shopCategoriesWithFamilies: ShopCategoriesWithFamiliesData[];
   };
   ActivityPost: { from?: string; backLabel?: string; screenTitle?: string };
   NoticePostChoice: { from?: string; backLabel?: string; screenTitle?: string };
-  CreatePost: { from?: string; backLabel?: string; screenTitle?: string };
+  CreatePost: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    shopCategoriesWithFamilies: ShopCategoriesWithFamiliesData[];
+    stock: StockData;
+  };
   PostPreview: { from?: string; backLabel?: string; screenTitle?: string };
   PostNetworks: { from?: string; backLabel?: string; screenTitle?: string };
   PostFrequency: { from?: string; backLabel?: string; screenTitle?: string };

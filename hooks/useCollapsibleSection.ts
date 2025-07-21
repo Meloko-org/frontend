@@ -24,9 +24,7 @@ export function useCollapsibleSection(duration: number = 300) {
   };
 
   const toggle = () => {
-    console.log("toggle - isOpen :", isOpen);
     const next = !isOpen;
-    console.log("toggle - next :", next);
     setIsOpen(next);
     animate(next);
   };
@@ -38,8 +36,6 @@ export function useCollapsibleSection(duration: number = 300) {
   };
 
   const refresh = () => {
-    console.log("refresh");
-    console.log("isOpen :", isOpen);
     if (lastLayoutHeight > 0) {
       contentHeight.value = lastLayoutHeight;
       if (isOpen) {

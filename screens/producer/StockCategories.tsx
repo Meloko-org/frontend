@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { useState, useEffect } from "react";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -96,12 +96,15 @@ export default function StockCategoriesScreen({ navigation }: Props) {
   };
 
   const fetchProductsTypes = async () => {
+    // retourne les types de produit ("bulk", "classic"... ) pour chaque catégorie
     const productsTypesResponse =
       await stocksTools.getProductsTypesByCategory();
     if (!productsTypesResponse.success) {
       console.log(productsTypesResponse.message);
       return;
     }
+
+    console.log(JSON.stringify(productsTypesResponse.data, null, 2));
 
     if (productsTypesResponse.success && productsTypesResponse.data) {
       const formatted: ProductsTypesByCategory[] = Object.entries(
@@ -110,6 +113,8 @@ export default function StockCategoriesScreen({ navigation }: Props) {
         categoryName,
         productsTypes,
       }));
+
+      console.log(JSON.stringify(formatted, null, 2));
 
       dispatch(setProductsTypes(formatted));
     }
@@ -133,6 +138,8 @@ export default function StockCategoriesScreen({ navigation }: Props) {
         ),
       );
 
+      console.log(availableCategories);
+
       // on ajoute le nombre de produits pour chaque catégorie qui appartient aux types du shop
       const availableCategoriesWithCount = availableCategories?.map(
         (category) => {
@@ -145,6 +152,8 @@ export default function StockCategoriesScreen({ navigation }: Props) {
           };
         },
       );
+
+      console.log(JSON.stringify(availableCategoriesWithCount, null, 2));
 
       setOpenScreenButtons(
         availableCategoriesWithCount!.map((cat, index) => {

@@ -41,12 +41,12 @@ export default function PremiumOptionsScreen({ navigation }: Props) {
 
   const canPost = useCanPost();
 
-  console.log(canPost);
-  console.log(JSON.stringify(shopStore?.socials, null, 2));
+  // console.log(canPost);
+  // console.log(JSON.stringify(shopStore?.socials, null, 2));
 
   return (
     <SafeAreaView
-      className="flex-1 bg-lightbg flex-1 dark:bg-darkbg"
+      className="flex-1 bg-lightbg dark:bg-darkbg"
       edges={["right", "left", "top"]}
     >
       <View style={{ flex: 1 }}>
@@ -54,7 +54,7 @@ export default function PremiumOptionsScreen({ navigation }: Props) {
           backLabel={backLabel || "Retour à la boutique"}
           screen={from || "ShopProducer"}
           label={screenTitle || "OPTIONS\nPREMIUM"}
-          extraClasses="mt-2 mb-5"
+          extraClasses="mt-2"
         />
       </View>
 
@@ -67,7 +67,7 @@ export default function PremiumOptionsScreen({ navigation }: Props) {
             navigation.navigate("PostType", {
               from: "PremiumOptions",
               backLabel: "Retour au premium",
-              screenTitle: "CREER\nUN POST",
+              screenTitle: "TYPE\nDE POST",
             });
           }}
           extraClasses="mb-1"

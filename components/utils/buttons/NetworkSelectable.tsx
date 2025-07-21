@@ -18,17 +18,12 @@ import OctIcon from "@expo/vector-icons/Octicons";
 import SimpleLineIcon from "@expo/vector-icons/SimpleLineIcons";
 import ZocialIcon from "@expo/vector-icons/Zocial";
 
-type IconButtonProps = {
+type NetworkSelectableButtonProps = {
   iconName: string;
   iconFamily?: keyof typeof iconLibraries;
-  iconColor?: string;
-  buttonColor?: string;
   extraClasses?: string;
-  onPressFn:
-    | ((event: GestureResponderEvent) => void)
-    | ((uri: string) => void)
-    | undefined;
-  animated?: boolean;
+  selected: boolean;
+  onPressFn: (event: GestureResponderEvent) => void;
   size?: number;
 };
 
@@ -49,41 +44,24 @@ const iconLibraries = {
   ZocialIcon,
 };
 
-export default function IconButton({
+export default function NetworkSelectableButton({
   iconName,
   iconFamily,
-  iconColor,
-  buttonColor,
   extraClasses,
+  selected,
   onPressFn,
-  animated = false,
   size,
-}: IconButtonProps): JSX.Element {
-  const rotationValue = useRef(new Animated.Value(0)).current; // Valeur animée pour la rotation
-  const [rotated, setRotated] = useState(false); // État pour savoir si l'icône est déjà pivotée
+}: NetworkSelectableButtonProps): JSX.Element {
+  const [toggleOn, setToggleOn] = useState<boolean>(
+    selected === true ? selected : false,
+  );
 
-  // Fonction pour lancer l'animation
-  const startAnimation = () => {
-    Animated.timing(rotationValue, {
-      toValue: rotated ? 0 : 1, // Tourne dans un sens ou l'autre
-      duration: 300, // Durée de l'animation
-      useNativeDriver: true, // Utilisation du driver natif pour de meilleures performances
-      easing: Easing.inOut(Easing.ease), // Animation fluide
-    }).start(() => setRotated(!rotated)); // Bascule l'état de rotation une fois l'animation terminée
+  const toggleButton = () => {
+    setToggleOn((prev) => !prev);
   };
 
-  // Calcule la rotation en fonction de la valeur animée (0 à 180 degrés)
-  const rotation = rotationValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "180deg"],
-  });
-
   const handlePress = (event: GestureResponderEvent) => {
-    // Si l'animation est activée via la prop, démarre l'animation
-    if (animated) {
-      startAnimation();
-    }
-
+    toggleButton();
     // Appelle la fonction onPressFn si elle est passée
     if (onPressFn) {
       onPressFn(event);
@@ -96,19 +74,20 @@ export default function IconButton({
 
   return (
     <TouchableOpacity
-      className={`${extraClasses} flex flex-row rounded-lg ${buttonColor} justify-center items-center`}
+      className={`
+				${extraClasses} 
+				flex flex-row border border-primary rounded-lg justify-center items-center
+				${toggleOn ? "bg-primary" : "bg-tertiary"}
+			`}
       onPress={handlePress}
     >
-      {/* Applique la rotation à l'icône via transform */}
-      <Animated.View style={{ transform: [{ rotate: rotation }] }}>
-        {IconComponent && (
-          <IconComponent
-            name={iconName}
-            size={size ? size : 25}
-            color={iconColor}
-          />
-        )}
-      </Animated.View>
+      {IconComponent && (
+        <IconComponent
+          name={iconName}
+          size={size ? size : 25}
+          color={"white"}
+        />
+      )}
     </TouchableOpacity>
   );
 }

@@ -213,8 +213,6 @@ export default function BusinessCenterScreen({ navigation }: Props) {
     // });
   };
 
-  console.log("createdAt shop :", shopStore?.createdAt);
-
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <TextHeading3

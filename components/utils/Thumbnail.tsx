@@ -56,8 +56,6 @@ export default function Thumbnail({
     </View>
   );
 
-  console.log("THUMBNAIL source :", source);
-
   return (
     <View className={extraClasses}>
       {clickable && onPress ? (
