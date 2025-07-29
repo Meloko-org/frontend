@@ -116,7 +116,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
       return;
     }
 
-    console.log("result :", JSON.stringify(ordersResponse.data, null, 2));
+    // console.log("result :", JSON.stringify(ordersResponse.data, null, 2));
 
     dispatch(setOrders(ordersResponse.data || []));
 

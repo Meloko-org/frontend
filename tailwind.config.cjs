@@ -27,6 +27,7 @@ module.exports = {
         danger: "#942911",
         warning: "#D16014",
         success: "#0081A7",
+        green: "#006045",
         night: "#0A090B",
         premium: "#FAA200",
         premiumbg: "#686B65",

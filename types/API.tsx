@@ -324,10 +324,59 @@ type ShopCategoriesWithFamiliesData = {
 };
 
 type PostThemeData = {
-  id: string;
+  _id: string;
   title: string;
   promptKey: string;
   promptContext: string;
+};
+
+type GeneratedPostData = {
+  _id: string;
+  stock: StockData;
+  shop: string;
+  title: string;
+  generatedText: string;
+  imageUrl: string;
+  networks: string[];
+  theme: string;
+  productTags: string[];
+  globalTags: string[];
+  globalMentions: string[];
+  createdAt: Date;
+};
+
+type ValidatePostValues = {
+  stockId: string;
+  title: string;
+  type: string;
+  imageUrl: string;
+  generatedText: string;
+  editedText: string;
+  productTags: string[];
+  globalTags: string[];
+  globalMentions: string[];
+  networks: string[];
+  isScheduled: boolean;
+  generatedId: string;
+};
+
+type ValidatePostData = {
+  _id: string;
+  stockId: string;
+  shop: string;
+  title: string;
+  type: string;
+  imageUrl: string;
+  generatedText: string;
+  editedText: string;
+  productTags: string[];
+  globalTags: string[];
+  globalMentions: string[];
+  networks: string[];
+  scheduledFor: Date | null;
+  publishedAt: Date | null;
+  status: string;
+  errorMessage: string;
 };
 
 export type {
@@ -365,4 +414,7 @@ export type {
   OrderSummary,
   ShopCategoriesWithFamiliesData,
   PostThemeData,
+  GeneratedPostData,
+  ValidatePostValues,
+  ValidatePostData,
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useState, useEffect } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
@@ -22,6 +22,8 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import stocksTools from "../../modules/stocksTools";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import { useCanPost } from "../../hooks/useCanPost";
+import { useFocusEffect } from "@react-navigation/native";
+import postTools from "../../modules/postTools";
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -73,6 +75,23 @@ export default function ShopProducteurScreen({ navigation }: Props) {
       }),
     );
   }, [shopStore?.products]);
+
+  const [programmedPosts, setProgrammedPosts] = useState<Number>(0);
+
+  const getProgrammedPosts = async () => {
+    const token = await getToken();
+    const postResponse = await postTools.getProgrammedPosts(token);
+
+    if (!postResponse.success) console.log(postResponse.message);
+
+    if (postResponse.data) setProgrammedPosts(postResponse.data.length);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      getProgrammedPosts();
+    }, []),
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -212,13 +231,14 @@ export default function ShopProducteurScreen({ navigation }: Props) {
           <OpenScreenButton
             label="Options Premium"
             bgColor="bg-premium"
-            notice="2"
+            notice={programmedPosts.toString()}
             redAlert={!canPost}
             onPressFn={() =>
               navigation.navigate("PremiumOptions", {
                 from: "ShopProducer",
                 backLabel: "Retour à la boutique",
                 screenTitle: "OPTIONS\nPREMIUM",
+                programmedPosts: programmedPosts.toString(),
               })
             }
             extraClasses="mb-1"

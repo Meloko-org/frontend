@@ -3,19 +3,22 @@ import NetworkSelectableButton from "./utils/buttons/NetworkSelectable";
 
 type NetworkSelectorProps = {
   networks: string[];
-  onPressFn: () => void;
+  selected: string[];
+  onToggle: (network: string) => void;
 };
 
 export default function NetworkSelector({
   networks,
-  onPressFn,
+  selected,
+  onToggle,
 }: NetworkSelectorProps) {
-  const buttons = networks.map((network) => (
+  const buttons = networks.map((network, index) => (
     <NetworkSelectableButton
+      key={index}
       iconName={network}
       iconFamily="FontAwesome6Icon"
-      onPressFn={onPressFn}
-      selected={false}
+      onPressFn={() => onToggle(network)}
+      selected={selected.includes(network)}
       size={30}
       extraClasses=" p-3 mr-2"
     />

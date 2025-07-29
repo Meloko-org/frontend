@@ -1,6 +1,7 @@
 // Navigation types
 
 import {
+  PostThemeData,
   ProductCategoryData,
   ProductData,
   ShopCategoriesWithFamiliesData,
@@ -97,7 +98,12 @@ type RootStackParamList = {
     stockData?: StockData;
     productData?: ProductData;
   };
-  PremiumOptions: { from?: string; backLabel?: string; screenTitle?: string };
+  PremiumOptions: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    programmedPosts?: string;
+  };
   PostType: { from?: string; backLabel?: string; screenTitle?: string };
   ProgrammedPosts: { from?: string; backLabel?: string; screenTitle?: string };
   PostParameters: { from?: string; backLabel?: string; screenTitle?: string };
@@ -116,7 +122,17 @@ type RootStackParamList = {
     shopCategoriesWithFamilies: ShopCategoriesWithFamiliesData[];
     stock: StockData;
   };
-  PostPreview: { from?: string; backLabel?: string; screenTitle?: string };
+  PostPreview: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    shopCategoriesWithFamilies: ShopCategoriesWithFamiliesData[];
+    stock: StockData;
+    productTags: string[];
+    theme: PostThemeData | null;
+    networks: string[];
+  };
+  PostHistory: { from?: string; backLabel?: string; screenTitle?: string };
   PostNetworks: { from?: string; backLabel?: string; screenTitle?: string };
   PostFrequency: { from?: string; backLabel?: string; screenTitle?: string };
   PostHashtags: { from?: string; backLabel?: string; screenTitle?: string };

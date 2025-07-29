@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { ShopState } from "../../reducers/shop";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
-import { useRoute } from "@react-navigation/native";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
+
+import { PostThemeData, TagData } from "../../types/API";
+import { useCollapsibleSection } from "../../hooks/useCollapsibleSection";
+
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-gesture-handler";
+import Animated from "react-native-reanimated";
 
 import {
   View,
@@ -13,22 +22,14 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView } from "react-native-gesture-handler";
 import TopBar from "../../components/TopBar";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import SelectableTag from "../../components/utils/badges/SelectableTag";
-import { PostThemeData, TagData } from "../../types/API";
 import TextBody1 from "../../components/utils/texts/Body1";
-import { useSelector } from "react-redux";
-import { ShopState } from "../../reducers/shop";
-import IconButton from "../../components/utils/buttons/Icon";
 import NetworkSelector from "../../components/NetworkSelector";
-import TextHeading4 from "../../components/utils/texts/Heading4";
-import { useCollapsibleSection } from "../../hooks/useCollapsibleSection";
 import OpenMenuButton from "../../components/utils/buttons/OpenMenu";
-import Animated from "react-native-reanimated";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
+import TextBody2 from "../../components/utils/texts/Body2";
 
 type CreatePostScreenRouteProp = RouteProp<RootStackParamList, "CreatePost">;
 
@@ -52,18 +53,30 @@ export default function CreatePostScreen({ navigation }: Props) {
     (state: { shop: ShopState }) => state.shop.value,
   );
 
+  const [previewEnable, setPreviewEnable] = useState<boolean>(false);
+
   const [customProduct, setCustomProduct] = useState<boolean>(false);
   const [socials, setSocials] = useState<string[]>([]);
   const [selectedSocials, setSelectedsocials] = useState<string[]>([]);
   const [tags, setTags] = useState<TagData[] | undefined>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const themeSection = useCollapsibleSection();
-  const [sectionLabel, setSectionLabel] = useState<string>(
-    "Choisissez un thème",
-  );
   const [themes, setThemes] = useState<PostThemeData[]>([]);
-  const [selectedTheme, setSelectedTheme] = useState<PostTheme | null>(null);
+  const [selectedTheme, setSelectedTheme] = useState<PostThemeData | null>(
+    null,
+  );
 
+  // active ou désactive le bouton de preview
+  useEffect(() => {
+    if (selectedSocials.length > 0 && selectedTheme !== null) {
+      setPreviewEnable(true);
+    } else {
+      setPreviewEnable(false);
+    }
+  }, [selectedSocials, selectedTags]);
+
+  // récupère les thèmes de post pour alimenter la dropdown
   useEffect(() => {
     const fetchPostThemes = async () => {
       const response = await fetch(`${API_ROOT}/postThemes`, {
@@ -73,38 +86,14 @@ export default function CreatePostScreen({ navigation }: Props) {
           mode: "cors",
         },
       });
-
       const themes = await response.json();
-
       setThemes(themes);
     };
 
     fetchPostThemes();
   }, []);
 
-  const DATA = [
-    {
-      id: "1",
-      title: "Mettre en avant la fraîcheur",
-    },
-    {
-      id: "2",
-      title: "Parler de la saison",
-    },
-    {
-      id: "3",
-      title: "Donner une idée recette",
-    },
-    {
-      id: "4",
-      title: "Urgence: écouler le stock",
-    },
-    {
-      id: "5",
-      title: "Mettre en avant une promo",
-    },
-  ];
-
+  // définit un élément de la dropdown
   const Item = ({ theme }: { theme: PostThemeData }) => (
     <TouchableOpacity
       className="border border-tertiary mb-1 rounded-lg bg-tertiary h-12 flex flex-row items-center justify-center"
@@ -117,22 +106,52 @@ export default function CreatePostScreen({ navigation }: Props) {
     </TouchableOpacity>
   );
 
-  const handleToggleTag = () => {};
+  const handleToggleTag = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
+    );
+  };
 
-  useEffect(() => {
-    if (stock) {
-      setCustomProduct(stock.hasOwnProperty("productCustomName"));
-      setTags(stock.tags);
-      setSocials(Object.keys(shopStore?.socials));
-    }
-  }, []);
+  const handleToggleSocial = (network: string) => {
+    setSelectedsocials((prev) =>
+      prev.includes(network)
+        ? prev.filter((n) => n !== network)
+        : [...prev, network],
+    );
+  };
 
-  console.log("CREATEPOST shopcat :", shopCategoriesWithFamilies);
-  console.log("CREATEPOST le produit :", stock);
-  console.log(customProduct);
-  console.log(JSON.stringify(shopStore?.socials, null, 2));
-  console.log(socials);
-  console.log(themes);
+  useFocusEffect(
+    useCallback(() => {
+      // réinitialisation des states pour un affichage vierge à chaque passage sur la screen
+      setSelectedTags([]);
+      setSelectedTheme(null);
+      setSelectedsocials([]);
+
+      if (stock) {
+        setCustomProduct(stock.hasOwnProperty("productCustomName"));
+        setTags(stock.tags);
+
+        const connectedNetworks = Object.entries(shopStore!.socials)
+          .filter(([_, data]) => data.connected && data.isEnabled)
+          .map(([network]) => network);
+
+        setSocials(connectedNetworks);
+      }
+    }, [stock, shopStore]),
+  );
+
+  const handlePreview = () => {
+    navigation.navigate("PostPreview", {
+      from: "CreatePost",
+      backLabel: "Retour création",
+      screenTitle: "PREVISUALISATION\nDU POST",
+      shopCategoriesWithFamilies,
+      stock: stock,
+      productTags: selectedTags,
+      theme: selectedTheme,
+      networks: selectedSocials,
+    });
+  };
 
   return (
     <SafeAreaView
@@ -154,10 +173,10 @@ export default function CreatePostScreen({ navigation }: Props) {
         />
       </View>
 
-      <View className="px-3 pt-5" style={{ flex: 9 }}>
-        <ScrollView>
+      <View className="px-3" style={{ flex: 9 }}>
+        <ScrollView showsVerticalScrollIndicator={false}>
           {stock && (
-            <View className="">
+            <View className="pt-5 mb-5">
               <TextBody1 centered>Produit sélectionné</TextBody1>
               <TextHeading3 centered extraClasses="mb-2">
                 {customProduct
@@ -168,8 +187,12 @@ export default function CreatePostScreen({ navigation }: Props) {
                 <Image
                   source={
                     customProduct
-                      ? { uri: stock.image }
-                      : { uri: stock.product.image }
+                      ? stock.image
+                        ? { uri: stock.image }
+                        : require("../../assets/icon.png")
+                      : stock.product.image
+                        ? { uri: stock.product.image }
+                        : require("../../assets/icon.png")
                   }
                   className="rounded-lg"
                   alt={`photo du produit ${customProduct ? stock.productCustomName : stock.product.name}`}
@@ -181,61 +204,84 @@ export default function CreatePostScreen({ navigation }: Props) {
                 />
               </View>
 
-              <View className="flex flex-row border rounded-lg p-1 bg-white border-white dark:bg-tertiary dark:border-tertiary justify-center mb-5">
+              <View
+                className={`${stock.stock.$numberDecimal === "0" ? "bg-danger/50" : "bg-white dark:bg-tertiary"} flex flex-row border rounded-lg p-1 border-white  dark:border-tertiary justify-center mb-5`}
+              >
                 <TextBody1>Stock actuel : </TextBody1>
                 <TextBody1 extraClasses="font-bold">
                   {stock.stock.$numberDecimal}
                 </TextBody1>
               </View>
 
-              <View className="flex flex-row flex-wrap justify-center mb-2">
-                {tags &&
-                  tags.map((tag) => (
-                    <SelectableTag
-                      key={tag._id}
-                      tag={tag}
-                      onPressFn={handleToggleTag}
-                      extraClasses="mr-2 mb-2"
-                    />
-                  ))}
-              </View>
-
-              <View className="mb-3">
-                <OpenMenuButton
-                  label={selectedTheme?.title || "Choisissez un thème"}
-                  onPressFn={themeSection.toggle}
-                  extraClasses="mb-1"
-                />
-                <Animated.View
-                  style={[themeSection.animatedStyle]}
-                  className="overflow-hidden"
-                >
-                  <View
-                    onLayout={themeSection.onLayout}
-                    style={themeSection.innerContainerStyle}
-                    className="px-3"
-                  >
-                    <FlatList
-                      data={themes}
-                      renderItem={({ item }) => <Item theme={item} />}
-                      keyExtractor={(item) => item.id}
-                    />
-                  </View>
-                </Animated.View>
-              </View>
-
               <View className="">
-                <TextHeading4 centered extraClasses="mb-2">
-                  CHOIX DES RÉSEAUX
-                </TextHeading4>
-                <View className="flex flex-row justify-center">
-                  <View className="shrink">
-                    <NetworkSelector networks={socials} onPressFn={() => {}} />
-                  </View>
+                <TextBody1 centered extraClasses="font-bold mb-1">
+                  CHOIX DES TAGS
+                </TextBody1>
+                <TextBody2 centered extraClasses="mb-2">
+                  (ces tags aident l'IA à comprendre le contexte du produit)
+                </TextBody2>
+                <View className="flex flex-row flex-wrap justify-center">
+                  {tags &&
+                    tags.map((tag) => (
+                      <SelectableTag
+                        key={tag._id}
+                        tag={tag}
+                        selected={false}
+                        onPressFn={() => handleToggleTag(tag.name)}
+                        extraClasses="mr-2 mb-2"
+                      />
+                    ))}
+                  {tags && tags.length === 0 && (
+                    <TextBody1 centered>
+                      Aucun tag associé à ce produit
+                    </TextBody1>
+                  )}
                 </View>
               </View>
             </View>
           )}
+
+          <View className="mb-5">
+            <TextBody1 centered extraClasses="font-bold mb-2">
+              CHOIX DU THEME
+            </TextBody1>
+            <OpenMenuButton
+              label={selectedTheme?.title || "Choisissez un thème"}
+              onPressFn={themeSection.toggle}
+              extraClasses="mb-1"
+            />
+            <Animated.View
+              style={[themeSection.animatedStyle]}
+              className="overflow-hidden"
+            >
+              <View
+                onLayout={themeSection.onLayout}
+                style={themeSection.innerContainerStyle}
+                className="px-3"
+              >
+                <View>
+                  {themes.map((theme) => (
+                    <Item key={theme._id} theme={theme} />
+                  ))}
+                </View>
+              </View>
+            </Animated.View>
+          </View>
+
+          <View className="mb-5">
+            <TextBody1 centered extraClasses="font-bold mb-2">
+              CHOIX DES RÉSEAUX
+            </TextBody1>
+            <View className="flex flex-row justify-center">
+              <View className="shrink">
+                <NetworkSelector
+                  networks={socials}
+                  selected={selectedSocials}
+                  onToggle={handleToggleSocial}
+                />
+              </View>
+            </View>
+          </View>
         </ScrollView>
       </View>
 
@@ -245,7 +291,8 @@ export default function CreatePostScreen({ navigation }: Props) {
             label="Prévisualiser"
             iconName="arrow-right-long"
             iconFamily="FontAwesome6Icon"
-            onPressFn={() => {}}
+            disabled={!previewEnable}
+            onPressFn={handlePreview}
             extraClasses="h-14"
           />
         </View>

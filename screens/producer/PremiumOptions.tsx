@@ -1,21 +1,25 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useState, useEffect } from "react";
+import { useAuth } from "@clerk/clerk-react";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
-import { useRoute } from "@react-navigation/native";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
 import { useSelector } from "react-redux";
 import { ShopState } from "../../reducers/shop";
 
+import { useCanPost } from "../../hooks/useCanPost";
+import postTools from "../../modules/postTools";
+
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
+
 import TopBar from "../../components/TopBar";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import StatusIndicator from "../../components/utils/StatusIndicator";
-import { useCanPost } from "../../hooks/useCanPost";
 
 type PremiumOptionsScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -33,16 +37,14 @@ type Props = {
 
 export default function PremiumOptionsScreen({ navigation }: Props) {
   const route = useRoute<PremiumOptionsScreenRouteProp>();
-  const { from, backLabel, screenTitle } = route.params || {};
+  const { from, backLabel, screenTitle, programmedPosts } = route.params || {};
 
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
 
+  // vérifie les paramètres requis pour poster
   const canPost = useCanPost();
-
-  // console.log(canPost);
-  // console.log(JSON.stringify(shopStore?.socials, null, 2));
 
   return (
     <SafeAreaView
@@ -75,7 +77,7 @@ export default function PremiumOptionsScreen({ navigation }: Props) {
         <OpenScreenButton
           label="Posts programmés"
           bgColor={canPost ? "bg-premium" : "bg-premium/50"}
-          notice="2"
+          notice={programmedPosts}
           disabled={!canPost}
           onPressFn={() => {
             navigation.navigate("ProgrammedPosts", {
@@ -95,6 +97,19 @@ export default function PremiumOptionsScreen({ navigation }: Props) {
               from: "PremiumOptions",
               backLabel: "Retour au premium",
               screenTitle: "PARAMETRES",
+            });
+          }}
+          extraClasses="mb-1"
+        />
+        <OpenScreenButton
+          label="Historique des posts publiés"
+          bgColor="bg-premium"
+          redAlert={!canPost}
+          onPressFn={() => {
+            navigation.navigate("PostHistory", {
+              from: "PremiumOptions",
+              backLabel: "Retour au premium",
+              screenTitle: "HISTORIQUE\nDES POSTS",
             });
           }}
           extraClasses="mb-1"

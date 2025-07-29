@@ -1,7 +1,4 @@
 import React, { JSX } from "react";
-import { useState, useRef } from "react";
-import { TouchableOpacity, Animated, Easing } from "react-native";
-import { GestureResponderEvent } from "react-native";
 
 import EntypoIcon from "@expo/vector-icons/Entypo";
 import EvilIcon from "@expo/vector-icons/EvilIcons";
@@ -17,15 +14,7 @@ import MaterialIcon from "@expo/vector-icons/MaterialIcons";
 import OctIcon from "@expo/vector-icons/Octicons";
 import SimpleLineIcon from "@expo/vector-icons/SimpleLineIcons";
 import ZocialIcon from "@expo/vector-icons/Zocial";
-
-type NetworkSelectableButtonProps = {
-  iconName: string;
-  iconFamily?: keyof typeof iconLibraries;
-  extraClasses?: string;
-  selected: boolean;
-  onPressFn: (event: GestureResponderEvent) => void;
-  size?: number;
-};
+import { View } from "react-native";
 
 const iconLibraries = {
   EntypoIcon,
@@ -44,34 +33,26 @@ const iconLibraries = {
   ZocialIcon,
 };
 
-export default function NetworkSelectableButton({
+type NetworkIconProps = {
+  iconName: string;
+  iconFamily: keyof typeof iconLibraries;
+  color?: string;
+  size?: number;
+  extraClasses?: string;
+};
+
+export default function NetworkIcon({
   iconName,
   iconFamily,
+  color,
+  size = 25,
   extraClasses,
-  selected,
-  onPressFn,
-  size,
-}: NetworkSelectableButtonProps): JSX.Element {
-  const IconComponent = iconFamily
-    ? iconLibraries[iconFamily]
-    : FontAwesome5Icon;
+}: NetworkIconProps) {
+  const IconComponent = iconLibraries[iconFamily];
 
   return (
-    <TouchableOpacity
-      className={`
-				${extraClasses} 
-				flex flex-row border border-primary rounded-lg justify-center items-center
-				${selected ? "bg-primary" : "bg-tertiary"}
-			`}
-      onPress={onPressFn}
-    >
-      {IconComponent && (
-        <IconComponent
-          name={iconName}
-          size={size ? size : 25}
-          color={"white"}
-        />
-      )}
-    </TouchableOpacity>
+    <View className={`${extraClasses}`}>
+      <IconComponent name={iconName} color={color} size={size} />
+    </View>
   );
 }

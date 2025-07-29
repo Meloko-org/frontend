@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 
 import { TouchableOpacity, View, Text } from "react-native";
 import TextBody1 from "./utils/texts/Body1";

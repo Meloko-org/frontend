@@ -19,6 +19,7 @@ import {
   ShopData,
   ShopResultData,
   StockData,
+  ValidatePostData,
 } from "../../types/API";
 import EditProductSheet from "./EditProductSheet";
 import ProductFamiliesSheet from "./ProductFamilies";
@@ -26,6 +27,9 @@ import ConfirmSheet from "./Confirm";
 import ImageUploaderSheet from "./ImageUploader";
 import MapEmptySearchResults from "./MapEmptySearchResults";
 import ShopDetails from "./ShopDetails";
+import EditPostText from "./EditPostText";
+import ProgrammedPostPreview from "./ProgrammedPostPreview";
+import PublishedPost from "./PublishedPost";
 
 registerSheet("alert", CustomAlert);
 registerSheet("product-details", ProductDetails);
@@ -39,6 +43,9 @@ registerSheet("product-families", ProductFamiliesSheet);
 registerSheet("confirm", ConfirmSheet);
 registerSheet("image-uploader", ImageUploaderSheet);
 registerSheet("shop-details", ShopDetails);
+registerSheet("edit-post-text", EditPostText);
+registerSheet("programmed-post-preview", ProgrammedPostPreview);
+registerSheet("published-post", PublishedPost);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -121,6 +128,23 @@ declare module "react-native-actions-sheet" {
         type: string[] | string;
       };
       returnedValue: string;
+    }>;
+    "edit-post-text": SheetDefinition<{
+      payload: {
+        text: string;
+      };
+      returnValue: string;
+    }>;
+    "programmed-post-preview": SheetDefinition<{
+      payload: {
+        post: ValidatePostData;
+      };
+      returnValue: string;
+    }>;
+    "published-post": SheetDefinition<{
+      payload: {
+        post: ValidatePostData;
+      };
     }>;
   }
 }

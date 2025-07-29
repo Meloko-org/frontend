@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 import productsTools from "../../../modules/productsTools";
 
