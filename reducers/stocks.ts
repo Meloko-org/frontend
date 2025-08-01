@@ -1,12 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ProductsTypesByCategory } from "../types/API";
+import {
+  ProductsTypesByCategory,
+  ShopCategoriesWithFamiliesData,
+} from "../types/API";
 
 export type StocksState = {
   value: ProductsTypesByCategory[];
+  shopCategoriesWithFamilies?: ShopCategoriesWithFamiliesData[];
 };
 
 const initialState: StocksState = {
   value: [],
+  shopCategoriesWithFamilies: undefined,
 };
 
 export const stocksSlice = createSlice({
@@ -19,8 +24,15 @@ export const stocksSlice = createSlice({
     ): void => {
       state.value = action.payload;
     },
+    setShopCategoriesWithFamilies: (
+      state: StocksState,
+      action: PayloadAction<ShopCategoriesWithFamiliesData[] | undefined>,
+    ): void => {
+      state.shopCategoriesWithFamilies = action.payload;
+    },
   },
 });
 
-export const { setProductsTypes } = stocksSlice.actions;
+export const { setProductsTypes, setShopCategoriesWithFamilies } =
+  stocksSlice.actions;
 export default stocksSlice.reducer;

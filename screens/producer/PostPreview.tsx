@@ -15,7 +15,7 @@ import TopBar from "../../components/TopBar";
 import postTools from "../../modules/postTools";
 import Spinner from "../../components/utils/Spinner";
 import { SheetManager } from "react-native-actions-sheet";
-import { GeneratedPostData } from "../../types/API";
+import { ActivityPostData, GeneratedPostData, NoteData } from "../../types/API";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import TextBody1 from "../../components/utils/texts/Body1";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
@@ -43,8 +43,10 @@ export default function PostPreviewScreen({ navigation }: Props) {
     from,
     backLabel,
     screenTitle,
-    shopCategoriesWithFamilies,
+    postType,
     stock,
+    note,
+    activity,
     productTags,
     theme,
     networks,
@@ -54,15 +56,18 @@ export default function PostPreviewScreen({ navigation }: Props) {
   const [isGenerating, setIsGenerating] = useState<boolean>(true);
   const [generatedPost, setGeneratedPost] = useState<GeneratedPostData>();
   const [postText, setPostText] = useState<string>();
-  const [postType, setPostType] = useState<string>();
+  // const [postType, setPostType] = useState<string>();
   const [isPosting, setIsPosting] = useState<boolean>(false);
 
   const [isProgramming, setIsProgramming] = useState<boolean>(false);
 
-  const fetchGeneratedPost = async () => {
+  // fetchGeneratedPost reçoit l'élément qui constitue le sujet du post (stockId, note, ou activity)
+  const fetchGeneratedPost = async (type: string) => {
     const token = await getToken();
+
     const values = {
-      stockId: stock._id,
+      subjectType: postType,
+      elementId: stock ? stock._id : note ? note._id : activity?._id,
       selectedThemeId: theme?._id,
       productTags,
       networks,
@@ -93,10 +98,10 @@ export default function PostPreviewScreen({ navigation }: Props) {
       setGeneratedPost(undefined);
       setPostText(undefined);
 
-      fetchGeneratedPost();
+      fetchGeneratedPost(postType);
 
-      if (stock) setPostType("product");
-    }, [stock]),
+      // if (stock) setPostType("product");
+    }, [stock, note, activity]),
   );
 
   const handleEditPostText = async () => {
@@ -122,7 +127,7 @@ export default function PostPreviewScreen({ navigation }: Props) {
       const token = await getToken();
 
       const values = {
-        stockId: stock._id,
+        stockId: stock?._id,
         title: generatedPost?.title!,
         type: postType!,
         imageUrl: generatedPost?.imageUrl!,
@@ -180,8 +185,9 @@ export default function PostPreviewScreen({ navigation }: Props) {
             from: "ProductPostChoice",
             backLabel: "Retour au choix",
             screenTitle: "CRÉATION\nDU POST",
-            shopCategoriesWithFamilies,
             stock,
+            note,
+            activity,
           }}
           extraClasses="mt-2"
         />

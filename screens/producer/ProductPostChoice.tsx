@@ -40,15 +40,23 @@ type Props = {
 
 export default function ProductPostChoiceScreen({ navigation }: Props) {
   const route = useRoute<ProductPostChoiceScreenRouteProp>();
-  const { from, backLabel, screenTitle, shopCategoriesWithFamilies } =
-    route.params || {};
+  // const { from, backLabel, screenTitle, shopCategoriesWithFamilies } =
+  //   route.params || {};
+  const { from, backLabel, screenTitle } = route.params || {};
 
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
 
+  const stocksStore = useSelector(
+    (state: { stocks: StocksState }) => state.stocks.shopCategoriesWithFamilies,
+  );
+  const [shopCategoriesWithFamilies, setShopCategoriesWithFamilies] =
+    useState(stocksStore);
+
+  // création des collapsibleSections et sous sections
   const categorySections =
-    shopCategoriesWithFamilies.map((category) => {
+    shopCategoriesWithFamilies?.map((category) => {
       const categorySection = useCollapsibleSection();
 
       const hasClassic = category.families.some((family) => family.isClassic);
@@ -99,7 +107,6 @@ export default function ProductPostChoiceScreen({ navigation }: Props) {
                         from: "ProductPostChoice",
                         backLabel: "Retour au choix",
                         screenTitle: "CRÉATION\nDU POST",
-                        shopCategoriesWithFamilies,
                         stock: stock,
                       });
                     }}
@@ -124,7 +131,6 @@ export default function ProductPostChoiceScreen({ navigation }: Props) {
                   from: "ProductPostChoice",
                   backLabel: "Retour au choix",
                   screenTitle: "CRÉATION\nDU POST",
-                  shopCategoriesWithFamilies: shopCategoriesWithFamilies,
                   stock: stock,
                 });
               }}

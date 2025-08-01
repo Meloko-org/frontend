@@ -1,6 +1,8 @@
 // Navigation types
 
 import {
+  ActivityPostData,
+  NoteData,
   PostThemeData,
   ProductCategoryData,
   ProductData,
@@ -111,24 +113,30 @@ type RootStackParamList = {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
-    shopCategoriesWithFamilies: ShopCategoriesWithFamiliesData[];
   };
-  ActivityPost: { from?: string; backLabel?: string; screenTitle?: string };
+  ActivityPostChoice: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+  };
   NoticePostChoice: { from?: string; backLabel?: string; screenTitle?: string };
   CreatePost: {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
-    shopCategoriesWithFamilies: ShopCategoriesWithFamiliesData[];
-    stock: StockData;
+    stock?: StockData;
+    note?: NoteData;
+    activity?: ActivityPostData;
   };
   PostPreview: {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
-    shopCategoriesWithFamilies: ShopCategoriesWithFamiliesData[];
-    stock: StockData;
-    productTags: string[];
+    postType: string;
+    stock?: StockData;
+    note?: NoteData;
+    activity?: ActivityPostData;
+    productTags?: string[];
     theme: PostThemeData | null;
     networks: string[];
   };

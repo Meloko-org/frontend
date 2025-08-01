@@ -86,7 +86,7 @@ export default function HomeScreen({ navigation }: Props) {
       const producer = producerResponse.data;
       dispatch(setProducerData(producer));
 
-      const shopResponse = await shopTools.getShopInfos(token, producer?._id);
+      const shopResponse = await shopTools.getShopInfos(token, producer?._id!);
 
       if (!shopResponse.success) {
         console.warn(shopResponse.message);

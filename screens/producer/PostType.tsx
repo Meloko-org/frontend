@@ -6,8 +6,11 @@ import { RootStackParamList } from "../../types/Navigation";
 import { useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
-import { useSelector } from "react-redux";
-import { StocksState } from "../../reducers/stocks";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  StocksState,
+  setShopCategoriesWithFamilies,
+} from "../../reducers/stocks";
 import { ShopState } from "../../reducers/shop";
 import {
   ProductCategoryData,
@@ -39,19 +42,17 @@ export default function PostTypeScreen({ navigation }: Props) {
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
-  const stocksStore = useSelector(
-    (state: { stocks: StocksState }) => state.stocks.value,
-  );
+
+  const dispatch = useDispatch();
 
   /**
-   * on calcule ici les catégories de produits avec les familles qu'on passe en props
-   * à la screen suivante pour pouvoir créer des sections avec useCollapsibleSection
-   * (impossible d'utiliser le hook useCollaspibleSection dans un map pour créer les
-   * différentes sections si shopCategoriesWtihFamilies n'est pas défini au premier rendu)
+   * on calcule ici les catégories de produits avec les familles et on les
+   * enregistre dans le stocksStore car pour pouvoir créer des collapsibleSections imbriquées
+   * selon les catégories et les familles dans ProductPostChoice, le map doit se faire
+   * sur une valeur définié au premier rendu.
+   * Dans ProductPostChoice, il suffit de créer un state qui s'initialise la propriété
+   * shopCategoriesWithFamilies du stocks reducer et de faire le map sur ce state.
    */
-  const [shopCategoriesWithFamilies, setShopCategoriesWithFamilies] = useState<
-    ShopCategoriesWithFamiliesData[]
-  >([]);
 
   useEffect(() => {
     if (!shopStore?.products) return;
@@ -97,8 +98,10 @@ export default function PostTypeScreen({ navigation }: Props) {
       families: Array.from(entry.families.values()),
     }));
 
-    setShopCategoriesWithFamilies(result);
+    dispatch(setShopCategoriesWithFamilies(result));
   }, []);
+
+  console.log("POSTYPE :", JSON.stringify(shopStore?.notes, null, 2));
 
   return (
     <SafeAreaView
@@ -122,7 +125,6 @@ export default function PostTypeScreen({ navigation }: Props) {
               from: "PostType",
               backLabel: "Retour au type",
               screenTitle: "CHOISIR\nUN PRODUIT",
-              shopCategoriesWithFamilies: shopCategoriesWithFamilies,
             });
           }}
           extraClasses="mb-1"
@@ -141,7 +143,7 @@ export default function PostTypeScreen({ navigation }: Props) {
         <OpenScreenButton
           label="Activité"
           onPressFn={() => {
-            navigation.navigate("ActivityPost", {
+            navigation.navigate("ActivityPostChoice", {
               from: "PostType",
               backLabel: "Retour au type",
               screenTitle: "POSTER UNE\nACTIVITE",

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import ProductsNumber from "../utils/badges/Secondary";
 import _Fontawesome from "react-native-vector-icons/FontAwesome6";

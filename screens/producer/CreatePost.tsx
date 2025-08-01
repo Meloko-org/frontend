@@ -30,6 +30,9 @@ import NetworkSelector from "../../components/NetworkSelector";
 import OpenMenuButton from "../../components/utils/buttons/OpenMenu";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import TextBody2 from "../../components/utils/texts/Body2";
+import TextHeading4 from "../../components/utils/texts/Heading4";
+import globalTools from "../../modules/globalTools";
+import StarsNotation from "../../components/utils/StarsNotation";
 
 type CreatePostScreenRouteProp = RouteProp<RootStackParamList, "CreatePost">;
 
@@ -44,7 +47,7 @@ type Props = {
 
 export default function CreatePostScreen({ navigation }: Props) {
   const route = useRoute<CreatePostScreenRouteProp>();
-  const { from, backLabel, screenTitle, shopCategoriesWithFamilies, stock } =
+  const { from, backLabel, screenTitle, stock, note, activity } =
     route.params || {};
 
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
@@ -55,16 +58,46 @@ export default function CreatePostScreen({ navigation }: Props) {
 
   const [previewEnable, setPreviewEnable] = useState<boolean>(false);
 
+  // states liés au produit
   const [customProduct, setCustomProduct] = useState<boolean>(false);
-  const [socials, setSocials] = useState<string[]>([]);
-  const [selectedSocials, setSelectedsocials] = useState<string[]>([]);
   const [tags, setTags] = useState<TagData[] | undefined>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  // states liés à un avis
+
+  const [postType, setPostType] = useState<string>("Product");
+
+  const [socials, setSocials] = useState<string[]>([]);
+  const [selectedSocials, setSelectedsocials] = useState<string[]>([]);
 
   const themeSection = useCollapsibleSection();
   const [themes, setThemes] = useState<PostThemeData[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<PostThemeData | null>(
     null,
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      // réinitialisation des states pour un affichage vierge à chaque passage sur la screen
+      setSelectedTags([]);
+      setSelectedTheme(null);
+      setSelectedsocials([]);
+
+      if (stock) {
+        setCustomProduct(stock.hasOwnProperty("productCustomName"));
+        setTags(stock.tags);
+        setPostType("product");
+      } else if (note) {
+        setPostType("review");
+      }
+
+      // détection des réseaux valides
+      const connectedNetworks = Object.entries(shopStore!.socials)
+        .filter(([_, data]) => data.connected && data.isEnabled)
+        .map(([network]) => network);
+
+      setSocials(connectedNetworks);
+    }, [stock, shopStore]),
   );
 
   // active ou désactive le bouton de preview
@@ -86,12 +119,16 @@ export default function CreatePostScreen({ navigation }: Props) {
           mode: "cors",
         },
       });
-      const themes = await response.json();
-      setThemes(themes);
+      const allThemes = await response.json();
+
+      const filteredThemes = allThemes.filter(
+        (theme: PostThemeData) => theme.type === postType,
+      );
+      setThemes(filteredThemes);
     };
 
     fetchPostThemes();
-  }, []);
+  }, [postType]);
 
   // définit un élément de la dropdown
   const Item = ({ theme }: { theme: PostThemeData }) => (
@@ -120,38 +157,22 @@ export default function CreatePostScreen({ navigation }: Props) {
     );
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      // réinitialisation des states pour un affichage vierge à chaque passage sur la screen
-      setSelectedTags([]);
-      setSelectedTheme(null);
-      setSelectedsocials([]);
-
-      if (stock) {
-        setCustomProduct(stock.hasOwnProperty("productCustomName"));
-        setTags(stock.tags);
-
-        const connectedNetworks = Object.entries(shopStore!.socials)
-          .filter(([_, data]) => data.connected && data.isEnabled)
-          .map(([network]) => network);
-
-        setSocials(connectedNetworks);
-      }
-    }, [stock, shopStore]),
-  );
-
   const handlePreview = () => {
     navigation.navigate("PostPreview", {
       from: "CreatePost",
       backLabel: "Retour création",
       screenTitle: "PREVISUALISATION\nDU POST",
-      shopCategoriesWithFamilies,
+      postType,
       stock: stock,
+      note: note,
+      activity: activity,
       productTags: selectedTags,
       theme: selectedTheme,
       networks: selectedSocials,
     });
   };
+
+  console.log("CREATE :", note?.note);
 
   return (
     <SafeAreaView
@@ -163,12 +184,6 @@ export default function CreatePostScreen({ navigation }: Props) {
           backLabel={backLabel || "Retour au choix"}
           screen={from || "ProductPostchoice"}
           label={screenTitle || "CRÉATION\nDU POST"}
-          screenParams={{
-            from: "PostType",
-            backLabel: "Retour au type",
-            screenTitle: "CHOISIR\nUN PRODUIT",
-            shopCategoriesWithFamilies,
-          }}
           extraClasses="mt-2"
         />
       </View>
@@ -237,6 +252,44 @@ export default function CreatePostScreen({ navigation }: Props) {
                     </TextBody1>
                   )}
                 </View>
+              </View>
+            </View>
+          )}
+
+          {note && (
+            <View className="pt-4 mb-5">
+              <TextBody1 centered>Avis sélectionné</TextBody1>
+              <TextHeading4 centered extraClasses="mb-2">
+                {note.user.lastname} -{" "}
+                {globalTools.formatDateToFr(note.createdAt)}
+              </TextHeading4>
+              <View className="flex flex-row justify-center items-center my-1">
+                <StarsNotation
+                  iconNames={["star", "star-half-o", "star-o"]}
+                  note={note.note.$numberDecimal}
+                  extraClasses=""
+                />
+              </View>
+
+              <TextHeading4 centered extraClasses="mb-2">
+                {note.comment}
+              </TextHeading4>
+
+              <View className="border rounded-lg bg-primary w-auto h-48 mb-2">
+                <Image
+                  source={
+                    note.photo
+                      ? { uri: note.photo }
+                      : require("../../assets/images/visite.jpg")
+                  }
+                  className="rounded-lg"
+                  alt={`photo de l'avis`}
+                  resizeMode="cover"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                  }}
+                />
               </View>
             </View>
           )}

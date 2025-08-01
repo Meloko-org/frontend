@@ -288,8 +288,7 @@ const getShopInfos = async (
   id: string,
 ): Promise<ApiResponse<ShopData>> => {
   try {
-    //console.log(`${API_ROOT}/shops/myshop/${id}`);
-    const response = await fetch(`${API_ROOT}/shops/myshop/${id}`, {
+    const response = await fetch(`${API_ROOT}/shops/myshop`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -309,7 +308,7 @@ const getShopInfos = async (
     const data = await response.json();
 
     return data.success
-      ? { success: true, data: data.shop }
+      ? { success: true, data: data.shopInfos }
       : { success: false, data: null, message: data.message };
   } catch (error) {
     console.log(error);

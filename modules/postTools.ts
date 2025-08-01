@@ -1,6 +1,8 @@
 import {
+  ActivityPostData,
   ApiResponse,
   GeneratedPostData,
+  NoteData,
   ValidatePostData,
   ValidatePostValues,
 } from "../types/API";
@@ -10,13 +12,15 @@ const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 const generatePost = async (
   token: string | null,
   values: {
-    stockId: string;
+    subjectType: string;
+    elementId: string;
     selectedThemeId: string | undefined;
     productTags: string[];
     networks: string[];
   },
 ): Promise<ApiResponse<GeneratedPostData>> => {
   try {
+    console.log("POSTTOOLS: ", values);
     const response = await fetch(`${API_ROOT}/posts/generate`, {
       method: "POST",
       headers: {

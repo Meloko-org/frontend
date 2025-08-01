@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { JSX, useState } from "react";
 import { View, Text } from "react-native";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
 import { ShopData } from "../../types/API";
@@ -17,12 +17,15 @@ export default function StarsNotation(props: StarsNotationProps): JSX.Element {
   const calculNote = (): number => {
     if (props.shopData !== undefined) {
       let calcul: number = 0;
-      const path = props.shopData.notes;
-      for (let i = 0; i < path.length; i++) {
-        calcul += parseFloat(path[i].note.$numberDecimal);
+      const path = props.shopData?.notes;
+      if (path) {
+        for (let i = 0; i < path?.length!; i++) {
+          calcul += parseFloat(path[i].note.$numberDecimal);
+        }
+        calcul /= path.length;
+        return calcul;
       }
-      calcul /= path.length;
-      return calcul;
+      return 0;
     } else {
       return 0;
     }

@@ -142,10 +142,15 @@ type CartData = {
   market?: MarketData;
 };
 
-type Note = {
+type NoteData = {
   _id: string;
   note: { $numberDecimal: string } | number | any;
+  user: UserData;
+  shop: string;
   comment: string;
+  source: string;
+  photo: string | null;
+  createdAt: Date;
 };
 
 type ShopData = {
@@ -164,7 +169,7 @@ type ShopData = {
   address: AddressData;
   markets: MarketsData[];
   clickCollect: ClickCollectData;
-  notes: Note[];
+  notes: NoteData[];
   isPremium: boolean;
   crew: CrewMember[];
   products?: StockData[];
@@ -328,6 +333,8 @@ type PostThemeData = {
   title: string;
   promptKey: string;
   promptContext: string;
+  type: string;
+  order: number;
 };
 
 type GeneratedPostData = {
@@ -379,6 +386,10 @@ type ValidatePostData = {
   errorMessage: string;
 };
 
+type ActivityPostData = {
+  _id: string;
+};
+
 export type {
   UserAddressData,
   ProductData,
@@ -410,11 +421,12 @@ export type {
   ProductDetail,
   WeightData,
   ApiResponse,
-  Note,
+  NoteData,
   OrderSummary,
   ShopCategoriesWithFamiliesData,
   PostThemeData,
   GeneratedPostData,
   ValidatePostValues,
   ValidatePostData,
+  ActivityPostData,
 };

@@ -63,7 +63,7 @@ import ProgrammedPostsScreen from "./screens/producer/ProgrammedPosts";
 import PostParametersScreen from "./screens/producer/PostParameters";
 import PostHistoryScreen from "./screens/producer/PostHistory";
 import ProductPostChoiceScreen from "./screens/producer/ProductPostChoice";
-import ActivityPostScreen from "./screens/producer/ActivityPost";
+import ActivityPostChoiceScreen from "./screens/producer/ActivityPostChoice";
 import NoticePostChoiceScreen from "./screens/producer/NoticePostChoice";
 import CreatePostScreen from "./screens/producer/CreatePost";
 import PostPreviewScreen from "./screens/producer/PostPreview";
@@ -364,8 +364,8 @@ const TabNavigatorProducer: React.FC = () => {
         options={{ tabBarButton: () => null }}
       />
       <Tab.Screen
-        name="ActivityPost"
-        component={ActivityPostScreen}
+        name="ActivityPostChoice"
+        component={ActivityPostChoiceScreen}
         options={{ tabBarButton: () => null }}
       />
       <Tab.Screen

@@ -55,7 +55,7 @@ export default function PublishedPost(props: SheetProps<"published-post">) {
           <TextBody1
             centered
             extraClasses="mb-5"
-          >{`Post publié le ${globalTools.formatDateToFr(props.payload?.post.publishedAt)}`}</TextBody1>
+          >{`Post publié le ${globalTools.formatDateToFr(props.payload?.post.publishedAt!)}`}</TextBody1>
 
           <View className="flex items-center bg-tertiary h-auto py-5">
             <ScrollView showsVerticalScrollIndicator={false}>
