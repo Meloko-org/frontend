@@ -134,7 +134,7 @@ export default function ButtonSecondaryEnd({
         <>
           <View className="flex flex-row items-center">
             <View className="flex-grow">
-              <Text className="text-lightbg text-center font-bold text-[24px]">
+              <Text className="text-dark dark:text-lightbg text-center font-bold text-[24px]">
                 {label}
               </Text>
             </View>

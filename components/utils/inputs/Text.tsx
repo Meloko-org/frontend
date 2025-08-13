@@ -15,8 +15,8 @@ import { GestureResponderEvent } from "react-native";
 import { useColorScheme } from "nativewind";
 
 type InputTextProps = {
-  placeholder: string;
-  label: string;
+  placeholder?: string;
+  label?: string | null;
   autoCapitalize?: "none" | "sentences" | "words" | "characters" | undefined;
   keyboardType?: undefined | KeyboardTypeOptions;
   textContentType?: TextInputProps["textContentType"];
@@ -27,16 +27,18 @@ type InputTextProps = {
   value?: string | Date;
   size?: string;
   extraClasses?: string;
+  height?: string;
   iconName?: string;
   secureTextEntry?: boolean;
   twoLines?: boolean;
   onIconPressFn?: ((event: GestureResponderEvent) => void) | undefined;
   showError?: boolean;
+  textClasses?: string;
 };
 
 export default function InputText({
   placeholder,
-  label,
+  label = null,
   autoCapitalize,
   keyboardType,
   textContentType,
@@ -47,11 +49,13 @@ export default function InputText({
   value,
   size,
   extraClasses,
+  height = "h-[70px]",
   iconName,
   secureTextEntry,
   twoLines,
   onIconPressFn,
   showError,
+  textClasses,
 }: InputTextProps): JSX.Element {
   const { colorScheme, toggleColorScheme } = useColorScheme();
 
@@ -63,25 +67,29 @@ export default function InputText({
     <View
       className={`
         ${extraClasses}
-        h-[70px] flex flex-row rounded-lg px-2 py-1 shadow-sm border 
+        ${height}
+        flex flex-row rounded-lg px-2 py-1 shadow-sm border 
         ${borderClasses}
         bg-white dark:bg-tertiary
       `}
     >
       <View className={`flex ${iconName ? "w-4/6" : "w-full"}`}>
-        <Text
-          className={`text-xs font-bold text-secondary/50 uppercase p-0 dark:text-lightbg/50 h-5`}
-          // className={`${props.size === "large" ? "text-md" : "text-sm"} font-bold text-secondary/50 uppercase p-0 dark:text-lightbg/50 h-5`}
-        >
-          {label}
-        </Text>
+        {label && (
+          <Text
+            className={`text-xs font-bold text-secondary/50 uppercase p-0 dark:text-lightbg/50 h-5`}
+          >
+            {label}
+          </Text>
+        )}
+
         <TextInput
           value={value}
           className={`
             ${size === "large" ? "text-lg leading-5 h-10" : "text-lg/4 h-8"} 
             ${iconName ? "w-80" : "w-full"} 
             ${twoLines && "h-[60px] leading-5"}
-            dark:text-lightbg p-0
+            ${textClasses}
+            text-dark dark:text-lightbg p-0
           `}
           placeholder={placeholder}
           placeholderTextColor={colorScheme === "dark" ? "#FCFFF0" : "#444C3D"}

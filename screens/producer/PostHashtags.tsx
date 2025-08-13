@@ -128,7 +128,6 @@ export default function PostHashtagsScreen({ navigation }: Props) {
         ? prev.filter((t) => t !== tagName)
         : [...prev, tagName],
     );
-    // setHasChanges(true);
   };
 
   const addMention = (mention: string) => {
@@ -138,7 +137,6 @@ export default function PostHashtagsScreen({ navigation }: Props) {
   };
 
   const removeMention = (mention: string) => {
-    console.log(mention);
     setAllMentions((prev) => prev.filter((m) => m !== mention));
     setCustomMentions((prev) => prev.filter((m) => m !== mention));
   };
@@ -187,9 +185,6 @@ export default function PostHashtagsScreen({ navigation }: Props) {
       setSaveLoading(false);
     }
   };
-
-  console.log("customMentions :", customMentions);
-  console.log("customizedMentions :", allMentions);
 
   return (
     <SafeAreaView
@@ -265,7 +260,6 @@ export default function PostHashtagsScreen({ navigation }: Props) {
                     toggleCustomHashtag(name);
                   }}
                   onKillFn={() => {
-                    console.log("youpi");
                     setCustomizedTags((prev) => prev.filter((t) => t !== name));
                     toggleCustomHashtag(name);
                   }}
@@ -309,7 +303,6 @@ export default function PostHashtagsScreen({ navigation }: Props) {
                     toggleCustomMention(name);
                   }}
                   onKillFn={() => {
-                    console.log("remove :", name);
                     removeMention(name);
                   }}
                   extraClasses="mr-2 mb-2"

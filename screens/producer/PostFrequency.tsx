@@ -169,14 +169,17 @@ export default function PostFrequencyScreen({ navigation }: Props) {
           >
             <View className="flex-row items-center flex-wrap">
               <TextBody2 extraClasses="mr-1">M’inviter à poster</TextBody2>
-              <TextInput
+              <InputText
                 keyboardType="numeric"
                 value={timesPerWeek}
+                size="large"
                 onChangeText={(newValue) => {
                   setTimesPerWeek(newValue);
                   checkIfHasChanges(selectedMode, newValue);
                 }}
-                className="border px-2 py-1 w-12 h-12 font-bold text-center rounded-md text-lg mx-1 border-gray-400 bg-lightbg text-dark dark:border-gray-600 bg-tertiary dark:text-lightbg"
+                extraClasses="w-12"
+                height="h-[50px]"
+                textClasses="font-bold text-center "
               />
               <TextBody2 extraClasses="ml-1">fois par semaine</TextBody2>
             </View>
