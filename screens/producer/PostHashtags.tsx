@@ -16,6 +16,7 @@ import { TagData } from "../../types/API";
 
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { ScrollView } from "react-native-gesture-handler";
 
 import TopBar from "../../components/TopBar";
@@ -64,9 +65,12 @@ export default function PostHashtagsScreen({ navigation }: Props) {
   const [customHashtags, setCustomHashtags] = useState<string[]>(
     shopStore?.socialPostSettings?.customHashtags ?? [],
   );
-  // mentions personnaliées
-  const [customizedMentions, setCustomizedMentions] = useState<string[]>([]);
+  // mentions existantes et personnaliées
+  const [allMentions, setAllMentions] = useState<string[]>(
+    shopStore?.socialPostSettings?.customMentions ?? [],
+  );
   const [newMention, setNewMention] = useState<string>("");
+
   // mentions à sauver dans la base
   const [customMentions, setCustomMentions] = useState<string[]>(
     shopStore?.socialPostSettings?.customMentions ?? [],
@@ -127,13 +131,24 @@ export default function PostHashtagsScreen({ navigation }: Props) {
     // setHasChanges(true);
   };
 
+  const addMention = (mention: string) => {
+    if (!allMentions.includes("@" + mention)) {
+      setAllMentions((prev) => [...prev, "@" + mention]);
+    }
+  };
+
+  const removeMention = (mention: string) => {
+    console.log(mention);
+    setAllMentions((prev) => prev.filter((m) => m !== mention));
+    setCustomMentions((prev) => prev.filter((m) => m !== mention));
+  };
+
   const toggleCustomMention = (mentionName: string) => {
     setCustomMentions((prev) =>
       prev.includes(mentionName)
         ? prev.filter((t) => t !== mentionName)
         : [...prev, mentionName],
     );
-    // setHasChanges(true);
   };
 
   const handleSave = async () => {
@@ -173,10 +188,8 @@ export default function PostHashtagsScreen({ navigation }: Props) {
     }
   };
 
-  // console.log("customized :", customizedTags);
-  // console.log("customHashtags :", customHashtags);
-  // console.log("customMentions :", customMentions);
-  // console.log("store :", shopStore?.socialPostSettings?.customHashtags);
+  console.log("customMentions :", customMentions);
+  console.log("customizedMentions :", allMentions);
 
   return (
     <SafeAreaView
@@ -193,10 +206,10 @@ export default function PostHashtagsScreen({ navigation }: Props) {
       </View>
 
       <View style={{ flex: 10 }}>
-        <ScrollView
-          className="flex-1"
-          // contentContainerStyle={{ paddingBottom: 120 }}
+        <KeyboardAwareScrollView
+          enableOnAndroid
           keyboardShouldPersistTaps="handled"
+          extraScrollHeight={50}
         >
           <View className="px-3 mb-5">
             <TextBody1 centered extraClasses="px-5">
@@ -276,13 +289,18 @@ export default function PostHashtagsScreen({ navigation }: Props) {
               onChangeText={(newValue) => setNewMention(newValue)}
               onIconPressFn={() => {
                 if (newMention) {
-                  setCustomizedMentions((prev) => [...prev, "@" + newMention]);
+                  if (
+                    !allMentions.includes("@" + newMention) &&
+                    !customMentions.includes("@" + newMention)
+                  ) {
+                    setAllMentions((prev) => [...prev, "@" + newMention]);
+                  }
                   setNewMention("");
                 }
               }}
             />
             <View className="flex flex-row flex-wrap my-3">
-              {customizedMentions.map((name, index) => (
+              {allMentions.map((name, index) => (
                 <KillableTag
                   key={index}
                   name={name}
@@ -291,21 +309,15 @@ export default function PostHashtagsScreen({ navigation }: Props) {
                     toggleCustomMention(name);
                   }}
                   onKillFn={() => {
-                    setCustomizedMentions((prev) =>
-                      prev.filter((t) => t !== name),
-                    );
-                    if (customMentions.includes(name)) {
-                      setCustomMentions((prev) =>
-                        prev.filter((t) => t !== name),
-                      );
-                    }
+                    console.log("remove :", name);
+                    removeMention(name);
                   }}
                   extraClasses="mr-2 mb-2"
                 />
               ))}
             </View>
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </View>
 
       <View
