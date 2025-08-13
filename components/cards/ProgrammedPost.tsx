@@ -22,16 +22,16 @@ export default function ProgrammedPostCard({
   let postLabel = "";
   let postColor = "";
 
-  switch (post.type) {
+  switch (post.subjectType) {
     case "product":
       postLabel = "POST PRODUIT";
       postColor = "success";
       break;
     case "review":
       postLabel = "POST AVIS CLIENT";
-      postColor = "green";
+      postColor = "night";
       break;
-    case "product":
+    case "activity":
       postLabel = "POST ACTIVITÉ";
       postColor = "premium";
       break;
@@ -42,7 +42,7 @@ export default function ProgrammedPostCard({
 
   return (
     <TouchableOpacity
-      className={`${extraClasses} border rounded-lg bg-lightbg dark:bg-tertiary`}
+      className={`${extraClasses} border rounded-lg bg-lightbg dark:bg-tertiary border-lightbg dark:border-darkbg`}
       onPress={onPressFn}
     >
       <View className={`bg-${postColor} h-8 flex justify-center rounded-t-lg`}>
@@ -64,7 +64,7 @@ export default function ProgrammedPostCard({
           )}
         </View>
         <View className="flex justify-center items-center p-2">
-          <FontAwesome6Icon name="angle-right" size={25} color="#98B66E" />
+          <FontAwesome6Icon name="eye" size={25} color="#98B66E" />
         </View>
       </View>
     </TouchableOpacity>

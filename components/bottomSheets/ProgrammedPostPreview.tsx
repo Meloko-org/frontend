@@ -26,9 +26,25 @@ export default function ProgrammedPostPreview(
   const { getToken } = useAuth();
 
   const [isPosting, setIsPosting] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
-  const handleClose = () => {
-    SheetManager.hide(props.sheetId);
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      const token = await getToken();
+      const postResponse = await postTools.deleteProgrammedPost(
+        token,
+        props.payload?.post._id,
+      );
+
+      setIsDeleting(false);
+
+      SheetManager.hide(props.sheetId, {
+        payload: postResponse.message,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handlePost = async () => {
@@ -143,7 +159,8 @@ export default function ProgrammedPostPreview(
             <View className="w-1/3">
               <CustomButton
                 label="Supprimer"
-                onPressFn={handleClose}
+                onPressFn={handleDelete}
+                isLoading={isDeleting}
                 extraClasses="bg-danger h-14 border rounded-lg "
                 textClasses="text-white font-bold text-lg"
               />

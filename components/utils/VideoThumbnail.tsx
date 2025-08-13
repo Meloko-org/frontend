@@ -25,23 +25,19 @@ export default function VideoThumbnail({
     <View className="w-full rounded-lg mb-5">
       {source ? (
         <>
-          <VideoView
-            player={player}
-            style={{
-              width: Dimensions.get("window").width,
-              height: Dimensions.get("window").width * (9 / 16),
-            }}
-          />
-          <View className="absolute top-1 right-1">
-            <IconButton
-              iconName="times-circle"
-              iconColor="white"
-              iconFamily="FontAwesome5Icon"
-              buttonColor="bg-danger"
-              onPressFn={() => onDelete?.(source)}
-              extraClasses="w-9 h-9"
-            />
-          </View>
+          <VideoView player={player} style={style} />
+          {onDelete && (
+            <View className="absolute top-1 right-1">
+              <IconButton
+                iconName="times-circle"
+                iconColor="white"
+                iconFamily="FontAwesome5Icon"
+                buttonColor="bg-danger"
+                onPressFn={() => onDelete?.(source)}
+                extraClasses="w-9 h-9"
+              />
+            </View>
+          )}
         </>
       ) : (
         <View

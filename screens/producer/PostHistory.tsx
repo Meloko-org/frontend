@@ -15,6 +15,7 @@ import { SheetManager } from "react-native-actions-sheet";
 import { View } from "react-native";
 import TopBar from "../../components/TopBar";
 import ProgrammedPostCard from "../../components/cards/ProgrammedPost";
+import Spinner from "../../components/utils/Spinner";
 
 type PostHistoryScreenRouteProp = RouteProp<RootStackParamList, "PostHistory">;
 
@@ -33,14 +34,17 @@ export default function PostHistoryScreen({ navigation }: Props) {
 
   const { getToken } = useAuth();
 
+  const [isFetching, seetIsFetching] = useState<boolean>(false);
   const [posts, setPosts] = useState<ValidatePostData[]>([]);
 
   const fetchPosts = async () => {
+    seetIsFetching(true);
     const token = await getToken();
     const postResponse = await postTools.getPostHistory(token);
     if (postResponse.data) {
       setPosts(postResponse.data);
     }
+    seetIsFetching(false);
   };
 
   useFocusEffect(
@@ -64,21 +68,27 @@ export default function PostHistoryScreen({ navigation }: Props) {
       </View>
 
       <View className="px-3 pt-5" style={{ flex: 8 }}>
-        {posts.map((post) => (
-          <ProgrammedPostCard
-            key={post._id}
-            post={post}
-            onPressFn={() => {
-              console.log("youpi");
-              SheetManager.show("published-post", {
-                payload: {
-                  post: post,
-                },
-              });
-            }}
-            extraClasses="mb-2"
-          />
-        ))}
+        {isFetching ? (
+          <View className="h-full flex justify-center items-center">
+            <Spinner />
+          </View>
+        ) : (
+          posts.map((post) => (
+            <ProgrammedPostCard
+              key={post._id}
+              post={post}
+              onPressFn={() => {
+                console.log("youpi");
+                SheetManager.show("published-post", {
+                  payload: {
+                    post: post,
+                  },
+                });
+              }}
+              extraClasses="mb-2"
+            />
+          ))
+        )}
       </View>
     </SafeAreaView>
   );

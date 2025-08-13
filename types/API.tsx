@@ -353,7 +353,10 @@ type GeneratedPostData = {
 };
 
 type ValidatePostValues = {
-  stockId: string;
+  subjectType: string;
+  stock: string | null;
+  note: string | null;
+  activity: string | null;
   title: string;
   type: string;
   imageUrl: string;
@@ -369,10 +372,12 @@ type ValidatePostValues = {
 
 type ValidatePostData = {
   _id: string;
-  stockId: string;
+  subjectType: string;
   shop: string;
+  stock: string;
+  note: string;
+  activity: string;
   title: string;
-  type: string;
   imageUrl: string;
   generatedText: string;
   editedText: string;
@@ -386,8 +391,18 @@ type ValidatePostData = {
   errorMessage: string;
 };
 
-type ActivityPostData = {
+type ActivityData = {
   _id: string;
+  productType: TypeData;
+  title: string;
+  promptKey: string;
+  promptContext: string;
+  isActive: boolean;
+};
+
+type ActivityPostData = {
+  title: string;
+  data: ActivityData[];
 };
 
 export type {
@@ -428,5 +443,6 @@ export type {
   GeneratedPostData,
   ValidatePostValues,
   ValidatePostData,
+  ActivityData,
   ActivityPostData,
 };

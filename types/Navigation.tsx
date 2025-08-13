@@ -1,6 +1,7 @@
 // Navigation types
 
 import {
+  ActivityData,
   ActivityPostData,
   NoteData,
   PostThemeData,
@@ -126,7 +127,7 @@ type RootStackParamList = {
     screenTitle?: string;
     stock?: StockData;
     note?: NoteData;
-    activity?: ActivityPostData;
+    activity?: ActivityData;
   };
   PostPreview: {
     from?: string;
@@ -135,7 +136,8 @@ type RootStackParamList = {
     postType: string;
     stock?: StockData;
     note?: NoteData;
-    activity?: ActivityPostData;
+    activity?: ActivityData;
+    mediaUri?: string;
     productTags?: string[];
     theme: PostThemeData | null;
     networks: string[];

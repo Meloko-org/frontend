@@ -173,10 +173,10 @@ export default function PostHashtagsScreen({ navigation }: Props) {
     }
   };
 
-  console.log("customized :", customizedTags);
-  console.log("customHashtags :", customHashtags);
-  console.log("customMentions :", customMentions);
-  console.log("store :", shopStore?.socialPostSettings?.customHashtags);
+  // console.log("customized :", customizedTags);
+  // console.log("customHashtags :", customHashtags);
+  // console.log("customMentions :", customMentions);
+  // console.log("store :", shopStore?.socialPostSettings?.customHashtags);
 
   return (
     <SafeAreaView
@@ -275,8 +275,10 @@ export default function PostHashtagsScreen({ navigation }: Props) {
               iconName="plus"
               onChangeText={(newValue) => setNewMention(newValue)}
               onIconPressFn={() => {
-                setCustomizedMentions((prev) => [...prev, "@" + newMention]);
-                setNewMention("");
+                if (newMention) {
+                  setCustomizedMentions((prev) => [...prev, "@" + newMention]);
+                  setNewMention("");
+                }
               }}
             />
             <View className="flex flex-row flex-wrap my-3">

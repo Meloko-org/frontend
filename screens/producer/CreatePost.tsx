@@ -33,6 +33,8 @@ import TextBody2 from "../../components/utils/texts/Body2";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import globalTools from "../../modules/globalTools";
 import StarsNotation from "../../components/utils/StarsNotation";
+import ImageUploader from "../../components/utils/ImageUploader";
+import VideoThumbnail from "../../components/utils/VideoThumbnail";
 
 type CreatePostScreenRouteProp = RouteProp<RootStackParamList, "CreatePost">;
 
@@ -65,6 +67,9 @@ export default function CreatePostScreen({ navigation }: Props) {
 
   // states liés à un avis
 
+  const [media, setMedia] = useState<string>();
+  const [mediaType, setMediaType] = useState<string>();
+
   const [postType, setPostType] = useState<string>("Product");
 
   const [socials, setSocials] = useState<string[]>([]);
@@ -89,6 +94,10 @@ export default function CreatePostScreen({ navigation }: Props) {
         setPostType("product");
       } else if (note) {
         setPostType("review");
+      } else if (activity) {
+        setMedia(undefined);
+        setMediaType(undefined);
+        setPostType("activity");
       }
 
       // détection des réseaux valides
@@ -166,13 +175,14 @@ export default function CreatePostScreen({ navigation }: Props) {
       stock: stock,
       note: note,
       activity: activity,
+      mediaUri: media,
       productTags: selectedTags,
       theme: selectedTheme,
       networks: selectedSocials,
     });
   };
 
-  console.log("CREATE :", note?.note);
+  console.log("CREATE :", mediaType);
 
   return (
     <SafeAreaView
@@ -291,6 +301,65 @@ export default function CreatePostScreen({ navigation }: Props) {
                   }}
                 />
               </View>
+            </View>
+          )}
+
+          {activity && (
+            <View className="pt-4 mb-5">
+              <TextBody1 centered>Activité sélectionnée</TextBody1>
+              <TextHeading4 centered extraClasses="mb-2">
+                {activity?.title}
+              </TextHeading4>
+              <View className="flex flex-row justify-center mb-5">
+                <View>
+                  <ImageUploader
+                    label="MEDIA"
+                    message="Choisissez une photo ou une vidéo."
+                    mediaTypes={["images", "videos", "livePhotos"]}
+                    size={90}
+                    defaultUri={null}
+                    onImageSelected={(uri, mediaType) => {
+                      setMedia(uri);
+                      setMediaType(mediaType);
+                    }}
+                    displayImage={false}
+                  />
+                </View>
+                <View className="justify-center w-48">
+                  <TextBody1 extraClasses="ml-2">{`Choisissez une photo,\nune video ou prenez une photo.`}</TextBody1>
+                </View>
+              </View>
+
+              {mediaType === "image" && (
+                <View className="border rounded-lg border-ligthbg dark:border-darkbg w-auto h-80 mb-2">
+                  <Image
+                    source={
+                      media ? { uri: media } : require("../../assets/icon.png")
+                    }
+                    className="rounded-lg"
+                    alt={`média de l'activité`}
+                    resizeMode="cover"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  />
+                </View>
+              )}
+
+              {mediaType === "video" && (
+                <View className="border rounded-lg border-lightbg dark:border-darkbg w-auto mb-2">
+                  <VideoThumbnail
+                    source={media!}
+                    style={{
+                      width: "100%",
+                      aspectRatio: 16 / 9,
+                      borderRadius: 8, // si tu veux arrondir comme ton conteneur
+                      overflow: "hidden",
+                    }}
+                  />
+                </View>
+              )}
             </View>
           )}
 

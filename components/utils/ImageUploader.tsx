@@ -8,11 +8,22 @@ import TextHeading4 from "./texts/Heading4";
 type ImageUploaderProps = {
   label?: string;
   size?: number;
-  onImageSelected?: (uri: string) => void;
+  onImageSelected?: (
+    uri: string,
+    mediaType: "image" | "video" | "livePhoto" | "pairedVideo" | undefined,
+  ) => void;
   defaultUri?: string | null;
   mediaTypes?: ImagePicker.MediaType | ImagePicker.MediaType[];
   message?: string;
+  displayImage?: boolean;
 };
+
+/** Pour définir les possibilités de l'ImageUploader, jouer sur les mediaTypes
+ * ["images"] pour choisir un fichier image
+ * ["videos"] pour choisir une video
+ * ["livePhotos"] pour prendre une photo
+ * ["images", "videos", "livePhotos"] pour les 3 possibilités par exemple
+ */
 
 export default function ImageUploader({
   label = "LOGO",
@@ -21,6 +32,7 @@ export default function ImageUploader({
   defaultUri = null,
   mediaTypes = "images",
   message = "Choisissez une photo",
+  displayImage = true,
 }: ImageUploaderProps) {
   const [imageUri, setImageUri] = useState<string | null>(defaultUri);
 
@@ -45,9 +57,12 @@ export default function ImageUploader({
     });
 
     if (!result.canceled) {
-      const uri = result.assets[0].uri;
+      const asset = result.assets[0];
+      const uri = asset.uri;
+      const mediaType = asset.type;
+
       setImageUri(uri);
-      onImageSelected?.(uri);
+      onImageSelected?.(uri, mediaType);
     }
   };
 
@@ -64,12 +79,15 @@ export default function ImageUploader({
       quality: 0.8,
     });
 
-    console.log(result);
+    console.log("IMAGEUPLOADER:", result);
 
     if (!result.canceled) {
-      const uri = result.assets[0].uri;
+      const asset = result.assets[0];
+      const uri = asset.uri;
+      const mediaType = asset.type;
+
       setImageUri(uri);
-      onImageSelected?.(uri);
+      onImageSelected?.(uri, mediaType);
     }
   };
 
@@ -104,7 +122,7 @@ export default function ImageUploader({
       }}
       className="relative"
     >
-      {imageUri ? (
+      {displayImage && imageUri ? (
         <View className="absolute top-0 left-0">
           <Image
             source={{ uri: imageUri }}
@@ -115,6 +133,7 @@ export default function ImageUploader({
       ) : (
         <TextHeading4 centered>{label}</TextHeading4>
       )}
+
       <View className="absolute right-0 bottom-0 items-center justify-center p-1">
         <FontAwesome6Icon name="camera" color="#98B66E" size={30} />
       </View>

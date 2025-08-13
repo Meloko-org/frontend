@@ -13,10 +13,11 @@ const generatePost = async (
   token: string | null,
   values: {
     subjectType: string;
-    elementId: string;
+    elementId: string | undefined;
     selectedThemeId: string | undefined;
-    productTags: string[];
+    productTags: string[] | undefined;
     networks: string[];
+    mediaUri: string | undefined;
   },
 ): Promise<ApiResponse<GeneratedPostData>> => {
   try {
@@ -195,10 +196,86 @@ const getPostHistory = async (
   }
 };
 
+const deleteProgrammedPost = async (
+  token: string | null,
+  postId: string | undefined,
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const response = await fetch(`${API_ROOT}/posts/delete/${postId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: `Erreur ${response.status}: Impossible de supprimer le post.`,
+      };
+    }
+
+    const data = await response.json();
+
+    return data.success
+      ? { success: true, message: data.message }
+      : { success: false, message: data.message };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Une erreur s'est produite lors de la suppression du post.",
+    };
+  }
+};
+
+const getActivities = async (
+  token: string | null,
+  productTypeIds: string[],
+): Promise<ApiResponse<ActivityPostData[]>> => {
+  try {
+    const response = await fetch(
+      `${API_ROOT}/posts/activities/by-product-type`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ productTypeIds }),
+      },
+    );
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible de récupérer les activités.`,
+      };
+    }
+
+    const data = await response.json();
+
+    return data.success
+      ? { success: true, data: data.activities }
+      : { success: false, data: null, message: data.message };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      data: null,
+      message:
+        "Une erreur s'est produite lors de la récupération des activités.",
+    };
+  }
+};
+
 export default {
   generatePost,
   validatePost,
   getProgrammedPosts,
   postProgrammedPosts,
   getPostHistory,
+  deleteProgrammedPost,
+  getActivities,
 };

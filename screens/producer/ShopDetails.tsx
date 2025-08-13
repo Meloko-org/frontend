@@ -258,7 +258,7 @@ export default function ShopDetailsScreen({ navigation }: Props) {
     } catch (error) {}
   };
 
-  console.log("shopStore video :", shopStore?.video);
+  // console.log("shopStore video :", shopStore?.video);
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">

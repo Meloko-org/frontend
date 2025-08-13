@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
-import { useRoute } from "@react-navigation/native";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
 import { View, Text } from "react-native";
@@ -16,6 +16,7 @@ import { ValidatePostData } from "../../types/API";
 import ProgrammedPostCard from "../../components/cards/ProgrammedPost";
 import ProgrammedPostPreviewModal from "../../components/modals/producer/ProgrammedPostPreview";
 import { SheetManager } from "react-native-actions-sheet";
+import Spinner from "../../components/utils/Spinner";
 
 type ProgrammedPostsScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -37,21 +38,26 @@ export default function ProgrammedPostsScreen({ navigation }: Props) {
 
   const { getToken } = useAuth();
 
+  const [isFetching, seetIsFetching] = useState<boolean>(false);
   const [programmedPosts, setProgrammedPosts] = useState<ValidatePostData[]>(
     [],
   );
 
   const fetchProgrammedPosts = async () => {
+    seetIsFetching(true);
     const token = await getToken();
     const postResponse = await postTools.getProgrammedPosts(token);
     if (postResponse.data) {
       setProgrammedPosts(postResponse.data);
     }
+    seetIsFetching(false);
   };
 
-  useEffect(() => {
-    fetchProgrammedPosts();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchProgrammedPosts();
+    }, []),
+  );
 
   const handleBottomSheet = async (post: ValidatePostData) => {
     let message = await SheetManager.show("programmed-post-preview", {
@@ -96,14 +102,20 @@ export default function ProgrammedPostsScreen({ navigation }: Props) {
       </View>
 
       <View className="px-3 pt-5" style={{ flex: 8 }}>
-        {programmedPosts.map((post) => (
-          <ProgrammedPostCard
-            key={post._id}
-            post={post}
-            onPressFn={() => handleBottomSheet(post)}
-            extraClasses="mb-2"
-          />
-        ))}
+        {isFetching ? (
+          <View className="h-full flex justify-center items-center">
+            <Spinner />
+          </View>
+        ) : (
+          programmedPosts.map((post) => (
+            <ProgrammedPostCard
+              key={post._id}
+              post={post}
+              onPressFn={() => handleBottomSheet(post)}
+              extraClasses="mb-2"
+            />
+          ))
+        )}
       </View>
     </SafeAreaView>
   );

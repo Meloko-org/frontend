@@ -101,7 +101,7 @@ export default function PostTypeScreen({ navigation }: Props) {
     dispatch(setShopCategoriesWithFamilies(result));
   }, []);
 
-  console.log("POSTYPE :", JSON.stringify(shopStore?.notes, null, 2));
+  // console.log("POSTYPE :", JSON.stringify(shopStore?.notes, null, 2));
 
   return (
     <SafeAreaView
@@ -146,7 +146,7 @@ export default function PostTypeScreen({ navigation }: Props) {
             navigation.navigate("ActivityPostChoice", {
               from: "PostType",
               backLabel: "Retour au type",
-              screenTitle: "POSTER UNE\nACTIVITE",
+              screenTitle: "CHOISIR UNE\nACTIVITE",
             });
           }}
           extraClasses="mb-1"

@@ -25,6 +25,7 @@ import TagBadge from "../../components/utils/badges/Tag";
 import NetworkIcon from "../../components/utils/NetworkIcon";
 import InputText from "../../components/utils/inputs/Text";
 import IconButton from "../../components/utils/buttons/Icon";
+import saveImageLocally from "../../helpers/ImageHelpers";
 
 type PostPreviewScreenRouteProp = RouteProp<RootStackParamList, "PostPreview">;
 
@@ -47,6 +48,7 @@ export default function PostPreviewScreen({ navigation }: Props) {
     stock,
     note,
     activity,
+    mediaUri,
     productTags,
     theme,
     networks,
@@ -63,6 +65,7 @@ export default function PostPreviewScreen({ navigation }: Props) {
 
   // fetchGeneratedPost reçoit l'élément qui constitue le sujet du post (stockId, note, ou activity)
   const fetchGeneratedPost = async (type: string) => {
+    setIsGenerating(true);
     const token = await getToken();
 
     const values = {
@@ -71,6 +74,7 @@ export default function PostPreviewScreen({ navigation }: Props) {
       selectedThemeId: theme?._id,
       productTags,
       networks,
+      mediaUri,
     };
 
     const postResponse = await postTools.generatePost(token, values);
@@ -126,11 +130,24 @@ export default function PostPreviewScreen({ navigation }: Props) {
 
       const token = await getToken();
 
+      let mediaPath = null;
+      if (postType === "activity") {
+        mediaPath = await saveImageLocally(
+          generatedPost?.imageUrl!,
+          "postMedias/",
+        );
+      } else {
+        mediaPath = generatedPost?.imageUrl;
+      }
+
       const values = {
-        stockId: stock?._id,
+        subjectType: postType,
+        stock: stock ? stock._id : null,
+        note: note ? note._id : null,
+        activity: activity ? activity._id : null,
         title: generatedPost?.title!,
         type: postType!,
-        imageUrl: generatedPost?.imageUrl!,
+        imageUrl: mediaPath!,
         generatedText: generatedPost?.generatedText!,
         editedText: postText!,
         productTags: generatedPost?.productTags!,
@@ -216,7 +233,7 @@ export default function PostPreviewScreen({ navigation }: Props) {
             <View className="flex items-center bg-tertiary h-[430px] pt-5 pb-2">
               <ScrollView showsVerticalScrollIndicator={false}>
                 <View className="flex items-center">
-                  <TextHeading3 centered extraClasses="">
+                  <TextHeading3 centered extraClasses="mb-1">
                     {generatedPost?.title}
                   </TextHeading3>
                   <View className="h-64 w-64 mb-2">
@@ -236,18 +253,18 @@ export default function PostPreviewScreen({ navigation }: Props) {
                     />
                   </View>
                   <View className="flex flex-row items-center px-2">
-                    <View className="flex-grow">
-                      <TextBody1 centered extraClasses="text-wrap">
+                    <View className="w-5/6 pl-3">
+                      <TextBody1 centered extraClasses="flex-shrink">
                         {postText}
                       </TextBody1>
                     </View>
-                    <View>
+                    <View className="w-1/6">
                       <IconButton
                         iconName="pen"
                         iconFamily="FontAwesome6Icon"
                         iconColor="#98B66E"
                         onPressFn={handleEditPostText}
-                        extraClasses="ml-5"
+                        extraClasses="ml-2"
                       />
                     </View>
                   </View>

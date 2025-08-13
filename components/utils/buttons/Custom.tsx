@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { JSX, useRef } from "react";
 
 import { Text, TouchableOpacity, Animated, View } from "react-native";
 import { GestureResponderEvent } from "react-native";
