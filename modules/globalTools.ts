@@ -51,9 +51,29 @@ const arraysEqualById = (arr1: { _id: string }[], arr2: { _id: string }[]) => {
   return JSON.stringify(ids1) === JSON.stringify(ids2);
 };
 
+/* convertit des mètres en km, arrondi à 1 décimale (ex: 12.3 km) */
+const formatDistance = (meters: number): string => {
+  const km = meters / 1000;
+  return `${km.toFixed(1)} km`;
+};
+
+/* convertit des secondes en heures + minutes */
+const formatDuration = (seconds: number): string => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}min`;
+  } else {
+    return `${minutes}min`;
+  }
+};
+
 export default {
   formatDateToFr,
   formatQuantity,
   getWeekDayLabel,
   arraysEqualById,
+  formatDistance,
+  formatDuration,
 };

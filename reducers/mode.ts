@@ -16,7 +16,7 @@ export const modeSlice = createSlice({
   name: "mode",
   initialState,
   reducers: {
-    changeMode: (state: ModeState, action: PayloadAction<ModeData>): void => {
+    changeMode: (state: ModeState, action: PayloadAction<string>): void => {
       state.value.mode = action.payload;
     },
   },

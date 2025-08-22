@@ -30,6 +30,7 @@ import ShopDetails from "./ShopDetails";
 import EditPostText from "./EditPostText";
 import ProgrammedPostPreview from "./ProgrammedPostPreview";
 import PublishedPost from "./PublishedPost";
+import CircuitShop from "./CircuitShop";
 
 registerSheet("alert", CustomAlert);
 registerSheet("product-details", ProductDetails);
@@ -46,6 +47,7 @@ registerSheet("shop-details", ShopDetails);
 registerSheet("edit-post-text", EditPostText);
 registerSheet("programmed-post-preview", ProgrammedPostPreview);
 registerSheet("published-post", PublishedPost);
+registerSheet("circuit-shop", CircuitShop);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -144,6 +146,11 @@ declare module "react-native-actions-sheet" {
     "published-post": SheetDefinition<{
       payload: {
         post: ValidatePostData;
+      };
+    }>;
+    "circuit-shop": SheetDefinition<{
+      payload: {
+        shop: ShopData;
       };
     }>;
   }

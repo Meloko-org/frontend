@@ -433,7 +433,10 @@ type ShopFeaturesData = {
 
 type CircuitParamsData = {
   shops: ShopData[];
-  route: string;
+  avgRating: string;
+  polyline: string;
+  totalDistance: string;
+  totalDuration: string;
 };
 
 export type {

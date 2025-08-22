@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Slider } from "@miblanchard/react-native-slider";
 import { SheetManager } from "react-native-actions-sheet";
 
-import { Text, View } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
 import TextHeading2 from "../components/utils/texts/Heading2";
 import TextBody2 from "../components/utils/texts/Body2";
 import InputText from "../components/utils/inputs/Text";
@@ -27,9 +27,13 @@ import { isEnabled } from "react-native/Libraries/Performance/Systrace";
 import TextBody1 from "../components/utils/texts/Body1";
 import featuresTools from "../modules/featuresTools";
 
+import { StatusBar } from "expo-status-bar";
+
 import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
 import TextHeading4 from "../components/utils/texts/Heading4";
 import CircuitMapScreen from "./CircuitMap";
+
+import { useColorScheme } from "nativewind";
 
 type CircuitParametersScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -428,3 +432,22 @@ export default function CircuitParametersScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  bgDark: {
+    // flex: 1,
+    backgroundColor: "#262E20",
+    // padding: 10,
+  },
+  iconDark: {
+    color: "#fff",
+  },
+  bgLight: {
+    // flex: 1,
+    backgroundColor: "#FCFFF0",
+    // padding: 10,
+  },
+  iconLight: {
+    color: "#000",
+  },
+});

@@ -47,7 +47,7 @@ type Props = {
 };
 
 export default function UserProfileScreen({ navigation }: Props) {
-  const { colorScheme, toggleColorScheme } = useColorScheme();
+  const { colorScheme, setColorScheme } = useColorScheme();
   // Import the Clerk Auth functions
   const { signOut, isSignedIn, getToken } = useAuth();
 
@@ -84,9 +84,9 @@ export default function UserProfileScreen({ navigation }: Props) {
       });
     } else {
       fetchData();
-      setFirstname(userStore.firstname);
-      setLastname(userStore.lastname);
-      setEmail(userStore.email);
+      setFirstname(userStore.firstname!);
+      setLastname(userStore.lastname!);
+      setEmail(userStore.email!);
     }
   }, [userStore, isSignedIn, dispatch]);
 
@@ -97,17 +97,17 @@ export default function UserProfileScreen({ navigation }: Props) {
       const producerResponse = await producerTools.getProducerInfos(token);
 
       if (!producerResponse.success) {
-        console.error(producerResponse.message);
+        console.warn(producerResponse.message);
         return;
       }
 
       const producer = producerResponse.data;
       dispatch(setProducerData(producer));
 
-      const shopResponse = await shopTools.getShopInfos(token, producer?._id);
+      const shopResponse = await shopTools.getShopInfos(token, producer?._id!);
 
       if (!shopResponse.success) {
-        console.error(shopResponse.message);
+        console.warn(shopResponse.message);
         return;
       }
 
@@ -155,48 +155,35 @@ export default function UserProfileScreen({ navigation }: Props) {
   };
 
   const switchProducer = () => {
-    navigation.navigate("TabNavigatorProducer", {
-      screen: "ProducerProfile",
-    });
+    navigation.navigate("ProducerProfile");
   };
 
   const handleOrdersPress = () => {
-    navigation.navigate("TabNavigatorUser", {
-      screen: "OrdersCustomer",
-    });
+    navigation.navigate("OrdersCustomer");
   };
 
   const handlePersonalInfoPress = () => {
-    navigation.navigate("TabNavigatorUser", {
-      screen: "UserProfileInformations",
-    });
+    navigation.navigate("UserProfileInformations");
   };
 
   const handleBookmarksPress = () => {
-    navigation.navigate("TabNavigatorUser", {
-      screen: "BookmarksCustomer",
-    });
+    navigation.navigate("BookmarksCustomer");
   };
 
   const handleSearchPress = () => {
-    navigation.navigate("TabNavigatorUser", {
-      screen: "Search",
-    });
+    navigation.navigate("MapCustomer");
   };
 
   const toggleMode = () => {
-    toggleColorScheme();
+    setColorScheme(colorScheme === "light" ? "dark" : "light");
+    console.log("toggle colorScheme :", colorScheme);
     const displayMode = modeStore.mode === "light" ? "dark" : "light";
     dispatch(changeMode(displayMode));
+    // dispatch(changeMode(colorScheme))
   };
 
-  console.log(
-    "------------------------------- CUSTOMER --------------------------------------------------------------------",
-  );
-  console.log("USERSTORE -> ", userStore);
-  console.log("PRODUCERSTORE -> ", producerStore);
-  console.log("SHOPSTORE -> ", shopStore);
-  console.log("");
+  console.log("PROFILE modeStore.mode :", modeStore.mode);
+  console.log("PROFILE colorScheme :", colorScheme);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -227,7 +214,7 @@ export default function UserProfileScreen({ navigation }: Props) {
                     iconColor="#98B66E"
                     size={40}
                     onPressFn={onSignoutPress}
-                    extraClasses="border border-primary"
+                    extraClasses="border border-primary p-1"
                   />
                 </View>
               </View>

@@ -245,7 +245,7 @@ export default function MainButton({
     }
   };
 
-  console.log(buttonType);
+  // console.log(buttonType);
 
   return <>{selectedButton()}</>;
 }

@@ -178,7 +178,7 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
   // console.log("MAPCUSTOMER: marketResults :", marketResults);
 
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <MapView
         mapType="hybrid"
         showsUserLocation={true}
