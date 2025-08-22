@@ -72,6 +72,8 @@ import PostFrequencyScreen from "./screens/producer/PostFrequency";
 import PostHashtagsScreen from "./screens/producer/PostHashtags";
 import OrderDetailsScreen from "./screens/producer/OrderDetails";
 import StocksEditScreen from "./screens/producer/StockEdit";
+import CircuitParametersScreen from "./screens/CircuitParameters";
+import CircuitMapScreen from "./screens/CircuitMap";
 
 import { Provider } from "react-redux";
 import { persistStore, persistReducer } from "redux-persist";
@@ -170,6 +172,8 @@ const TabNavigatorUser: React.FC = () => {
 
           if (route.name === "MapCustomer") {
             iconName = "search";
+          } else if (route.name === "CircuitParameters") {
+            iconName = "car";
           } else if (route.name === "Cart") {
             iconName = "shopping-basket";
           } else if (route.name === "BookmarksCustomer") {
@@ -193,6 +197,11 @@ const TabNavigatorUser: React.FC = () => {
       })}
     >
       <Tab.Screen name="MapCustomer" component={MapCustomerScreen} />
+      <Tab.Screen
+        name="CircuitParameters"
+        component={CircuitParametersScreen}
+      />
+      <Tab.Screen name="CircuitMap" component={CircuitMapScreen} />
       <Tab.Screen name="Cart" component={CartScreen} />
       <Tab.Screen
         name="BookmarksCustomer"

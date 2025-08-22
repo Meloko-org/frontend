@@ -4,6 +4,7 @@ import {
   MarketsData,
   StockData,
   ClickCollectData,
+  ShopFeaturesData,
 } from "../types/API";
 
 export type ShopState = {
@@ -36,6 +37,14 @@ export const shopSlice = createSlice({
     setTypes: (state: ShopState, action: PayloadAction<string[]>): void => {
       if (state.value) {
         state.value.type = action.payload;
+      }
+    },
+    setFeatures: (
+      state: ShopState,
+      action: PayloadAction<ShopFeaturesData[]>,
+    ): void => {
+      if (state.value) {
+        state.value.features = action.payload;
       }
     },
     setProducts: (
@@ -120,6 +129,7 @@ export const {
   setShopData,
   resetShopData,
   setTypes,
+  setFeatures,
   setProducts,
   addProducts,
   updateProduct,

@@ -47,6 +47,7 @@ export const userSlice = createSlice({
         orders: [],
         clerkPasswordEnabled: null,
         producer: null,
+        addresses: null,
       };
 
       console.log("user reset", state);

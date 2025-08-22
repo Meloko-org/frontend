@@ -3,6 +3,7 @@
 import {
   ActivityData,
   ActivityPostData,
+  CircuitOptionsData,
   NoteData,
   PostThemeData,
   ProductCategoryData,
@@ -161,6 +162,10 @@ type RootStackParamList = {
     orderId: string;
   };
   Sales: undefined;
+  CircuitParameters: undefined;
+  CircuitMap: {
+    circuitOptions: CircuitOptionsData;
+  };
 };
 
 export type { RootStackParamList };

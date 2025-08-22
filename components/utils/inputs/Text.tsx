@@ -23,6 +23,7 @@ type InputTextProps = {
   autoComplete?: TextInputProps["autoComplete"];
   onChangeText: (value: string) => void;
   onBlur?: () => void;
+  onEndEditing?: () => void;
   editable?: boolean;
   value?: string | Date;
   size?: string;
@@ -45,6 +46,7 @@ export default function InputText({
   autoComplete,
   onChangeText,
   onBlur,
+  onEndEditing,
   editable,
   value,
   size,
@@ -95,6 +97,7 @@ export default function InputText({
           placeholderTextColor={colorScheme === "dark" ? "#FCFFF0" : "#444C3D"}
           onChangeText={(value) => onChangeText(value)}
           onBlur={() => onBlur?.()}
+          onEndEditing={() => onEndEditing?.()}
           autoCapitalize={autoCapitalize}
           secureTextEntry={secureTextEntry}
           editable={editable}

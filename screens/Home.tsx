@@ -30,13 +30,13 @@ import { emptyCart } from "../reducers/cart";
 import { ModeState } from "../reducers/mode";
 import SignInScreen from "./Signin";
 
-type ProfileScreenNavigationProp = NativeStackNavigationProp<
+type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Home"
 >;
 
 type Props = {
-  navigation: ProfileScreenNavigationProp;
+  navigation: HomeScreenNavigationProp;
 };
 
 export default function HomeScreen({ navigation }: Props) {
@@ -163,7 +163,11 @@ export default function HomeScreen({ navigation }: Props) {
                 label="Circuit touristique"
                 iconName="car-side"
                 disabled={false}
-                onPressFn={() => console.log("youpi")}
+                onPressFn={() =>
+                  navigation.navigate("TabNavigatorUser", {
+                    screen: "CircuitParameters",
+                  })
+                }
                 extraClasses="mb-3 h-14"
               />
             </View>

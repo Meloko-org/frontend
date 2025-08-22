@@ -19,6 +19,12 @@ web-build/
 # Metro
 .metro-health-check*
 
+#build
+/android/build/
+/ios/build/
+/ios/Pods/
+/android/local.properties
+
 # debug
 npm-debug.*
 yarn-debug.*

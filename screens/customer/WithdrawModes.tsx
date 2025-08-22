@@ -99,7 +99,7 @@ export default function WithdrawModesScreen({ navigation }) {
     if (value === "market") {
       dispatch(
         updateWithdrawMode({
-          shopId: selectedShop.shop._id,
+          shopId: selectedShop?.shop._id,
           withdrawMode: value,
           // market: null,
         }),
@@ -109,7 +109,7 @@ export default function WithdrawModesScreen({ navigation }) {
     } else {
       dispatch(
         updateWithdrawMode({
-          shopId: selectedShop.shop._id,
+          shopId: selectedShop?.shop._id,
           withdrawMode: value,
           withdrawMarket: null,
           withdrawDay: null,

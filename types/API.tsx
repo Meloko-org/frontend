@@ -175,6 +175,7 @@ type ShopData = {
   products?: StockData[];
   socials: NetworksData;
   socialPostSettings?: SocialPostSettingsData;
+  features: ShopFeaturesData[];
   [key: string]: any;
 } | null;
 
@@ -286,6 +287,7 @@ type ProducerData = {
   siren: number | null;
   owner: UserData;
   iban: string | null;
+  bic: string | null;
   address: AddressData;
 } | null;
 
@@ -405,6 +407,35 @@ type ActivityPostData = {
   data: ActivityData[];
 };
 
+type UserPositionData = {
+  latitude: number | undefined;
+  longitude: number | undefined;
+};
+
+type CircuitOptionsData = {
+  types: string[];
+  address: string;
+  radius: {
+    value: number[];
+  };
+  userPosition: UserPositionData;
+  duration: string;
+  features: string[];
+};
+
+type ShopFeaturesData = {
+  _id: string;
+  key: string;
+  label: string;
+  description: string;
+  icon: string;
+};
+
+type CircuitParamsData = {
+  shops: ShopData[];
+  route: string;
+};
+
 export type {
   UserAddressData,
   ProductData,
@@ -445,4 +476,8 @@ export type {
   ValidatePostData,
   ActivityData,
   ActivityPostData,
+  UserPositionData,
+  CircuitOptionsData,
+  ShopFeaturesData,
+  CircuitParamsData,
 };

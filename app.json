@@ -1,13 +1,14 @@
 {
   "expo": {
-    "name": "frontend",
+    "name": "Meloko",
     "slug": "meloko",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icone_la_charrue.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "scheme": "Meloko",
+    "newArchEnabled": false,
+    "scheme": "meloko",
+    "package": "com.crawazaky.frontend",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -18,9 +19,19 @@
       "bundleIdentifier": "com.crawazaky.frontend"
     },
     "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyC1RZGSGuf9VZx0q-v-Ik5YF8KB-SoyxxY"
+        }
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "FOREGROUND_SERVICE"
+      ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/icone_la_charrue.png",
+        "backgroundColor": "#98B66E"
       },
       "package": "com.crawazaky.frontend"
     },
