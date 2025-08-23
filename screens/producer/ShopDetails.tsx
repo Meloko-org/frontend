@@ -395,7 +395,7 @@ export default function ShopDetailsScreen({ navigation }: Props) {
                 <InputText
                   label="Adresse"
                   placeholder="Saisissez votre adresse"
-                  value={address.address1}
+                  value={address.address1!}
                   onChangeText={(value: string) => {
                     setAddress({
                       address1: value,
@@ -421,7 +421,7 @@ export default function ShopDetailsScreen({ navigation }: Props) {
                 <InputText
                   label="Adresse complément"
                   placeholder="Complément d'adresse"
-                  value={address.address2}
+                  value={address.address2!}
                   onChangeText={(value: string) => {
                     setAddress({
                       address1: address.address1,
@@ -440,7 +440,7 @@ export default function ShopDetailsScreen({ navigation }: Props) {
                   <InputText
                     label="Code Postal"
                     placeholder="Saisissez le code postal"
-                    value={address.postalCode}
+                    value={address.postalCode!}
                     onChangeText={(value: string) => {
                       setAddress({
                         address1: address.address1,
@@ -466,7 +466,7 @@ export default function ShopDetailsScreen({ navigation }: Props) {
                   <InputText
                     label="Ville"
                     placeholder="Saisissez la ville"
-                    value={address.city}
+                    value={address.city!}
                     onChangeText={(value: string) => {
                       setAddress({
                         address1: address.address1,
@@ -494,7 +494,7 @@ export default function ShopDetailsScreen({ navigation }: Props) {
                 <InputText
                   label="Pays"
                   placeholder="Saisissez le pays"
-                  value={address.country}
+                  value={address.country!}
                   onChangeText={(value: string) => {
                     setAddress({
                       address1: address.address1,

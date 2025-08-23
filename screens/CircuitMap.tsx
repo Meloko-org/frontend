@@ -7,7 +7,7 @@ import MapView, { Polyline, Marker, Callout } from "react-native-maps";
 import polylineLib from "@mapbox/polyline";
 import * as Location from "expo-location";
 
-import { View } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { CircuitOptionsData, ShopData } from "../types/API";
 import circuitTools from "../modules/circuitTools";
 import { useCallback, useState } from "react";
@@ -127,10 +127,23 @@ export default function CircuitMapScreen({ navigation }: Props) {
                 latitude: Number(shop?.address.latitude?.$numberDecimal),
                 longitude: Number(shop?.address.longitude?.$numberDecimal),
               }}
-              title={shop?.name}
-              description={shop?.shortDesc}
-              onPress={() => handleMarker(shop)}
-            />
+            >
+              <Callout tooltip onPress={() => handleMarker(shop)}>
+                <View className="bg-lightbg dark:bg-darkbg rounded-lg p-2 w-auto shadow">
+                  <TextBody1 centered extraClasses="font-semibold">
+                    {shop?.name}
+                  </TextBody1>
+                  <Pressable
+                    className="mt-2 bg-primary rounded-lg p-2"
+                    onPress={() => handleMarker(shop)}
+                  >
+                    <Text className="text-white text-center">
+                      Plus de détails
+                    </Text>
+                  </Pressable>
+                </View>
+              </Callout>
+            </Marker>
           ))}
       </MapView>
 

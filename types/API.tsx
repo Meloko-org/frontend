@@ -254,10 +254,10 @@ type PeriodData = {
 
 type AddressData = {
   address1: string | null;
-  address2: String | null;
-  postalCode: String | null;
-  city: String | null;
-  country: String | null;
+  address2: string | null;
+  postalCode: string | null;
+  city: string | null;
+  country: string | null;
   latitude?: { $numberDecimal: string };
   longitude?: { $numberDecimal: string };
 };
