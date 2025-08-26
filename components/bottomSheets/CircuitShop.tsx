@@ -15,6 +15,7 @@ import Thumbnail from "../utils/Thumbnail";
 import ButtonPrimaryEnd from "../utils/buttons/PrimaryEnd";
 import MainButton from "../utils/buttons/MainButton";
 import StarRating from "../utils/StarRating";
+import TwoTimesButton from "../utils/buttons/TwoTimes";
 
 export default function CircuitShop(props: SheetProps<"circuit-shop">) {
   const insets = useSafeAreaInsets();
@@ -43,7 +44,7 @@ export default function CircuitShop(props: SheetProps<"circuit-shop">) {
       <View className="bg-lightbg dark:bg-darkbg pb-5">
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* zone 1 : titre  */}
-          <View className="flex flex-row items-center p-3">
+          <View className="flex flex-row items-center p-3 mb-3">
             <View className="">
               <Image
                 source={
@@ -67,64 +68,66 @@ export default function CircuitShop(props: SheetProps<"circuit-shop">) {
           </View>
 
           {/* zone 2 : notation */}
-          <View className="p-3">
-            <TextBody1 centered>Laisser une note :</TextBody1>
-            <View className="mt-3 mb-5 items-center">
-              {/* inclure ici le système de notation */}
+          <View className="px-2">
+            <View className="rounded-lg p-3 bg-premiumbg/30">
+              <TextBody1 centered>Laisser une note :</TextBody1>
+              <View className="mt-3 mb-5 items-center">
+                {/* inclure ici le système de notation */}
 
-              <StarRating
-                rating={note ?? 0}
-                onChange={(value) => setNote(value)}
+                <StarRating
+                  rating={note ?? 0}
+                  onChange={(value) => setNote(value)}
+                />
+              </View>
+              <InputTextarea
+                placeholder="Laisser un commentaire"
+                label="Commentaire"
+                value={comment}
+                onChangeText={(value: string) => setComment(value)}
+                numberOfLines={3}
+                extraClasses="mb-5"
               />
-            </View>
-            <InputTextarea
-              placeholder="Laisser un commentaire"
-              label="Commentaire"
-              value={comment}
-              onChangeText={(value: string) => setComment(value)}
-              numberOfLines={3}
-              extraClasses="mb-5"
-            />
-            <View className="flex mb-3">
-              <View className="flex flex-row items-center ">
-                <View className="w-1/4">
-                  <ImageUploader
-                    label="PHOTO"
-                    onImageSelected={handlePhotoSelected}
-                    mediaTypes={["images", "livePhotos"]}
-                    message={`Ajoutez une photo.`}
-                    displayImage={false}
-                  />
-                </View>
-                <View className="pl-3 w-3/4">
-                  {photo && (
-                    <Thumbnail
-                      source={photo!}
-                      style={{ width: "100%", aspectRatio: 16 / 9 }}
-                      extraClasses="flex flex-row items-center rounded-lg w-auto bg-white"
-                      onDelete={(uri: string) => {
-                        setPhoto(null);
-                        // setHasChanges(true);
-                      }}
+              <View className="flex mb-3">
+                <View className="flex flex-row items-center ">
+                  <View className="w-1/4">
+                    <ImageUploader
+                      label="PHOTO"
+                      onImageSelected={handlePhotoSelected}
+                      mediaTypes={["images", "livePhotos"]}
+                      message={`Ajoutez une photo.`}
+                      displayImage={false}
                     />
-                  )}
+                  </View>
+                  <View className="pl-3 w-3/4">
+                    {photo && (
+                      <Thumbnail
+                        source={photo!}
+                        style={{ width: "100%", aspectRatio: 16 / 9 }}
+                        extraClasses="flex flex-row items-center rounded-lg w-auto bg-white"
+                        onDelete={(uri: string) => {
+                          setPhoto(null);
+                          // setHasChanges(true);
+                        }}
+                      />
+                    )}
+                  </View>
                 </View>
+              </View>
+
+              <View className="px-5">
+                <ButtonPrimaryEnd
+                  label="Valider"
+                  iconName="check"
+                  onPressFn={() => {}}
+                  extraClasses="h-14 mb-3"
+                />
               </View>
             </View>
           </View>
 
-          <View className="px-5">
-            <ButtonPrimaryEnd
-              label="Valider"
-              iconName="check"
-              onPressFn={() => {}}
-              extraClasses="h-14 mb-5"
-            />
-          </View>
-
           {/* zone 3 : les boutons */}
           <View className="flex flex-row justify-around px-3 my-5">
-            <MainButton
+            {/* <MainButton
               buttonType="label-icon-top"
               label={`Supprimer\ndu circuit`}
               iconName="trash"
@@ -133,6 +136,18 @@ export default function CircuitShop(props: SheetProps<"circuit-shop">) {
               buttonBackground={false}
               extraClasses="h-24 w-48"
               onPressFn={() => {}}
+            /> */}
+            <TwoTimesButton
+              label={`Supprimer\ndu circuit`}
+              buttonType="top"
+              bgColor="bg-danger"
+              iconName="trash"
+              iconFamily="FontAwesome5Icon"
+              iconColor="#ffffff"
+              iconSize={28}
+              onConfirm={() => {}}
+              extraClasses="w-48 h-24"
+              textClasses="text-white text-lg/5"
             />
             <MainButton
               buttonType="label-icon-top"

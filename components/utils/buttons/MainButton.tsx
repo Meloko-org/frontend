@@ -24,7 +24,7 @@ import OctIcon from "@expo/vector-icons/Octicons";
 import SimpleLineIcon from "@expo/vector-icons/SimpleLineIcons";
 import ZocialIcon from "@expo/vector-icons/Zocial";
 
-type PrimaryButtonProps = {
+type MainButtonProps = {
   buttonType:
     | "label-icon-end"
     | "label-icon-start"
@@ -73,7 +73,7 @@ export default function MainButton({
   animated,
   disabled,
   isLoading,
-}: PrimaryButtonProps): JSX.Element {
+}: MainButtonProps): JSX.Element {
   const rotationValue = useRef(new Animated.Value(0)).current; // Valeur animée pour la rotation
   const [rotated, setRotated] = useState(false); // État pour savoir si l'icône est déjà pivotée
 
