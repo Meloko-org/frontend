@@ -1,10 +1,13 @@
 import React from "react";
 import { View, Text } from "react-native";
 import ActionSheet, { SheetProps } from "react-native-actions-sheet";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
 import TextHeading3 from "../utils/texts/Heading3";
 
 export default function CustomAlert(props: SheetProps<"alert">) {
+  const insets = useSafeAreaInsets();
+
   const alertIcon = () => {
     switch (props.payload?.alertType) {
       case "warning":
@@ -36,8 +39,9 @@ export default function CustomAlert(props: SheetProps<"alert">) {
 
   return (
     <ActionSheet
-      indicatorStyle={{ backgroundColor: "#000000" }}
-      containerStyle={{ paddingBottom: 50 }}
+      safeAreaInsets={insets}
+      indicatorStyle={{ backgroundColor: "#262E20" }}
+      containerStyle={{ paddingBottom: insets.bottom }}
       gestureEnabled={true}
       isModal={false}
       id={props.sheetId}

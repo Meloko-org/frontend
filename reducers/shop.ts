@@ -5,6 +5,7 @@ import {
   StockData,
   ClickCollectData,
   ShopFeaturesData,
+  NoteData,
 } from "../types/API";
 
 export type ShopState = {
@@ -92,12 +93,7 @@ export const shopSlice = createSlice({
         state.value.products = [];
       }
     },
-    addNote: (
-      state: ShopState,
-      action: PayloadAction<{
-        note: { $numberDecimal: string } | number | any;
-      }>,
-    ): void => {
+    addNote: (state: ShopState, action: PayloadAction<NoteData>): void => {
       if (state.value) {
         state.value.notes.push(action.payload);
       }

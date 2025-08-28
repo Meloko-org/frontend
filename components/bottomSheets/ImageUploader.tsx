@@ -4,26 +4,31 @@ import ActionSheet, {
   SheetManager,
   SheetProps,
 } from "react-native-actions-sheet";
-import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
-import PrimaryButton from "../utils/buttons/Primary";
-import SecondaryButton from "../utils/buttons/Secondary";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TextHeading4 from "../utils/texts/Heading4";
 import IconButton from "../utils/buttons/Icon";
-import CustomButton from "../utils/buttons/Custom";
 
 export default function ImageUploaderSheet(
   props: SheetProps<"image-uploader">,
 ) {
+  const insets = useSafeAreaInsets();
+
   return (
     <ActionSheet
+      CustomHeaderComponent={
+        <View className="flex rounded-t-lg items-center justify-center h-5 bg-white dark:bg-tertiary">
+          <View className="w-10 h-1 rounded-lg bg-darkbg dark:bg-white"></View>
+        </View>
+      }
+      safeAreaInsets={insets}
       snapPoints={[100]}
-      indicatorStyle={{ backgroundColor: "#000000" }}
+      // indicatorStyle={{ backgroundColor: "#262E20" }}
       gestureEnabled={true}
-      containerStyle={{ backgroundColor: "#ffffff", paddingBottom: 50 }}
+      containerStyle={{ paddingBottom: insets.bottom }}
       isModal={false}
       id={props.sheetId}
     >
-      <View className="p-5 min-h-min w-full flex justify-center items-center bg-white dark:bg-darkbg">
+      <View className="p-5 min-h-min w-full flex justify-center items-center bg-lightbg dark:bg-darkbg">
         <TextHeading4 centered extraClasses="font-extrabold text-xl">
           {props.payload?.message}
         </TextHeading4>

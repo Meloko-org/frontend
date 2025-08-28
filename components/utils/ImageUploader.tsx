@@ -16,6 +16,7 @@ type ImageUploaderProps = {
   mediaTypes?: ImagePicker.MediaType | ImagePicker.MediaType[];
   message?: string;
   displayImage?: boolean;
+  pickerOptions?: ImagePicker.ImagePickerOptions;
 };
 
 /** Pour définir les possibilités de l'ImageUploader, jouer sur les mediaTypes
@@ -33,6 +34,11 @@ export default function ImageUploader({
   mediaTypes = "images",
   message = "Choisissez une photo",
   displayImage = true,
+  pickerOptions = {
+    allowsEditing: true,
+    aspect: [1, 1], // carré
+    quality: 0.8,
+  },
 }: ImageUploaderProps) {
   const [imageUri, setImageUri] = useState<string | null>(defaultUri);
 
@@ -50,10 +56,8 @@ export default function ImageUploader({
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: mediaTypes,
-      allowsEditing: true,
-      aspect: [1, 1], // carré
-      quality: 0.8,
+      mediaTypes,
+      ...pickerOptions,
     });
 
     if (!result.canceled) {
@@ -74,9 +78,7 @@ export default function ImageUploader({
     }
 
     const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
+      ...pickerOptions,
     });
 
     console.log("IMAGEUPLOADER:", result);

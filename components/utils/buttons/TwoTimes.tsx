@@ -37,7 +37,6 @@ type MainButtonProps = {
   onConfirm: () => void;
   confirmColor?: string;
   cancelColor?: string;
-  animated?: boolean;
   iconSize?: number;
   buttonBackground?: boolean;
   disabled?: boolean;
@@ -74,7 +73,6 @@ export default function MainButton({
   cancelColor = "bg-tertiary",
   extraClasses,
   textClasses,
-  animated,
   disabled,
   isLoading = false,
 }: MainButtonProps): JSX.Element {

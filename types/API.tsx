@@ -269,6 +269,7 @@ type UserAddressData = {
 };
 
 type UserData = {
+  _id: string;
   email: string | null;
   firstname: string | null;
   lastname: string | null;

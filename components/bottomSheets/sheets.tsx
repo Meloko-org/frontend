@@ -152,6 +152,7 @@ declare module "react-native-actions-sheet" {
       payload: {
         shop: ShopData;
       };
+      returnValue: ShopData;
     }>;
   }
 }

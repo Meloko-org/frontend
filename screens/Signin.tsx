@@ -277,106 +277,91 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   console.log("producerStore: ", producerStore);
 
   return (
-    <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
-      <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-        <TopBar
-          backLabel={backLabel || "Retour à l'accueil"}
-          screen={from || "Home"}
-          label={screenTitle || "CONNEXION\nINSCRIPTION"}
-          extraClasses="mt-2"
-        />
+    <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+      <TopBar
+        backLabel={backLabel || "Retour à l'accueil"}
+        screen={from || "Home"}
+        label={screenTitle || "CONNEXION\nINSCRIPTION"}
+        extraClasses="mt-2"
+      />
 
-        <ScrollView>
-          <View className="flex flex-row justify-center mt-2 mb-3">
-            <View className="w-[70%]">
-              <View className="flex flex-row justify-center mb-3">
-                <TextBody1>Connexion avec votre compte</TextBody1>
-              </View>
-
-              <ButtonPrimaryEnd
-                label="Google"
-                iconName="google"
-                onPressFn={onGoogleAuthPress}
-                extraClasses="w-full mb-3"
-              />
-              <ButtonPrimaryEnd
-                label="Facebook"
-                iconName="facebook-f"
-                onPressFn={onFacebookAuthPress}
-                extraClasses="w-full mb-3"
-              />
-            </View>
-          </View>
-
-          <View className="px-5 mt-5 mb-3">
+      <ScrollView>
+        <View className="flex flex-row justify-center mt-2 mb-3">
+          <View className="w-[70%]">
             <View className="flex flex-row justify-center mb-3">
-              <TextBody1>Connexion par email</TextBody1>
+              <TextBody1>Connexion avec votre compte</TextBody1>
             </View>
 
-            <InputText
-              value={emailAddress}
-              onChangeText={(newEmail: string) => setEmailAddress(newEmail)}
-              placeholder="example@gmail.com"
-              label="Email"
-              size="large"
-              autoCapitalize="none"
-              extraClasses="w-full mb-2"
+            <ButtonPrimaryEnd
+              label="Google"
+              iconName="google"
+              onPressFn={onGoogleAuthPress}
+              extraClasses="w-full mb-3"
             />
-            <InputText
-              value={password}
-              onChangeText={(newPassword: string) => setPassword(newPassword)}
-              placeholder="Mot de passe"
-              label="Mot de passe"
-              autoCapitalize="none"
-              extraClasses="w-full mb-2"
-              size="large"
-              secureTextEntry={passwordInvisible}
-              iconName="eye"
-              onIconPressFn={() => setPasswordInvisible((prev) => !prev)}
+            <ButtonPrimaryEnd
+              label="Facebook"
+              iconName="facebook-f"
+              onPressFn={onFacebookAuthPress}
+              extraClasses="w-full mb-3"
             />
-            <View className="flex flex-row justify-center">
-              <View className="w-[90%]">
-                <ButtonPrimaryEnd
-                  label="Connexion"
-                  iconName="sign-in-alt"
-                  onPressFn={onSignInPress}
-                  isLoading={isConnectionLoading}
-                  extraClasses="w-full h-14"
-                />
-              </View>
-            </View>
+          </View>
+        </View>
+
+        <View className="px-5 mt-5 mb-3">
+          <View className="flex flex-row justify-center mb-3">
+            <TextBody1>Connexion par email</TextBody1>
           </View>
 
-          <View className="px-3 mt-5">
-            <View className="flex flex-row justify-center mb-3">
-              <TextBody1>Pas encore membre ?</TextBody1>
+          <InputText
+            value={emailAddress}
+            onChangeText={(newEmail: string) => setEmailAddress(newEmail)}
+            placeholder="example@gmail.com"
+            label="Email"
+            size="large"
+            autoCapitalize="none"
+            extraClasses="w-full mb-2"
+          />
+          <InputText
+            value={password}
+            onChangeText={(newPassword: string) => setPassword(newPassword)}
+            placeholder="Mot de passe"
+            label="Mot de passe"
+            autoCapitalize="none"
+            extraClasses="w-full mb-2"
+            size="large"
+            secureTextEntry={passwordInvisible}
+            iconName="eye"
+            onIconPressFn={() => setPasswordInvisible((prev) => !prev)}
+          />
+          <View className="flex flex-row justify-center">
+            <View className="w-[90%]">
+              <ButtonPrimaryEnd
+                label="Connexion"
+                iconName="sign-in-alt"
+                onPressFn={onSignInPress}
+                isLoading={isConnectionLoading}
+                extraClasses="w-full h-14"
+              />
             </View>
-            <OpenScreenButton
-              label="Créer un compte"
-              onPressFn={() =>
-                navigation.navigate("SignUp", {
-                  from: "SignIn",
-                  backLabel: "Retour à la connexion",
-                  screenTitle: "CREER UN\nCOMPTE",
-                })
-              }
-            />
           </View>
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+        </View>
+
+        <View className="px-3 mt-5">
+          <View className="flex flex-row justify-center mb-3">
+            <TextBody1>Pas encore membre ?</TextBody1>
+          </View>
+          <OpenScreenButton
+            label="Créer un compte"
+            onPressFn={() =>
+              navigation.navigate("SignUp", {
+                from: "SignIn",
+                backLabel: "Retour à la connexion",
+                screenTitle: "CREER UN\nCOMPTE",
+              })
+            }
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: "center",
-    backgroundColor: "grey",
-  },
-  contentContainer: {
-    flex: 1,
-    alignItems: "center",
-  },
-});
