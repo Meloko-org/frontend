@@ -15,7 +15,12 @@ import {
 // To keep synced with the Native Stack
 type RootStackParamList = {
   Home: undefined;
-  SignIn: { from?: string; backLabel?: string; screenTitle?: string };
+  SignIn: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    next: string;
+  };
   SignUp: { from: string; backLabel: string; screenTitle: string };
   TabNavigatorUser: undefined;
   TabNavigatorProducer: undefined;

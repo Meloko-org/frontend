@@ -79,8 +79,10 @@ export default function UserProfileScreen({ navigation }: Props) {
     if (!isSignedIn) {
       // à modifier
       navigation.navigate("SignIn", {
-        from: "UserProfile",
-        label: "Retour à la recherche",
+        from: "Home",
+        backLabel: "Accueil",
+        screenTitle: `CONNEXION\nINSCRIPTION`,
+        next: "UserProfile",
       });
     } else {
       fetchData();
@@ -187,14 +189,14 @@ export default function UserProfileScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <View className="flex-1">
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          showsVerticalScrollIndicator={false}
-          className="flex h-full w-full p-3"
-        >
-          {isSignedIn ? (
-            <>
+      {isSignedIn && (
+        <>
+          <View className="flex-1">
+            <ScrollView
+              contentContainerStyle={{ flexGrow: 1 }}
+              showsVerticalScrollIndicator={false}
+              className="flex h-full w-full p-3"
+            >
               <View className="flex flex-row items-center mb-5">
                 <View className="">
                   <ColorSchemeButton
@@ -285,40 +287,19 @@ export default function UserProfileScreen({ navigation }: Props) {
                   extraClasses="mb-1"
                 />
               </View>
-            </>
-          ) : (
-            <View className="flex justify-center items-center h-full">
-              <TextHeading2 extraClasses="mb-3">
-                Connectez-vous pour voir votre profil.
-              </TextHeading2>
-              <ButtonPrimaryEnd
-                label="Connexion"
-                iconName="sign-in"
-                disabled={isUserSaveLoading}
-                extraClasses="w-full"
-                onPressFn={() => setIsSigninModalVisible(true)}
-                isLoading={isUserSaveLoading}
-              />
-            </View>
-          )}
-        </ScrollView>
-      </View>
+            </ScrollView>
+          </View>
 
-      {isSignedIn && (
-        <View className="absolute bottom-0 flex items-center w-full">
-          <CustomButton
-            label="Basculer en mode Producteur"
-            extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-5 px-5 h-[60px]"
-            textClasses="text-lightbg dark:text-tertiary text-lg font-bold"
-            onPressFn={switchProducer}
-          />
-        </View>
+          <View className="absolute bottom-0 flex items-center w-full">
+            <CustomButton
+              label="Basculer en mode Producteur"
+              extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-5 px-5 h-[60px]"
+              textClasses="text-lightbg dark:text-tertiary text-lg font-bold"
+              onPressFn={switchProducer}
+            />
+          </View>
+        </>
       )}
-
-      {/* <SignInScreen
-        showModal={isSigninModalVisible}
-        onCloseFn={() => setIsSigninModalVisible(false)}
-      /> */}
     </SafeAreaView>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/clerk-expo";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
@@ -45,6 +46,8 @@ type Props = {
 };
 
 export default function CircuitParametersScreen({ navigation }: Props) {
+  const { signOut, isSignedIn, getToken } = useAuth();
+
   const [isSearchAddressLoading, setIsSearchAddressLoading] =
     useState<boolean>(false);
   const [isCoordinatesLoading, setIsCoordinatesLoading] =
@@ -95,8 +98,17 @@ export default function CircuitParametersScreen({ navigation }: Props) {
   };
 
   useEffect(() => {
-    fetchTypeLabels();
-    fetchFeatures();
+    if (!isSignedIn) {
+      navigation.navigate("SignIn", {
+        from: "Home",
+        backLabel: "Retour à l'accueil",
+        screenTitle: `CONNEXION\nINSCRIPTION`,
+        next: "CircuitParameters",
+      });
+    } else {
+      fetchTypeLabels();
+      fetchFeatures();
+    }
   }, []);
 
   const toggleAlltypes = () => {

@@ -79,14 +79,10 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
         if (!producerResponse.success) {
           console.error(producerResponse.message);
         } else {
-          navigation.navigate("TabNavigatorProducer", {
-            screen: "ProducerProfile",
-          });
+          navigation.navigate("ProducerProfile");
         }
       } else {
-        navigation.navigate("TabNavigatorUser", {
-          screen: "UserProfile",
-        });
+        navigation.navigate("UserProfile");
       }
     } catch (error) {
       console.error(error);

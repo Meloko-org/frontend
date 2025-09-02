@@ -201,7 +201,6 @@ const TabNavigatorUser: React.FC = () => {
         name="CircuitParameters"
         component={CircuitParametersScreen}
       />
-      <Tab.Screen name="CircuitMap" component={CircuitMapScreen} />
       <Tab.Screen name="Cart" component={CartScreen} />
       <Tab.Screen
         name="BookmarksCustomer"
@@ -209,6 +208,13 @@ const TabNavigatorUser: React.FC = () => {
         options={{ title: "Favoris" }}
       />
       <Tab.Screen name="UserProfile" component={UserProfileScreen} />
+
+      <Tab.Screen
+        name="CircuitMap"
+        component={CircuitMapScreen}
+        options={{ tabBarButton: () => null }}
+      />
+
       <Tab.Screen
         name="UserProfileInformations"
         component={UserProfileInformationsScreen}
@@ -219,6 +225,7 @@ const TabNavigatorUser: React.FC = () => {
         component={UserProfileAddressesScreen}
         options={{ tabBarButton: () => null }}
       />
+
       <Tab.Screen
         name="ShopUser"
         component={ShopUserScreen}
@@ -286,6 +293,9 @@ const TabNavigatorProducer: React.FC = () => {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="ShopProducer" component={ShopProducerScreen} />
+      <Tab.Screen name="BusinessCenter" component={BusinessCenterScreen} />
+      <Tab.Screen name="ProducerProfile" component={ProducerProfileScreen} />
+
       <Tab.Screen
         name="ShopDetails"
         component={ShopDetailsScreen}
@@ -331,6 +341,7 @@ const TabNavigatorProducer: React.FC = () => {
         component={ShopWithdrawDeliveryScreen}
         options={{ tabBarButton: () => null }}
       />
+
       <Tab.Screen
         name="StockCategories"
         component={StockCategoriesScreen}
@@ -351,12 +362,12 @@ const TabNavigatorProducer: React.FC = () => {
         component={StocksAddScreen}
         options={{ tabBarButton: () => null }}
       />
-
       <Tab.Screen
         name="StocksEdit"
         component={StocksEditScreen}
         options={{ tabBarButton: () => null }}
       />
+
       <Tab.Screen
         name="PremiumOptions"
         component={PremiumOptionsScreen}
@@ -422,8 +433,6 @@ const TabNavigatorProducer: React.FC = () => {
         component={PostHashtagsScreen}
         options={{ tabBarButton: () => null }}
       />
-      {/* <Tab.Screen name="BusinessCenter" component={BusinessScreen} /> */}
-      <Tab.Screen name="BusinessCenter" component={BusinessCenterScreen} />
       <Tab.Screen
         name="PendingOrders"
         component={PendingOrdersScreen}
@@ -449,21 +458,14 @@ const TabNavigatorProducer: React.FC = () => {
         component={AllOrdersScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen name="ProducerProfile" component={ProducerProfileScreen} />
-
-      <Tab.Screen
-        name="Sales"
-        component={SalesScreen}
-        options={{ tabBarButton: () => null }}
-      />
-      {/* <Tab.Screen
-        name="StocksOld"
-        component={StocksOldScreen}
-        options={{ tabBarButton: () => null }}
-      /> */}
       <Tab.Screen
         name="OrderDetails"
         component={OrderDetailsScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="Sales"
+        component={SalesScreen}
         options={{ tabBarButton: () => null }}
       />
     </Tab.Navigator>

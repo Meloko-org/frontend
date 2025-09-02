@@ -1,6 +1,11 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { useSignIn, useSignUp, useSSO } from "@clerk/clerk-expo";
-import { useAuth } from "@clerk/clerk-expo";
+import {
+  useSignIn,
+  useSignUp,
+  useSSO,
+  useAuth,
+  useUser,
+} from "@clerk/clerk-expo";
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
@@ -36,6 +41,7 @@ import TextHeading4 from "../components/utils/texts/Heading4";
 import TextBody1 from "../components/utils/texts/Body1";
 import OpenScreenButton from "../components/utils/buttons/OpenScreen";
 import TextHeading2 from "../components/utils/texts/Heading2";
+import ChooseAccountTypeModal from "../components/modals/ChooseAccountType";
 
 type SignInScreenRouteProp = RouteProp<RootStackParamList, "SignIn">;
 
@@ -65,7 +71,7 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   useWarmUpBrowser();
 
   const route = useRoute<SignInScreenRouteProp>();
-  const { from, backLabel, screenTitle } = route.params || {}; // route.params peut être non défini quand on revient SignUpScreen
+  const { from, backLabel, screenTitle, next } = route.params || {}; // route.params peut être non défini quand on revient SignUpScreen
 
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
@@ -82,9 +88,15 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
 
   // Import the Clerk Auth functions
   const { signIn, setActive, isLoaded } = useSignIn();
+  const { user } = useUser();
 
   // import the Clerk Google OAuth flow
   const { startSSOFlow } = useSSO();
+
+  const [isChooseAccountTypeModalVisible, setIsChooseAccountTypeModalvisible] =
+    useState<boolean>(false);
+
+  // const [ nextScreen, setNextScreen ] = useState<string>()
 
   // Form fields
   const [emailAddress, setEmailAddress] = useState<string>("");
@@ -104,10 +116,18 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
 
       if (!userResponse.success) {
         console.error(userResponse.message);
+        SheetManager.show("alert", {
+          payload: {
+            message: userResponse.message!,
+            alertType: "error",
+          },
+        });
         return;
       }
 
       console.log("user fetchData :", userResponse.data);
+
+      let target = "";
 
       dispatch(updateUser(userResponse.data!));
 
@@ -116,8 +136,10 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
       if (!producerResponse.success) {
         console.error(producerResponse.message);
         // pas de profil producer, on dirige vers la SearchScreen
-        navigation.navigate("TabNavigatorUser", { screen: "Search" });
-        return;
+        // navigation.navigate("MapCustomer");
+        // setNextScreen("MapCustomer")
+        target = "MapCustomer";
+        // return;
       }
 
       console.log("producer fetchData :", producerResponse.data);
@@ -125,19 +147,29 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
       const producer = producerResponse.data;
       dispatch(setProducerData(producer));
 
-      const shopResponse = await shopTools.getShopInfos(token, producer?._id);
+      const shopResponse = await shopTools.getShopInfos(token, producer?._id!);
 
       if (!shopResponse.success) {
         console.error(shopResponse.message);
-        navigation.navigate("TabNavigatorProducer", { screen: "Shop" });
+        // navigation.navigate("TabNavigatorProducer", { screen: "Shop" });
+        // setNextScreen("Shop")
+        target = "Shop";
       }
 
       const shop = shopResponse.data;
       dispatch(setShopData(shop));
 
-      navigation.navigate("TabNavigatorProducer", {
-        screen: "BusinessCenter",
-      });
+      // navigation.navigate("TabNavigatorProducer", {
+      //   screen: "BusinessCenter",
+      // });
+      // setNextScreen("BusinessCenter")
+      target = "BusinessCenter";
+
+      if (next) {
+        navigation.replace(next);
+      } else {
+        navigation.replace(target);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -164,11 +196,24 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
       // If the signin event went well
       if (createdSessionId) {
         console.log("sessionId", createdSessionId);
+        // on récupère le user avant que lastSignInAt ait pu être mis à jour
+        const freshUser = await user?.reload();
+
         await setActive!({ session: createdSessionId });
         // setActive!({ session: createdSessionId });
         setPerformedSignedIn(true);
-        fetchData();
+
+        if (freshUser) {
+          if (freshUser.lastSignInAt === null) {
+            // signifie que c'est une inscription et non un log
+            // ouvrir la modal de choix de compte
+            setIsChooseAccountTypeModalvisible(true);
+          } else {
+            fetchData();
+          }
+        }
       } else {
+        // afficher un message d'erreur
       }
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
@@ -183,28 +228,57 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
     }
 
     try {
+      console.log("SIGNIN google auth");
       // Start the authentication process by calling `startSSOFlow()`
-      const { createdSessionId, setActive, signIn, signUp } =
+
+      const redirectUrl = AuthSession.makeRedirectUri({ scheme: "meloko" });
+      console.log("Redirect URL:", redirectUrl);
+
+      const result = await startSSOFlow({
+        strategy: "oauth_google",
+        redirectUrl,
+      });
+      console.log("OAuth result:", result);
+
+      const { createdSessionId, setActive, signIn, signUp } = result;
+
+      /*const { createdSessionId, setActive, signIn, signUp } =
         await startSSOFlow({
           strategy: "oauth_google",
           // For web, defaults to current path
           // For native, you must pass a scheme, like AuthSession.makeRedirectUri({ scheme, path })
           // For more info, see https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturioptions
-          redirectUrl: AuthSession.makeRedirectUri(),
-        });
+          redirectUrl: AuthSession.makeRedirectUri({ scheme: "meloko"}),
+        });*/
       // Try to start the Google OAuth flow
       //   const { createdSessionId, setActive } = await startOAuthFlow({
       //     redirectUrl: Linking.createURL("/home", { scheme: "Meloko" }), // Redirect path on successful signin
       //   });
 
+      console.log("SIGNIN sessionId", createdSessionId);
+
       // If the signin event went well
       if (createdSessionId) {
-        console.log("sessionId", createdSessionId);
+        // on récupère le user avant que lastSignInAt ait pu être mis à jour
+        const freshUser = await user?.reload();
+
+        console.log("SIGNIN freshUser :", freshUser);
+
         await setActive!({ session: createdSessionId });
         // setActive!({ session: createdSessionId });
         setPerformedSignedIn(true);
-        fetchData();
+
+        if (freshUser) {
+          if (freshUser.lastSignInAt === null) {
+            // signifie que c'est une inscription et non un log
+            // ouvrir la modal de choix de compte
+            setIsChooseAccountTypeModalvisible(true);
+          } else {
+            fetchData();
+          }
+        }
       } else {
+        // afficher message erreur
       }
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
@@ -272,9 +346,7 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
     }
   }, [isLoaded, emailAddress, password]);
 
-  console.log("---------------- SIGNIN -------------------");
-  console.log("userStore :", userStore);
-  console.log("producerStore: ", producerStore);
+  console.log("SIGNIN next: ", next);
 
   return (
     <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
@@ -282,11 +354,27 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
         backLabel={backLabel || "Retour à l'accueil"}
         screen={from || "Home"}
         label={screenTitle || "CONNEXION\nINSCRIPTION"}
-        extraClasses="mt-2"
+        extraClasses="mt-2 mb-5"
       />
 
       <ScrollView>
-        <View className="flex flex-row justify-center mt-2 mb-3">
+        <View className="px-3 my-5">
+          <View className="flex flex-row justify-center mb-3">
+            <TextBody1>Pas encore membre ?</TextBody1>
+          </View>
+          <OpenScreenButton
+            label="Créer un compte"
+            onPressFn={() =>
+              navigation.navigate("SignUp", {
+                from: "SignIn",
+                backLabel: "Retour à la connexion",
+                screenTitle: "CREER UN\nCOMPTE",
+              })
+            }
+          />
+        </View>
+
+        <View className="flex flex-row justify-center my-5">
           <View className="w-[70%]">
             <View className="flex flex-row justify-center mb-3">
               <TextBody1>Connexion avec votre compte</TextBody1>
@@ -345,23 +433,16 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
             </View>
           </View>
         </View>
-
-        <View className="px-3 mt-5">
-          <View className="flex flex-row justify-center mb-3">
-            <TextBody1>Pas encore membre ?</TextBody1>
-          </View>
-          <OpenScreenButton
-            label="Créer un compte"
-            onPressFn={() =>
-              navigation.navigate("SignUp", {
-                from: "SignIn",
-                backLabel: "Retour à la connexion",
-                screenTitle: "CREER UN\nCOMPTE",
-              })
-            }
-          />
-        </View>
       </ScrollView>
+
+      <ChooseAccountTypeModal
+        isVisible={isChooseAccountTypeModalVisible}
+        onUserPress={() => {
+          setIsChooseAccountTypeModalvisible(false);
+          fetchData();
+        }}
+        onProducerPress={() => console.log("go onboarding")} // navigation vers le onboarding
+      />
     </SafeAreaView>
   );
 }
