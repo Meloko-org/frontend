@@ -24,7 +24,7 @@ const getUserInfos = async (
     }
 
     const data = await response.json();
-    console.warn("user data", data.user.addresses);
+    // console.warn("user data", data.user.addresses);
     return data.success
       ? { success: true, data: data.user }
       : { success: false, data: null, message: data.message };

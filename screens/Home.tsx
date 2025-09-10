@@ -87,14 +87,21 @@ export default function HomeScreen({ navigation }: Props) {
       const producer = producerResponse.data;
       dispatch(setProducerData(producer));
 
-      const shopResponse = await shopTools.getShopInfos(token, producer?._id!);
+      if (producer?.onboardingStep! < 6) {
+        navigation.navigate("Onboarding" + (producer?.onboardingStep + 1));
+      } else {
+        const shopResponse = await shopTools.getShopInfos(
+          token,
+          producer?._id!,
+        );
 
-      if (!shopResponse.success) {
-        console.warn(shopResponse.message);
+        if (!shopResponse.success) {
+          console.warn(shopResponse.message);
+        }
+
+        const shop = shopResponse.data;
+        dispatch(setShopData(shop));
       }
-
-      const shop = shopResponse.data;
-      dispatch(setShopData(shop));
     } catch (error) {
       console.error(error);
     }

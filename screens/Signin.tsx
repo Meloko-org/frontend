@@ -147,23 +147,30 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
       const producer = producerResponse.data;
       dispatch(setProducerData(producer));
 
-      const shopResponse = await shopTools.getShopInfos(token, producer?._id!);
+      if (producer?.onboardingStep! < 6) {
+        target = "Onboarding" + producer?.onboardingStep;
+      } else {
+        const shopResponse = await shopTools.getShopInfos(
+          token,
+          producer?._id!,
+        );
 
-      if (!shopResponse.success) {
-        console.error(shopResponse.message);
-        // navigation.navigate("TabNavigatorProducer", { screen: "Shop" });
-        // setNextScreen("Shop")
-        target = "Shop";
+        if (!shopResponse.success) {
+          console.error(shopResponse.message);
+          // navigation.navigate("TabNavigatorProducer", { screen: "Shop" });
+          // setNextScreen("Shop")
+          target = "Shop";
+        }
+
+        const shop = shopResponse.data;
+        dispatch(setShopData(shop));
+
+        // navigation.navigate("TabNavigatorProducer", {
+        //   screen: "BusinessCenter",
+        // });
+        // setNextScreen("BusinessCenter")
+        target = "BusinessCenter";
       }
-
-      const shop = shopResponse.data;
-      dispatch(setShopData(shop));
-
-      // navigation.navigate("TabNavigatorProducer", {
-      //   screen: "BusinessCenter",
-      // });
-      // setNextScreen("BusinessCenter")
-      target = "BusinessCenter";
 
       if (next) {
         navigation.replace(next);

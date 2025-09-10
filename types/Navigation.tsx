@@ -1,4 +1,5 @@
 // Navigation types
+import { NavigatorScreenParams } from "@react-navigation/native";
 
 import {
   ActivityData,
@@ -12,37 +13,7 @@ import {
   StockData,
 } from "./API";
 
-// To keep synced with the Native Stack
-type RootStackParamList = {
-  Home: undefined;
-  SignIn: {
-    from?: string;
-    backLabel?: string;
-    screenTitle?: string;
-    next: string;
-  };
-  SignUp: { from: string; backLabel: string; screenTitle: string };
-  TabNavigatorUser: undefined;
-  TabNavigatorProducer: undefined;
-
-  MapCustomer: undefined;
-  Cart: undefined;
-  Bookmarks: undefined;
-  UserProfile: undefined;
-  UserProfileInformations: undefined;
-  UserProfileAddresses: undefined;
-  ShopUser: {
-    shopId: string | undefined;
-    distance: number | undefined;
-    relevantProducts: StockData[];
-    sheetId: string;
-  };
-  WithdrawModesUser: undefined;
-  OrdersCustomer: undefined;
-  PaymentCustomer: undefined;
-  BookmarksCustomer: undefined;
-  OrderCustomer: undefined;
-
+type ProducerTabParamList = {
   ShopProducer: undefined;
   ShopDetails: { from?: string; backLabel?: string; screenTitle?: string };
   ShopOffline: { from?: string; backLabel?: string; screenTitle?: string };
@@ -51,6 +22,7 @@ type RootStackParamList = {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
+    onboarding?: boolean;
   };
   ShopWithdrawClickcollect: {
     from?: string;
@@ -77,7 +49,12 @@ type RootStackParamList = {
     backLabel?: string;
     screenTitle?: string;
   };
-  StockCategories: { from?: string; backLabel?: string; screenTitle?: string };
+  StockCategories: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    onboarding?: boolean;
+  };
   StockFamilies: {
     from?: string;
     backLabel?: string;
@@ -166,11 +143,102 @@ type RootStackParamList = {
     screenTitle?: string;
     orderId: string;
   };
-  Sales: undefined;
+};
+
+type UserTabParamList = {
+  MapCustomer: undefined;
+  Cart: undefined;
+  Bookmarks: undefined;
+  UserProfile: undefined;
+  UserProfileInformations: undefined;
+  UserProfileAddresses: undefined;
+  ShopUser: {
+    shopId: string | undefined;
+    distance: number | undefined;
+    relevantProducts: StockData[];
+    sheetId: string;
+  };
+  WithdrawModesUser: undefined;
+  OrdersCustomer: undefined;
+  PaymentCustomer: undefined;
+  BookmarksCustomer: undefined;
+  OrderCustomer: undefined;
+
   CircuitParameters: undefined;
   CircuitMap: {
     circuitOptions: CircuitOptionsData;
   };
 };
 
-export type { RootStackParamList };
+// To keep synced with the Native Stack
+type RootStackParamList = {
+  TabNavigatorUser: NavigatorScreenParams<UserTabParamList> | undefined;
+  TabNavigatorProducer: NavigatorScreenParams<ProducerTabParamList> | undefined;
+  Home: undefined;
+  SignIn: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    next: string;
+  };
+  SignUp: {
+    from: string;
+    backLabel: string;
+    screenTitle: string;
+  };
+  Sales: undefined;
+  Onboarding0: undefined;
+  Onboarding1: undefined;
+  Onboarding2: undefined;
+  Onboarding3: undefined;
+  Onboarding4: undefined;
+  Onboarding5: undefined;
+};
+
+export type { RootStackParamList, ProducerTabParamList, UserTabParamList };
+
+/** typage de la nav selon que la screen est indépendante ou appartient à un tab
+
+Tab: 
+
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { ProducerTabParamList } from "../navigation"; // <-- ton fichier de types
+
+type ShopWithdrawModesRouteProp = RouteProp<
+  ProducerTabParamList,
+  "ShopWithdrawModes"
+>;
+
+type ShopWithdrawModesNavProp = BottomTabNavigationProp<
+  ProducerTabParamList,
+  "ShopWithdrawModes"
+>;
+
+type Props = {
+  navigation: ShopWithdrawModesNavProp;
+  route: ShopWithdrawModesRouteProp;
+};
+
+export default function ShopWithdrawModesScreen({ navigation, route }: Props) {
+  const { from, backLabel, screenTitle, onboarding } = route.params || {};
+  ...
+}
+
+
+Stack : 
+
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../navigation";
+
+type Props = NativeStackScreenProps<RootStackParamList, "Onboarding5">;
+
+export default function Onboarding5Screen({ navigation, route }: Props) {
+  // route.params si besoin
+  ...
+}
+
+
+
+
+*/

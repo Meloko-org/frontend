@@ -290,6 +290,7 @@ type ProducerData = {
   iban: string | null;
   bic: string | null;
   address: AddressData;
+  onboardingStep: number;
 } | null;
 
 type ProductDetail = {

@@ -1,12 +1,12 @@
-import { View, Image, Text } from "react-native";
+import { useState } from "react";
+
 import { CrewMember } from "../../types/API";
-import TextHeading3 from "../utils/texts/Heading3";
-import TextBody1 from "../utils/texts/Body1";
 import ImageUploader from "../utils/ImageUploader";
+
+import { View, Image, Text } from "react-native";
 import InputText from "../utils/inputs/Text";
 import InputTextarea from "../utils/inputs/Textarea";
 import IconButton from "../utils/buttons/Icon";
-import { useState } from "react";
 
 type CrewMemberEditProps = {
   member: CrewMember;

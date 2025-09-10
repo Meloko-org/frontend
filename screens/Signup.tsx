@@ -61,9 +61,12 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
   const [code, setCode] = useState<string>("");
 
   const fetchData = async () => {
+    console.log("start fetchData");
     try {
       const token = await getToken();
       const userResponse = await userTools.getUserInfos(token);
+
+      console.log("getUserInfos done");
 
       if (!userResponse.success) {
         console.error(userResponse.message);
@@ -76,10 +79,20 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
       if (isProducer) {
         const producerResponse = await producerTools.initialiseProducer(token);
 
+        console.log("initialiseProducer done");
+
         if (!producerResponse.success) {
           console.error(producerResponse.message);
         } else {
-          navigation.navigate("ProducerProfile");
+          console.log("producerResponse data :", producerResponse.data);
+
+          if (producerResponse.data?.onboardingStep! < 6) {
+            navigation.navigate(
+              "Onboarding" + producerResponse.data.onboardingStep!,
+            );
+          } else {
+            navigation.navigate("ProducerProfile");
+          }
         }
       } else {
         navigation.navigate("UserProfile");
@@ -90,6 +103,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
   };
 
   const onSignUpPress = async () => {
+    setConnectionLoading(true);
     // vérification des champs
     if (emailAddress === "") {
       SheetManager.show("alert", {
@@ -145,6 +159,8 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
         strategy: "email_code",
       });
 
+      setConnectionLoading(false);
+
       // Verification is pending
       setPendingVerification(true);
     } catch (err: any) {
@@ -174,6 +190,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
   };
 
   const onPressVerify = async () => {
+    setVerifyLoading(true);
     // If Clerk is not loaded
     if (!isLoaded) {
       return;
@@ -189,8 +206,11 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
 
+        setVerifyLoading(false);
+
         fetchData();
       } else {
+        setVerifyLoading(false);
         console.error(JSON.stringify(completeSignUp, null, 2));
       }
     } catch (err: any) {
@@ -231,7 +251,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
                   <CodeInput onCodeChange={setCode} />
                 </View>
                 <ButtonPrimaryEnd
-                  label="Vérifier email"
+                  label="Valider le code"
                   iconName="arrow-right"
                   onPressFn={handleVerifyCode}
                   isLoading={isVerifyLoading}
@@ -249,6 +269,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
                     placeholder="example@gmail.com"
                     label="Email"
                     autoCapitalize="none"
+                    size="large"
                     extraClasses="w-full mb-2"
                   />
                   <InputText
@@ -288,7 +309,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
                   <CheckBox
                     label="Je suis un producteur"
                     bgColor="bg-white dark:bg-tertiary"
-                    textClasses="text-dark dark:text-white"
+                    textClasses="text-black dark:text-white"
                     onPressFn={() => setIsProducer(!isProducer)}
                   />
                 </View>

@@ -91,7 +91,7 @@ export default function InputText({
             ${iconName ? "w-80" : "w-full"} 
             ${twoLines && "h-[60px] leading-5"}
             ${textClasses}
-            text-dark dark:text-lightbg p-0
+            text-black dark:text-lightbg p-0
           `}
           placeholder={placeholder}
           placeholderTextColor={colorScheme === "dark" ? "#FCFFF0" : "#444C3D"}

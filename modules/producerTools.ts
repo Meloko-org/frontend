@@ -80,7 +80,9 @@ const updateProducer = async (
   }
 };
 
-const initialiseProducer = async (token: string | null) => {
+const initialiseProducer = async (
+  token: string | null,
+): Promise<ApiResponse<ProducerData>> => {
   try {
     const response = await fetch(`${API_ROOT}/producers/initialise`, {
       method: "POST",
@@ -91,10 +93,14 @@ const initialiseProducer = async (token: string | null) => {
       },
     });
     const data = await response.json();
-    return data;
+
+    return data.success
+      ? { success: true, data: data.producer, message: data.message }
+      : { success: false, data: null, message: data.message };
   } catch (error) {
     return {
       success: false,
+      data: null,
       message: "Erreur serveur: veuillez réessayer plus tard.",
     };
   }

@@ -56,13 +56,19 @@ export default function Thumbnail({
     </View>
   );
 
-  return (
-    <View className={extraClasses}>
-      {clickable && onPress ? (
-        <Pressable onPress={onPress}>{image}</Pressable>
-      ) : (
-        image
-      )}
-    </View>
+  return clickable && onPress ? (
+    <Pressable onPress={onPress}>{image}</Pressable>
+  ) : (
+    image
   );
+
+  // return (
+  //   <View className={extraClasses}>
+  //     {clickable && onPress ? (
+  //       <Pressable onPress={onPress}>{image}</Pressable>
+  //     ) : (
+  //       image
+  //     )}
+  //   </View>
+  // );
 }

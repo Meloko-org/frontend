@@ -46,7 +46,7 @@ type Props = {
 
 export default function StockCategoriesScreen({ navigation }: Props) {
   const route = useRoute<StockCategoriesScreenRouteProp>();
-  const { from, backLabel, screenTitle } = route.params || {};
+  const { from, backLabel, screenTitle, onboarding } = route.params || {};
 
   const dispatch = useDispatch();
   const shopStore = useSelector(
@@ -215,12 +215,15 @@ export default function StockCategoriesScreen({ navigation }: Props) {
       className="bg-lightbg flex-1 dark:bg-darkbg"
       edges={["right", "left", "top"]}
     >
-      <TopBar
-        backLabel={backLabel || "Retour à la boutique"}
-        screen={from || "ShopProducer"}
-        label={screenTitle || "GESTION\nDES STOCKS"}
-        extraClasses="my-2"
-      />
+      {!onboarding && (
+        <TopBar
+          backLabel={backLabel || "Retour à la boutique"}
+          screen={from || "ShopProducer"}
+          label={screenTitle || "GESTION\nDES STOCKS"}
+          extraClasses="my-2"
+        />
+      )}
+
       <ScrollView>
         {isFetchLoading ? (
           <Spinner />

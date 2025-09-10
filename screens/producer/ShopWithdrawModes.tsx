@@ -1,18 +1,20 @@
 import React from "react";
 import { useState, useEffect } from "react";
 
+import { useSelector } from "react-redux";
+import { ShopState } from "../../reducers/shop";
+
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/Navigation";
 import { useRoute } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 
-import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import TopBar from "../../components/TopBar";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
-import { useSelector } from "react-redux";
-import { ShopState } from "../../reducers/shop";
 
 type ShopWithdrawModesScreenRouteProp = RouteProp<
   RootStackParamList,
@@ -30,7 +32,7 @@ type Props = {
 
 export default function ShopWithdrawModesScreen({ navigation }: Props) {
   const route = useRoute<ShopWithdrawModesScreenRouteProp>();
-  const { from, backLabel, screenTitle } = route.params || {};
+  const { from, backLabel, screenTitle, onboarding } = route.params || {};
 
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
@@ -62,14 +64,16 @@ export default function ShopWithdrawModesScreen({ navigation }: Props) {
       className="flex-1 bg-lightbg dark:bg-darkbg"
       edges={["right", "left", "top"]}
     >
-      <View style={{ flex: 1 }}>
-        <TopBar
-          backLabel={backLabel || "Retour à la boutique"}
-          screen={from || "ShopProducer"}
-          label={screenTitle || "MODES DE\nRETRAIT"}
-          extraClasses="mt-2"
-        />
-      </View>
+      {!onboarding && (
+        <View style={{ flex: 1 }}>
+          <TopBar
+            backLabel={backLabel || "Retour à la boutique"}
+            screen={from || "ShopProducer"}
+            label={screenTitle || "MODES DE\nRETRAIT"}
+            extraClasses="mt-2"
+          />
+        </View>
+      )}
 
       <View className="px-3 mt-5" style={{ flex: 11 }}>
         <ScrollView>

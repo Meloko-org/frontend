@@ -74,6 +74,12 @@ import OrderDetailsScreen from "./screens/producer/OrderDetails";
 import StocksEditScreen from "./screens/producer/StockEdit";
 import CircuitParametersScreen from "./screens/CircuitParameters";
 import CircuitMapScreen from "./screens/CircuitMap";
+import Onboarding0Screen from "./screens/Onboarding0";
+import Onboarding1Screen from "./screens/Onboarding1";
+import Onboarding2Screen from "./screens/Onboarding2";
+import Onboarding3Screen from "./screens/Onboarding3";
+import Onboarding4Screen from "./screens/Onboarding4";
+import Onboarding5Screen from "./screens/Onboarding5";
 
 import { Provider } from "react-redux";
 import { persistStore, persistReducer } from "redux-persist";
@@ -489,6 +495,30 @@ export default function App() {
                       <Stack.Screen name="Home" component={HomeScreen} />
                       <Stack.Screen name="SignUp" component={SignUpScreen} />
                       <Stack.Screen name="SignIn" component={SignInScreen} />
+                      <Stack.Screen
+                        name="Onboarding0"
+                        component={Onboarding0Screen}
+                      />
+                      <Stack.Screen
+                        name="Onboarding1"
+                        component={Onboarding1Screen}
+                      />
+                      <Stack.Screen
+                        name="Onboarding2"
+                        component={Onboarding2Screen}
+                      />
+                      <Stack.Screen
+                        name="Onboarding3"
+                        component={Onboarding3Screen}
+                      />
+                      <Stack.Screen
+                        name="Onboarding4"
+                        component={Onboarding4Screen}
+                      />
+                      <Stack.Screen
+                        name="Onboarding5"
+                        component={Onboarding5Screen}
+                      />
                       <Stack.Screen
                         name="TabNavigatorUser"
                         component={TabNavigatorUser}
