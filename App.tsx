@@ -4,16 +4,21 @@ LogBox.ignoreAllLogs();
 import { ClerkProvider, ClerkLoaded } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { NavigationContainer } from "@react-navigation/native";
 // import { ModalProvider } from "./context/ModalContext";
 import { SheetProvider } from "react-native-actions-sheet";
 import "./components/bottomSheets/sheets";
+
+import { NavigationContainer } from "@react-navigation/native";
 import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
 } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { RootStackParamList } from "./types/Navigation";
+import {
+  RootStackParamList,
+  ProducerTabParamList,
+  UserTabParamList,
+} from "./types/Navigation";
 
 import _FontAwesome from "react-native-vector-icons/FontAwesome5";
 import { useColorScheme } from "nativewind";
@@ -80,6 +85,7 @@ import Onboarding2Screen from "./screens/Onboarding2";
 import Onboarding3Screen from "./screens/Onboarding3";
 import Onboarding4Screen from "./screens/Onboarding4";
 import Onboarding5Screen from "./screens/Onboarding5";
+import ProducerContactScreen from "./screens/producer/ProducerContact";
 
 import { Provider } from "react-redux";
 import { persistStore, persistReducer } from "redux-persist";
@@ -97,6 +103,8 @@ import orders from "./reducers/orders";
 import mapShopResults from "./reducers/mapShopResults";
 import mapMarketResults from "./reducers/mapMarketResults";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+
+import React from "react";
 
 const reducers = combineReducers({
   user,
@@ -125,7 +133,9 @@ const FontAwesome = _FontAwesome as unknown as React.ElementType;
 
 // Create a Natrive Stack Navigator
 const Stack = createNativeStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator<RootStackParamList>();
+// const Tab = createBottomTabNavigator<RootStackParamList>();
+const UserTab = createBottomTabNavigator<UserTabParamList>();
+const ProducerTab = createBottomTabNavigator<ProducerTabParamList>();
 
 // Navigator screen options
 const options: NativeStackNavigationOptions = {
@@ -171,7 +181,7 @@ const TabNavigatorUser: React.FC = () => {
   const { colorScheme } = useColorScheme();
   const tabBarBackgroundColor = colorScheme === "dark" ? "#444C3D" : "#FFF";
   return (
-    <Tab.Navigator
+    <UserTab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName: string = "";
@@ -202,62 +212,62 @@ const TabNavigatorUser: React.FC = () => {
         },
       })}
     >
-      <Tab.Screen name="MapCustomer" component={MapCustomerScreen} />
-      <Tab.Screen
+      <UserTab.Screen name="MapCustomer" component={MapCustomerScreen} />
+      <UserTab.Screen
         name="CircuitParameters"
         component={CircuitParametersScreen}
       />
-      <Tab.Screen name="Cart" component={CartScreen} />
-      <Tab.Screen
+      <UserTab.Screen name="Cart" component={CartScreen} />
+      <UserTab.Screen
         name="BookmarksCustomer"
         component={BookmarksScreen}
         options={{ title: "Favoris" }}
       />
-      <Tab.Screen name="UserProfile" component={UserProfileScreen} />
+      <UserTab.Screen name="UserProfile" component={UserProfileScreen} />
 
-      <Tab.Screen
+      <UserTab.Screen
         name="CircuitMap"
         component={CircuitMapScreen}
         options={{ tabBarButton: () => null }}
       />
 
-      <Tab.Screen
+      <UserTab.Screen
         name="UserProfileInformations"
         component={UserProfileInformationsScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <UserTab.Screen
         name="UserProfileAddresses"
         component={UserProfileAddressesScreen}
         options={{ tabBarButton: () => null }}
       />
 
-      <Tab.Screen
+      <UserTab.Screen
         name="ShopUser"
         component={ShopUserScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <UserTab.Screen
         name="WithdrawModesUser"
         component={WithdrawModesUserScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <UserTab.Screen
         name="OrderCustomer"
         component={OrderCustomerScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <UserTab.Screen
         name="PaymentCustomer"
         component={PaymentCustomerScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <UserTab.Screen
         name="OrdersCustomer"
         component={OrdersCustomerScreen}
         options={{ tabBarButton: () => null }}
       />
-    </Tab.Navigator>
+    </UserTab.Navigator>
   );
 };
 
@@ -266,22 +276,20 @@ const TabNavigatorProducer: React.FC = () => {
   const tabBarBackgroundColor = colorScheme === "dark" ? "#444C3D" : "#FFF";
 
   return (
-    <Tab.Navigator
+    <ProducerTab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName: string = "";
 
-          if (route.name === "Home") {
-            iconName = "home";
+          if (route.name === "ProducerContact") {
+            iconName = "phone-alt";
           } else if (route.name === "ShopProducer") {
             iconName = "store";
           } else if (route.name === "BusinessCenter") {
             iconName = "file-invoice-dollar";
           } else if (route.name === "ProducerProfile") {
             iconName = "user-circle";
-          } // else if (route.name === "Stocks") {
-          //   iconName = "boxes";
-          // }
+          }
 
           return (
             <FontAwesome name={iconName} size={size} color={color} solid />
@@ -297,184 +305,194 @@ const TabNavigatorProducer: React.FC = () => {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="ShopProducer" component={ShopProducerScreen} />
-      <Tab.Screen name="BusinessCenter" component={BusinessCenterScreen} />
-      <Tab.Screen name="ProducerProfile" component={ProducerProfileScreen} />
+      <ProducerTab.Screen
+        name="ProducerContact"
+        component={ProducerContactScreen}
+      />
+      <ProducerTab.Screen name="ShopProducer" component={ShopProducerScreen} />
+      <ProducerTab.Screen
+        name="BusinessCenter"
+        component={BusinessCenterScreen}
+      />
+      <ProducerTab.Screen
+        name="ProducerProfile"
+        component={ProducerProfileScreen}
+      />
 
-      <Tab.Screen
+      <ProducerTab.Screen
         name="ShopDetails"
         component={ShopDetailsScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="ShopOffline"
         component={ShopOfflineScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="ShopParams"
         component={ShopParamsScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="ShopWithdrawModes"
         component={ShopWithdrawModesScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+
+      <ProducerTab.Screen
         name="ShopWithdrawClickcollect"
         component={ShopWithdrawClickcollectScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="ShopWithdrawShopMarkets"
         component={ShopWithdrawShopMarketsScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="ShopWithdrawShopMarketsSearch"
         component={ShopWithdrawShopMarketsSearchScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="ShopWithdrawShopMarketsManage"
         component={ShopWithdrawShopMarketsManageScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="ShopWithdrawDelivery"
         component={ShopWithdrawDeliveryScreen}
         options={{ tabBarButton: () => null }}
       />
 
-      <Tab.Screen
+      <ProducerTab.Screen
         name="StockCategories"
         component={StockCategoriesScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="StockFamilies"
         component={StockFamiliesScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="Stocks"
         component={StocksScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="StocksAdd"
         component={StocksAddScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="StocksEdit"
         component={StocksEditScreen}
         options={{ tabBarButton: () => null }}
       />
 
-      <Tab.Screen
+      <ProducerTab.Screen
         name="PremiumOptions"
         component={PremiumOptionsScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="PostType"
         component={PostTypeScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="ProductPostChoice"
         component={ProductPostChoiceScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="ActivityPostChoice"
         component={ActivityPostChoiceScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="NoticePostChoice"
         component={NoticePostChoiceScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="CreatePost"
         component={CreatePostScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="PostPreview"
         component={PostPreviewScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="ProgrammedPosts"
         component={ProgrammedPostsScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="PostParameters"
         component={PostParametersScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="PostNetworks"
         component={PostNetworksScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="PostFrequency"
         component={PostFrequencyScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="PostHistory"
         component={PostHistoryScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="PostHashtags"
         component={PostHashtagsScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="PendingOrders"
         component={PendingOrdersScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="ValidatedOrders"
         component={ValidatedOrdersScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="WithdrawnOrders"
         component={WithdrawnOrdersScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="CanceledOrders"
-        component={CanceledOrdersScreen}
+        component={WithdrawnOrdersScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="AllOrders"
         component={AllOrdersScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      <ProducerTab.Screen
         name="OrderDetails"
         component={OrderDetailsScreen}
         options={{ tabBarButton: () => null }}
       />
-      <Tab.Screen
+      {/* <ProducerTab.Screen
         name="Sales"
-        component={SalesScreen}
+        component={withErrorBoundary(ShopWithdrawModesScreen, "SalesScreen")}
         options={{ tabBarButton: () => null }}
-      />
-    </Tab.Navigator>
+      /> */}
+    </ProducerTab.Navigator>
   );
 };
 
@@ -518,6 +536,30 @@ export default function App() {
                       <Stack.Screen
                         name="Onboarding5"
                         component={Onboarding5Screen}
+                      />
+                      <Stack.Screen
+                        name="OnboardingShopWithdrawModes"
+                        component={ShopWithdrawModesScreen}
+                      />
+                      <Stack.Screen
+                        name="OnboardingShopWithdrawClickcollect"
+                        component={ShopWithdrawClickcollectScreen}
+                      />
+                      <Stack.Screen
+                        name="OnboardingShopWithdrawShopMarkets"
+                        component={ShopWithdrawShopMarketsScreen}
+                      />
+                      <Stack.Screen
+                        name="OnboardingShopWithdrawShopMarketsManage"
+                        component={ShopWithdrawShopMarketsManageScreen}
+                      />
+                      <Stack.Screen
+                        name="OnboardingShopWithdrawShopMarketsSearch"
+                        component={ShopWithdrawShopMarketsSearchScreen}
+                      />
+                      <Stack.Screen
+                        name="OnboardingShopWithdrawDelivery"
+                        component={ShopWithdrawDeliveryScreen}
                       />
                       <Stack.Screen
                         name="TabNavigatorUser"

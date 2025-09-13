@@ -1,10 +1,10 @@
 import React from "react";
 import { useState, useEffect } from "react";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { ProducerTabParamList } from "../../types/Navigation";
 import { RootStackParamList } from "../../types/Navigation";
-import { useRoute } from "@react-navigation/native";
-import { RouteProp } from "@react-navigation/native";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { Slider } from "@miblanchard/react-native-slider";
 import { SheetManager } from "react-native-actions-sheet";
@@ -24,26 +24,23 @@ import { addMarket, ShopState } from "../../reducers/shop";
 import shopTools from "../../modules/shopTools";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 
-type ShopWithdrawShopMarketsSearchScreenRouteProp = RouteProp<
-  RootStackParamList,
-  "ShopWithdrawShopMarketsSearch"
+type FromProducerTab = BottomTabScreenProps<
+  ProducerTabParamList,
+  "ShopWithdrawClickcollect"
 >;
 
-type ShopWithdrawShopMarketsSearchScreenNavigationProp =
-  NativeStackNavigationProp<
-    RootStackParamList,
-    "ShopWithdrawShopMarketsSearch"
-  >;
+type FromRootStack = NativeStackScreenProps<
+  RootStackParamList,
+  "OnboardingShopWithdrawClickcollect"
+>;
 
-type Props = {
-  navigation: ShopWithdrawShopMarketsSearchScreenNavigationProp;
-};
+type Props = FromProducerTab | FromRootStack;
 
 export default function ShopWithdrawShopMarketsSearchScreen({
   navigation,
+  route,
 }: Props) {
-  const route = useRoute<ShopWithdrawShopMarketsSearchScreenRouteProp>();
-  const { from, backLabel, screenTitle } = route.params || {};
+  const { from, backLabel, screenTitle, onboarding } = route.params || {};
 
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
@@ -134,15 +131,26 @@ export default function ShopWithdrawShopMarketsSearchScreen({
   };
 
   return (
-    <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
-      <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+    <SafeAreaView
+      className="bg-lightbg flex-1 dark:bg-darkbg"
+      edges={["right", "left", "top"]}
+    >
+      <View style={{ flex: 1 }}>
         <TopBar
           backLabel={backLabel || "Retour points de vente"}
-          screen={from || "ShopWithdrawShopMarkets"}
+          screen={
+            from || onboarding
+              ? "OnboardingShopWithdrawShopMarkets"
+              : "ShopWithdrawShopMarkets"
+          }
           label={screenTitle || "POINTS DE\nVENTE"}
+          navigationOverride={navigation}
+          screenParams={{ onboarding }}
           extraClasses="mt-2"
         />
+      </View>
 
+      <View className="px-3 mt-5" style={{ flex: 11 }}>
         <View className="px-3">
           <View>
             <TextHeading4 centered={true} extraClasses="mt-2 mb-5">
@@ -180,7 +188,9 @@ export default function ShopWithdrawShopMarketsSearchScreen({
                 />
               </View>
               <View className="w-[15%]">
-                <TextBody1 className="dark:text-lightbg">{radius} km</TextBody1>
+                <TextBody1 extraClasses="dark:text-lightbg">
+                  {radius} km
+                </TextBody1>
               </View>
             </View>
           </View>
@@ -227,7 +237,7 @@ export default function ShopWithdrawShopMarketsSearchScreen({
             </ScrollView>
           )}
         </View>
-      </SafeAreaView>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }

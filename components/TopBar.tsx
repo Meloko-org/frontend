@@ -2,11 +2,12 @@ import React, { JSX, useEffect } from "react";
 
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types/Navigation";
+import { ProducerTabParamList, RootStackParamList } from "../types/Navigation";
 
 import TextHeading4 from "./utils/texts/Heading4";
 import { View, Text, LayoutChangeEvent } from "react-native";
 import BackLabelButton from "./utils/buttons/BackLabel";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 
 type TopBarProps = {
   onLayout?: (event: LayoutChangeEvent) => void;
@@ -15,6 +16,9 @@ type TopBarProps = {
   screen: keyof RootStackParamList | string;
   screenParams?: object;
   extraClasses?: string;
+  navigationOverride?:
+    | NativeStackNavigationProp<RootStackParamList>
+    | BottomTabNavigationProp<ProducerTabParamList>;
 };
 
 export default function TopBar({
@@ -24,8 +28,10 @@ export default function TopBar({
   screen,
   screenParams,
   extraClasses,
+  navigationOverride,
 }: TopBarProps): JSX.Element {
   const navigation =
+    navigationOverride ??
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
@@ -36,11 +42,21 @@ export default function TopBar({
       <View>
         <BackLabelButton
           backLabel={backLabel}
-          onPressFn={() =>
-            screenParams
-              ? navigation.navigate(screen as any, screenParams)
-              : navigation.navigate(screen as any)
-          }
+          onPressFn={() => {
+            if (screenParams) {
+              (navigation as any).navigate(
+                screen as never,
+                screenParams as never,
+              );
+            } else {
+              (navigation as any).navigate(screen as never);
+            }
+          }}
+          // onPressFn={() =>
+          //   screenParams
+          //     ? navigation.navigate(screen as any, screenParams)
+          //     : navigation.navigate(screen as any)
+          // }
           extraClasses="ml-1 px-2"
         />
       </View>

@@ -94,9 +94,11 @@ export default function Onboarding5Screen({ navigation }: Props) {
             iconName="angle-right"
             iconFamily="FontAwesome6Icon"
             onPressFn={() =>
-              navigation.navigate("TabNavigatorProducer", {
-                screen: "ShopWithdrawmodes",
-                params: { onboarding: true },
+              navigation.navigate("OnboardingShopWithdrawModes", {
+                from: "Onboarding5",
+                backLabel: "Retour",
+                screenTitle: "MODES DE\nRETRAIT",
+                onboarding: true,
               })
             }
             extraClasses="h-20 mb-2"
@@ -107,8 +109,9 @@ export default function Onboarding5Screen({ navigation }: Props) {
             iconName="angle-right"
             iconFamily="FontAwesome6Icon"
             onPressFn={() =>
-              navigation.navigate("StockCategories", {
-                onboarding: true,
+              navigation.navigate("TabNavigatorProducer", {
+                screen: "StockCategories",
+                params: { onboarding: true },
               })
             }
             extraClasses="h-20"

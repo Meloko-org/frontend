@@ -1,10 +1,10 @@
-import React from "react";
+import React, { JSX } from "react";
 import { useState, useEffect } from "react";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { ProducerTabParamList } from "../../types/Navigation";
 import { RootStackParamList } from "../../types/Navigation";
-import { useRoute } from "@react-navigation/native";
-import { RouteProp } from "@react-navigation/native";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { SheetManager } from "react-native-actions-sheet";
 
@@ -22,23 +22,6 @@ import { MarketData } from "../../types/API";
 import Market from "../../components/cards/Market";
 import shopTools from "../../modules/shopTools";
 
-type ShopWithdrawShopMarketsManageScreenRouteProp = RouteProp<
-  RootStackParamList,
-  "ShopWithdrawShopMarketsManage"
->;
-
-type ShopWithdrawShopMarketsManageScreenNavigationProp =
-  NativeStackNavigationProp<
-    RootStackParamList,
-    "ShopWithdrawShopMarketsManage"
-  >;
-
-type Props = {
-  navigation: ShopWithdrawShopMarketsManageScreenNavigationProp;
-  isVisible: boolean;
-  onCloseFn: (bool: boolean) => void;
-};
-
 type PeriodData = {
   openingTime: string | null;
   closingTime: string | null;
@@ -48,13 +31,31 @@ type OpeningHourData = {
   periods: PeriodData[];
 };
 
+type FromProducerTab = BottomTabScreenProps<
+  ProducerTabParamList,
+  "ShopWithdrawShopMarketsManage"
+> & {
+  isVisible: boolean;
+  onCloseFn: (bool: boolean) => void;
+};
+
+type FromRootStack = NativeStackScreenProps<
+  RootStackParamList,
+  "OnboardingShopWithdrawShopMarketsManage"
+> & {
+  isVisible: boolean;
+  onCloseFn: (bool: boolean) => void;
+};
+
+type Props = FromProducerTab | FromRootStack;
+
 export default function ShopWithdrawShopMarketsManageScreen({
   navigation,
+  route,
   isVisible,
   onCloseFn,
 }: Props) {
-  const route = useRoute<ShopWithdrawShopMarketsManageScreenRouteProp>();
-  const { from, backLabel, screenTitle } = route.params || {};
+  const { from, backLabel, screenTitle, onboarding } = route.params || {};
 
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
@@ -178,15 +179,26 @@ export default function ShopWithdrawShopMarketsManageScreen({
   console.log("markets :", shopStore?.markets);
 
   return (
-    <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
-      <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+    <SafeAreaView
+      className="bg-lightbg flex-1 dark:bg-darkbg"
+      edges={["right", "left", "top"]}
+    >
+      <View style={{ flex: 1 }}>
         <TopBar
           backLabel={backLabel || "Retour points de vente"}
-          screen={from || "ShopWithdrawShopMarkets"}
+          screen={
+            from || onboarding
+              ? "OnboardingShopWithdrawShopMarkets"
+              : "ShopWithdrawShopMarkets"
+          }
           label={screenTitle || "POINTS DE\nVENTE"}
+          navigationOverride={navigation}
+          screenParams={{ onboarding }}
           extraClasses="mt-2"
         />
+      </View>
 
+      <View className="px-3 mt-5" style={{ flex: 11 }}>
         <ScrollView>
           <View className="px-3">
             <View>
@@ -210,7 +222,7 @@ export default function ShopWithdrawShopMarketsManageScreen({
             </View>
           </View>
         </ScrollView>
-      </SafeAreaView>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }

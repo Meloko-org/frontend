@@ -1,10 +1,9 @@
 import React, { JSX } from "react";
 import { useState, useEffect } from "react";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
-import { useFocusEffect, useRoute } from "@react-navigation/native";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { ProducerTabParamList } from "../../types/Navigation";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -30,22 +29,22 @@ import {
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import categoriesTools from "../../modules/categoriesTools";
 
-type StockCategoriesScreenRouteProp = RouteProp<
-  RootStackParamList,
+type StockCategoriesRouteProp = RouteProp<
+  ProducerTabParamList,
   "StockCategories"
 >;
 
-type StockCategoriesScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+type StockCategoriesNavProp = BottomTabNavigationProp<
+  ProducerTabParamList,
   "StockCategories"
 >;
 
 type Props = {
-  navigation: StockCategoriesScreenNavigationProp;
+  navigation: StockCategoriesNavProp;
+  route: StockCategoriesRouteProp;
 };
 
-export default function StockCategoriesScreen({ navigation }: Props) {
-  const route = useRoute<StockCategoriesScreenRouteProp>();
+export default function StockCategoriesScreen({ navigation, route }: Props) {
   const { from, backLabel, screenTitle, onboarding } = route.params || {};
 
   const dispatch = useDispatch();

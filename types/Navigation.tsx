@@ -28,26 +28,31 @@ type ProducerTabParamList = {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
+    onboarding?: boolean;
   };
   ShopWithdrawShopMarkets: {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
+    onboarding?: boolean;
   };
   ShopWithdrawShopMarketsSearch: {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
+    onboarding?: boolean;
   };
   ShopWithdrawShopMarketsManage: {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
+    onboarding?: boolean;
   };
   ShopWithdrawDelivery: {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
+    onboarding?: boolean;
   };
   StockCategories: {
     from?: string;
@@ -143,6 +148,7 @@ type ProducerTabParamList = {
     screenTitle?: string;
     orderId: string;
   };
+  ProducerContact: undefined;
 };
 
 type UserTabParamList = {
@@ -193,6 +199,42 @@ type RootStackParamList = {
   Onboarding3: undefined;
   Onboarding4: undefined;
   Onboarding5: undefined;
+  OnboardingShopWithdrawModes: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    onboarding: true;
+  };
+  OnboardingShopWithdrawClickcollect: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    onboarding: true;
+  };
+  OnboardingShopWithdrawShopMarkets: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    onboarding: true;
+  };
+  OnboardingShopWithdrawShopMarketsManage: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    onboarding: true;
+  };
+  OnboardingShopWithdrawShopMarketsSearch: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    onboarding: true;
+  };
+  OnboardingShopWithdrawDelivery: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    onboarding: true;
+  };
 };
 
 export type { RootStackParamList, ProducerTabParamList, UserTabParamList };
@@ -238,7 +280,59 @@ export default function Onboarding5Screen({ navigation, route }: Props) {
   ...
 }
 
+Tab et stack :
+
+import { CompositeScreenProps } from "@react-navigation/native";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+
+type FromProducerTab = BottomTabScreenProps<
+  ProducerTabParamList,
+  "ShopWithdrawModes"
+>;
+
+type FromRootStack = NativeStackScreenProps<
+  RootStackParamList,
+  "OnboardingShopWithdrawModes"
+>;
+
+** BottomTabScreenProps et NativeStackScreenProps donnent directement navigation + route **
+
+type Props = FromProducerTab | FromRootStack;
+
+export default function ShopWithdrawModesScreen({ navigation, route }: Props) {
+  const { onboarding } = route.params || {};
+  // ...
+}
+
+Tab et stack avec param supplémentaires :
 
 
+type FromProducerTab = BottomTabScreenProps<
+  ProducerTabParamList,
+  "ShopWithdrawShopMarketsManage"
+> & {
+  isVisible: boolean;
+  onCloseFn: (bool: boolean) => void;
+};
 
+type FromRootStack = NativeStackScreenProps<
+  RootStackParamList,
+  "OnboardingShopWithdrawShopMarketsManage"
+> & {
+  isVisible: boolean;
+  onCloseFn: (bool: boolean) => void;
+};
+
+type Props = FromProducerTab | FromRootStack;
+
+export default function ShopWithdrawShopMarketsManageScreen({
+  navigation,
+  route,
+  isVisible,
+  onCloseFn,
+}: Props) {
+  
+  const { from, backLabel, screenTitle, onboarding } = route.params || {};
+  
 */

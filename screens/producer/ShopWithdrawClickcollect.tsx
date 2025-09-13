@@ -4,10 +4,10 @@ import { useAuth } from "@clerk/clerk-expo";
 import { useDispatch, useSelector } from "react-redux";
 import { setClickCollect, ShopState } from "../../reducers/shop";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { ProducerTabParamList } from "../../types/Navigation";
 import { RootStackParamList } from "../../types/Navigation";
-import { useRoute } from "@react-navigation/native";
-import { RouteProp } from "@react-navigation/native";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import shopTools from "../../modules/shopTools";
 
@@ -21,23 +21,23 @@ import InputTextarea from "../../components/utils/inputs/Textarea";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import { SheetManager } from "react-native-actions-sheet";
 
-type ShopWithdrawClickcollectScreenRouteProp = RouteProp<
-  RootStackParamList,
+type FromProducerTab = BottomTabScreenProps<
+  ProducerTabParamList,
   "ShopWithdrawClickcollect"
 >;
 
-type ShopWithdrawClickcollectScreenNavigationProp = NativeStackNavigationProp<
+type FromRootStack = NativeStackScreenProps<
   RootStackParamList,
-  "ShopWithdrawClickcollect"
+  "OnboardingShopWithdrawClickcollect"
 >;
 
-type Props = {
-  navigation: ShopWithdrawClickcollectScreenNavigationProp;
-};
+type Props = FromProducerTab | FromRootStack;
 
-export default function ShopWithdrawClickcollectScreen({ navigation }: Props) {
-  const route = useRoute<ShopWithdrawClickcollectScreenRouteProp>();
-  const { from, backLabel, screenTitle } = route.params || {};
+export default function ShopWithdrawClickcollectScreen({
+  navigation,
+  route,
+}: Props) {
+  const { from, backLabel, screenTitle, onboarding } = route.params || {};
 
   const { getToken } = useAuth();
   const dispatch = useDispatch();
@@ -107,7 +107,6 @@ export default function ShopWithdrawClickcollectScreen({ navigation }: Props) {
   };
 
   const handlePlanningChange = (newOpeningHours: OpeningHourData[]) => {
-    // console.log("new :", JSON.stringify(newOpeningHours));
     const updatedOpeningHours = updateOpeningHours(newOpeningHours);
     setClickCollectHours(updatedOpeningHours);
   };
@@ -150,16 +149,30 @@ export default function ShopWithdrawClickcollectScreen({ navigation }: Props) {
     }
   };
 
+  console.log("clickcollect from: ", from);
+  console.log("clickcollect onboarding: ", onboarding);
+
   return (
-    <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
-      <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+    <SafeAreaView
+      className="bg-lightbg flex-1 dark:bg-darkbg"
+      edges={["right", "left", "top"]}
+    >
+      <View style={{ flex: 1 }}>
         <TopBar
           backLabel={backLabel || "Retour à l'accueil"}
-          screen={from || "Home"}
+          screen={
+            from || onboarding
+              ? "OnboardingShopWithdrawModes"
+              : "ShopWithdrawModes"
+          }
           label={screenTitle || "CONNEXION\nINSCRIPTION"}
+          navigationOverride={navigation}
+          screenParams={{ onboarding }}
           extraClasses="mt-2"
         />
+      </View>
 
+      <View className="px-3 mt-5" style={{ flex: 11 }}>
         <ScrollView>
           <View className="px-3">
             <TextBody1 centered={true} extraClasses="mb-5 px-3">
@@ -196,7 +209,7 @@ export default function ShopWithdrawClickcollectScreen({ navigation }: Props) {
             </View>
           </View>
         </ScrollView>
-      </SafeAreaView>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
