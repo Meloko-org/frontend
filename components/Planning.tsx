@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { JSX, useEffect } from "react";
 import { useState } from "react";
 import { LayoutChangeEvent, TouchableOpacity, View } from "react-native";
 

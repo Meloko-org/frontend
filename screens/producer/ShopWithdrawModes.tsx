@@ -56,9 +56,6 @@ export default function ShopWithdrawModesScreen({ navigation, route }: Props) {
     }
   }, []);
 
-  console.log("withdrawmodes from :", from);
-  console.log("withdrawmodes onboarding :", onboarding);
-
   return (
     <SafeAreaView
       className="flex-1 bg-lightbg dark:bg-darkbg"
@@ -141,7 +138,7 @@ export default function ShopWithdrawModesScreen({ navigation, route }: Props) {
             }}
             extraClasses="mb-2"
           />
-          <OpenScreenButton
+          {/* <OpenScreenButton
             label="Livraison"
             switchProps={{
               label: "",
@@ -171,7 +168,7 @@ export default function ShopWithdrawModesScreen({ navigation, route }: Props) {
                 );
               }
             }}
-          />
+          /> */}
         </ScrollView>
       </View>
     </SafeAreaView>

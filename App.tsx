@@ -562,6 +562,26 @@ export default function App() {
                         component={ShopWithdrawDeliveryScreen}
                       />
                       <Stack.Screen
+                        name="OnboardingStocks"
+                        component={StocksScreen}
+                      />
+                      <Stack.Screen
+                        name="OnboardingStocksAdd"
+                        component={StocksAddScreen}
+                      />
+                      <Stack.Screen
+                        name="OnboardingStocksEdit"
+                        component={StocksEditScreen}
+                      />
+                      <Stack.Screen
+                        name="OnboardingStockCategories"
+                        component={StockCategoriesScreen}
+                      />
+                      <Stack.Screen
+                        name="OnboardingStockFamilies"
+                        component={StockFamiliesScreen}
+                      />
+                      <Stack.Screen
                         name="TabNavigatorUser"
                         component={TabNavigatorUser}
                       />

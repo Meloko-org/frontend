@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
+
 import { useDispatch, useSelector } from "react-redux";
 import { setClickCollect, ShopState } from "../../reducers/shop";
 
@@ -10,16 +11,17 @@ import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import shopTools from "../../modules/shopTools";
+import { SheetManager } from "react-native-actions-sheet";
 
-import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
+
+import { View } from "react-native";
 import TopBar from "../../components/TopBar";
 import TextBody1 from "../../components/utils/texts/Body1";
 import Planning from "../../components/Planning";
 import InputTextarea from "../../components/utils/inputs/Textarea";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
-import { SheetManager } from "react-native-actions-sheet";
 
 type FromProducerTab = BottomTabScreenProps<
   ProducerTabParamList,

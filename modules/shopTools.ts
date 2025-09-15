@@ -320,7 +320,6 @@ const updateShopMarkets = async (values: UpdateShopMarketsData) => {
 
 const getShopInfos = async (
   token: string | null,
-  id: string,
 ): Promise<ApiResponse<ShopData>> => {
   try {
     const response = await fetch(`${API_ROOT}/shops/myshop`, {

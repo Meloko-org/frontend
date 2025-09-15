@@ -9,16 +9,37 @@ import { View } from "react-native";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import TextHeading2 from "../components/utils/texts/Heading2";
 import TextBody1 from "../components/utils/texts/Body1";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { ShopState } from "../reducers/shop";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Onboarding5">;
 
 export default function Onboarding5Screen({ navigation }: Props) {
   const IconCheck = FoundationIcon;
 
+  const shopStore = useSelector(
+    (state: { shop: ShopState }) => state.shop.value,
+  );
+
   const [withdrawDisabled, setWithdrawDisabled] = useState<boolean>(false);
   const [addProductDisabled, setAddProductDisabled] = useState<boolean>(false);
   const [businessDisabled, setBusinessDisabled] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (
+      shopStore?.clickCollect ||
+      (shopStore?.markets && shopStore?.markets.length > 0)
+    ) {
+      setWithdrawDisabled(true);
+    }
+
+    if (shopStore?.products) {
+      setAddProductDisabled(true);
+    }
+  }, [shopStore]);
+
+  console.log("Onboarding5 shopStore :", JSON.stringify(shopStore, null, 2));
 
   return (
     <SafeAreaView
@@ -109,9 +130,11 @@ export default function Onboarding5Screen({ navigation }: Props) {
             iconName="angle-right"
             iconFamily="FontAwesome6Icon"
             onPressFn={() =>
-              navigation.navigate("TabNavigatorProducer", {
-                screen: "StockCategories",
-                params: { onboarding: true },
+              navigation.navigate("OnboardingStockCategories", {
+                from: "Onboarding5",
+                backLabel: "Retour",
+                screenTitle: "GESTION\nDES STOCKS",
+                onboarding: true,
               })
             }
             extraClasses="h-20"

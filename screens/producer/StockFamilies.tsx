@@ -1,11 +1,16 @@
-import React from "react";
+import React, { JSX } from "react";
 import { useState, useEffect } from "react";
 import { SheetManager } from "react-native-actions-sheet";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+// import { RootStackParamList } from "../../types/Navigation";
+// import { useRoute } from "@react-navigation/native";
+// import { RouteProp } from "@react-navigation/native";
+
+import { ProducerTabParamList } from "../../types/Navigation";
 import { RootStackParamList } from "../../types/Navigation";
-import { useRoute } from "@react-navigation/native";
-import { RouteProp } from "@react-navigation/native";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,23 +22,36 @@ import { StockData } from "../../types/API";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import OpenMenuButton from "../../components/utils/buttons/OpenMenu";
 
-type StockFamiliesScreenRouteProp = RouteProp<
-  RootStackParamList,
+// type StockFamiliesScreenRouteProp = RouteProp<
+//   RootStackParamList,
+//   "StockFamilies"
+// >;
+
+// type StockFamiliesScreenNavigationProp = NativeStackNavigationProp<
+//   RootStackParamList,
+//   "StockFamilies"
+// >;
+
+// type Props = {
+//   navigation: StockFamiliesScreenNavigationProp;
+// };
+
+type FromProducerTab = BottomTabScreenProps<
+  ProducerTabParamList,
   "StockFamilies"
 >;
 
-type StockFamiliesScreenNavigationProp = NativeStackNavigationProp<
+type FromRootStack = NativeStackScreenProps<
   RootStackParamList,
-  "StockFamilies"
+  "OnboardingStockFamilies"
 >;
 
-type Props = {
-  navigation: StockFamiliesScreenNavigationProp;
-};
+type Props = FromProducerTab | FromRootStack;
 
-export default function StockFamiliesScreen({ navigation }: Props) {
-  const route = useRoute<StockFamiliesScreenRouteProp>();
-  const { from, backLabel, screenTitle, category } = route.params || {};
+export default function StockFamiliesScreen({ navigation, route }: Props) {
+  // const route = useRoute<StockFamiliesScreenRouteProp>();
+  const { from, backLabel, screenTitle, category, onboarding } =
+    route.params || {};
 
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
@@ -77,15 +95,32 @@ export default function StockFamiliesScreen({ navigation }: Props) {
             label={family.family}
             notice={family.count?.toString()}
             redAlert={hasZeroStock}
-            onPressFn={() =>
-              navigation.navigate("Stocks", {
-                from: "StockFamilies",
-                backLabel: "Retour au choix " + category,
-                screenTitle: "STOCK\n" + family.family,
-                category: category,
-                family: family.family,
-              })
-            }
+            onPressFn={() => {
+              if (onboarding) {
+                (navigation as FromRootStack["navigation"]).navigate(
+                  "OnboardingStocks",
+                  {
+                    from: "OnboardingStockCategories",
+                    backLabel: "Retour au choix " + category,
+                    screenTitle: "STOCK\n" + family.family,
+                    onboarding: true,
+                    category: category,
+                    family: family.family,
+                  },
+                );
+              } else {
+                (navigation as FromProducerTab["navigation"]).navigate(
+                  "Stocks",
+                  {
+                    from: "StockCategories",
+                    backLabel: "Retour au choix " + category,
+                    screenTitle: "STOCK\n" + family.family,
+                    category: category,
+                    family: family.family,
+                  },
+                );
+              }
+            }}
             extraClasses="mb-1"
           />
         );
@@ -107,8 +142,11 @@ export default function StockFamiliesScreen({ navigation }: Props) {
       >
         <TopBar
           backLabel={backLabel || "Retour aux catégories"}
-          screen={from || "StockCategories"}
+          screen={
+            from || onboarding ? "OnboardingStockCategories" : "StockCategories"
+          }
           label={screenTitle || "CHOIX\n" + category}
+          screenParams={{ onboarding }}
           extraClasses="my-2"
         />
 
@@ -130,15 +168,30 @@ export default function StockFamiliesScreen({ navigation }: Props) {
                       <OpenScreenButton
                         key={newfamilyName}
                         label={newfamilyName}
-                        onPressFn={() =>
-                          navigation.navigate("Stocks", {
-                            from: "StockFamilies",
-                            backLabel: "Retour au choix",
-                            screenTitle: newfamilyName,
-                            category: category,
-                            family: newfamilyName,
-                          })
-                        }
+                        onPressFn={() => {
+                          if (onboarding) {
+                            (
+                              navigation as FromRootStack["navigation"]
+                            ).navigate("OnboardingStocks", {
+                              from: "OnboardingStockFamilies",
+                              backLabel: "Retour au choix",
+                              screenTitle: newfamilyName,
+                              category: category,
+                              family: newfamilyName,
+                              onboarding: true,
+                            });
+                          } else {
+                            (
+                              navigation as FromProducerTab["navigation"]
+                            ).navigate("Stocks", {
+                              from: "StockFamilies",
+                              backLabel: newfamilyName,
+                              screenTitle: "***",
+                              category: category,
+                              family: newfamilyName,
+                            });
+                          }
+                        }}
                         extraClasses="mb-1"
                       />,
                     ]);

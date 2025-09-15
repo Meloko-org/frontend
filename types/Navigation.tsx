@@ -65,6 +65,7 @@ type ProducerTabParamList = {
     backLabel?: string;
     screenTitle?: string;
     category: string;
+    onboarding?: boolean;
   };
   Stocks: {
     from?: string;
@@ -72,6 +73,7 @@ type ProducerTabParamList = {
     screenTitle?: string;
     category: string;
     family?: string;
+    onboarding?: boolean;
   };
   StocksAdd: {
     from?: string;
@@ -79,6 +81,7 @@ type ProducerTabParamList = {
     screenTitle?: string;
     category: string;
     family?: string;
+    onboarding?: boolean;
   };
   StocksEdit: {
     from?: string;
@@ -88,6 +91,7 @@ type ProducerTabParamList = {
     family?: string;
     stockData?: StockData;
     productData?: ProductData;
+    onboarding?: boolean;
   };
   PremiumOptions: {
     from?: string;
@@ -235,6 +239,45 @@ type RootStackParamList = {
     screenTitle?: string;
     onboarding: true;
   };
+  OnboardingStockCategories: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    onboarding: true;
+  };
+  OnboardingStockFamilies: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    category: string;
+    onboarding: boolean;
+  };
+  OnboardingStocks: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    category: string;
+    family?: string;
+    onboarding: true;
+  };
+  OnboardingStocksAdd: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    category: string;
+    family?: string;
+    onboarding: true;
+  };
+  OnboardingStocksEdit: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    category?: string;
+    family?: string;
+    stockData?: StockData;
+    productData?: ProductData;
+    onboarding: true;
+  };
 };
 
 export type { RootStackParamList, ProducerTabParamList, UserTabParamList };
@@ -334,5 +377,32 @@ export default function ShopWithdrawShopMarketsManageScreen({
 }: Props) {
   
   const { from, backLabel, screenTitle, onboarding } = route.params || {};
-  
+
+
+
+onPress sur les boutons : 
+
+onPressFn={() => {
+  if (onboarding) {
+    (navigation as FromRootStack["navigation"]).navigate(
+      "Onboarding***",
+      {
+        from: "Onboarding***",
+        backLabel: "Retour ***",
+        screenTitle: "***",
+        onboarding: true,
+      },
+    );
+  } else {
+    (navigation as FromProducerTab["navigation"]).navigate(
+      "***",
+      {
+        from: "***",
+        backLabel: "Retour ***",
+        screenTitle: "***",
+      },
+    );
+  }
+}}
+
 */

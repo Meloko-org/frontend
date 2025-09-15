@@ -1,51 +1,57 @@
 import React, { JSX } from "react";
 import { useState, useEffect } from "react";
+import { useAuth } from "@clerk/clerk-expo";
 
-import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
-import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { useFocusEffect } from "@react-navigation/native";
 import { ProducerTabParamList } from "../../types/Navigation";
+import { RootStackParamList } from "../../types/Navigation";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
   addProducts,
   resetProducts,
   setProducts,
+  setShopData,
   ShopState,
 } from "../../reducers/shop";
 import { setProductsTypes, StocksState } from "../../reducers/stocks";
 
 import stocksTools from "../../modules/stocksTools";
+import categoriesTools from "../../modules/categoriesTools";
+import shopTools from "../../modules/shopTools";
 
-import { View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView } from "react-native-gesture-handler";
-import TopBar from "../../components/TopBar";
-import Spinner from "../../components/utils/Spinner";
 import {
   ProductCategoryData,
   ProductsTypesByCategory,
   StockData,
 } from "../../types/API";
+
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-gesture-handler";
+
+import { View } from "react-native";
+import TopBar from "../../components/TopBar";
+import Spinner from "../../components/utils/Spinner";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
-import categoriesTools from "../../modules/categoriesTools";
 
-type StockCategoriesRouteProp = RouteProp<
+type FromProducerTab = BottomTabScreenProps<
   ProducerTabParamList,
   "StockCategories"
 >;
 
-type StockCategoriesNavProp = BottomTabNavigationProp<
-  ProducerTabParamList,
-  "StockCategories"
+type FromRootStack = NativeStackScreenProps<
+  RootStackParamList,
+  "OnboardingStockCategories"
 >;
 
-type Props = {
-  navigation: StockCategoriesNavProp;
-  route: StockCategoriesRouteProp;
-};
+type Props = FromProducerTab | FromRootStack;
 
 export default function StockCategoriesScreen({ navigation, route }: Props) {
   const { from, backLabel, screenTitle, onboarding } = route.params || {};
+
+  const { getToken } = useAuth();
 
   const dispatch = useDispatch();
   const shopStore = useSelector(
@@ -55,7 +61,7 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
     (state: { stocks: StocksState }) => state.stocks.value,
   );
 
-  const [shopId, setShopId] = useState<string>(shopStore!._id);
+  const [shopId, setShopId] = useState<string | null>(shopStore?._id ?? null);
   const [isFetchLoading, setIsFetchLoading] = useState<boolean>(true);
   const [stocks, setStocks] = useState<StockData[] | null>([]);
   const [shopTypes, setShopTypes] = useState<string[]>([]);
@@ -67,16 +73,35 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
 
   useFocusEffect(
     React.useCallback(() => {
-      // récupération des types du shop
-      if (shopStore !== null) {
-        setShopTypes(shopStore.types.map((type: { _id: string }) => type._id));
-      }
-      // récupération des catégories globales
-      fetchGlobalCategories();
-      // récupération des types de produits par catégorie
-      fetchProductsTypes();
-      // récupération des stocks
-      fetchStocks();
+      const init = async () => {
+        // récupération des types du shop
+        if (shopStore !== null) {
+          setShopTypes(
+            shopStore.types.map((type: { _id: string }) => type._id),
+          );
+        } else {
+          const token = await getToken();
+          const shopResponse = await shopTools.getShopInfos(token);
+          if (shopResponse.success && shopResponse.data) {
+            setShopTypes(
+              shopResponse.data.types.map((type: { _id: string }) => type._id),
+            );
+            dispatch(setShopData(shopResponse.data));
+          }
+        }
+
+        // récupération des catégories globales
+        fetchGlobalCategories();
+        // récupération des types de produits par catégorie
+        fetchProductsTypes();
+        // récupération des stocks si on n'est pas dans le cas d'un onboarding
+        if (!onboarding) {
+          fetchStocks();
+        }
+        setIsFetchLoading(false);
+      };
+
+      init();
     }, []),
   );
 
@@ -98,12 +123,13 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
     // retourne les types de produit ("bulk", "classic"... ) pour chaque catégorie
     const productsTypesResponse =
       await stocksTools.getProductsTypesByCategory();
+
     if (!productsTypesResponse.success) {
       console.log(productsTypesResponse.message);
       return;
     }
 
-    console.log(JSON.stringify(productsTypesResponse.data, null, 2));
+    // console.log("catégories de produits avec type :", JSON.stringify(productsTypesResponse.data, null, 2));
 
     if (productsTypesResponse.success && productsTypesResponse.data) {
       const formatted: ProductsTypesByCategory[] = Object.entries(
@@ -113,7 +139,7 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
         productsTypes,
       }));
 
-      console.log(JSON.stringify(formatted, null, 2));
+      // console.log("categories avec types de produits du shop:", JSON.stringify(formatted, null, 2));
 
       dispatch(setProductsTypes(formatted));
     }
@@ -132,19 +158,24 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
     if (!isFetchLoading) {
       // on détermine les catégories possibles en fonction des types du shop
       const availableCategories = globalCategories?.filter((category) =>
-        shopStore!.types.some(
+        shopStore?.types?.some(
           (shopType: { _id: string }) => shopType._id === category.type,
         ),
       );
 
-      console.log(availableCategories);
+      // console.log("availableCategories :", availableCategories);
 
-      // on ajoute le nombre de produits pour chaque catégorie qui appartient aux types du shop
+      // on ajoute le nombre de produits (ou 0 si onboarding) pour chaque catégorie qui appartient aux types du shop
       const availableCategoriesWithCount = availableCategories?.map(
         (category) => {
-          const count = shopStore!.products?.filter(
-            (p) => p.product.family.category.name === category.name,
-          ).length;
+          let count;
+          if (!onboarding) {
+            count = shopStore?.products?.filter(
+              (p) => p.product.family.category.name === category.name,
+            ).length;
+          } else {
+            count = 0;
+          }
           return {
             ...category,
             count,
@@ -152,7 +183,10 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
         },
       );
 
-      console.log(JSON.stringify(availableCategoriesWithCount, null, 2));
+      console.log(
+        "availableCategoriesWithCount :",
+        JSON.stringify(availableCategoriesWithCount, null, 2),
+      );
 
       setOpenScreenButtons(
         availableCategoriesWithCount!.map((cat, index) => {
@@ -193,14 +227,55 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
               label={cat.name}
               notice={cat.count?.toString()}
               redAlert={hasZeroStock}
-              onPressFn={() =>
-                navigation.navigate(targetScreen, {
-                  from: "StockCategories",
-                  backLabel: "Retour aux catégories",
-                  screenTitle: screenTitle,
-                  category: cat.name,
-                })
-              }
+              onPressFn={() => {
+                if (onboarding) {
+                  if (productsType === "bulk") {
+                    (navigation as FromRootStack["navigation"]).navigate(
+                      "OnboardingStocks",
+                      {
+                        from: "OnboardingStockCategories",
+                        backLabel: "Retour aux stocks",
+                        screenTitle: "STOCKS\n" + cat.name.toLocaleUpperCase(),
+                        category: cat.name,
+                        onboarding: true,
+                      },
+                    );
+                  } else {
+                    (navigation as FromRootStack["navigation"]).navigate(
+                      "OnboardingStockFamilies",
+                      {
+                        from: "OnboardingStockCategories",
+                        backLabel: "Retour aux stocks",
+                        screenTitle: "CHOIX\n" + cat.name.toLocaleUpperCase(),
+                        category: cat.name,
+                        onboarding: true,
+                      },
+                    );
+                  }
+                } else {
+                  if (productsType === "bulk") {
+                    (navigation as FromProducerTab["navigation"]).navigate(
+                      "Stocks",
+                      {
+                        from: "Shop",
+                        backLabel: "Retour à la boutique",
+                        screenTitle: screenTitle,
+                        category: cat.name,
+                      },
+                    );
+                  } else {
+                    (navigation as FromProducerTab["navigation"]).navigate(
+                      "StockFamilies",
+                      {
+                        from: "Shop",
+                        backLabel: "Retour à la boutique",
+                        screenTitle: screenTitle,
+                        category: cat.name,
+                      },
+                    );
+                  }
+                }
+              }}
               extraClasses="mb-1"
             />
           );
@@ -209,19 +284,24 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
     }
   }, [shopStore?.products, globalCategories, stocksStore]);
 
+  // console.log("STOCKCATEGORIES shopStore :", JSON.stringify(shopStore, null, 2))
+  // console.log("STOCKCATEGORIES onboarding :", onboarding)
+  // console.log("STOCKCATEGORIES shopTypes :", shopTypes)
+  console.log("stockStore :", stocksStore);
+
   return (
     <SafeAreaView
       className="bg-lightbg flex-1 dark:bg-darkbg"
       edges={["right", "left", "top"]}
     >
-      {!onboarding && (
-        <TopBar
-          backLabel={backLabel || "Retour à la boutique"}
-          screen={from || "ShopProducer"}
-          label={screenTitle || "GESTION\nDES STOCKS"}
-          extraClasses="my-2"
-        />
-      )}
+      <TopBar
+        backLabel={backLabel || "Retour à la boutique"}
+        screen={from || onboarding ? "Onboarding5" : "ShopProducer"}
+        label={screenTitle || "GESTION\nDES STOCKS"}
+        screenParams={{ onboarding: true }}
+        navigationOverride={navigation}
+        extraClasses="my-2"
+      />
 
       <ScrollView>
         {isFetchLoading ? (

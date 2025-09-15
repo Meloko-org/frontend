@@ -1,10 +1,16 @@
 import React from "react";
 import { useState, useEffect } from "react";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+// import { RootStackParamList } from "../../types/Navigation";
+// import { useFocusEffect, useRoute } from "@react-navigation/native";
+// import { RouteProp } from "@react-navigation/native";
+
+import { ProducerTabParamList } from "../../types/Navigation";
 import { RootStackParamList } from "../../types/Navigation";
-import { useFocusEffect, useRoute } from "@react-navigation/native";
-import { RouteProp } from "@react-navigation/native";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useFocusEffect } from "@react-navigation/native";
 
 import { SheetManager } from "react-native-actions-sheet";
 
@@ -22,20 +28,30 @@ import TextBody1 from "../../components/utils/texts/Body1";
 import { StocksState } from "../../reducers/stocks";
 import { handleSheetFlow, showAlert } from "../../helpers/sheetHelpers";
 
-type StocksAddScreenRouteProp = RouteProp<RootStackParamList, "StocksAdd">;
+// type StocksAddScreenRouteProp = RouteProp<RootStackParamList, "StocksAdd">;
 
-type StocksAddScreenNavigationProp = NativeStackNavigationProp<
+// type StocksAddScreenNavigationProp = NativeStackNavigationProp<
+//   RootStackParamList,
+//   "StocksAdd"
+// >;
+
+// type Props = {
+//   navigation: StocksAddScreenNavigationProp;
+// };
+
+type FromProducerTab = BottomTabScreenProps<ProducerTabParamList, "StocksAdd">;
+
+type FromRootStack = NativeStackScreenProps<
   RootStackParamList,
-  "StocksAdd"
+  "OnboardingStocksAdd"
 >;
 
-type Props = {
-  navigation: StocksAddScreenNavigationProp;
-};
+type Props = FromProducerTab | FromRootStack;
 
-export default function StocksAddScreen({ navigation }: Props) {
-  const route = useRoute<StocksAddScreenRouteProp>();
-  const { from, backLabel, screenTitle, category, family } = route.params || {};
+export default function StocksAddScreen({ navigation, route }: Props) {
+  // const route = useRoute<StocksAddScreenRouteProp>();
+  const { from, backLabel, screenTitle, category, family, onboarding } =
+    route.params || {};
 
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
@@ -131,14 +147,40 @@ export default function StocksAddScreen({ navigation }: Props) {
           disabled={false}
           isLoading={false}
           onPressFn={async () => {
-            navigation.navigate("StocksEdit", {
-              from: "Stocks",
-              backLabel: "Retour au stock " + (family ? family : category),
-              screenTitle: "FICHE\nPRODUIT",
-              category: category,
-              family: family,
-              productData: product,
-            });
+            if (onboarding) {
+              (navigation as FromRootStack["navigation"]).navigate(
+                "OnboardingStocksEdit",
+                {
+                  from: "OnboardingStocks",
+                  backLabel: "Retour au stock " + (family ? family : category),
+                  screenTitle: "FICHE\nPRODUIT",
+                  category: category,
+                  family: family,
+                  productData: product,
+                  onboarding: true,
+                },
+              );
+            } else {
+              (navigation as FromProducerTab["navigation"]).navigate(
+                "StocksEdit",
+                {
+                  from: "Stocks",
+                  backLabel: "Retour au stock " + (family ? family : category),
+                  screenTitle: "FICHE\nPRODUIT",
+                  category: category,
+                  family: family,
+                  productData: product,
+                },
+              );
+            }
+            // navigation.navigate("StocksEdit", {
+            //   from: "Stocks",
+            //   backLabel: "Retour au stock " + (family ? family : category),
+            //   screenTitle: "FICHE\nPRODUIT",
+            //   category: category,
+            //   family: family,
+            //   productData: product,
+            // });
             // await handleSheetFlow({
             //   sheet: "edit-product",
             //   payload: { product: product },

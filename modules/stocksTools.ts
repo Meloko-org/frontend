@@ -8,7 +8,7 @@ import {
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
 const getStocksByShop = async (
-  id: string,
+  id: string | null,
 ): Promise<ApiResponse<StockData[]>> => {
   try {
     const response = await fetch(`${API_ROOT}/stocks/${id}`, {

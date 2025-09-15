@@ -10,17 +10,16 @@ import { setProducts } from "../../reducers/shop";
 import { StockData } from "../../types/API";
 import stocksTools from "../../modules/stocksTools";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
-import { useFocusEffect, useRoute } from "@react-navigation/native";
-import { RouteProp } from "@react-navigation/native";
+// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+// import { RootStackParamList } from "../../types/Navigation";
+// import { useFocusEffect, useRoute } from "@react-navigation/native";
+// import { RouteProp } from "@react-navigation/native";
 
-import { SheetManager } from "react-native-actions-sheet";
-import {
-  handleSheetFlow,
-  showAlert,
-  showConfirm,
-} from "../../helpers/sheetHelpers";
+import { ProducerTabParamList } from "../../types/Navigation";
+import { RootStackParamList } from "../../types/Navigation";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useFocusEffect } from "@react-navigation/native";
 
 import { View, StyleSheet, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -28,24 +27,25 @@ import { ScrollView } from "react-native-gesture-handler";
 import TopBar from "../../components/TopBar";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import StockProductCard from "../../components/cards/StockProductCard";
-import TextHeading1 from "../../components/utils/texts/Heading1";
-import EditProduct from "../../components/EditProduct";
-import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 
-type StocksScreenRouteProp = RouteProp<RootStackParamList, "Stocks">;
-
-type StocksScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "Stocks"
->;
-
-type Props = {
-  navigation: StocksScreenNavigationProp;
+type FromProducerTab = BottomTabScreenProps<ProducerTabParamList, "Stocks"> & {
+  category: string;
+  family: string;
 };
 
-export default function StocksScreen({ navigation }: Props) {
-  const route = useRoute<StocksScreenRouteProp>();
-  const { from, backLabel, screenTitle, category, family } = route.params || {};
+type FromRootStack = NativeStackScreenProps<
+  RootStackParamList,
+  "OnboardingStocks"
+> & {
+  category: string;
+  family: string;
+};
+
+type Props = FromProducerTab | FromRootStack;
+
+export default function StocksScreen({ navigation, route }: Props) {
+  const { from, backLabel, screenTitle, category, family, onboarding } =
+    route.params || {};
 
   const { getToken } = useAuth();
 
@@ -115,12 +115,23 @@ export default function StocksScreen({ navigation }: Props) {
     >
       <TopBar
         backLabel={
-          backLabel || (family ? "Retour au choix" : "Retour aux catégories")
+          backLabel || onboarding
+            ? "Retour aux stocks"
+            : family
+              ? "Retour au choix"
+              : "Retour aux catégories"
         }
-        screen={from || (family ? "StockFamilies" : "StockCategories")}
+        screen={
+          from || onboarding
+            ? "OnboardingStockCategories"
+            : family
+              ? "StockFamilies"
+              : "StockCategories"
+        }
         screenParams={{
           category: category,
           family: family,
+          onboarding,
         }}
         label={screenTitle || "STOCK\n" + (family ? family : category)}
         extraClasses="my-2"

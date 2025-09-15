@@ -2,10 +2,15 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+// import { RootStackParamList } from "../../types/Navigation";
+// import { useFocusEffect, useRoute } from "@react-navigation/native";
+// import { RouteProp } from "@react-navigation/native";
+
+import { ProducerTabParamList } from "../../types/Navigation";
 import { RootStackParamList } from "../../types/Navigation";
-import { useFocusEffect, useRoute } from "@react-navigation/native";
-import { RouteProp } from "@react-navigation/native";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { useDispatch } from "react-redux";
 import { updateProduct, setProducts } from "../../reducers/shop";
@@ -35,19 +40,28 @@ import TextHeading3 from "../../components/utils/texts/Heading3";
 import InputText from "../../components/utils/inputs/Text";
 import ImageUploader from "../../components/utils/ImageUploader";
 
-type StocksEditScreenRouteProp = RouteProp<RootStackParamList, "StocksEdit">;
+// type StocksEditScreenRouteProp = RouteProp<RootStackParamList, "StocksEdit">;
 
-type StocksEditScreenNavigationProp = NativeStackNavigationProp<
+// type StocksEditScreenNavigationProp = NativeStackNavigationProp<
+//   RootStackParamList,
+//   "StocksEdit"
+// >;
+
+// type Props = {
+//   navigation: StocksEditScreenNavigationProp;
+// };
+
+type FromProducerTab = BottomTabScreenProps<ProducerTabParamList, "StocksEdit">;
+
+type FromRootStack = NativeStackScreenProps<
   RootStackParamList,
-  "StocksEdit"
+  "OnboardingStocksEdit"
 >;
 
-type Props = {
-  navigation: StocksEditScreenNavigationProp;
-};
+type Props = FromProducerTab | FromRootStack;
 
-export default function StocksEditScreen({ navigation }: Props) {
-  const route = useRoute<StocksEditScreenRouteProp>();
+export default function StocksEditScreen({ navigation, route }: Props) {
+  // const route = useRoute<StocksEditScreenRouteProp>();
   const {
     from,
     backLabel,
@@ -56,6 +70,7 @@ export default function StocksEditScreen({ navigation }: Props) {
     family,
     stockData,
     productData,
+    onboarding,
   } = route.params || {};
 
   const dispatch = useDispatch();
@@ -335,12 +350,31 @@ export default function StocksEditScreen({ navigation }: Props) {
       },
     });
 
-    navigation.navigate("Stocks", {
-      backLabel: "Retour " + (isBulk ? "aux catégories" : "au choix"),
-      screenTitle: "STOCKS\n" + (family ? family : category),
-      category: category!,
-      family: family,
-    });
+    if (onboarding) {
+      (navigation as FromRootStack["navigation"]).navigate("OnboardingStocks", {
+        // from: "Onboarding***",
+        backLabel: "Retour " + (isBulk ? "aux catégories" : "au choix"),
+        screenTitle: "STOCKS\n" + (family ? family : category),
+        category: category!,
+        family: family,
+        onboarding: true,
+      });
+    } else {
+      (navigation as FromProducerTab["navigation"]).navigate("Stocks", {
+        from: "***",
+        backLabel: "Retour " + (isBulk ? "aux catégories" : "au choix"),
+        screenTitle: "STOCKS\n" + (family ? family : category),
+        category: category!,
+        family: family,
+      });
+    }
+
+    // navigation.navigate("Stocks", {
+    //   backLabel: "Retour " + (isBulk ? "aux catégories" : "au choix"),
+    //   screenTitle: "STOCKS\n" + (family ? family : category),
+    //   category: category!,
+    //   family: family,
+    // });
   };
 
   const handleDeleteProduct = async (id: string) => {
@@ -374,12 +408,35 @@ export default function StocksEditScreen({ navigation }: Props) {
           alertType: "success",
         },
         onAfter: async (action) => {
-          navigation.navigate("Stocks", {
-            backLabel: "Retour " + (stockData ? "au choix" : "aux catégories"),
-            screenTitle: "STOCKS\n" + (family ? family : category),
-            category: category!,
-            family: family,
-          });
+          if (onboarding) {
+            (navigation as FromRootStack["navigation"]).navigate(
+              "OnboardingStocks",
+              {
+                // from: "Onboarding***",
+                backLabel:
+                  "Retour " + (stockData ? "au choix" : "aux catégories"),
+                screenTitle: "STOCKS\n" + (family ? family : category),
+                category: category!,
+                family: family,
+                onboarding: true,
+              },
+            );
+          } else {
+            (navigation as FromProducerTab["navigation"]).navigate("Stocks", {
+              from: "***",
+              backLabel:
+                "Retour " + (stockData ? "au choix" : "aux catégories"),
+              screenTitle: "STOCKS\n" + (family ? family : category),
+              category: category!,
+              family: family,
+            });
+          }
+          // navigation.navigate("Stocks", {
+          //   backLabel: "Retour " + (stockData ? "au choix" : "aux catégories"),
+          //   screenTitle: "STOCKS\n" + (family ? family : category),
+          //   category: category!,
+          //   family: family,
+          // });
         },
       });
     }

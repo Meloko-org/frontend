@@ -91,7 +91,7 @@ type MarketsData = {
   market: MarketData;
   isActive: boolean;
   openingHours: OpeningHoursData[];
-}[];
+};
 
 type MarketResultData = {
   market: MarketData;
