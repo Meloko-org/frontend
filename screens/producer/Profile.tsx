@@ -5,32 +5,32 @@ import { ModeState, changeMode } from "../../reducers/mode";
 import { useColorScheme } from "nativewind";
 
 import { UserState, updateUser, resetUser } from "../../reducers/user";
-import { resetProducerData, setProducerData } from "../../reducers/producer";
-import { resetShopData } from "../../reducers/shop";
+import {
+  ProducerState,
+  resetProducerData,
+  setProducerData,
+} from "../../reducers/producer";
+import { resetShopData, ShopState } from "../../reducers/shop";
 import { emptyCart } from "../../reducers/cart";
 
 import producerTools from "../../modules/producerTools";
-import { ProducerData, ShopData } from "../../types/API";
 
+import { RouteProp } from "@react-navigation/native";
+import { CompositeNavigationProp } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
+import {
+  ProducerTabParamList,
+  RootStackParamList,
+} from "../../types/Navigation"; // <-- ton fichier de types
+
+import { SheetManager } from "react-native-actions-sheet";
 
 /* Eléments graphiques */
-import {
-  View,
-  Alert,
-  Text,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-  Keyboard,
-} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  GestureHandlerRootView,
-  ScrollView,
-} from "react-native-gesture-handler";
+import { ScrollView } from "react-native-gesture-handler";
+
+import { View, Text, StyleSheet } from "react-native";
 import InputText from "../../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import CustomButton from "../../components/utils/buttons/Custom";
@@ -43,17 +43,20 @@ import Animated, {
 } from "react-native-reanimated";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import ColorSchemeButton from "../../components/utils/buttons/ColorScheme";
-import TextBody1 from "../../components/utils/texts/Body1";
-import CheckBox from "../../components/utils/inputs/CheckBox";
-import { SheetManager } from "react-native-actions-sheet";
 
-type ProfileScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+type ProducerProfileNavProp = CompositeNavigationProp<
+  BottomTabNavigationProp<ProducerTabParamList, "ProducerProfile">,
+  NativeStackNavigationProp<RootStackParamList>
+>;
+
+type ProducerProfileRouteProp = RouteProp<
+  ProducerTabParamList,
   "ProducerProfile"
 >;
 
 type Props = {
-  navigation: ProfileScreenNavigationProp;
+  navigation: ProducerProfileNavProp;
+  route: ProducerProfileRouteProp;
 };
 
 export default function ProducerProfileScreen({ navigation }: Props) {
@@ -65,10 +68,10 @@ export default function ProducerProfileScreen({ navigation }: Props) {
     (state: { user: UserState }) => state.user.value,
   );
   const producerStore = useSelector(
-    (state: { producer: ProducerData }) => state.producer?.value,
+    (state: { producer: ProducerState }) => state.producer?.value,
   );
   const shopStore = useSelector(
-    (state: { shop: ShopData }) => state.shop?.value,
+    (state: { shop: ShopState }) => state.shop?.value,
   );
 
   // Import the Clerk Auth functions
@@ -84,11 +87,11 @@ export default function ProducerProfileScreen({ navigation }: Props) {
   const [isProducerSaveLoading, setProducerSaveLoading] = useState(false);
 
   const [isBottomSheetOpen, setBottomSheetOpen] = useState(false);
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  // const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const openBottomSheet = () => {
-    bottomSheetRef.current?.expand();
-  };
+  // const openBottomSheet = () => {
+  //   bottomSheetRef.current?.expand();
+  // };
 
   const [socialReason, setSocialReason] = useState<string>("");
   const [siren, setSiren] = useState<string>("");
@@ -130,18 +133,28 @@ export default function ProducerProfileScreen({ navigation }: Props) {
   useEffect(() => {
     console.log("Valeur actuelle de producerStore:", producerStore);
     if (producerStore !== null) {
-      setSocialReason(producerStore.socialReason);
-      setSiren(producerStore.siren);
-      setIban(producerStore.iban);
-      setBic(producerStore.bic);
-      setAddress({
-        address1: producerStore.address.address1,
-        address2: producerStore.address.address2,
-        postalCode: producerStore.address.postalCode,
-        city: producerStore.address.city,
-        country: producerStore.address.country,
-      });
-      //setIsPremium()
+      setSocialReason(producerStore.socialReason ?? "");
+      setSiren(producerStore.siren ?? "");
+      setIban(producerStore.iban ?? "");
+      setBic(producerStore.bic ?? "");
+      if (producerStore.address) {
+        setAddress({
+          address1: producerStore.address.address1 ?? "",
+          address2: producerStore.address.address2 ?? "",
+          postalCode: producerStore.address.postalCode ?? "",
+          city: producerStore.address.city ?? "",
+          country: producerStore.address.country ?? "",
+        });
+      } else {
+        // valeur par défaut
+        setAddress({
+          address1: "",
+          address2: "",
+          postalCode: "",
+          city: "",
+          country: "",
+        });
+      }
     }
   }, []);
 
@@ -246,7 +259,7 @@ export default function ProducerProfileScreen({ navigation }: Props) {
                 iconColor="#98B66E"
                 size={40}
                 onPressFn={onSignoutPress}
-                extraClasses="border border-primary"
+                extraClasses="border border-primary p-1"
               />
             </View>
           </View>

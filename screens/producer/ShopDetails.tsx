@@ -1,21 +1,20 @@
 import React, { JSX, ReactNode, useCallback } from "react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
-import { useCollapsibleSection } from "../../hooks/useCollapsibleSection";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
-import { useRoute } from "@react-navigation/native";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { ProducerTabParamList } from "../../types/Navigation"; // <-- ton fichier de types
 
 import { useDispatch, useSelector } from "react-redux";
 import { setShopData, ShopState } from "../../reducers/shop";
 
+import { useCollapsibleSection } from "../../hooks/useCollapsibleSection";
 import saveImageLocally from "../../helpers/ImageHelpers";
 import shopTools from "../../modules/shopTools";
 import { AddressData, CrewMember } from "../../types/API";
@@ -37,19 +36,22 @@ import ThumbnailCarousel from "../../components/utils/ThumbnailCarousel";
 import TextBody1 from "../../components/utils/texts/Body1";
 import VideoThumbnail from "../../components/utils/VideoThumbnail";
 
-type ShopDetailsScreenRouteProp = RouteProp<RootStackParamList, "ShopDetails">;
+type ShopWithdrawModesRouteProp = RouteProp<
+  ProducerTabParamList,
+  "ShopDetails"
+>;
 
-type ShopDetailsScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+type ShopWithdrawModesNavProp = BottomTabNavigationProp<
+  ProducerTabParamList,
   "ShopDetails"
 >;
 
 type Props = {
-  navigation: ShopDetailsScreenNavigationProp;
+  navigation: ShopWithdrawModesNavProp;
+  route: ShopWithdrawModesRouteProp;
 };
 
-export default function ShopDetailsScreen({ navigation }: Props) {
-  const route = useRoute<ShopDetailsScreenRouteProp>();
+export default function ShopDetailsScreen({ navigation, route }: Props) {
   const { from, backLabel, screenTitle } = route.params || {};
   const { getToken } = useAuth();
 
@@ -187,13 +189,31 @@ export default function ShopDetailsScreen({ navigation }: Props) {
       setLongDesc(shopStore.longDesc); // à modifier shortDesc/longDesc
       setSiret(shopStore.siret);
       setLogo(shopStore.logo);
-      setAddress({
-        address1: shopStore.address.address1,
-        address2: shopStore.address.address2,
-        postalCode: shopStore.address.postalCode,
-        city: shopStore.address.city,
-        country: shopStore.address.country,
-      });
+      // setAddress({
+      //   address1: shopStore.address.address1 ?? "",
+      //   address2: shopStore.address.address2 ?? "",
+      //   postalCode: shopStore.address.postalCode ?? "",
+      //   city: shopStore.address.city ?? "",
+      //   country: shopStore.address.country ?? "",
+      // })
+      if (shopStore.address) {
+        setAddress({
+          address1: shopStore.address.address1 ?? "",
+          address2: shopStore.address.address2 ?? "",
+          postalCode: shopStore.address.postalCode ?? "",
+          city: shopStore.address.city ?? "",
+          country: shopStore.address.country ?? "",
+        });
+      } else {
+        // valeur par défaut
+        setAddress({
+          address1: "",
+          address2: "",
+          postalCode: "",
+          city: "",
+          country: "",
+        });
+      }
     }
   }, []);
 

@@ -1,4 +1,5 @@
 import React, { JSX } from "react";
+import { useAuth } from "@clerk/clerk-expo";
 import { useState, useEffect } from "react";
 
 import { ProducerTabParamList } from "../../types/Navigation";
@@ -17,7 +18,12 @@ import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import TextBody1 from "../../components/utils/texts/Body1";
 import { useDispatch, useSelector } from "react-redux";
-import { addMarket, resetMarkets, ShopState } from "../../reducers/shop";
+import {
+  addMarket,
+  resetMarkets,
+  setShopData,
+  ShopState,
+} from "../../reducers/shop";
 import { MarketData } from "../../types/API";
 import Market from "../../components/cards/Market";
 import shopTools from "../../modules/shopTools";
@@ -57,6 +63,8 @@ export default function ShopWithdrawShopMarketsManageScreen({
 }: Props) {
   const { from, backLabel, screenTitle, onboarding } = route.params || {};
 
+  const { getToken } = useAuth();
+
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
@@ -75,10 +83,10 @@ export default function ShopWithdrawShopMarketsManageScreen({
 
   // permet d'afficher la liste des markets du shop
   useEffect(() => {
-    // console.log(
-    //   "shopstore.markets:",
-    //   JSON.stringify(shopStore.markets, null, 2),
-    // );
+    console.log(
+      "shopstore.markets:",
+      JSON.stringify(shopStore?.markets, null, 2),
+    );
     if (shopStore?.markets) {
       const markets = shopStore?.markets.map(
         ({ market, openingHours, isActive }) => (
@@ -137,20 +145,22 @@ export default function ShopWithdrawShopMarketsManageScreen({
   const handleValidate = async () => {
     try {
       setValidateLoading(true);
+
+      const token = await getToken();
       // enregistrer les données
-      const values = {
-        shopId: shopStore?._id,
-        markets: marketsDataToSave,
-      };
+      const values = marketsDataToSave;
 
       // console.log("values :", JSON.stringify(values, null, 2))
 
-      const shopMarketsResponse = await shopTools.updateShopMarkets(values);
+      const shopMarketsResponse = await shopTools.updateShopMarkets(
+        token,
+        values,
+      );
 
       if (!shopMarketsResponse.success) {
         SheetManager.show("alert", {
           payload: {
-            message: shopMarketsResponse.message,
+            message: shopMarketsResponse.message!,
             alertType: "warning",
           },
         });
@@ -160,8 +170,10 @@ export default function ShopWithdrawShopMarketsManageScreen({
 
       console.log("shopMarketsResponse :", shopMarketsResponse.data);
 
-      dispatch(resetMarkets());
-      dispatch(addMarket(shopMarketsResponse.data.markets));
+      // dispatch(resetMarkets());
+      // dispatch(addMarket(shopMarketsResponse.data.markets));
+      dispatch(setShopData(shopMarketsResponse.data));
+
       SheetManager.show("alert", {
         payload: {
           message: "Mise à jour des points de vente effectuée",
@@ -198,30 +210,30 @@ export default function ShopWithdrawShopMarketsManageScreen({
         />
       </View>
 
-      <View className="px-3 mt-5" style={{ flex: 11 }}>
+      <View className="px-3 mt-5" style={{ flex: 10.5 }}>
         <ScrollView>
           <View className="px-3">
-            <View>
-              <TextBody1 centered={true} extraClasses="mb-5">
-                {`Activez ou désactivez un point de vente\nen cliquant dessus.\nDéfinissez les jours et les horaires où vous êtes présent sur ces places de marché.`}
-              </TextBody1>
+            <TextBody1 centered={true} extraClasses="mb-5">
+              {`1 - Définissez les jours et les horaires de présence sur chaque point de vente.\n2 - Activez ou désactivez un point de vente en cliquant dessus.`}
+            </TextBody1>
 
-              {marketPlaces}
-            </View>
-
-            <View className="px-5">
-              <ButtonPrimaryEnd
-                label="Sauvegarder"
-                iconName="sync-alt"
-                iconFamily="FontAwesome5Icon"
-                disabled={isValidateLoading}
-                extraClasses="my-5 h-14"
-                onPressFn={() => handleValidate()}
-                isLoading={isValidateLoading}
-              />
-            </View>
+            <View>{marketPlaces}</View>
           </View>
         </ScrollView>
+      </View>
+
+      <View className="px-3" style={{ flex: 1.5 }}>
+        <View className="px-5">
+          <ButtonPrimaryEnd
+            label="Sauvegarder"
+            iconName="sync-alt"
+            iconFamily="FontAwesome5Icon"
+            disabled={isValidateLoading}
+            extraClasses="my-5 h-14"
+            onPressFn={() => handleValidate()}
+            isLoading={isValidateLoading}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );

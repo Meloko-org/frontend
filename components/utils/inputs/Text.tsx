@@ -25,7 +25,7 @@ type InputTextProps = {
   onBlur?: () => void;
   onEndEditing?: () => void;
   editable?: boolean;
-  value?: string | Date;
+  value?: string;
   size?: string;
   extraClasses?: string;
   height?: string;
@@ -90,8 +90,8 @@ export default function InputText({
             ${size === "large" ? "text-lg leading-5 h-10" : "text-lg/4 h-8"} 
             ${iconName ? "w-80" : "w-full"} 
             ${twoLines && "h-[60px] leading-5"}
-            ${textClasses}
-            text-black dark:text-lightbg p-0
+            ${textClasses ? textClasses : "text-black dark:text-lightbg"}
+             p-0
           `}
           placeholder={placeholder}
           placeholderTextColor={colorScheme === "dark" ? "#FCFFF0" : "#444C3D"}
@@ -105,7 +105,7 @@ export default function InputText({
           textContentType={textContentType}
           autoComplete={autoComplete}
           multiline={twoLines ?? false}
-        ></TextInput>
+        />
       </View>
 
       {iconName && onIconPressFn && (

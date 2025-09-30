@@ -35,6 +35,8 @@ import { View } from "react-native";
 import TopBar from "../../components/TopBar";
 import Spinner from "../../components/utils/Spinner";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
+import PrimaryButton from "../../components/utils/buttons/Primary";
+import TextBody1 from "../../components/utils/texts/Body1";
 
 type FromProducerTab = BottomTabScreenProps<
   ProducerTabParamList,
@@ -68,6 +70,9 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
   const [globalCategories, setGlobalCategories] = useState<
     ProductCategoryData[] | null
   >([]);
+  const [isStockSetted, setIsStockSetted] = useState<boolean | undefined>(
+    false,
+  );
 
   const [openScreenButtons, setOpenScreenButtons] = useState<JSX.Element[]>([]);
 
@@ -102,7 +107,7 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
       };
 
       init();
-    }, []),
+    }, [shopStore]),
   );
 
   const fetchStocks = async () => {
@@ -154,6 +159,13 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
     setGlobalCategories(categoriesResponse.data);
   };
 
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     console.log("youpi")
+
+  //   }, [shopStore?.products, globalCategories, stocksStore])
+  // )
+
   useEffect(() => {
     if (!isFetchLoading) {
       // on détermine les catégories possibles en fonction des types du shop
@@ -165,11 +177,15 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
 
       // console.log("availableCategories :", availableCategories);
 
-      // on ajoute le nombre de produits (ou 0 si onboarding) pour chaque catégorie qui appartient aux types du shop
+      /* on ajoute le nombre de produits pour chaque catégorie qui appartient aux types du shop
+        si on n'est pas dans le cas du onboarding ou si on est dans le cas du onboarding et 
+        qu'au moins un produit a été ajouté. 
+        Dans le cas du onboarding, tant qu'aucun produit n'a été ajouté, on met count à 0
+      */
       const availableCategoriesWithCount = availableCategories?.map(
         (category) => {
           let count;
-          if (!onboarding) {
+          if (!onboarding || (onboarding && shopStore?.products !== null)) {
             count = shopStore?.products?.filter(
               (p) => p.product.family.category.name === category.name,
             ).length;
@@ -182,6 +198,14 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
           };
         },
       );
+
+      /* Activation du bouton "Valider les produits" si au moins un produit a été ajouté pendant le onboarding */
+      if (onboarding) {
+        const hasProduct = availableCategoriesWithCount?.some(
+          (cat) => cat.count! > 0,
+        );
+        setIsStockSetted(hasProduct);
+      }
 
       console.log(
         "availableCategoriesWithCount :",
@@ -201,25 +225,8 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
 
           // vérification des stocks de chaque produit pour une catégorie
           const hasZeroStock = productsInCategory?.some((product) => {
-            return Number(product.stock.$numberDecimal) === 0;
+            return Number(product.stock) === 0;
           });
-
-          // on force le typage de targetScreen car navigation.navigate n'accepte pas les string génériques
-          // mais seulement un RootStackParamList
-          let targetScreen: "StockFamilies" | "Stocks";
-          let screenTitle: string;
-
-          // !! ATTENTION !! pas de gestion de "both" pour l'instant
-          switch (productsType) {
-            case "bulk":
-              targetScreen = "Stocks";
-              screenTitle = "STOCKS\n" + cat.name.toLocaleUpperCase();
-              break;
-            case "classic":
-              targetScreen = "StockFamilies";
-              screenTitle = "CHOIX\n" + cat.name.toLocaleUpperCase();
-              break;
-          }
 
           return (
             <OpenScreenButton
@@ -259,7 +266,7 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
                       {
                         from: "Shop",
                         backLabel: "Retour à la boutique",
-                        screenTitle: screenTitle,
+                        screenTitle: "STOCKS\n" + cat.name.toLocaleUpperCase(),
                         category: cat.name,
                       },
                     );
@@ -269,7 +276,7 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
                       {
                         from: "Shop",
                         backLabel: "Retour à la boutique",
-                        screenTitle: screenTitle,
+                        screenTitle: "CHOIX\n" + cat.name.toLocaleUpperCase(),
                         category: cat.name,
                       },
                     );
@@ -288,28 +295,54 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
   // console.log("STOCKCATEGORIES onboarding :", onboarding)
   // console.log("STOCKCATEGORIES shopTypes :", shopTypes)
   console.log("stockStore :", stocksStore);
+  console.log("shopStore products :", shopStore?.products);
 
   return (
     <SafeAreaView
       className="bg-lightbg flex-1 dark:bg-darkbg"
       edges={["right", "left", "top"]}
     >
-      <TopBar
-        backLabel={backLabel || "Retour à la boutique"}
-        screen={from || onboarding ? "Onboarding5" : "ShopProducer"}
-        label={screenTitle || "GESTION\nDES STOCKS"}
-        screenParams={{ onboarding: true }}
-        navigationOverride={navigation}
-        extraClasses="my-2"
-      />
-
-      <ScrollView>
-        {isFetchLoading ? (
-          <Spinner />
+      <View style={{ flex: 1 }}>
+        {!onboarding ? (
+          <TopBar
+            backLabel={backLabel || "Retour à la boutique"}
+            screen={from || onboarding ? "Onboarding5" : "ShopProducer"}
+            label={screenTitle || "GESTION\nDES STOCKS"}
+            screenParams={{ onboarding: true }}
+            navigationOverride={navigation}
+            extraClasses="my-2"
+          />
         ) : (
-          <View className="px-3">{openScreenButtons}</View>
+          <TextBody1 centered extraClasses="mt-5">
+            Ajoutez au moins un produit
+          </TextBody1>
         )}
-      </ScrollView>
+      </View>
+
+      <View className="px-3 mt-5" style={{ flex: 10 }}>
+        <ScrollView>
+          {isFetchLoading ? (
+            <Spinner />
+          ) : (
+            <View className="">{openScreenButtons}</View>
+          )}
+        </ScrollView>
+      </View>
+
+      {onboarding && (
+        <View className="px-3 mt-5" style={{ flex: 2 }}>
+          <PrimaryButton
+            label="Valider les produits"
+            onPressFn={() =>
+              (navigation as FromRootStack["navigation"]).navigate(
+                "Onboarding5",
+              )
+            }
+            disabled={!isStockSetted}
+            extraClasses="h-20"
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 }

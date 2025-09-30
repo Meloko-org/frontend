@@ -6,6 +6,7 @@ import { GestureResponderEvent } from "react-native";
 type PrimaryButtonProps = {
   label: string;
   extraClasses?: string;
+  textClasses?: string;
   disabled?: boolean;
   onPressFn: ((event: GestureResponderEvent) => void) | undefined;
   isLoading?: boolean;
@@ -14,6 +15,7 @@ type PrimaryButtonProps = {
 export default function PrimaryButton({
   label,
   extraClasses,
+  textClasses = "text-[24px]",
   disabled,
   onPressFn,
   isLoading,
@@ -90,7 +92,7 @@ export default function PrimaryButton({
         </View>
       ) : (
         <>
-          <Text className="text-lightbg text-center font-bold text-[24px]">
+          <Text className={`${textClasses} text-lightbg text-center font-bold`}>
             {label}
           </Text>
         </>

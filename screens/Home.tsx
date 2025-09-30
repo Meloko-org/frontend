@@ -87,7 +87,9 @@ export default function HomeScreen({ navigation }: Props) {
       const producer = producerResponse.data;
       dispatch(setProducerData(producer));
 
-      if (producer?.onboardingStep! < 6) {
+      if (producer?.onboardingStep === 5) {
+        navigation.navigate("Onboarding" + producer?.onboardingStep);
+      } else if (producer?.onboardingStep! < 5) {
         navigation.navigate("Onboarding" + (producer?.onboardingStep + 1));
       } else {
         const shopResponse = await shopTools.getShopInfos(

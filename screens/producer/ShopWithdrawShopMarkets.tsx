@@ -61,8 +61,8 @@ export default function ShopWithdrawShopMarketsScreen({
                     "OnboardingShopWithdrawShopMarketsSearch",
                     {
                       from: "OnboardingShopWithdrawModes",
-                      backLabel: "Retour modes de retrait",
-                      screenTitle: "CLICK &\nCOLLECT",
+                      backLabel: "Retour aux points de vente",
+                      screenTitle: "RECHERCHE",
                       onboarding: true,
                     },
                   );
@@ -71,8 +71,8 @@ export default function ShopWithdrawShopMarketsScreen({
                     "ShopWithdrawShopMarketsSearch",
                     {
                       from: "ShopWithdrawModes",
-                      backLabel: "Retour modes de retrait",
-                      screenTitle: "CLICK &\nCOLLECT",
+                      backLabel: "Retour aux points de vente",
+                      screenTitle: "RECHERCHE",
                     },
                   );
                 }
@@ -87,8 +87,8 @@ export default function ShopWithdrawShopMarketsScreen({
                     "OnboardingShopWithdrawShopMarketsManage",
                     {
                       from: "OnboardingShopWithdrawModes",
-                      backLabel: "Retour modes de retrait",
-                      screenTitle: "CLICK &\nCOLLECT",
+                      backLabel: "Retour aux points de vente",
+                      screenTitle: "PARAMÈTRES",
                       onboarding: true,
                     },
                   );
@@ -97,8 +97,8 @@ export default function ShopWithdrawShopMarketsScreen({
                     "ShopWithdrawShopMarketsManage",
                     {
                       from: "ShopWithdrawModes",
-                      backLabel: "Retour modes de retrait",
-                      screenTitle: "CLICK &\nCOLLECT",
+                      backLabel: "Retour aux points de vente",
+                      screenTitle: "PARAMÈTRES",
                     },
                   );
                 }

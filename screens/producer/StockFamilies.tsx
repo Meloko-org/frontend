@@ -86,7 +86,7 @@ export default function StockFamiliesScreen({ navigation, route }: Props) {
         );
 
         const hasZeroStock = productsInFamily?.some((product) => {
-          return Number(product.stock.$numberDecimal) === 0;
+          return Number(product.stock) === 0;
         });
 
         return (

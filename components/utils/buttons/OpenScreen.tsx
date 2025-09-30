@@ -19,7 +19,7 @@ type OpenScreenButtonProps = {
   noticeColor?: string;
   switchProps?: {
     label: string;
-    value: boolean;
+    value: boolean | undefined;
     onValueChange: (isEnabled: boolean) => void;
     trackColor?: { false: string; true: string };
     thumbColor?: string;

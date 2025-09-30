@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 
-import { MarketData, MarketsData, OpeningHoursData } from "../../types/API";
+// import { MarketData, MarketsData, OpeningHoursData } from "../../types/API";
+import { MarketData, MarketsData, OpeningHourData } from "../../types/API";
 import Planning from "../Planning";
 
 import { Image, Text, TouchableOpacity, View, Alert } from "react-native";
@@ -16,7 +17,8 @@ const FontAwesome = _Fontawesome as unknown as React.ElementType;
 
 type CardMarketProps = {
   marketData: MarketData;
-  openingHoursData?: OpeningHoursData;
+  // openingHoursData?: OpeningHoursData;
+  openingHoursData?: OpeningHourData[];
   isActiveData?: boolean;
   onPressFn?: ((arg0: MarketData) => void) | undefined;
   extraClasses?: string;
@@ -39,15 +41,15 @@ type CardMarketProps = {
   }) => void;
 };
 
-type OpeningHourData = {
-  day: number;
-  periods: PeriodData[];
-};
+// type OpeningHourData = {
+//   day: number;
+//   periods: PeriodData[];
+// };
 
-type PeriodData = {
-  openingTime: string | null;
-  closingTime: string | null;
-};
+// type PeriodData = {
+//   openingTime: string | null;
+//   closingTime: string | null;
+// };
 
 export default function Market(props: CardMarketProps): JSX.Element {
   const [isHighlighted, setHighlighted] = useState(false);
@@ -149,9 +151,9 @@ export default function Market(props: CardMarketProps): JSX.Element {
         className={`${props.extraClasses} flex rounded-lg p-2 shadow-lg w-full bg-white dark:bg-tertiary  `}
       >
         <View
-          className={`${isHighlighted || props.isRadioButtonActive ? "bg-primary" : ""} flex flex-row w-full rounded-lg mb-2 items-center`}
+          className={`${isHighlighted || props.isRadioButtonActive ? "bg-primary" : ""} flex flex-row w-full p-1 rounded-lg mb-2 items-center`}
         >
-          <View className="flex-none justify-center rounded-lg h-full mr-1">
+          <View className="flex-none justify-center rounded-lg mr-1">
             <Image
               source={require("../../assets/images/tomate.webp")}
               className="rounded-full w-16 h-16"

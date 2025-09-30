@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 
 import { useDispatch, useSelector } from "react-redux";
-import { setClickCollect, ShopState } from "../../reducers/shop";
+import { setClickCollect, setShopData, ShopState } from "../../reducers/shop";
 
 import { ProducerTabParamList } from "../../types/Navigation";
 import { RootStackParamList } from "../../types/Navigation";
@@ -22,6 +22,7 @@ import TextBody1 from "../../components/utils/texts/Body1";
 import Planning from "../../components/Planning";
 import InputTextarea from "../../components/utils/inputs/Textarea";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
+import { ClickCollectData, OpeningHourData, PeriodData } from "../../types/API";
 
 type FromProducerTab = BottomTabScreenProps<
   ProducerTabParamList,
@@ -49,26 +50,24 @@ export default function ShopWithdrawClickcollectScreen({
 
   const [isValidateLoading, setValidateLoading] = useState(false);
   const [instructions, setInstructions] = useState<string>(
-    shopStore?.clickCollect?.instructions
-      ? shopStore?.clickCollect?.instructions
-      : "",
+    shopStore?.clickCollect?.instructions ?? "",
   );
 
-  type PeriodData = {
-    openingTime: string | null;
-    closingTime: string | null;
-  };
+  // type PeriodData = {
+  //   openingTime: string | null;
+  //   closingTime: string | null;
+  // };
 
-  type OpeningHourData = {
-    day: number;
-    periods: PeriodData[];
-  };
+  // type OpeningHourData = {
+  //   day: number;
+  //   periods: PeriodData[];
+  // };
 
-  type ClickCollectValues = {
-    instructions: string | undefined;
-    isActive: boolean;
-    openingHours: OpeningHourData[];
-  } | null;
+  // type ClickCollectValues = {
+  //   instructions: string | undefined;
+  //   isActive: boolean;
+  //   openingHours: OpeningHourData[];
+  // } | null;
 
   const [clickCollectHours, setClickCollectHours] = useState<OpeningHourData[]>(
     [
@@ -114,17 +113,29 @@ export default function ShopWithdrawClickcollectScreen({
   };
 
   const handleValidate = async () => {
+    console.log("youpi");
     try {
       setValidateLoading(true);
 
-      const token: string | null = await getToken();
-      const values: ClickCollectValues = {
+      const token = await getToken();
+
+      // const values: ClickCollectValues = {
+      //   instructions,
+      //   isActive: shopStore!.clickCollect!.isActive,
+      //   openingHours: clickCollectHours,
+      // };
+
+      const values: ClickCollectData = {
         instructions,
-        isActive: shopStore!.clickCollect!.isActive,
+        isActive: onboarding ? true : shopStore?.clickCollect?.isActive,
         openingHours: clickCollectHours,
       };
 
+      console.log(values);
+
       const shopResponse = await shopTools.updateClickCollect(token, values);
+
+      console.log("CC response :", shopResponse);
 
       if (!shopResponse.success && shopResponse.message) {
         SheetManager.show("alert", {
@@ -137,11 +148,16 @@ export default function ShopWithdrawClickcollectScreen({
         return;
       }
 
-      dispatch(setClickCollect(values));
+      if (onboarding) {
+        dispatch(setShopData(shopResponse.data));
+      } else {
+        dispatch(setClickCollect(values));
+      }
+
       SheetManager.show("alert", {
         payload: {
           message: "Click&Collect mis à jour",
-          alertType: "error",
+          alertType: "success",
         },
       });
       setValidateLoading(false);
@@ -151,8 +167,7 @@ export default function ShopWithdrawClickcollectScreen({
     }
   };
 
-  console.log("clickcollect from: ", from);
-  console.log("clickcollect onboarding: ", onboarding);
+  console.log("clickcollect shopStore: ", shopStore);
 
   return (
     <SafeAreaView

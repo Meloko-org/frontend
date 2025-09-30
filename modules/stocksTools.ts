@@ -1,8 +1,10 @@
 import {
   ApiResponse,
+  CreateStockPayload,
   ProductsTypesByCategory,
   StockData,
   TagData,
+  UpdateStockPayload,
 } from "../types/API";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
@@ -84,7 +86,7 @@ const getSuggestedTags = async (
 
 const createStocks = async (
   token: string | null,
-  values: StockData,
+  values: CreateStockPayload,
 ): Promise<ApiResponse<StockData[]>> => {
   try {
     const response = await fetch(`${API_ROOT}/stocks/create`, {
@@ -121,7 +123,7 @@ const createStocks = async (
 
 const updateStocks = async (
   token: string | null,
-  values: StockData,
+  values: UpdateStockPayload,
 ): Promise<ApiResponse<StockData[]>> => {
   try {
     const response = await fetch(`${API_ROOT}/stocks/update`, {

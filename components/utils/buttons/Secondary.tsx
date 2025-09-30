@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { JSX, useRef } from "react";
 import { Text, View, TouchableOpacity, Animated, Easing } from "react-native";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
 import { GestureResponderEvent } from "react-native";
@@ -15,7 +15,7 @@ type SecondaryButtonProps = {
 export default function SecondaryButton({
   label,
   extraClasses,
-  textClasses,
+  textClasses = "text-[24px]",
   disabled,
   onPressFn,
   isLoading,

@@ -96,65 +96,112 @@ export default function StocksScreen({ navigation, route }: Props) {
           ));
 
   const handleOpenEdit = (stockData: StockData) => {
-    navigation.navigate("StocksEdit", {
-      from: "Stocks",
-      backLabel: "Retour au stock " + (family ? family : category),
-      screenTitle: "FICHE\nPRODUIT",
-      category: category,
-      family: family,
-      stockData: stockData,
-    });
+    if (onboarding) {
+      (navigation as FromRootStack["navigation"]).navigate(
+        "OnboardingStocksEdit",
+        {
+          from: "OnboardingStocks",
+          backLabel: "Retour au stock " + (family ? family : category),
+          screenTitle: "FICHE\nPRODUIT",
+          category: category,
+          family: family,
+          stockData: stockData,
+          onboarding: true,
+        },
+      );
+    } else {
+      (navigation as FromProducerTab["navigation"]).navigate("StocksEdit", {
+        from: "Stocks",
+        backLabel: "Retour au stock " + (family ? family : category),
+        screenTitle: "FICHE\nPRODUIT",
+        category: category,
+        family: family,
+        stockData: stockData,
+      });
+    }
+    // navigation.navigate("StocksEdit", {
+    //   from: "Stocks",
+    //   backLabel: "Retour au stock " + (family ? family : category),
+    //   screenTitle: "FICHE\nPRODUIT",
+    //   category: category,
+    //   family: family,
+    //   stockData: stockData,
+    // });
   };
 
   console.log(stocksStore);
+
+  console.log("S family :", family);
 
   return (
     <SafeAreaView
       className="bg-lightbg flex-1 dark:bg-darkbg"
       edges={["right", "left", "top"]}
     >
-      <TopBar
-        backLabel={
-          backLabel || onboarding
-            ? "Retour aux stocks"
-            : family
-              ? "Retour au choix"
-              : "Retour aux catégories"
-        }
-        screen={
-          from || onboarding
-            ? "OnboardingStockCategories"
-            : family
-              ? "StockFamilies"
-              : "StockCategories"
-        }
-        screenParams={{
-          category: category,
-          family: family,
-          onboarding,
-        }}
-        label={screenTitle || "STOCK\n" + (family ? family : category)}
-        extraClasses="my-2"
-      />
-      <View className="px-3 mb-3">
+      <View style={{ flex: 1 }}>
+        <TopBar
+          backLabel={
+            backLabel || onboarding
+              ? "Retour aux stocks"
+              : family
+                ? "Retour au choix"
+                : "Retour aux catégories"
+          }
+          screen={
+            from || onboarding
+              ? "OnboardingStockCategories"
+              : family
+                ? "StockFamilies"
+                : "StockCategories"
+          }
+          screenParams={{
+            category: category,
+            family: family,
+            onboarding,
+          }}
+          label={screenTitle || "STOCK\n" + (family ? family : category)}
+          extraClasses="my-2"
+        />
+      </View>
+
+      <View style={{ flex: 1.3 }} className="px-3 pt-3">
         <OpenScreenButton
           label="Ajouter un produit"
-          // bgColor="bg-tertiary"
-          onPressFn={() =>
-            navigation.navigate("StocksAdd", {
-              from: "Stocks",
-              backLabel: "Retour au stock",
-              screenTitle: "AJOUTER\nUN PRODUIT",
-              category: category,
-              family: family,
-            })
-          }
+          onPressFn={() => {
+            if (onboarding) {
+              (navigation as FromRootStack["navigation"]).navigate(
+                "OnboardingStocksAdd",
+                {
+                  from: "OnboardingStocks",
+                  backLabel: "Retour au stock",
+                  screenTitle: "AJOUTER\nUN PRODUIT",
+                  category: category,
+                  family: family,
+                  onboarding: true,
+                },
+              );
+            } else {
+              (navigation as FromProducerTab["navigation"]).navigate(
+                "StocksAdd",
+                {
+                  from: "Stocks",
+                  backLabel: "Retour au stock",
+                  screenTitle: "AJOUTER\nUN PRODUIT",
+                  category: category,
+                  family: family,
+                },
+              );
+            }
+          }}
           extraClasses=""
         />
       </View>
-      <ScrollView>
-        <View className="px-3">{filteredProducts}</View>
-      </ScrollView>
+
+      <View style={{ flex: 11 }} className="px-3">
+        <ScrollView>
+          <View className="px-3">{filteredProducts}</View>
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }

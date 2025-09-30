@@ -11,7 +11,7 @@ type SwitchInputProps = {
   thumbColor?: string;
   ios_backgroundColor?: string;
   label: string | React.ReactNode;
-  value: boolean;
+  value: boolean | undefined;
   onValueChange: (isEnabled: boolean) => void; // Fonction appelée lorsque l'utilisateur active/désactive le switch
   extraClasses?: string;
   disabled?: boolean;

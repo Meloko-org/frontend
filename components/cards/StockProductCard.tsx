@@ -26,7 +26,7 @@ export default function StockProductCard({
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`${Number(stock.stock.$numberDecimal) === 0 ? "bg-danger/80" : "bg-white dark:bg-tertiary"} shadow-lg rounded-lg  p-2 mb-2`}
+      className={`${stock.stock === 0 ? "bg-danger/80" : "bg-white dark:bg-tertiary"} shadow-lg rounded-lg  p-2 mb-2`}
     >
       <View className="flex flex-row items-center w-full">
         <View className="rounded-lg w-1/4">
@@ -46,7 +46,7 @@ export default function StockProductCard({
           />
         </View>
 
-        <View className="w-3/4">
+        <View className="w-3/4 pl-2">
           <TextBody1 extraClasses="font-bold mb-1">
             {stock.productCustomName
               ? stock.productCustomName
@@ -56,9 +56,7 @@ export default function StockProductCard({
           <View className="flex flex-row">
             <View className="flex flex-row items-center">
               <TextBody2>Prix: </TextBody2>
-              <TextBody1 extraClasses="font-bold">
-                {parseFloat(stock.price.$numberDecimal)}
-              </TextBody1>
+              <TextBody1 extraClasses="font-bold">{stock.price}</TextBody1>
               <TextBody2>
                 {stock.productCustomName !== undefined
                   ? " €"
@@ -70,9 +68,7 @@ export default function StockProductCard({
 
             <View className="flex flex-row flex-grow items-center justify-end pr-2">
               <TextBody2>Quantité: </TextBody2>
-              <TextBody1 extraClasses="font-bold">
-                {parseInt(stock.stock.$numberDecimal)}
-              </TextBody1>
+              <TextBody1 extraClasses="font-bold">{stock.stock}</TextBody1>
             </View>
           </View>
 

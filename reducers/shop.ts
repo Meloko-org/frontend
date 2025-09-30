@@ -21,7 +21,15 @@ export const shopSlice = createSlice({
   initialState,
   reducers: {
     setShopData: (state: ShopState, action: PayloadAction<ShopData>): void => {
-      state.value = action.payload;
+      if (!state.value) {
+        state.value = action.payload;
+      } else {
+        state.value = {
+          ...state.value,
+          ...action.payload,
+          products: action.payload?.products ?? state.value.products,
+        };
+      }
     },
     resetShopData: (state: ShopState): void => {
       state.value = null;

@@ -81,6 +81,10 @@ export default function StocksAddScreen({ navigation, route }: Props) {
     }
 
     if (productsResponse.data) {
+      console.log(JSON.stringify(productsResponse.data[0], null, 2));
+    }
+
+    if (productsResponse.data) {
       const productsForCategoryInStore = shopStore?.products?.filter(
         (product) => product.product.family.category.name === category,
       );
@@ -231,25 +235,33 @@ export default function StocksAddScreen({ navigation, route }: Props) {
   // console.log("backLabel:", backLabel);
   // console.log("screenTitle:", screenTitle);
   // console.log("category:", category);
-  // console.log("family :", family)
+  console.log("S ADD family :", family);
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
       <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-        <TopBar
-          backLabel={backLabel || "Retour aux stocks"}
-          screen={from || "StockCategories"}
-          label={screenTitle || ""}
-          screenParams={{
-            category: category,
-            family: family,
-          }}
-          extraClasses="mt-2"
-        />
+        <View style={{ flex: 1 }}>
+          <TopBar
+            backLabel={backLabel || "Retour aux stocks"}
+            screen={
+              from || onboarding
+                ? "OnboardingStockCategories"
+                : "StockCategories"
+            }
+            label={screenTitle || ""}
+            screenParams={{
+              category: category,
+              family: family,
+            }}
+            extraClasses="mt-2"
+          />
+        </View>
 
-        <ScrollView>
-          <View className="p-3">{renderButtons()}</View>
-        </ScrollView>
+        <View style={{ flex: 12 }}>
+          <ScrollView>
+            <View className="p-3">{renderButtons()}</View>
+          </ScrollView>
+        </View>
       </SafeAreaView>
     </View>
   );

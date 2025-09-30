@@ -36,13 +36,13 @@ export default function ChooseAccountTypeModal({
               label="Utilisateur"
               onPressFn={onUserPress}
               isLoading={false}
-              extraClasses="mb-5"
+              extraClasses="h-14 my-5"
             />
             <SecondaryButton
               label="Producteur"
               onPressFn={onProducerPress}
               isLoading={false}
-              extraClasses=""
+              extraClasses="h-14"
             />
           </View>
         </View>

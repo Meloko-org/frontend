@@ -6,41 +6,37 @@ import {
   useAuth,
   useUser,
 } from "@clerk/clerk-expo";
+import type { SessionResource } from "@clerk/types";
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
-import * as Linking from "expo-linking";
-import { SheetManager } from "react-native-actions-sheet";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types/Navigation";
-import { useRoute } from "@react-navigation/native";
-import { RouteProp } from "@react-navigation/native";
 
-import {
-  View,
-  Modal,
-  StyleSheet,
-  ImageBackground,
-  Button,
-  Text,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView } from "react-native-gesture-handler";
-import InputText from "../components/utils/inputs/Text";
-import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
-import TopBar from "../components/TopBar";
 import { useDispatch, useSelector } from "react-redux";
 import { UserState, updateUser } from "../reducers/user";
 import { ProducerState, setProducerData } from "../reducers/producer";
 import { ShopState, setShopData } from "../reducers/shop";
-import { useColorScheme } from "nativewind";
+
+import { SheetManager } from "react-native-actions-sheet";
+
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList, UserTabParamList } from "../types/Navigation";
+import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
+import { getRedirectTarget } from "../helpers/navigationHelpers";
 
 import userTools from "../modules/userTools";
 import producerTools from "../modules/producerTools";
 import shopTools from "../modules/shopTools";
-import TextHeading4 from "../components/utils/texts/Heading4";
+
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-gesture-handler";
+
+import { View } from "react-native";
+import InputText from "../components/utils/inputs/Text";
+import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
+import TopBar from "../components/TopBar";
+// import { useColorScheme } from "nativewind";
+
 import TextBody1 from "../components/utils/texts/Body1";
 import OpenScreenButton from "../components/utils/buttons/OpenScreen";
-import TextHeading2 from "../components/utils/texts/Heading2";
 import ChooseAccountTypeModal from "../components/modals/ChooseAccountType";
 
 type SignInScreenRouteProp = RouteProp<RootStackParamList, "SignIn">;
@@ -52,6 +48,7 @@ type SignInScreenNavigationProp = NativeStackNavigationProp<
 
 type SignInScreenProps = {
   navigation: SignInScreenNavigationProp;
+  route: SignInScreenRouteProp;
 };
 
 // Warm up the android browser to improve UX
@@ -67,10 +64,9 @@ export const useWarmUpBrowser = () => {
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function SignInScreen({ navigation }: SignInScreenProps) {
+export default function SignInScreen({ navigation, route }: SignInScreenProps) {
   useWarmUpBrowser();
 
-  const route = useRoute<SignInScreenRouteProp>();
   const { from, backLabel, screenTitle, next } = route.params || {}; // route.params peut être non défini quand on revient SignUpScreen
 
   const userStore = useSelector(
@@ -89,6 +85,8 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   // Import the Clerk Auth functions
   const { signIn, setActive, isLoaded } = useSignIn();
   const { user } = useUser();
+  // sert au stockage de createdSessionId pour une utilisation ultérieure dans la modal
+  const pendingSessionIdRef = useRef<string | null>(null);
 
   // import the Clerk Google OAuth flow
   const { startSSOFlow } = useSSO();
@@ -106,12 +104,91 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
   const [performedSignedIn, setPerformedSignedIn] = useState(false);
   const [isConnectionLoading, setConnectionLoading] = useState(false);
 
-  const { colorScheme } = useColorScheme();
+  // const { colorScheme } = useColorScheme();
+
+  // const fetchData = async () => {
+  //   try {
+  //     // store user info in the store
+  //     const token = await getToken();
+  //     const userResponse = await userTools.getUserInfos(token);
+
+  //     if (!userResponse.success) {
+  //       console.error(userResponse.message);
+  //       SheetManager.show("alert", {
+  //         payload: {
+  //           message: userResponse.message!,
+  //           alertType: "error",
+  //         },
+  //       });
+  //       return;
+  //     }
+
+  //     console.log("user fetchData :", userResponse.data);
+
+  //     let stackTarget = "";
+  //     let tabUserTarget = "";
+  //     let tabProducerTarget = "";
+
+  //     dispatch(updateUser(userResponse.data!));
+
+  //     const producerResponse = await producerTools.getProducerInfos(token);
+
+  //     /* pas de profil producer, on dirige vers la SearchScreen */
+  //     if (!producerResponse.success) {
+  //       target = "MapCustomer";
+  //     }
+
+  //     const producer = producerResponse.data;
+  //     dispatch(setProducerData(producer));
+
+  //     /* profil producer existant mais onboarding en cours */
+  //     if (producer?.onboardingStep === 5) {
+  //       target = "Onboarding5"
+  //     } else if (producer?.onboardingStep! < 5) {
+  //       target = "Onboarding" + producer?.onboardingStep;
+  //     } else {
+  //       /* profil producer existant et complet */
+  //       const shopResponse = await shopTools.getShopInfos(
+  //         token,
+  //       );
+
+  //       /* cas inutile car impossible avec le onboarding */
+  //       // if (!shopResponse.success) {
+  //       //   console.error(shopResponse.message);
+  //       //   target = "Shop";
+  //       // }
+
+  //       const shop = shopResponse.data;
+  //       dispatch(setShopData(shop));
+
+  //       target = "BusinessCenter";
+  //     }
+
+  //     if (next) {
+  //       navigation.replace("TabNavigatorUser", {
+  //         screen: next as keyof UserTabParamList
+  //       });
+  //     } else {
+  //       navigation.replace("TabNavigatorUser", {
+  //         screen: target
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  useFocusEffect(
+    useCallback(() => {
+      setEmailAddress("");
+      setPassword("");
+    }, []),
+  );
 
   const fetchData = async () => {
     try {
-      // store user info in the store
       const token = await getToken();
+      // Étape 1 : récupération des données
       const userResponse = await userTools.getUserInfos(token);
 
       if (!userResponse.success) {
@@ -124,61 +201,39 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
         });
         return;
       }
-
-      console.log("user fetchData :", userResponse.data);
-
-      let target = "";
-
-      dispatch(updateUser(userResponse.data!));
+      const user = userResponse.data;
+      dispatch(updateUser(user!));
 
       const producerResponse = await producerTools.getProducerInfos(token);
 
       if (!producerResponse.success) {
-        console.error(producerResponse.message);
-        // pas de profil producer, on dirige vers la SearchScreen
-        // navigation.navigate("MapCustomer");
-        // setNextScreen("MapCustomer")
-        target = "MapCustomer";
-        // return;
+        console.log(producerResponse.message);
       }
 
-      console.log("producer fetchData :", producerResponse.data);
+      const producer = producerResponse.success ? producerResponse.data : null;
 
-      const producer = producerResponse.data;
-      dispatch(setProducerData(producer));
+      // Étape 2 : logique de redirection
+      const redirect = getRedirectTarget({ user, producer, next });
 
-      if (producer?.onboardingStep! < 6) {
-        target = "Onboarding" + producer?.onboardingStep;
-      } else {
-        const shopResponse = await shopTools.getShopInfos(
-          token,
-          producer?._id!,
-        );
-
-        if (!shopResponse.success) {
-          console.error(shopResponse.message);
-          // navigation.navigate("TabNavigatorProducer", { screen: "Shop" });
-          // setNextScreen("Shop")
-          target = "Shop";
-        }
-
-        const shop = shopResponse.data;
-        dispatch(setShopData(shop));
-
-        // navigation.navigate("TabNavigatorProducer", {
-        //   screen: "BusinessCenter",
-        // });
-        // setNextScreen("BusinessCenter")
-        target = "BusinessCenter";
-      }
-
-      if (next) {
-        navigation.replace(next);
-      } else {
-        navigation.replace(target);
+      // Étape 3 : exécution de la navigation
+      switch (redirect.type) {
+        case "root":
+          navigation.navigate(redirect.screen);
+          break;
+        case "userTab":
+          navigation.navigate("TabNavigatorUser", { screen: redirect.screen });
+          break;
+        case "producerTab":
+          navigation.navigate("TabNavigatorProducer", {
+            screen: redirect.screen,
+          });
+          break;
+        case "onboarding":
+          navigation.navigate(redirect.screen);
+          break;
       }
     } catch (error) {
-      console.error(error);
+      console.error("Erreur lors du fetchData:", error);
     }
   };
 
@@ -249,46 +304,27 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
 
       const { createdSessionId, setActive, signIn, signUp } = result;
 
-      /*const { createdSessionId, setActive, signIn, signUp } =
-        await startSSOFlow({
-          strategy: "oauth_google",
-          // For web, defaults to current path
-          // For native, you must pass a scheme, like AuthSession.makeRedirectUri({ scheme, path })
-          // For more info, see https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturioptions
-          redirectUrl: AuthSession.makeRedirectUri({ scheme: "meloko"}),
-        });*/
-      // Try to start the Google OAuth flow
-      //   const { createdSessionId, setActive } = await startOAuthFlow({
-      //     redirectUrl: Linking.createURL("/home", { scheme: "Meloko" }), // Redirect path on successful signin
-      //   });
-
-      console.log("SIGNIN sessionId", createdSessionId);
-
       // If the signin event went well
       if (createdSessionId) {
-        // on récupère le user avant que lastSignInAt ait pu être mis à jour
-        const freshUser = await user?.reload();
+        console.log("signup :", signUp);
 
-        console.log("SIGNIN freshUser :", freshUser);
+        if (signUp?.createdUserId) {
+          // Nouvel utilisateur : on stocke ce qu'il faut pour l'utiliser après
+          pendingSessionIdRef.current = createdSessionId;
+          setIsChooseAccountTypeModalvisible(true);
+        } else {
+          console.log("not signup");
+          await setActive!({ session: createdSessionId });
+          setPerformedSignedIn(true);
 
-        await setActive!({ session: createdSessionId });
-        // setActive!({ session: createdSessionId });
-        setPerformedSignedIn(true);
-
-        if (freshUser) {
-          if (freshUser.lastSignInAt === null) {
-            // signifie que c'est une inscription et non un log
-            // ouvrir la modal de choix de compte
-            setIsChooseAccountTypeModalvisible(true);
-          } else {
-            fetchData();
-          }
+          fetchData();
         }
       } else {
         // afficher message erreur
+        console.log("Erreur lors de la connexion avec google.");
       }
     } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2));
+      console.error(err);
     }
   }, []);
 
@@ -344,7 +380,7 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
       console.error(JSON.stringify(err, null, 2));
       SheetManager.show("alert", {
         payload: {
-          message: err.errors.map((err: string) => err.message).join("\n"),
+          message: err.errors.map((err: string) => err).join("\n"),
           alertType: "error",
         },
       });
@@ -365,22 +401,6 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
       />
 
       <ScrollView>
-        <View className="px-3 my-5">
-          <View className="flex flex-row justify-center mb-3">
-            <TextBody1>Pas encore membre ?</TextBody1>
-          </View>
-          <OpenScreenButton
-            label="Créer un compte"
-            onPressFn={() =>
-              navigation.navigate("SignUp", {
-                from: "SignIn",
-                backLabel: "Retour à la connexion",
-                screenTitle: "CREER UN\nCOMPTE",
-              })
-            }
-          />
-        </View>
-
         <View className="flex flex-row justify-center my-5">
           <View className="w-[70%]">
             <View className="flex flex-row justify-center mb-3">
@@ -391,13 +411,13 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
               label="Google"
               iconName="google"
               onPressFn={onGoogleAuthPress}
-              extraClasses="w-full mb-3"
+              extraClasses="w-full h-14 mb-3"
             />
             <ButtonPrimaryEnd
               label="Facebook"
               iconName="facebook-f"
               onPressFn={onFacebookAuthPress}
-              extraClasses="w-full mb-3"
+              extraClasses="w-full h-14 mb-3"
             />
           </View>
         </View>
@@ -440,15 +460,55 @@ export default function SignInScreen({ navigation }: SignInScreenProps) {
             </View>
           </View>
         </View>
+
+        <View className="px-3 my-5">
+          <View className="flex flex-row justify-center mb-3">
+            <TextBody1>Pas encore membre ?</TextBody1>
+          </View>
+          <OpenScreenButton
+            label="Créer un compte"
+            onPressFn={() =>
+              navigation.navigate("SignUp", {
+                from: "SignIn",
+                backLabel: "Retour à la connexion",
+                screenTitle: "CREER UN\nCOMPTE",
+              })
+            }
+          />
+        </View>
       </ScrollView>
 
       <ChooseAccountTypeModal
         isVisible={isChooseAccountTypeModalVisible}
-        onUserPress={() => {
+        onUserPress={async () => {
+          const id = pendingSessionIdRef.current!;
+          await setActive!({ session: id });
+          pendingSessionIdRef.current = null;
           setIsChooseAccountTypeModalvisible(false);
           fetchData();
         }}
-        onProducerPress={() => console.log("go onboarding")} // navigation vers le onboarding
+        onProducerPress={async () => {
+          const id = pendingSessionIdRef.current!;
+          await setActive!({ session: id });
+          pendingSessionIdRef.current = null;
+
+          const token = await getToken();
+          const producerResponse =
+            await producerTools.initialiseProducer(token);
+
+          if (!producerResponse.success) {
+            SheetManager.show("alert", {
+              payload: {
+                message:
+                  "Le compte producteur n'a pu être créé. Veuillez recommencer.",
+                alertType: "error",
+              },
+            });
+            return;
+          }
+          setIsChooseAccountTypeModalvisible(false);
+          fetchData();
+        }}
       />
     </SafeAreaView>
   );

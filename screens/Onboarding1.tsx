@@ -8,8 +8,10 @@ import { setProducerData } from "../reducers/producer";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
 
+import { SheetManager } from "react-native-actions-sheet";
 import { validateRequiredFields } from "../helpers/fieldHelpers";
 import saveImageLocally from "../helpers/ImageHelpers";
+import onboardingTools from "../modules/onboardingTools";
 
 import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,13 +19,11 @@ import { ScrollView } from "react-native-gesture-handler";
 
 import { KeyboardAvoidingView, Platform, View } from "react-native";
 import UnderlineInputText from "../components/utils/inputs/UnderlineText";
-import TextBody1 from "../components/utils/texts/Body1";
 import ImageUploader from "../components/utils/ImageUploader";
+import TextBody1 from "../components/utils/texts/Body1";
 import Thumbnail from "../components/utils/Thumbnail";
 import ButtonSecondaryStart from "../components/utils/buttons/SecondaryStart";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
-import { SheetManager } from "react-native-actions-sheet";
-import onboardingTools from "../modules/onboardingTools";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Onboarding1">;
 

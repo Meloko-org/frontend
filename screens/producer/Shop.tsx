@@ -1,10 +1,19 @@
 import React, { useCallback } from "react";
-import { useState, useEffect } from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
 import { useAuth } from "@clerk/clerk-expo";
+import { useState, useEffect } from "react";
+
+// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+// import { RootStackParamList } from "../../types/Navigation";
+
+import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { ProducerTabParamList } from "../../types/Navigation"; // <-- ton fichier de types
+
 import { useDispatch, useSelector } from "react-redux";
 import { setProducts, setShopData, ShopState } from "../../reducers/shop";
+
+import { useCanPost } from "../../hooks/useCanPost";
+import postTools from "../../modules/postTools";
 
 /* Eléments graphiques */
 import { View, TouchableOpacity, Alert, Text, Image } from "react-native";
@@ -21,20 +30,21 @@ import ThumbnailCarousel from "../../components/utils/ThumbnailCarousel";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import stocksTools from "../../modules/stocksTools";
 import TextHeading3 from "../../components/utils/texts/Heading3";
-import { useCanPost } from "../../hooks/useCanPost";
-import { useFocusEffect } from "@react-navigation/native";
-import postTools from "../../modules/postTools";
+import { ProducerState } from "../../reducers/producer";
 
-type ProfileScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+type ShopProducteurRouteProp = RouteProp<ProducerTabParamList, "ShopProducer">;
+
+type ShopProducteurNavProp = BottomTabNavigationProp<
+  ProducerTabParamList,
   "ShopProducer"
 >;
 
 type Props = {
-  navigation: ProfileScreenNavigationProp;
+  navigation: ShopProducteurNavProp;
+  route: ShopProducteurRouteProp;
 };
 
-export default function ShopProducteurScreen({ navigation }: Props) {
+export default function ShopProducteurScreen({ navigation, route }: Props) {
   const [description, setDescription] = useState<string>("");
 
   const { getToken } = useAuth();
@@ -44,10 +54,15 @@ export default function ShopProducteurScreen({ navigation }: Props) {
     (state: { shop: ShopState }) => state.shop.value,
   );
 
+  const producerStore = useSelector(
+    (state: { producer: ProducerState }) => state.producer.value,
+  );
+
   const canPost = useCanPost();
 
   const [shopData, setShopData] = useState(shopStore);
   const [hasZeroStock, setHasZeroStock] = useState<boolean | undefined>(false);
+  const [isOnline, setIsOnline] = useState<boolean>(false);
 
   const fetchStocks = async (shopId: string) => {
     const stocksResponse = await stocksTools.getStocksByShop(shopId);
@@ -71,7 +86,7 @@ export default function ShopProducteurScreen({ navigation }: Props) {
   useEffect(() => {
     setHasZeroStock(
       shopStore?.products?.some((product) => {
-        return Number(product.stock.$numberDecimal) === 0;
+        return Number(product.stock) === 0;
       }),
     );
   }, [shopStore?.products]);
@@ -89,9 +104,12 @@ export default function ShopProducteurScreen({ navigation }: Props) {
 
   useFocusEffect(
     useCallback(() => {
+      setIsOnline(producerStore?.onboardingStep === 6);
       getProgrammedPosts();
     }, []),
   );
+
+  console.log("SHOP producerStore :", producerStore);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -113,7 +131,9 @@ export default function ShopProducteurScreen({ navigation }: Props) {
             </View>
           </View>
           <View className="absolute right-0 mr-2">
-            <Text className="text-danger font-bold">{`HORS\nLIGNE`}</Text>
+            <Text
+              className={`${isOnline ? "text-primary" : "text-danger"} font-bold text-center`}
+            >{`${isOnline ? "EN\nLIGNE" : "HORS\nLIGNE"}`}</Text>
           </View>
         </View>
 

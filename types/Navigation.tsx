@@ -15,7 +15,11 @@ import {
 
 type ProducerTabParamList = {
   ShopProducer: undefined;
-  ShopDetails: { from?: string; backLabel?: string; screenTitle?: string };
+  ShopDetails: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+  };
   ShopOffline: { from?: string; backLabel?: string; screenTitle?: string };
   ShopParams: { from?: string; backLabel?: string; screenTitle?: string };
   ShopWithdrawModes: {
@@ -192,9 +196,9 @@ type RootStackParamList = {
     next: string;
   };
   SignUp: {
-    from: string;
-    backLabel: string;
-    screenTitle: string;
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
   };
   Sales: undefined;
   Onboarding0: undefined;
@@ -280,11 +284,22 @@ type RootStackParamList = {
   };
 };
 
-export type { RootStackParamList, ProducerTabParamList, UserTabParamList };
+type Redirect =
+  | { type: "root"; screen: keyof RootStackParamList }
+  | { type: "userTab"; screen: keyof UserTabParamList }
+  | { type: "producerTab"; screen: keyof ProducerTabParamList }
+  | { type: "onboarding"; screen: keyof RootStackParamList };
+
+export type {
+  RootStackParamList,
+  ProducerTabParamList,
+  UserTabParamList,
+  Redirect,
+};
 
 /** typage de la nav selon que la screen est indépendante ou appartient à un tab
 
-Tab: 
+Tab: (producer)
 
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
@@ -323,6 +338,7 @@ export default function Onboarding5Screen({ navigation, route }: Props) {
   ...
 }
 
+
 Tab et stack :
 
 import { CompositeScreenProps } from "@react-navigation/native";
@@ -347,6 +363,7 @@ export default function ShopWithdrawModesScreen({ navigation, route }: Props) {
   const { onboarding } = route.params || {};
   // ...
 }
+
 
 Tab et stack avec param supplémentaires :
 
@@ -404,5 +421,33 @@ onPressFn={() => {
     );
   }
 }}
+
+
+Tab avec redirections vers stack et tab:
+
+import { RouteProp } from "@react-navigation/native";
+import { CompositeNavigationProp } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+// ✅ Import de tes types centralisés
+import { RootStackParamList, ProducerTabParamList } from "../navigation";
+
+// On combine tab + stack
+type ProducerProfileNavProp = CompositeNavigationProp<
+  BottomTabNavigationProp<ProducerTabParamList, "ProducerProfile">,
+  NativeStackNavigationProp<RootStackParamList>
+>;
+
+type ProducerProfileRouteProp = RouteProp<
+  ProducerTabParamList,
+  "ProducerProfile"
+>;
+
+type Props = {
+  navigation: ProducerProfileNavProp;
+  route: ProducerProfileRouteProp;
+};
+
 
 */

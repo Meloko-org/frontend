@@ -1,4 +1,12 @@
-import { ApiResponse, ShopData, MarketData } from "../types/API";
+import {
+  ApiResponse,
+  ShopData,
+  MarketData,
+  ClickCollectData,
+  MarketsData,
+  AddressData,
+  CrewMember,
+} from "../types/API";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -23,7 +31,18 @@ const createOrUpdateShop = async (token: string, values: string) => {
 
 const updateShop = async (
   token: string | null,
-  values: string,
+  values: {
+    _id: string | undefined;
+    name: string;
+    siret: string;
+    shortDesc: string;
+    longDesc: string;
+    logo: string;
+    address: AddressData;
+    photos: string[];
+    video: string[];
+    crew: CrewMember[];
+  },
 ): Promise<ApiResponse<ShopData>> => {
   try {
     const response = await fetch(`${API_ROOT}/shops/update`, {
@@ -204,22 +223,60 @@ const getStocksByshopAndCategory = async (
   }
 };
 
-type Period = {
-  openingTime: string | null;
-  closingTime: string | null;
-};
-type OpeningHour = {
-  day: number;
-  periods: Period[];
-};
-type ClickCollectValues = {
-  instructions: string | undefined;
-  openingHours: OpeningHour[];
-} | null;
+// type Period = {
+//   openingTime: string | null;
+//   closingTime: string | null;
+// };
+// type OpeningHour = {
+//   day: number;
+//   periods: Period[];
+// };
+// type ClickCollectValues = {
+//   instructions: string | undefined;
+//   openingHours: OpeningHour[];
+// } | null;
+
+// const updateClickCollect = async (
+//   token: string | null,
+//   values: ClickCollectValues,
+// ): Promise<ApiResponse<ShopData>> => {
+//   try {
+//     const response = await fetch(`${API_ROOT}/shops/clickCollect`, {
+//       method: "PUT",
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//         mode: "cors",
+//       },
+//       body: JSON.stringify(values),
+//     });
+
+//     if (!response.ok) {
+//       return {
+//         success: false,
+//         data: null,
+//         message: `Erreur ${response.status}: Impossible de mettre à jour.`,
+//       };
+//     }
+
+//     const data = await response.json();
+
+//     return data.success
+//       ? { success: true, data: data.shop }
+//       : { success: false, data: null, message: data.message };
+//   } catch (error) {
+//     console.log(error);
+//     return {
+//       success: false,
+//       data: null,
+//       message: "Une erreur s'est produite lors de la mise à jour.",
+//     };
+//   }
+// };
 
 const updateClickCollect = async (
   token: string | null,
-  values: ClickCollectValues,
+  values: ClickCollectData,
 ): Promise<ApiResponse<ShopData>> => {
   try {
     const response = await fetch(`${API_ROOT}/shops/clickCollect`, {
@@ -256,39 +313,62 @@ const updateClickCollect = async (
 };
 
 type AddShopMarketsData = {
-  shopId: string | undefined;
   marketIds: string[];
 };
 
 // permet au shop d'ajouter un market
-const addShopMarkets = async (values: AddShopMarketsData) => {
+const addShopMarkets = async (
+  token: string | null,
+  values: AddShopMarketsData,
+): Promise<ApiResponse<ShopData>> => {
   try {
     const response = await fetch(`${API_ROOT}/shops/markets/add`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
         mode: "cors",
       },
       body: JSON.stringify(values),
     });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible d'obtenir les données.`,
+      };
+    }
+
     const data = await response.json();
-    return data;
+
+    return data.success
+      ? { success: true, data: data.shop }
+      : { success: false, data: null, message: data.message };
   } catch (error) {
     console.log(error);
+    return {
+      success: false,
+      data: null,
+      message: "Une erreur s'est produite lors de la mise à jour.",
+    };
   }
 };
 
 type UpdateShopMarketsData = {
-  shopId: string | undefined;
   markets: string[];
 };
 
-const updateShopMarkets = async (values: UpdateShopMarketsData) => {
+const updateShopMarkets = async (
+  token: string | null,
+  values: MarketsData[],
+): Promise<ApiResponse<ShopData>> => {
   try {
     const response = await fetch(`${API_ROOT}/shops/markets/update`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
         mode: "cors",
       },
       body: JSON.stringify(values),
@@ -305,8 +385,8 @@ const updateShopMarkets = async (values: UpdateShopMarketsData) => {
     const data = await response.json();
 
     return data.success
-      ? { success: true, data: data.markets }
-      : { succes: false, data: null, message: data.message };
+      ? { success: true, data: data.shop }
+      : { success: false, data: null, message: data.message };
   } catch (error) {
     console.log(error);
     return {
@@ -320,16 +400,20 @@ const updateShopMarkets = async (values: UpdateShopMarketsData) => {
 
 const getShopInfos = async (
   token: string | null,
+  withStocks: string = "false",
 ): Promise<ApiResponse<ShopData>> => {
   try {
-    const response = await fetch(`${API_ROOT}/shops/myshop`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        mode: "cors",
+    const response = await fetch(
+      `${API_ROOT}/shops/myshop?withStocks=${withStocks}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          mode: "cors",
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       return {
@@ -355,7 +439,10 @@ const getShopInfos = async (
   }
 };
 
-const getMarkets = async (city: string, radius: number[]) => {
+const getMarkets = async (
+  city: string,
+  radius: number[],
+): Promise<ApiResponse<MarketData[]>> => {
   try {
     const response = await fetch(`${API_ROOT}/shops/markets`, {
       method: "POST",
@@ -365,11 +452,28 @@ const getMarkets = async (city: string, radius: number[]) => {
       },
       body: JSON.stringify({ city, radius }),
     });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible d'obtenir les données.`,
+      };
+    }
+
     const data = await response.json();
+
     console.log("getMarkets :", data);
-    return data;
+    return data.success
+      ? { success: true, data: data.markets }
+      : { success: false, data: null, message: data.message };
   } catch (error) {
     console.log(error);
+    return {
+      success: false,
+      data: null,
+      message: "Une erreur s'est produite lors de la récupération des données.",
+    };
   }
 };
 
@@ -386,7 +490,7 @@ const getMarketById = async (marketId: string): Promise<MarketData> => {
     return data;
   } catch (error) {
     console.log(error);
-    // return null
+    // return
   }
 };
 

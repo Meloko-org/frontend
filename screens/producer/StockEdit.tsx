@@ -2,11 +2,6 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 
-// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-// import { RootStackParamList } from "../../types/Navigation";
-// import { useFocusEffect, useRoute } from "@react-navigation/native";
-// import { RouteProp } from "@react-navigation/native";
-
 import { ProducerTabParamList } from "../../types/Navigation";
 import { RootStackParamList } from "../../types/Navigation";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
@@ -18,20 +13,31 @@ import { updateProduct, setProducts } from "../../reducers/shop";
 import { SheetManager } from "react-native-actions-sheet";
 import saveImageLocally from "../../helpers/ImageHelpers";
 
-import { TextInput, View, Text, Image } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView } from "react-native-gesture-handler";
-import TopBar from "../../components/TopBar";
-import { useSelector } from "react-redux";
-import { ShopState } from "../../reducers/shop";
-import { ProductData, StockData, TagData } from "../../types/API";
-import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
-import productsTools from "../../modules/productsTools";
-import SecondaryButton from "../../components/utils/buttons/Secondary";
-import TextBody1 from "../../components/utils/texts/Body1";
-import { StocksState } from "../../reducers/stocks";
+import {
+  CreateBulkStockPayload,
+  CreateClassicStockPayload,
+  CreateStockPayload,
+  ProductData,
+  StockData,
+  TagData,
+  UpdateBulkStockPayload,
+  UpdateClassicStockPayload,
+  UpdateStockPayload,
+} from "../../types/API";
+
 import { handleSheetFlow, showAlert } from "../../helpers/sheetHelpers";
 import stocksTools from "../../modules/stocksTools";
+
+import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  NativeViewGestureHandler,
+  ScrollView,
+} from "react-native-gesture-handler";
+
+import { TextInput, View, Text, Image } from "react-native";
+import TopBar from "../../components/TopBar";
+import SecondaryButton from "../../components/utils/buttons/Secondary";
+import TextBody1 from "../../components/utils/texts/Body1";
 import PrimaryButton from "../../components/utils/buttons/Primary";
 import IconButton from "../../components/utils/buttons/Icon";
 import SelectableTag from "../../components/utils/badges/SelectableTag";
@@ -39,17 +45,6 @@ import InputTextarea from "../../components/utils/inputs/Textarea";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import InputText from "../../components/utils/inputs/Text";
 import ImageUploader from "../../components/utils/ImageUploader";
-
-// type StocksEditScreenRouteProp = RouteProp<RootStackParamList, "StocksEdit">;
-
-// type StocksEditScreenNavigationProp = NativeStackNavigationProp<
-//   RootStackParamList,
-//   "StocksEdit"
-// >;
-
-// type Props = {
-//   navigation: StocksEditScreenNavigationProp;
-// };
 
 type FromProducerTab = BottomTabScreenProps<ProducerTabParamList, "StocksEdit">;
 
@@ -91,10 +86,10 @@ export default function StocksEditScreen({ navigation, route }: Props) {
     string | undefined
   >("");
   const [weightPerUnit, setWeightPerUnit] = useState<string | undefined>("");
-  const [price, setPrice] = useState<number | undefined>(0);
-  const [stock, setStock] = useState<number | undefined>(0);
+  const [price, setPrice] = useState<string>("");
+  const [stock, setStock] = useState<number>(0);
   const [description, setDescription] = useState<string | undefined>("");
-  const [pricePerKilo, setPricePerKilo] = useState<number | undefined>(0);
+  const [pricePerKilo, setPricePerKilo] = useState<string>("");
   const [origin, setOrigin] = useState<string | undefined>("");
   const [format, setFormat] = useState<string | undefined>("");
   const [portion, setPortion] = useState<string | undefined>("");
@@ -111,6 +106,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
     familyId: string | undefined,
     existingTags?: TagData[],
   ) => {
+    console.log("S-EDIT family :", familyId);
     const tagResponse = await stocksTools.getSuggestedTags(familyId);
     if (!tagResponse.success) {
       console.log("impossible de récupérer les tags suggérés.");
@@ -145,22 +141,20 @@ export default function StocksEditScreen({ navigation, route }: Props) {
       // mode création
 
       if (bulk) {
-        setPrice(0);
+        setPrice("");
         setStock(0);
         setDescription("");
         setWeightPerUnit(
-          productData.weight.measurement.$numberDecimal +
-            " " +
-            productData.weight.unit,
+          productData.weight.measurement + " " + productData.weight.unit,
         );
         setNameAdapted(productData.name);
         setFamilyAdpated(productData.family.name);
         setImageAdapted(productData.image);
       } else {
-        setPrice(0);
+        setPrice("");
         setStock(0);
         setProductCustomName("");
-        setPricePerKilo(0);
+        setPricePerKilo("");
         setOrigin("");
         setFormat("");
         setPortion("");
@@ -173,10 +167,10 @@ export default function StocksEditScreen({ navigation, route }: Props) {
       // mode modification
 
       if (bulk) {
-        setPrice(Number(stockData.price.$numberDecimal));
-        setStock(Number(stockData.stock.$numberDecimal));
+        setPrice(stockData.price.toString());
+        setStock(stockData.stock);
         setWeightPerUnit(
-          stockData.product.weight.measurement.$numberDecimal +
+          stockData.product.weight.measurement +
             " " +
             stockData.product.weight.unit,
         );
@@ -184,10 +178,10 @@ export default function StocksEditScreen({ navigation, route }: Props) {
         setFamilyAdpated(stockData.product.family.name);
         setImageAdapted(stockData.product.image);
       } else {
-        setPrice(Number(stockData.price.$numberDecimal));
-        setStock(Number(stockData.stock.$numberDecimal));
+        setPrice(stockData.price.toString());
+        setStock(stockData.stock);
         setProductCustomName(stockData.productCustomName);
-        setPricePerKilo(Number(stockData.pricePerKilo.$numberDecimal));
+        setPricePerKilo(stockData.pricePerKilo.toString());
         setOrigin(stockData.origin);
         setFormat(stockData.format);
         setPortion(stockData.portion);
@@ -230,6 +224,15 @@ export default function StocksEditScreen({ navigation, route }: Props) {
   const handleSaveProduct = async () => {
     setSaveLoading(true);
 
+    let numPrice, numPricePerKilo;
+
+    if (isNaN(stock)) {
+      setStock(0);
+      setSaveLoading(false);
+      return;
+    }
+
+    /* Vérification des champs pour tout type de produit */
     if (!price || !stock) {
       SheetManager.show("alert", {
         payload: {
@@ -239,32 +242,51 @@ export default function StocksEditScreen({ navigation, route }: Props) {
       });
       setSaveLoading(false);
       return;
+    } else {
+      numPrice = parseFloat(price.replace(",", "."));
+    }
+
+    /* Vérification des champs pour type de produit classic */
+    if (!isBulk) {
+      if (!pricePerKilo) {
+        SheetManager.show("alert", {
+          payload: {
+            message: "Le prix au kilo est manquant.",
+            alertType: "error",
+          },
+        });
+        setSaveLoading(false);
+        return;
+      }
+    } else {
+      numPricePerKilo = parseFloat(pricePerKilo.replace(",", "."));
     }
 
     const token = await getToken();
-    let values;
+    let createValues: CreateStockPayload | undefined;
+    let updateValues: UpdateStockPayload | undefined;
 
     // si on est dans le cas d'un produit vrac
     if (isBulk) {
       if (productData) {
         // si création d'un produit
-        values = {
+        createValues = {
           product: productData,
-          price,
+          price: numPrice,
           stock,
           description,
           tags,
-        };
+        } as CreateBulkStockPayload;
       } else {
         // si modification d'un produit
-        values = {
+        updateValues = {
           _id: stockData?._id,
           product: stockData?.product,
-          price,
+          price: numPrice,
           stock,
           description,
           tags,
-        };
+        } as UpdateBulkStockPayload;
       }
 
       // si on est dans le cas d'un produit classic
@@ -282,12 +304,12 @@ export default function StocksEditScreen({ navigation, route }: Props) {
 
       if (productData) {
         // si création d'un produit
-        values = {
+        createValues = {
           product: productData,
           productCustomName,
-          price,
+          price: numPrice,
           stock,
-          pricePerKilo,
+          pricePerKilo: numPricePerKilo,
           weightPerUnit,
           origin,
           format,
@@ -296,16 +318,16 @@ export default function StocksEditScreen({ navigation, route }: Props) {
           description,
           image,
           tags,
-        };
+        } as CreateClassicStockPayload;
       } else {
         // si modification d'un produit
-        values = {
+        updateValues = {
           _id: stockData?._id,
           product: stockData?.product,
           productCustomName,
-          price,
+          price: numPrice,
           stock,
-          pricePerKilo,
+          pricePerKilo: numPricePerKilo,
           weightPerUnit,
           origin,
           format,
@@ -314,27 +336,27 @@ export default function StocksEditScreen({ navigation, route }: Props) {
           description,
           image,
           tags,
-        };
+        } as UpdateClassicStockPayload;
       }
     }
 
     let stockResponse;
     let message;
 
-    if (productData) {
-      stockResponse = await stocksTools.createStocks(token, values);
+    if (createValues) {
+      stockResponse = await stocksTools.createStocks(token, createValues);
       message = "Produit créé.";
-    } else {
-      stockResponse = await stocksTools.updateStocks(token, values);
+    } else if (updateValues) {
+      stockResponse = await stocksTools.updateStocks(token, updateValues);
       message = "Produit modifié.";
     }
 
     setSaveLoading(false);
 
-    if (!stockResponse.success) {
+    if (!stockResponse?.success) {
       SheetManager.show("alert", {
         payload: {
-          message: stockResponse.message!,
+          message: stockResponse?.message!,
           alertType: "error",
         },
       });
@@ -345,7 +367,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
 
     SheetManager.show("alert", {
       payload: {
-        message: message,
+        message: message!,
         alertType: "success",
       },
     });
@@ -361,20 +383,13 @@ export default function StocksEditScreen({ navigation, route }: Props) {
       });
     } else {
       (navigation as FromProducerTab["navigation"]).navigate("Stocks", {
-        from: "***",
+        // from: "***",
         backLabel: "Retour " + (isBulk ? "aux catégories" : "au choix"),
         screenTitle: "STOCKS\n" + (family ? family : category),
         category: category!,
         family: family,
       });
     }
-
-    // navigation.navigate("Stocks", {
-    //   backLabel: "Retour " + (isBulk ? "aux catégories" : "au choix"),
-    //   screenTitle: "STOCKS\n" + (family ? family : category),
-    //   category: category!,
-    //   family: family,
-    // });
   };
 
   const handleDeleteProduct = async (id: string) => {
@@ -423,7 +438,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
             );
           } else {
             (navigation as FromProducerTab["navigation"]).navigate("Stocks", {
-              from: "***",
+              // from: "***",
               backLabel:
                 "Retour " + (stockData ? "au choix" : "aux catégories"),
               screenTitle: "STOCKS\n" + (family ? family : category),
@@ -478,11 +493,14 @@ export default function StocksEditScreen({ navigation, route }: Props) {
     >
       <TopBar
         backLabel={backLabel || "Retour aux stocks"}
-        screen={from || "StockCategories"}
+        screen={
+          from || onboarding ? "OnboardingStockCategories" : "StockCategories"
+        }
         label={screenTitle || ""}
         screenParams={{
           category: category,
           family: family,
+          onboarding: true,
         }}
         extraClasses="mt-2"
       />
@@ -495,6 +513,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                 <View className="flex-none w-1/4">
                   <View className="rounded-lg w-[90px] h-[90px]">
                     <ImageUploader
+                      label="PHOTO"
                       size={90}
                       defaultUri={stockData?.image}
                       onImageSelected={handleImageSelected}
@@ -553,7 +572,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
               </View>
             ) : (
               <TextInput
-                className="bg-white rounded-lg w-36 text-right text-xl leading-5 pr-2"
+                className="bg-white text-black rounded-lg w-36 text-right text-xl leading-5 pr-2"
                 value={weightPerUnit}
                 onChangeText={(value: string) => setWeightPerUnit(value)}
               />
@@ -566,10 +585,10 @@ export default function StocksEditScreen({ navigation, route }: Props) {
             </View>
             <View className="flex flex-row justify-end items-center mr-2">
               <TextInput
-                className="bg-white rounded-lg w-36 text-right text-xl leading-5 pr-2"
-                value={price?.toString() ?? ""}
-                onChangeText={(value: string) => setPrice(Number(value))}
-                keyboardType="numeric"
+                className="bg-white text-black rounded-lg w-36 text-right text-xl leading-5 pr-2"
+                value={price}
+                onChangeText={(value: string) => setPrice(value)}
+                keyboardType="decimal-pad"
               />
               <Text className="font-bold text-xl text-secondary dark:text-lightbg ml-2">
                 €
@@ -591,10 +610,15 @@ export default function StocksEditScreen({ navigation, route }: Props) {
               />
               <View className="flex flex-row justify-center w-24">
                 <TextInput
-                  className="bg-white rounded-lg w-14 text-right text-xl leading-5 pr-2"
+                  className="bg-white text-black rounded-lg w-14 text-center text-xl leading-5"
                   value={stock?.toString() ?? ""}
                   onChangeText={(value: string) => setStock(Number(value))}
-                  keyboardType="numeric"
+                  // onFocus={() => {
+                  //   if (stock === 0) {
+                  //     setStock(undefined)
+                  //   }
+                  // }}
+                  keyboardType="decimal-pad"
                 />
               </View>
               <IconButton
@@ -624,12 +648,10 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                 </View>
                 <View className="flex flex-row justify-end items-center mr-2">
                   <TextInput
-                    className="bg-white rounded-lg w-36 text-right text-xl leading-5 pr-2"
-                    value={pricePerKilo?.toString() ?? ""}
-                    onChangeText={(value: string) =>
-                      setPricePerKilo(Number(value))
-                    }
-                    keyboardType="numeric"
+                    className="bg-white text-black rounded-lg w-36 text-right text-xl leading-5 pr-2"
+                    value={pricePerKilo}
+                    onChangeText={(value: string) => setPricePerKilo(value)}
+                    keyboardType="decimal-pad"
                   />
                   <Text className="font-bold text-xl text-secondary dark:text-lightbg ml-2">
                     €
@@ -642,7 +664,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                   <TextBody1 extraClasses="font-bold">ORIGINE</TextBody1>
                 </View>
                 <TextInput
-                  className="bg-white rounded-xl w-60 text-right text-xl leading-5 pr-2"
+                  className="bg-white text-black rounded-xl w-60 text-right text-xl leading-5 pr-2"
                   value={origin}
                   onChangeText={(value: string) => setOrigin(value)}
                 />
@@ -653,7 +675,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                   <TextBody1 extraClasses="font-bold">FORMAT</TextBody1>
                 </View>
                 <TextInput
-                  className="bg-white rounded-lg w-60 text-right text-xl leading-5 pr-2"
+                  className="bg-white text-black rounded-lg w-60 text-right text-xl leading-5 pr-2"
                   value={format}
                   onChangeText={(value: string) => setFormat(value)}
                 />
@@ -664,7 +686,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                   <TextBody1 extraClasses="font-bold">PORTION</TextBody1>
                 </View>
                 <TextInput
-                  className="bg-white rounded-lg w-60 text-right text-xl leading-5 pr-2"
+                  className="bg-white text-black rounded-lg w-60 text-right text-xl leading-5 pr-2"
                   value={portion}
                   onChangeText={(value: string) => setPortion(value)}
                 />
@@ -675,7 +697,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                   <TextBody1 extraClasses="font-bold">{`DLC A\nRECEPTION`}</TextBody1>
                 </View>
                 <TextInput
-                  className="bg-white rounded-lg w-60 text-right text-xl leading-5 pr-2"
+                  className="bg-white text-black rounded-lg w-60 text-right text-xl leading-5 pr-2"
                   value={bestBeforeDate}
                   onChangeText={(value: string) => setBestBeforeDate(value)}
                 />

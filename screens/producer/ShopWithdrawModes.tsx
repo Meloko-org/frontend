@@ -15,6 +15,8 @@ import { View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import TopBar from "../../components/TopBar";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
+import TextBody1 from "../../components/utils/texts/Body1";
+import PrimaryButton from "../../components/utils/buttons/Primary";
 
 type FromProducerTab = BottomTabScreenProps<
   ProducerTabParamList,
@@ -35,12 +37,16 @@ export default function ShopWithdrawModesScreen({ navigation, route }: Props) {
     (state: { shop: ShopState }) => state.shop.value,
   );
 
-  const [isClickCollectEnable, setClickCollectEnable] =
-    useState<boolean>(false);
+  const [isClickCollectEnable, setClickCollectEnable] = useState<
+    boolean | undefined
+  >(false);
   const [isShopMarketsEnable, setShopMarketsEnable] = useState<boolean>(false);
   const [isDeliveryEnable, setDeliveryEnable] = useState<boolean>(false);
+  const [isWithdrawModeSetted, setIsWithdrawModeSetted] =
+    useState<boolean>(false);
 
   useEffect(() => {
+    /* gestion des switch des boutons */
     if (shopStore !== null) {
       if (shopStore.clickCollect) {
         setClickCollectEnable(shopStore.clickCollect.isActive);
@@ -54,7 +60,18 @@ export default function ShopWithdrawModesScreen({ navigation, route }: Props) {
       // 	setDeliveryEnable(shopStore.delivery.isActive)
       // }
     }
-  }, []);
+
+    /* gestion du bouton de validation */
+    if (
+      (shopStore?.clickCollect && shopStore?.clickCollect.isActive) ||
+      (shopStore?.markets &&
+        shopStore?.markets.some((market) => market.isActive))
+    ) {
+      setIsWithdrawModeSetted(true);
+    }
+  }, [shopStore]);
+
+  console.log("SWM shopStore :", shopStore);
 
   return (
     <SafeAreaView
@@ -62,18 +79,31 @@ export default function ShopWithdrawModesScreen({ navigation, route }: Props) {
       edges={["right", "left", "top"]}
     >
       <View style={{ flex: 1 }}>
-        <TopBar
-          backLabel={backLabel || "Retour à la boutique"}
-          screen={from || onboarding ? "Onboarding5" : "ShopProducer"}
-          label={screenTitle || "MODES DE\nRETRAIT"}
-          screenParams={{ onboarding: true }}
-          navigationOverride={navigation}
-          extraClasses="mt-2"
-        />
+        {!onboarding && (
+          <TopBar
+            backLabel={
+              backLabel || onboarding ? "Retour" : "Retour à la boutique"
+            }
+            screen={from || onboarding ? "Onboarding5" : "ShopProducer"}
+            label={screenTitle || "MODES DE\nRETRAIT"}
+            screenParams={{ onboarding: true }}
+            navigationOverride={navigation}
+            extraClasses="mt-2"
+          />
+        )}
       </View>
 
-      <View className="px-3 mt-5" style={{ flex: 11 }}>
+      <View className="px-3 mt-5" style={{ flex: 10 }}>
         <ScrollView>
+          {onboarding && (
+            <View className="border border-primary rounded-lg mb-5 p-3">
+              <TextBody1
+                centered
+              >{`Paramétrez au moins un mode de retrait pour la mise en ligne de votre boutique.\n
+Une fois votre boutique en ligne, vous pourrez à tout moment ajouter, modifier, supprimer\ndes modes de retrait depuis votre boutique.`}</TextBody1>
+            </View>
+          )}
+
           <OpenScreenButton
             label="Click & Collect"
             switchProps={{
@@ -171,6 +201,21 @@ export default function ShopWithdrawModesScreen({ navigation, route }: Props) {
           /> */}
         </ScrollView>
       </View>
+
+      {onboarding && (
+        <View className="px-3 mt-5" style={{ flex: 2 }}>
+          <PrimaryButton
+            label="Valider les modes de retrait"
+            onPressFn={() =>
+              (navigation as FromRootStack["navigation"]).navigate(
+                "Onboarding5",
+              )
+            }
+            disabled={!isWithdrawModeSetted}
+            extraClasses="h-20"
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 }

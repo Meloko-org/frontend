@@ -87,10 +87,16 @@ type MarketData = {
   address: AddressData;
 };
 
+// type MarketsData = {
+//   market: MarketData;
+//   isActive: boolean;
+//   openingHours: OpeningHoursData[];
+// };
+
 type MarketsData = {
   market: MarketData;
   isActive: boolean;
-  openingHours: OpeningHoursData[];
+  openingHours: OpeningHourData[];
 };
 
 type MarketResultData = {
@@ -102,9 +108,9 @@ type MarketResultData = {
 type StockData = {
   _id: string;
   productCustomName: string;
-  price: { $numberDecimal: string };
-  pricePerKilo: { $numberDecimal: string };
-  stock: { $numberDecimal: string };
+  price: number;
+  pricePerKilo: number;
+  stock: number;
   shop: ShopData;
   product: ProductData;
   weightPerUnit: string;
@@ -227,29 +233,40 @@ type ShopResultData = {
   distance?: number;
 };
 
-type ClickCollectData =
-  | {
-      instructions: string;
-      isActive: boolean;
-      openingHours: OpeningHourData[];
-    }
-  | undefined;
+// type ClickCollectData =
+//   | {
+//       instructions: string;
+//       isActive: boolean;
+//       openingHours: OpeningHourData[];
+//     }
+//   | undefined;
 
-type OpeningHoursData = {
-  day: number;
-  periods: PeriodData[];
-}[];
+// type OpeningHoursData = {
+//   day: number;
+//   periods: PeriodData[];
+// }[];
 
-type OpeningHourData =
-  | {
-      day: number;
-      periods: PeriodData[];
-    }
-  | [];
+// type OpeningHourData =
+//   | {
+//       day: number;
+//       periods: PeriodData[];
+//     }
+//   | [];
 
 type PeriodData = {
-  openingTime: string;
-  closingTime: string;
+  openingTime: string | null;
+  closingTime: string | null;
+};
+
+type OpeningHourData = {
+  day: number;
+  periods: PeriodData[];
+};
+
+type ClickCollectData = {
+  instructions: string;
+  isActive: boolean | undefined;
+  openingHours: OpeningHourData[];
 };
 
 type AddressData = {
@@ -285,7 +302,7 @@ type UserData = {
 type ProducerData = {
   _id: string;
   socialReason: string | null;
-  siren: number | null;
+  siren: string | null;
   owner: UserData;
   iban: string | null;
   bic: string | null;
@@ -301,7 +318,7 @@ type ProductDetail = {
 
 type WeightData = {
   unit: string;
-  measurement: { $numberDecimal: string };
+  measurement: number;
 };
 
 // type de réponse de l'api
@@ -441,6 +458,43 @@ type CircuitParamsData = {
   totalDuration: string;
 };
 
+/* types spéciaux pour la création ou l'update des produits en fonction du type bulk ou classic */
+
+// bulk / création
+type CreateBulkStockPayload = {
+  price: number;
+  stock: number;
+  product: ProductData;
+  description: string;
+  tags: TagData[];
+};
+
+// bulk / update
+type UpdateBulkStockPayload = CreateBulkStockPayload & { _id: string };
+
+// classic / création
+type CreateClassicStockPayload = {
+  productCustomName: string;
+  price: number;
+  pricePerKilo: number;
+  stock: number;
+  product: ProductData;
+  weightPerUnit: string;
+  origin: string;
+  format: string;
+  portion: string;
+  bestBeforeDate: string;
+  description: string;
+  image: string;
+  tags: TagData[];
+};
+
+// classic / update
+type UpdateClassicStockPayload = CreateClassicStockPayload & { _id: string };
+
+type CreateStockPayload = CreateBulkStockPayload | CreateClassicStockPayload;
+type UpdateStockPayload = UpdateBulkStockPayload | UpdateClassicStockPayload;
+
 export type {
   UserAddressData,
   ProductData,
@@ -467,7 +521,7 @@ export type {
   ProductsTypesByCategory,
   AddressData,
   ClickCollectData,
-  OpeningHoursData,
+  OpeningHourData,
   PeriodData,
   ProductDetail,
   WeightData,
@@ -485,4 +539,10 @@ export type {
   CircuitOptionsData,
   ShopFeaturesData,
   CircuitParamsData,
+  CreateBulkStockPayload,
+  UpdateBulkStockPayload,
+  CreateClassicStockPayload,
+  UpdateClassicStockPayload,
+  CreateStockPayload,
+  UpdateStockPayload,
 };

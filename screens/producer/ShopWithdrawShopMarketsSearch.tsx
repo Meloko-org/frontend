@@ -1,4 +1,5 @@
 import React from "react";
+import { useAuth } from "@clerk/clerk-expo";
 import { useState, useEffect } from "react";
 
 import { ProducerTabParamList } from "../../types/Navigation";
@@ -20,9 +21,11 @@ import InputText from "../../components/utils/inputs/Text";
 import TextBody2 from "../../components/utils/texts/Body2";
 import TextBody1 from "../../components/utils/texts/Body1";
 import { useDispatch, useSelector } from "react-redux";
-import { addMarket, ShopState } from "../../reducers/shop";
+import { addMarket, setShopData, ShopState } from "../../reducers/shop";
 import shopTools from "../../modules/shopTools";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
+import { MarketData } from "../../types/API";
+import Spinner from "../../components/utils/Spinner";
 
 type FromProducerTab = BottomTabScreenProps<
   ProducerTabParamList,
@@ -46,14 +49,16 @@ export default function ShopWithdrawShopMarketsSearchScreen({
     (state: { shop: ShopState }) => state.shop.value,
   );
   const dispatch = useDispatch();
+  const { getToken } = useAuth();
 
   const [city, setCity] = useState<string>();
   const [radius, setRadius] = useState<number[]>([10]);
-  const [marketsList, setMarketsList] = useState<string[]>();
+  const [marketsList, setMarketsList] = useState<MarketData[] | null>();
   const [errmess, setErrmess] = useState();
 
   const [marketSelected, setMarketSelected] = useState<string[]>([]);
   const [isAddMarketLoading, setAddMarketLoading] = useState(false);
+  const [isMarketSearching, setIsMarketSearching] = useState<boolean>(false);
 
   const handleSwitch = (marketId: string, isEnabled: boolean) => {
     setMarketSelected((prevSelected) => {
@@ -67,16 +72,23 @@ export default function ShopWithdrawShopMarketsSearchScreen({
 
   const onSearchPress = async () => {
     try {
+      setMarketsList(null);
+
       if (city) {
-        const data = await shopTools.getMarkets(city, radius);
-
-        if (data.error) {
-          setErrmess(data.error);
+        setIsMarketSearching(true);
+        const marketResponse = await shopTools.getMarkets(city, radius);
+        setIsMarketSearching(false);
+        if (!marketResponse.success) {
+          SheetManager.show("alert", {
+            payload: {
+              message: marketResponse.message!,
+              alertType: "warning",
+            },
+          });
+          return;
         }
 
-        if (data) {
-          setMarketsList(data);
-        }
+        setMarketsList(marketResponse.data);
       }
     } catch (error) {
       console.log(error);
@@ -86,17 +98,18 @@ export default function ShopWithdrawShopMarketsSearchScreen({
   const handleAddMarket = async () => {
     try {
       setAddMarketLoading(true);
+      const token = await getToken();
+
       const values = {
-        shopId: shopStore?._id,
         marketIds: marketSelected,
       };
 
-      const data = await shopTools.addShopMarkets(values);
+      const shopResponse = await shopTools.addShopMarkets(token, values);
 
-      if (data.error) {
+      if (!shopResponse.success) {
         SheetManager.show("alert", {
           payload: {
-            message: data.error,
+            message: shopResponse.message!,
             alertType: "error",
           },
         });
@@ -104,15 +117,13 @@ export default function ShopWithdrawShopMarketsSearchScreen({
         return;
       }
 
-      if (data) {
-        SheetManager.show("alert", {
-          payload: {
-            message: data.message,
-            alertType: "success",
-          },
-        });
-        dispatch(addMarket(data.markets.markets));
-      }
+      // SheetManager.show("alert", {
+      //   payload: {
+      //     message: shopResponse.message!,
+      //     alertType: "success",
+      //   },
+      // });
+      dispatch(setShopData(shopResponse.data));
 
       setAddMarketLoading(false);
       setMarketSelected([]);
@@ -121,7 +132,7 @@ export default function ShopWithdrawShopMarketsSearchScreen({
       SheetManager.show("alert", {
         payload: {
           message:
-            "Rendez vous sur l'ecran\nprécédent pour paramétrer\nles places de marché que\nvous venez d'ajouter.",
+            "Rendez vous sur l'ecran\nprécédent pour paramétrer\nles points de vente que\nvous venez d'ajouter.",
           alertType: "success",
         },
       });
@@ -195,6 +206,12 @@ export default function ShopWithdrawShopMarketsSearchScreen({
             </View>
           </View>
 
+          {isMarketSearching && (
+            <View className="flex items-center mt-5">
+              <Spinner />
+            </View>
+          )}
+
           {marketsList && marketsList.length > 0 && (
             <ScrollView
               showsVerticalScrollIndicator={false}
@@ -207,7 +224,7 @@ export default function ShopWithdrawShopMarketsSearchScreen({
                 <TextBody2 centered={true} extraClasses="mb-5">
                   Cochez pour sélectionner
                 </TextBody2>
-                {marketsList.length > 0 ? (
+                {marketsList.length > 0 &&
                   marketsList.map((market) => (
                     <MarketSelector
                       key={market._id}
@@ -218,10 +235,7 @@ export default function ShopWithdrawShopMarketsSearchScreen({
                         handleSwitch(market._id, isEnabled)
                       }
                     />
-                  ))
-                ) : (
-                  <TextBody1 centered={true}>{errmess}</TextBody1>
-                )}
+                  ))}
               </View>
 
               <View className="px-5">
@@ -229,7 +243,7 @@ export default function ShopWithdrawShopMarketsSearchScreen({
                   label="Ajouter"
                   iconName="plus"
                   disabled={isAddMarketLoading}
-                  extraClasses="my-5"
+                  extraClasses="my-5 h-14"
                   onPressFn={() => handleAddMarket()}
                   isLoading={isAddMarketLoading}
                 />

@@ -5,18 +5,25 @@ type TextBody1Props = {
   children: React.ReactNode | string | number;
   extraClasses?: string;
   centered?: boolean;
+  textClasses?: string;
 };
 
-export default function TextBody1(props: TextBody1Props): JSX.Element {
+export default function TextBody1({
+  children,
+  extraClasses,
+  centered,
+  textClasses,
+}: TextBody1Props): JSX.Element {
   return (
     <>
       <Text
         className={`
-          ${props.extraClasses} 
-          ${props.centered ? "text-center" : "text-left"} 
-          text-secondary dark:text-lightbg`}
+          ${extraClasses} 
+          ${centered ? "text-center" : "text-left"} 
+          ${textClasses ? textClasses : "text-secondary dark:text-lightbg"}
+        `}
       >
-        {props.children}
+        {children}
       </Text>
     </>
   );

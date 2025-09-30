@@ -86,16 +86,23 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
         } else {
           console.log("producerResponse data :", producerResponse.data);
 
-          if (producerResponse.data?.onboardingStep! < 6) {
-            navigation.navigate(
-              "Onboarding" + producerResponse.data.onboardingStep!,
-            );
-          } else {
-            navigation.navigate("ProducerProfile");
-          }
+          // if (producerResponse.data?.onboardingStep! < 6) {
+          //   navigation.navigate(
+          //     "Onboarding" + producerResponse.data.onboardingStep!,
+          //   );
+          // } else {
+          //   navigation.navigate("TabNavigatorProducer", {
+          //     screen: "ProducerProfile"
+          //   });
+          // }
+
+          /* Redirection vers l'onboarding */
+          navigation.navigate("Onboarding0");
         }
       } else {
-        navigation.navigate("UserProfile");
+        navigation.navigate("TabNavigatorUser", {
+          screen: "UserProfile",
+        });
       }
     } catch (error) {
       console.error(error);
@@ -169,7 +176,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
       console.error(JSON.stringify(err, null, 2));
       SheetManager.show("alert", {
         payload: {
-          message: err.errors.map((err: string) => err.message).join("\n"),
+          message: err.errors.map((err: string) => err).join("\n"),
           alertType: "error",
         },
       });
