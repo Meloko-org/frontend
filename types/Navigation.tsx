@@ -193,12 +193,13 @@ type RootStackParamList = {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
-    next: string;
+    next?: string;
   };
   SignUp: {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
+    next?: string;
   };
   Sales: undefined;
   Onboarding0: undefined;
@@ -303,7 +304,7 @@ Tab: (producer)
 
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
-import { ProducerTabParamList } from "../navigation"; // <-- ton fichier de types
+import { ProducerTabParamList } from "../navigation"; 
 
 type ShopWithdrawModesRouteProp = RouteProp<
   ProducerTabParamList,

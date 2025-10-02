@@ -80,9 +80,9 @@ export default function StocksAddScreen({ navigation, route }: Props) {
       return;
     }
 
-    if (productsResponse.data) {
-      console.log(JSON.stringify(productsResponse.data[0], null, 2));
-    }
+    // if (productsResponse.data) {
+    //   console.log(JSON.stringify(productsResponse.data[0], null, 2));
+    // }
 
     if (productsResponse.data) {
       const productsForCategoryInStore = shopStore?.products?.filter(
@@ -235,7 +235,8 @@ export default function StocksAddScreen({ navigation, route }: Props) {
   // console.log("backLabel:", backLabel);
   // console.log("screenTitle:", screenTitle);
   // console.log("category:", category);
-  console.log("S ADD family :", family);
+  // console.log("S ADD family :", family);
+  console.log("STOCKADD onboarding :", onboarding);
 
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">

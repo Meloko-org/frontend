@@ -45,6 +45,7 @@ import InputTextarea from "../../components/utils/inputs/Textarea";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import InputText from "../../components/utils/inputs/Text";
 import ImageUploader from "../../components/utils/ImageUploader";
+import Spinner from "../../components/utils/Spinner";
 
 type FromProducerTab = BottomTabScreenProps<ProducerTabParamList, "StocksEdit">;
 
@@ -56,7 +57,6 @@ type FromRootStack = NativeStackScreenProps<
 type Props = FromProducerTab | FromRootStack;
 
 export default function StocksEditScreen({ navigation, route }: Props) {
-  // const route = useRoute<StocksEditScreenRouteProp>();
   const {
     from,
     backLabel,
@@ -465,14 +465,9 @@ export default function StocksEditScreen({ navigation, route }: Props) {
     }
   };
 
-  console.log("------------------------------------ STOCKSADD");
-  // console.log("from:", from);
-  // console.log("backLabel:", backLabel);
-  // console.log("screenTitle:", screenTitle);
-  // console.log("stockData:", stockData);
-  // console.log("productData :", productData);
-  // console.log("image sauvée: ", image);
+  console.log("STOCKEDIT stockData tags:", stockData?.tags);
 
+  console.log("STOCKEDIT onboarding :", onboarding);
   console.log(
     "suggested :",
     suggestedTags?.map((t) => t.name),
@@ -494,7 +489,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
       <TopBar
         backLabel={backLabel || "Retour aux stocks"}
         screen={
-          from || onboarding ? "OnboardingStockCategories" : "StockCategories"
+          from || (onboarding ? "OnboardingStockCategories" : "StockCategories")
         }
         label={screenTitle || ""}
         screenParams={{
@@ -709,29 +704,37 @@ export default function StocksEditScreen({ navigation, route }: Props) {
             TAGS SUGGÉRÉS
           </TextBody1>
           <View className="flex flex-row flex-wrap">
-            {suggestedTags?.map((tag) => (
-              <SelectableTag
-                key={tag._id}
-                tag={tag}
-                onPressFn={() => toggleTag(tag)}
-                extraClasses="mr-2 mb-2"
-                selected={isTagSelected(tag._id)}
-              />
-            ))}
+            {!suggestedTags ? (
+              <Spinner />
+            ) : (
+              suggestedTags?.map((tag) => (
+                <SelectableTag
+                  key={tag._id}
+                  tag={tag}
+                  onPressFn={() => toggleTag(tag)}
+                  extraClasses="mr-2 mb-2"
+                  selected={isTagSelected(tag._id)}
+                />
+              ))
+            )}
           </View>
           <TextBody1 extraClasses="font-bold mt-5 mb-2">
             TOUS LES TAGS
           </TextBody1>
           <View className="flex flex-row flex-wrap">
-            {remaingingTags?.map((tag) => (
-              <SelectableTag
-                key={tag._id}
-                tag={tag}
-                onPressFn={() => toggleTag(tag)}
-                extraClasses="mr-2 mb-2"
-                selected={isTagSelected(tag._id)}
-              />
-            ))}
+            {!remaingingTags ? (
+              <Spinner />
+            ) : (
+              remaingingTags?.map((tag) => (
+                <SelectableTag
+                  key={tag._id}
+                  tag={tag}
+                  onPressFn={() => toggleTag(tag)}
+                  extraClasses="mr-2 mb-2"
+                  selected={isTagSelected(tag._id)}
+                />
+              ))
+            )}
           </View>
         </View>
       </ScrollView>

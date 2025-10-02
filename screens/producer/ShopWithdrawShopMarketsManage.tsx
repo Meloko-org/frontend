@@ -40,26 +40,28 @@ type OpeningHourData = {
 type FromProducerTab = BottomTabScreenProps<
   ProducerTabParamList,
   "ShopWithdrawShopMarketsManage"
-> & {
-  isVisible: boolean;
-  onCloseFn: (bool: boolean) => void;
-};
+>;
+// & {
+//   isVisible: boolean;
+//   onCloseFn: (bool: boolean) => void;
+// };
 
 type FromRootStack = NativeStackScreenProps<
   RootStackParamList,
   "OnboardingShopWithdrawShopMarketsManage"
-> & {
-  isVisible: boolean;
-  onCloseFn: (bool: boolean) => void;
-};
+>;
+// & {
+//   isVisible: boolean;
+//   onCloseFn: (bool: boolean) => void;
+// };
 
 type Props = FromProducerTab | FromRootStack;
 
 export default function ShopWithdrawShopMarketsManageScreen({
   navigation,
   route,
-  isVisible,
-  onCloseFn,
+  // isVisible,
+  // onCloseFn,
 }: Props) {
   const { from, backLabel, screenTitle, onboarding } = route.params || {};
 

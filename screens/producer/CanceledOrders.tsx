@@ -1,37 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
-import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView } from "react-native-gesture-handler";
-import { ActivityIndicator, FlatList, View } from "react-native";
-import TopBar from "../../components/TopBar";
-import { useSelector } from "react-redux";
-import { OrdersState } from "../../reducers/orders";
+import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { ProducerTabParamList } from "../../types/Navigation";
+
 import { OrderData } from "../../types/API";
-import OrderStatus from "../../components/cards/OrderStatus";
-import { SheetManager } from "react-native-actions-sheet";
 import businessTools from "../../modules/businessTools";
+
+import { SheetManager } from "react-native-actions-sheet";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ActivityIndicator, FlatList, View } from "react-native";
+
+import TopBar from "../../components/TopBar";
+import OrderStatus from "../../components/cards/OrderStatus";
 import Spinner from "../../components/utils/Spinner";
 
-type CanceledOrdersScreenRouteProp = RouteProp<
-  RootStackParamList,
+type CanceledOrdersRouteProp = RouteProp<
+  ProducerTabParamList,
   "CanceledOrders"
 >;
 
-type CanceledOrdersScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+type CanceledOrdersNavProp = BottomTabNavigationProp<
+  ProducerTabParamList,
   "CanceledOrders"
 >;
 
 type Props = {
-  navigation: CanceledOrdersScreenNavigationProp;
+  navigation: CanceledOrdersNavProp;
+  route: CanceledOrdersRouteProp;
 };
 
-export default function CanceledOrdersScreen({ navigation }: Props) {
-  const route = useRoute<CanceledOrdersScreenRouteProp>();
+export default function CanceledOrdersScreen({ navigation, route }: Props) {
   const { from, backLabel, screenTitle } = route.params || {};
 
   const { getToken } = useAuth();

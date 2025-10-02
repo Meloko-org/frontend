@@ -107,7 +107,7 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
       };
 
       init();
-    }, [shopStore]),
+    }, []),
   );
 
   const fetchStocks = async () => {
@@ -207,10 +207,10 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
         setIsStockSetted(hasProduct);
       }
 
-      console.log(
-        "availableCategoriesWithCount :",
-        JSON.stringify(availableCategoriesWithCount, null, 2),
-      );
+      // console.log(
+      //   "availableCategoriesWithCount :",
+      //   JSON.stringify(availableCategoriesWithCount, null, 2),
+      // );
 
       setOpenScreenButtons(
         availableCategoriesWithCount!.map((cat, index) => {
@@ -264,8 +264,8 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
                     (navigation as FromProducerTab["navigation"]).navigate(
                       "Stocks",
                       {
-                        from: "Shop",
-                        backLabel: "Retour à la boutique",
+                        from: "StockCategories",
+                        backLabel: "Retour aux stocks",
                         screenTitle: "STOCKS\n" + cat.name.toLocaleUpperCase(),
                         category: cat.name,
                       },
@@ -274,8 +274,8 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
                     (navigation as FromProducerTab["navigation"]).navigate(
                       "StockFamilies",
                       {
-                        from: "Shop",
-                        backLabel: "Retour à la boutique",
+                        from: "StockCategories",
+                        backLabel: "Retour aux stocks",
                         screenTitle: "CHOIX\n" + cat.name.toLocaleUpperCase(),
                         category: cat.name,
                       },
@@ -294,8 +294,9 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
   // console.log("STOCKCATEGORIES shopStore :", JSON.stringify(shopStore, null, 2))
   // console.log("STOCKCATEGORIES onboarding :", onboarding)
   // console.log("STOCKCATEGORIES shopTypes :", shopTypes)
-  console.log("stockStore :", stocksStore);
-  console.log("shopStore products :", shopStore?.products);
+  // console.log("stockStore :", stocksStore);
+  // console.log("shopStore products :", shopStore?.products);
+  console.log("STOCKCATEGORIES onboarding :", onboarding);
 
   return (
     <SafeAreaView
@@ -306,9 +307,8 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
         {!onboarding ? (
           <TopBar
             backLabel={backLabel || "Retour à la boutique"}
-            screen={from || onboarding ? "Onboarding5" : "ShopProducer"}
+            screen={from || "ShopProducer"}
             label={screenTitle || "GESTION\nDES STOCKS"}
-            screenParams={{ onboarding: true }}
             navigationOverride={navigation}
             extraClasses="my-2"
           />

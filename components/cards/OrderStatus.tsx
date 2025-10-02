@@ -1,13 +1,12 @@
-import React from "react";
+import React, { JSX } from "react";
 import { useSelector } from "react-redux";
 import { ShopState } from "../../reducers/shop";
 import { OrderData } from "../../types/API";
-import { View } from "react-native";
 import { useColorScheme } from "nativewind";
 
 import globalTools from "../../modules/globalTools";
 
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { TouchableOpacity, View } from "react-native";
 import TextHeading4 from "../utils/texts/Heading4";
 import TextBody1 from "../utils/texts/Body1";
 import OrderStatusBadge from "../utils/badges/OrderStatus";
@@ -45,8 +44,8 @@ export default function OrderStatus({
       <View
         className={`${extraClasses} rounded-lg border bg-white dark:bg-tertiary p-2`}
       >
-        <View className="mb-1">
-          <TextHeading4>
+        <View className="mb-1 bg-lightbg dark:bg-darkbg rounded-lg pb-1">
+          <TextHeading4 centered>
             {orderData?.user.lastname} {orderData?.user.firstname}
           </TextHeading4>
         </View>
@@ -55,16 +54,10 @@ export default function OrderStatus({
           <View>
             <BlackBadge extraClasses="py-1 px-2">{`N°${orderData?._id.slice(0, 7)}`}</BlackBadge>
           </View>
-          <View>
-            <TextBody1 extraClasses="pr-3">
+          <View className="">
+            <TextBody1 extraClasses="" textClasses="text-right">
               {globalTools.formatDateToFr(orderData?.createdAt)}
             </TextBody1>
-          </View>
-          <View>
-            <BadgeSecondary
-              extraClasses="px-2"
-              textClasses="font-bold"
-            >{`${shopDetails?.shopTotalPrice.$numberDecimal} €`}</BadgeSecondary>
           </View>
         </View>
 
@@ -88,10 +81,15 @@ export default function OrderStatus({
             )}
           </View>
 
-          <View className="w-2/6">
+          <View className="w-2/6 justify-start items-end h-full">
+            <View className="mb-3">
+              <BadgeSecondary
+                extraClasses="px-2"
+                textClasses="font-bold"
+              >{`${shopDetails?.shopTotalPrice.$numberDecimal} €`}</BadgeSecondary>
+            </View>
             <OrderStatusBadge
-              extraClasses="ml-2 py-1 px-1"
-              // a revoir
+              extraClasses="py-1 px-1"
               status={status ? status : shopDetails?.status}
             />
           </View>

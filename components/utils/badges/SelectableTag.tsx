@@ -1,4 +1,4 @@
-import React, { JSX, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { TagData } from "../../../types/API";
 
@@ -21,9 +21,17 @@ export default function SelectableTag({
     selected === true ? selected : false,
   );
 
+  useEffect(() => {
+    if (selected !== undefined) {
+      setToggleOn(selected);
+    }
+  }, [selected]);
+
   const toggleTag = () => {
     setToggleOn((prev) => !prev);
   };
+
+  console.log("SELECTABLETAG toggleOn :", toggleOn);
 
   return (
     <TouchableOpacity

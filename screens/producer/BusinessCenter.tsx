@@ -1,10 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
+
+// import {  } from "@react-navigation/native";
+// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+// import { RootStackParamList } from "../../types/Navigation";
+
+import { RouteProp, useFocusEffect } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { ProducerTabParamList } from "../../types/Navigation";
+
+import { useDispatch, useSelector } from "react-redux";
+import { OrdersState, setOrders } from "../../reducers/orders";
+import { ShopState } from "../../reducers/shop";
+
+import globalTools from "../../modules/globalTools";
+import businessTools from "../../modules/businessTools";
+
+import { OrderSummary } from "../../types/API";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
+import { SheetManager } from "react-native-actions-sheet";
 
 import { Picker } from "@react-native-picker/picker";
 import {
@@ -15,38 +31,31 @@ import {
   isWithinInterval,
 } from "date-fns";
 
-import { View, TouchableOpacity, Alert, Text, Image } from "react-native";
+import { View } from "react-native";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import TextBody1 from "../../components/utils/texts/Body1";
 import TextHeading3 from "../../components/utils/texts/Heading3";
-import { useDispatch, useSelector } from "react-redux";
-import { useFocusEffect } from "@react-navigation/native";
-import { OrderData, OrderSummary } from "../../types/API";
-import { OrdersState, setOrders } from "../../reducers/orders";
-import producerTools from "../../modules/producerTools";
-import { SheetManager } from "react-native-actions-sheet";
-import globalTools from "../../modules/globalTools";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import QRCodeScannerModal from "../../components/modals/producer/QRCodeScannerModal";
-import TextHeading2 from "../../components/utils/texts/Heading2";
-import TextBody2 from "../../components/utils/texts/Body2";
-import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
 import Spinner from "../../components/utils/Spinner";
-import orderTools from "../../modules/orderTools";
-import businessTools from "../../modules/businessTools";
-import { ShopState } from "../../reducers/shop";
 
-type BusinessCenterScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "TabNavigatorProducer"
+type BusinessCenterRouteProp = RouteProp<
+  ProducerTabParamList,
+  "BusinessCenter"
+>;
+
+type BusinessCenterNavProp = BottomTabNavigationProp<
+  ProducerTabParamList,
+  "BusinessCenter"
 >;
 
 type Props = {
-  navigation: BusinessCenterScreenNavigationProp;
+  navigation: BusinessCenterNavProp;
+  route: BusinessCenterRouteProp;
 };
 
-export default function BusinessCenterScreen({ navigation }: Props) {
+export default function BusinessCenterScreen({ navigation, route }: Props) {
   const { getToken } = useAuth();
   const dispatch = useDispatch();
   const ordersStore = useSelector(
@@ -217,7 +226,7 @@ export default function BusinessCenterScreen({ navigation }: Props) {
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <TextHeading3
         centered
-        extraClasses="mb-5"
+        extraClasses="mb-5 mt-2"
       >{`Tableau de bord`}</TextHeading3>
 
       <ScrollView
@@ -229,10 +238,10 @@ export default function BusinessCenterScreen({ navigation }: Props) {
         ) : (
           <>
             <View className="mb-3">
-              <TextBody1 centered extraClasses="mb-2">
+              <TextBody1 centered extraClasses="mb-1">
                 Dernière commande :
               </TextBody1>
-              <View className="flex-row items-center rounded-lg bg-white dark:bg-tertiary py-1 px-2 space-around w-full mb-5">
+              <View className="flex-row items-center rounded-lg bg-white dark:bg-tertiary py-1 px-2 space-around w-full mb-3">
                 <View className="flex-none">
                   <TextBody1>
                     {lastOrder?.user.firstname + " " + lastOrder?.user.lastname}

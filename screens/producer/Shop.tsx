@@ -109,7 +109,7 @@ export default function ShopProducteurScreen({ navigation, route }: Props) {
     }, []),
   );
 
-  console.log("SHOP producerStore :", producerStore);
+  // console.log("SHOP producerStore :", producerStore);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

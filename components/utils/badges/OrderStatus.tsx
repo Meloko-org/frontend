@@ -1,10 +1,15 @@
-import React from "react";
-import { Text, View } from "react-native";
-import TextHeading4 from "../texts/Heading4";
+import React, { JSX } from "react";
+import { View } from "react-native";
 import TextBody2 from "../texts/Body2";
 
 type OrderStatusBadgeProps = {
-  status: "pending" | "validated" | "withdrawn" | "canceled";
+  status:
+    | "pending"
+    | "validated"
+    | "withdrawn"
+    | "canceled"
+    | string
+    | undefined;
   extraClasses?: string;
 };
 

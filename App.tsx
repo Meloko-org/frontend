@@ -474,7 +474,7 @@ const TabNavigatorProducer: React.FC = () => {
       />
       <ProducerTab.Screen
         name="CanceledOrders"
-        component={WithdrawnOrdersScreen}
+        component={CanceledOrdersScreen}
         options={{ tabBarButton: () => null }}
       />
       <ProducerTab.Screen

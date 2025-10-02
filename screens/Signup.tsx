@@ -1,39 +1,29 @@
 import React, { useState } from "react";
 import { useAuth, useSignUp } from "@clerk/clerk-expo";
+
 import { useDispatch } from "react-redux";
 import { updateUser } from "../reducers/user";
-import { SheetManager } from "react-native-actions-sheet";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
-import { useRoute } from "@react-navigation/native";
-import { RouteProp } from "@react-navigation/native";
 
 import userTools from "../modules/userTools";
 import producerTools from "../modules/producerTools";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+import { SheetManager } from "react-native-actions-sheet";
+
 import TopBar from "../components/TopBar";
 import InputText from "../components/utils/inputs/Text";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
-import { StyleSheet, TextInput, Button, View, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View } from "react-native";
 import CheckBox from "../components/utils/inputs/CheckBox";
 import CodeInput from "../components/CodeInput";
 import TextHeading4 from "../components/utils/texts/Heading4";
-import CustomAlert from "../components/bottomSheets/CustomAlert";
 
-type SignUpScreenRouteProp = RouteProp<RootStackParamList, "SignUp">;
+type Props = NativeStackScreenProps<RootStackParamList, "SignUp">;
 
-type SignUpScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "SignUp"
->;
-
-type SignUpScreenProps = {
-  navigation: SignUpScreenNavigationProp;
-};
-
-export default function SignUpScreen({ navigation }: SignUpScreenProps) {
-  const route = useRoute<SignUpScreenRouteProp>();
+export default function SignUpScreen({ navigation, route }: Props) {
   const { from, backLabel, screenTitle } = route.params;
 
   // Import the Clerk signup functions
@@ -226,7 +216,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
       console.error(JSON.stringify(err, null, 2));
       SheetManager.show("alert", {
         payload: {
-          message: err.errors.map((err: string) => err.message).join("\n"),
+          message: err.errors.map((err: string) => err).join("\n"),
           alertType: "warning",
         },
       });
@@ -239,9 +229,9 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
       <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
         <TopBar
-          backLabel={backLabel}
-          screen={from}
-          label={screenTitle}
+          backLabel={backLabel || "Retour"}
+          screen={from || "SignIn"}
+          label={screenTitle || "INSCIPTION"}
           extraClasses="mt-2"
         />
 

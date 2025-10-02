@@ -1,37 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
-import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView } from "react-native-gesture-handler";
-import { ActivityIndicator, FlatList, View } from "react-native";
-import TopBar from "../../components/TopBar";
 import { useSelector } from "react-redux";
-import { OrdersState } from "../../reducers/orders";
+
+import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { ProducerTabParamList } from "../../types/Navigation";
+
 import { OrderData } from "../../types/API";
-import OrderStatus from "../../components/cards/OrderStatus";
-import { SheetManager } from "react-native-actions-sheet";
 import businessTools from "../../modules/businessTools";
+
+import { SheetManager } from "react-native-actions-sheet";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ActivityIndicator, FlatList, View } from "react-native";
+
+import TopBar from "../../components/TopBar";
+import OrderStatus from "../../components/cards/OrderStatus";
 import Spinner from "../../components/utils/Spinner";
 
-type ValidatedOrdersScreenRouteProp = RouteProp<
-  RootStackParamList,
+type ValidatedOrdersRouteProp = RouteProp<
+  ProducerTabParamList,
   "ValidatedOrders"
 >;
 
-type ValidatedOrdersScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+type ValidatedOrdersNavProp = BottomTabNavigationProp<
+  ProducerTabParamList,
   "ValidatedOrders"
 >;
 
 type Props = {
-  navigation: ValidatedOrdersScreenNavigationProp;
+  navigation: ValidatedOrdersNavProp;
+  route: ValidatedOrdersRouteProp;
 };
 
-export default function ValidatedOrdersScreen({ navigation }: Props) {
-  const route = useRoute<ValidatedOrdersScreenRouteProp>();
+export default function ValidatedOrdersScreen({ navigation, route }: Props) {
   const { from, backLabel, screenTitle } = route.params || {};
 
   const { getToken } = useAuth();
@@ -106,7 +107,7 @@ export default function ValidatedOrdersScreen({ navigation }: Props) {
         backLabel={backLabel || "Retour au tableau"}
         screen={from || "BusinessCenter"}
         label={screenTitle || "COMMANDES\nVALIDEES"}
-        extraClasses="mt-2"
+        extraClasses="mt-2 mb-5"
       />
 
       <View className="px-3">

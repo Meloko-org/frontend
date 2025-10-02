@@ -2,11 +2,6 @@ import React, { JSX } from "react";
 import { useState, useEffect } from "react";
 import { SheetManager } from "react-native-actions-sheet";
 
-// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-// import { RootStackParamList } from "../../types/Navigation";
-// import { useRoute } from "@react-navigation/native";
-// import { RouteProp } from "@react-navigation/native";
-
 import { ProducerTabParamList } from "../../types/Navigation";
 import { RootStackParamList } from "../../types/Navigation";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
@@ -21,20 +16,6 @@ import { ShopState } from "../../reducers/shop";
 import { StockData } from "../../types/API";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import OpenMenuButton from "../../components/utils/buttons/OpenMenu";
-
-// type StockFamiliesScreenRouteProp = RouteProp<
-//   RootStackParamList,
-//   "StockFamilies"
-// >;
-
-// type StockFamiliesScreenNavigationProp = NativeStackNavigationProp<
-//   RootStackParamList,
-//   "StockFamilies"
-// >;
-
-// type Props = {
-//   navigation: StockFamiliesScreenNavigationProp;
-// };
 
 type FromProducerTab = BottomTabScreenProps<
   ProducerTabParamList,
@@ -100,8 +81,8 @@ export default function StockFamiliesScreen({ navigation, route }: Props) {
                 (navigation as FromRootStack["navigation"]).navigate(
                   "OnboardingStocks",
                   {
-                    from: "OnboardingStockCategories",
-                    backLabel: "Retour au choix " + category,
+                    from: "OnboardingStockFamilies",
+                    backLabel: "Retour au stock " + category,
                     screenTitle: "STOCK\n" + family.family,
                     onboarding: true,
                     category: category,
@@ -112,8 +93,8 @@ export default function StockFamiliesScreen({ navigation, route }: Props) {
                 (navigation as FromProducerTab["navigation"]).navigate(
                   "Stocks",
                   {
-                    from: "StockCategories",
-                    backLabel: "Retour au choix " + category,
+                    from: "StockFamilies",
+                    backLabel: "Retour au stock " + category,
                     screenTitle: "STOCK\n" + family.family,
                     category: category,
                     family: family.family,
@@ -134,6 +115,8 @@ export default function StockFamiliesScreen({ navigation, route }: Props) {
   // console.log("screenTitle:", screenTitle);
   // console.log("category:", category);
 
+  console.log("STOCKFAMILIES onboarding :", onboarding);
+
   return (
     <View className="flex-1 h-full bg-lightbg dark:bg-darkbg">
       <SafeAreaView
@@ -141,9 +124,10 @@ export default function StockFamiliesScreen({ navigation, route }: Props) {
         edges={["right", "left", "top"]}
       >
         <TopBar
-          backLabel={backLabel || "Retour aux catégories"}
+          backLabel={backLabel || "Retour aux stocks"}
           screen={
-            from || onboarding ? "OnboardingStockCategories" : "StockCategories"
+            from ||
+            (onboarding ? "OnboardingStockCategories" : "StockCategories")
           }
           label={screenTitle || "CHOIX\n" + category}
           screenParams={{ onboarding }}

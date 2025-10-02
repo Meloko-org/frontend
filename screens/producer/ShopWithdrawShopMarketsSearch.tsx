@@ -29,12 +29,12 @@ import Spinner from "../../components/utils/Spinner";
 
 type FromProducerTab = BottomTabScreenProps<
   ProducerTabParamList,
-  "ShopWithdrawClickcollect"
+  "ShopWithdrawShopMarketsSearch"
 >;
 
 type FromRootStack = NativeStackScreenProps<
   RootStackParamList,
-  "OnboardingShopWithdrawClickcollect"
+  "OnboardingShopWithdrawShopMarketsSearch"
 >;
 
 type Props = FromProducerTab | FromRootStack;

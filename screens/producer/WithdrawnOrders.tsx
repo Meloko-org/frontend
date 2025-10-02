@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
-import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
+
+import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { ProducerTabParamList } from "../../types/Navigation";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
@@ -16,22 +17,22 @@ import { SheetManager } from "react-native-actions-sheet";
 import businessTools from "../../modules/businessTools";
 import Spinner from "../../components/utils/Spinner";
 
-type WithdrawnOrdersScreenRouteProp = RouteProp<
-  RootStackParamList,
+type WithdrawnOrdersRouteProp = RouteProp<
+  ProducerTabParamList,
   "WithdrawnOrders"
 >;
 
-type WithdrawnOrdersScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+type WithdrawnOrderssNavProp = BottomTabNavigationProp<
+  ProducerTabParamList,
   "WithdrawnOrders"
 >;
 
 type Props = {
-  navigation: WithdrawnOrdersScreenNavigationProp;
+  navigation: WithdrawnOrderssNavProp;
+  route: WithdrawnOrdersRouteProp;
 };
 
-export default function WithdrawnOrdersScreen({ navigation }: Props) {
-  const route = useRoute<WithdrawnOrdersScreenRouteProp>();
+export default function WithdrawnOrdersScreen({ navigation, route }: Props) {
   const { from, backLabel, screenTitle } = route.params || {};
 
   const { getToken } = useAuth();
@@ -106,7 +107,7 @@ export default function WithdrawnOrdersScreen({ navigation }: Props) {
         backLabel={backLabel || "Retour au tableau"}
         screen={from || "BusinessCenter"}
         label={screenTitle || "COMMANDES\nRETIREES"}
-        extraClasses="mt-2"
+        extraClasses="mt-2 mb-5"
       />
 
       <View className="px-3">

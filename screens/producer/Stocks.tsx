@@ -1,19 +1,11 @@
 import React, { useEffect } from "react";
-import { useColorScheme } from "nativewind";
 import { useAuth } from "@clerk/clerk-expo";
 
 import { useSelector, useDispatch } from "react-redux";
 import { ShopState } from "../../reducers/shop";
 import { StocksState } from "../../reducers/stocks";
-import { setProducts } from "../../reducers/shop";
 
 import { StockData } from "../../types/API";
-import stocksTools from "../../modules/stocksTools";
-
-// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-// import { RootStackParamList } from "../../types/Navigation";
-// import { useFocusEffect, useRoute } from "@react-navigation/native";
-// import { RouteProp } from "@react-navigation/native";
 
 import { ProducerTabParamList } from "../../types/Navigation";
 import { RootStackParamList } from "../../types/Navigation";
@@ -28,18 +20,12 @@ import TopBar from "../../components/TopBar";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import StockProductCard from "../../components/cards/StockProductCard";
 
-type FromProducerTab = BottomTabScreenProps<ProducerTabParamList, "Stocks"> & {
-  category: string;
-  family: string;
-};
+type FromProducerTab = BottomTabScreenProps<ProducerTabParamList, "Stocks">;
 
 type FromRootStack = NativeStackScreenProps<
   RootStackParamList,
   "OnboardingStocks"
-> & {
-  category: string;
-  family: string;
-};
+>;
 
 type Props = FromProducerTab | FromRootStack;
 
@@ -68,6 +54,11 @@ export default function StocksScreen({ navigation, route }: Props) {
     ?.productsTypes.toString();
 
   console.warn(shopStore?.products?.length);
+
+  // if (shopStore?.products) {
+  //   console.log(shopStore?.products.map((prod) => prod._id))
+  //   console.log(shopStore?.products[0])
+  // }
 
   const filteredProducts =
     productsType === "bulk"
@@ -119,19 +110,13 @@ export default function StocksScreen({ navigation, route }: Props) {
         stockData: stockData,
       });
     }
-    // navigation.navigate("StocksEdit", {
-    //   from: "Stocks",
-    //   backLabel: "Retour au stock " + (family ? family : category),
-    //   screenTitle: "FICHE\nPRODUIT",
-    //   category: category,
-    //   family: family,
-    //   stockData: stockData,
-    // });
   };
 
-  console.log(stocksStore);
+  // console.log(stocksStore);
 
-  console.log("S family :", family);
+  // console.log("S family :", family);
+
+  console.log("STOCKS onboarding :", onboarding);
 
   return (
     <SafeAreaView
@@ -141,18 +126,20 @@ export default function StocksScreen({ navigation, route }: Props) {
       <View style={{ flex: 1 }}>
         <TopBar
           backLabel={
-            backLabel || onboarding
+            backLabel ||
+            (onboarding
               ? "Retour aux stocks"
               : family
                 ? "Retour au choix"
-                : "Retour aux catégories"
+                : "Retour aux stocks")
           }
           screen={
-            from || onboarding
+            from ||
+            (onboarding
               ? "OnboardingStockCategories"
               : family
                 ? "StockFamilies"
-                : "StockCategories"
+                : "StockCategories")
           }
           screenParams={{
             category: category,

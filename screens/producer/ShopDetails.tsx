@@ -96,6 +96,7 @@ export default function ShopDetailsScreen({ navigation, route }: Props) {
     if (savedUri) {
       console.log("image sauvée");
       setLogo(savedUri);
+      setHasChanges(true);
     }
   };
 
@@ -302,10 +303,11 @@ export default function ShopDetailsScreen({ navigation, route }: Props) {
             <View className="flex flex-row justify-between items-center mb-5 px-3">
               <View className="flex flex-row justify-center items-center w-2/6">
                 <ImageUploader
+                  label="LOGO"
                   defaultUri={shopStore?.logo}
                   onImageSelected={handleImageSelected}
                   mediaTypes={["images"]}
-                  message={`Choisisssez une image\nou prenez une photo.`}
+                  message={`Choisisssez une image.`}
                 />
               </View>
 
@@ -561,7 +563,7 @@ export default function ShopDetailsScreen({ navigation, route }: Props) {
                       <ImageUploader
                         label="PHOTO"
                         onImageSelected={handlePhotosSelected}
-                        mediaTypes={["images"]}
+                        mediaTypes={["images", "livePhotos"]}
                         message={`Ajoutez une photo.`}
                       />
                     </View>

@@ -3,6 +3,7 @@ import { useAuth } from "@clerk/clerk-expo";
 import { useColorScheme } from "nativewind";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
 
 import { View, Image } from "react-native";
@@ -31,14 +32,16 @@ import { emptyCart } from "../reducers/cart";
 import { changeMode, ModeState } from "../reducers/mode";
 import SignInScreen from "./Signin";
 
-type HomeScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "Home"
->;
+// type HomeScreenNavigationProp = NativeStackNavigationProp<
+//   RootStackParamList,
+//   "Home"
+// >;
 
-type Props = {
-  navigation: HomeScreenNavigationProp;
-};
+// type Props = {
+//   navigation: HomeScreenNavigationProp;
+// };
+
+type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 export default function HomeScreen({ navigation }: Props) {
   const { colorScheme, toggleColorScheme } = useColorScheme();
@@ -92,14 +95,13 @@ export default function HomeScreen({ navigation }: Props) {
       } else if (producer?.onboardingStep! < 5) {
         navigation.navigate("Onboarding" + (producer?.onboardingStep + 1));
       } else {
-        const shopResponse = await shopTools.getShopInfos(
-          token,
-          producer?._id!,
-        );
+        const shopResponse = await shopTools.getShopInfos(token, "true");
 
         if (!shopResponse.success) {
           console.warn(shopResponse.message);
         }
+
+        // console.log("HOME shopResponse :", JSON.stringify(shopResponse.data, null, 2))
 
         const shop = shopResponse.data;
         dispatch(setShopData(shop));
@@ -139,6 +141,7 @@ export default function HomeScreen({ navigation }: Props) {
 
   console.log("HOME modeStore :", modeStore.mode);
   console.log("HOME colorScheme :", colorScheme);
+  // console.log("HOME shopStore products :", shopStore?.products)
 
   return (
     <SafeAreaView

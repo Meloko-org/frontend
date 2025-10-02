@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
-import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
+
+import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { ProducerTabParamList } from "../../types/Navigation";
 
 import { useSelector } from "react-redux";
 import { OrdersState } from "../../reducers/orders";
@@ -18,22 +19,19 @@ import { SheetManager } from "react-native-actions-sheet";
 import businessTools from "../../modules/businessTools";
 import Spinner from "../../components/utils/Spinner";
 
-type PendingOrdersScreenRouteProp = RouteProp<
-  RootStackParamList,
-  "PendingOrders"
->;
+type PendingOrdersRouteProp = RouteProp<ProducerTabParamList, "PendingOrders">;
 
-type PendingOrdersScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+type PendingOrdersNavProp = BottomTabNavigationProp<
+  ProducerTabParamList,
   "PendingOrders"
 >;
 
 type Props = {
-  navigation: PendingOrdersScreenNavigationProp;
+  navigation: PendingOrdersNavProp;
+  route: PendingOrdersRouteProp;
 };
 
-export default function PendingOrdersScreen({ navigation }: Props) {
-  const route = useRoute<PendingOrdersScreenRouteProp>();
+export default function PendingOrdersScreen({ navigation, route }: Props) {
   const { from, backLabel, screenTitle } = route.params || {};
 
   const { getToken } = useAuth();
@@ -108,7 +106,7 @@ export default function PendingOrdersScreen({ navigation }: Props) {
         backLabel={backLabel || "Retour au tableau"}
         screen={from || "BusinessCenter"}
         label={screenTitle || "COMMANDES\nEN ATTENTE"}
-        extraClasses="mt-2"
+        extraClasses="mt-2 mb-5"
       />
 
       <View className="px-3">
