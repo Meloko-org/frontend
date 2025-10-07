@@ -30,7 +30,6 @@ type FromRootStack = NativeStackScreenProps<
 type Props = FromProducerTab | FromRootStack;
 
 export default function StockFamiliesScreen({ navigation, route }: Props) {
-  // const route = useRoute<StockFamiliesScreenRouteProp>();
   const { from, backLabel, screenTitle, category, onboarding } =
     route.params || {};
 
@@ -84,7 +83,7 @@ export default function StockFamiliesScreen({ navigation, route }: Props) {
                     from: "OnboardingStockFamilies",
                     backLabel: "Retour au stock " + category,
                     screenTitle: "STOCK\n" + family.family,
-                    onboarding: true,
+                    onboarding,
                     category: category,
                     family: family.family,
                   },
@@ -158,19 +157,19 @@ export default function StockFamiliesScreen({ navigation, route }: Props) {
                               navigation as FromRootStack["navigation"]
                             ).navigate("OnboardingStocks", {
                               from: "OnboardingStockFamilies",
-                              backLabel: "Retour au choix",
-                              screenTitle: newfamilyName,
+                              backLabel: "Retour au stock " + category,
+                              screenTitle: "STOCK\n" + newfamilyName,
                               category: category,
                               family: newfamilyName,
-                              onboarding: true,
+                              onboarding,
                             });
                           } else {
                             (
                               navigation as FromProducerTab["navigation"]
                             ).navigate("Stocks", {
                               from: "StockFamilies",
-                              backLabel: newfamilyName,
-                              screenTitle: "***",
+                              backLabel: "Retour au stock " + category,
+                              screenTitle: "STOCK\n" + newfamilyName,
                               category: category,
                               family: newfamilyName,
                             });

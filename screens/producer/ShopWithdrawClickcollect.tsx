@@ -127,7 +127,7 @@ export default function ShopWithdrawClickcollectScreen({
 
       const values: ClickCollectData = {
         instructions,
-        isActive: onboarding ? true : shopStore?.clickCollect?.isActive,
+        isActive: onboarding ? true : shopStore?.clickCollect?.isActive!,
         openingHours: clickCollectHours,
       };
 
@@ -167,7 +167,10 @@ export default function ShopWithdrawClickcollectScreen({
     }
   };
 
-  console.log("clickcollect shopStore: ", shopStore);
+  console.log(
+    "SHOPWITHDRAWCLICKCOLLECT shopStore clickcollect: ",
+    shopStore?.clickCollect,
+  );
 
   return (
     <SafeAreaView
@@ -178,9 +181,8 @@ export default function ShopWithdrawClickcollectScreen({
         <TopBar
           backLabel={backLabel || "Retour à l'accueil"}
           screen={
-            from || onboarding
-              ? "OnboardingShopWithdrawModes"
-              : "ShopWithdrawModes"
+            from ||
+            (onboarding ? "OnboardingShopWithdrawModes" : "ShopWithdrawModes")
           }
           label={screenTitle || "CONNEXION\nINSCRIPTION"}
           navigationOverride={navigation}

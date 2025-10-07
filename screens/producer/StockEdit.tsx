@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 
@@ -46,6 +46,8 @@ import TextHeading3 from "../../components/utils/texts/Heading3";
 import InputText from "../../components/utils/inputs/Text";
 import ImageUploader from "../../components/utils/ImageUploader";
 import Spinner from "../../components/utils/Spinner";
+import SimpleInputText from "../../components/utils/inputs/SimpleText";
+import globalTools from "../../modules/globalTools";
 
 type FromProducerTab = BottomTabScreenProps<ProducerTabParamList, "StocksEdit">;
 
@@ -76,6 +78,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
   const [familyId, setFamilyId] = useState<string | undefined>();
 
   const [isSaveLoading, setSaveLoading] = useState<boolean>(false);
+  const [hasChanges, setHasChanges] = useState<boolean>(false);
 
   // variables adapted
   const [nameAdapted, setNameAdapted] = useState<string>();
@@ -101,6 +104,16 @@ export default function StocksEditScreen({ navigation, route }: Props) {
   const [remaingingTags, setRemainingTags] = useState<TagData[] | undefined>(
     [],
   );
+  const initialTagIdsRef = useRef<string[]>([]);
+
+  // gestion des erreurs
+  const [errors, setErrors] = useState({
+    productCustomName: false,
+    price: false,
+    stock: false,
+    weightPerUnit: false,
+    pricePerKilo: false,
+  });
 
   const fetchAndManageTags = async (
     familyId: string | undefined,
@@ -114,11 +127,11 @@ export default function StocksEditScreen({ navigation, route }: Props) {
     setSuggestedTags(tagResponse.data?.suggestedTags ?? []);
     setRemainingTags(tagResponse.data?.remainingTags ?? []);
 
-    if (existingTags) {
-      setTags(existingTags);
-    } else {
-      setTags([]);
-    }
+    // on stocke les ids des tags initiaux pour future comparaison hasChanges
+    const initial = (existingTags ?? []).map((t) => t._id);
+    initialTagIdsRef.current = initial;
+
+    setTags(existingTags ?? []);
   };
 
   useEffect(() => {
@@ -198,16 +211,22 @@ export default function StocksEditScreen({ navigation, route }: Props) {
   };
 
   const toggleTag = (tag: TagData) => {
-    if (!tags) {
-      setTags([tag]);
-      return;
-    }
-    const isSelected = tags?.some((t) => t._id === tag._id);
-    if (isSelected) {
-      setTags(tags?.filter((t) => t._id !== tag._id));
-    } else {
-      setTags([...(tags ?? []), tag]);
-    }
+    const cur = tags ?? [];
+    // détermine si le tag cliqué fait déjà partie des tags
+    const isSelected = cur.some((t) => t._id === tag._id);
+    // on ajoute ou on supprime le tag en fonction de isSelected
+    const newTags = isSelected
+      ? cur.filter((t) => t._id !== tag._id)
+      : [...cur, tag];
+    // on met à jourle state
+    setTags(newTags);
+    // on crée les tableaux d'ids: les ids initiaux et les ids redéfinis de tags
+    const newIds = newTags.map((t) => ({ _id: t._id }));
+    const initialIds = initialTagIdsRef.current.map((r) => ({ _id: r }));
+    // on compare les deux tableaux
+    const equalsInitial = globalTools.arraysEqualById(newIds, initialIds);
+    // on met à jour le state hasChanges en fonciton
+    setHasChanges(!equalsInitial);
   };
 
   const handleQuantityChange = async (change: number) => {
@@ -219,46 +238,77 @@ export default function StocksEditScreen({ navigation, route }: Props) {
     }
 
     setStock(newStock);
+    setErrors((prev) => ({
+      ...prev,
+      stock: false,
+    }));
+    setHasChanges(true);
+  };
+
+  const checkErrors = () => {
+    const newErrors: Record<string, boolean> = {};
+
+    /* Vérification des champs pour tout type de produit */
+
+    if (!price) {
+      newErrors.price = true;
+    }
+
+    if (isNaN(stock)) {
+      setStock(0);
+      newErrors.stock = true;
+    }
+
+    if (!stock || stock === 0) {
+      newErrors.stock = true;
+    }
+
+    /* Vérification des champs pour type de produit classic */
+
+    if (!isBulk) {
+      if (!productCustomName) {
+        newErrors.productCustomName = true;
+      }
+
+      if (!pricePerKilo) {
+        newErrors.pricePerKilo = true;
+      }
+
+      if (!weightPerUnit) {
+        newErrors.weightPerUnit = true;
+      }
+    }
+
+    setErrors((prev) => ({
+      ...prev,
+      ...newErrors,
+    }));
+
+    return Object.keys(newErrors).length > 0;
   };
 
   const handleSaveProduct = async () => {
     setSaveLoading(true);
 
-    let numPrice, numPricePerKilo;
+    let numPrice;
+    let numPricePerKilo;
 
-    if (isNaN(stock)) {
-      setStock(0);
-      setSaveLoading(false);
-      return;
-    }
+    const hasErrors = checkErrors();
 
-    /* Vérification des champs pour tout type de produit */
-    if (!price || !stock) {
+    if (hasErrors) {
       SheetManager.show("alert", {
         payload: {
-          message: "Le prix ou la quantité ne sont pas indiqués.",
-          alertType: "warning",
+          message: "Vérifez les champs entourés en rouge",
+          alertType: "error",
         },
       });
       setSaveLoading(false);
+      setHasChanges(false);
       return;
-    } else {
-      numPrice = parseFloat(price.replace(",", "."));
     }
 
-    /* Vérification des champs pour type de produit classic */
+    numPrice = parseFloat(price.replace(",", "."));
     if (!isBulk) {
-      if (!pricePerKilo) {
-        SheetManager.show("alert", {
-          payload: {
-            message: "Le prix au kilo est manquant.",
-            alertType: "error",
-          },
-        });
-        setSaveLoading(false);
-        return;
-      }
-    } else {
       numPricePerKilo = parseFloat(pricePerKilo.replace(",", "."));
     }
 
@@ -360,6 +410,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
           alertType: "error",
         },
       });
+      setHasChanges(false);
       return;
     }
 
@@ -446,12 +497,6 @@ export default function StocksEditScreen({ navigation, route }: Props) {
               family: family,
             });
           }
-          // navigation.navigate("Stocks", {
-          //   backLabel: "Retour " + (stockData ? "au choix" : "aux catégories"),
-          //   screenTitle: "STOCKS\n" + (family ? family : category),
-          //   category: category!,
-          //   family: family,
-          // });
         },
       });
     }
@@ -465,21 +510,21 @@ export default function StocksEditScreen({ navigation, route }: Props) {
     }
   };
 
-  console.log("STOCKEDIT stockData tags:", stockData?.tags);
+  // console.log("STOCKEDIT errors:", errors);
 
-  console.log("STOCKEDIT onboarding :", onboarding);
-  console.log(
-    "suggested :",
-    suggestedTags?.map((t) => t.name),
-  );
-  console.log(
-    "remaining :",
-    remaingingTags?.map((t) => t.name),
-  );
-  console.log(
-    "tags :",
-    tags?.map((t) => t.name),
-  );
+  // console.log("STOCKEDIT onboarding :", onboarding);
+  // console.log(
+  //   "suggested :",
+  //   suggestedTags?.map((t) => t.name),
+  // );
+  // console.log(
+  //   "remaining :",
+  //   remaingingTags?.map((t) => t.name),
+  // );
+  // console.log(
+  //   "tags :",
+  //   tags?.map((t) => t.name),
+  // );
 
   return (
     <SafeAreaView
@@ -495,7 +540,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
         screenParams={{
           category: category,
           family: family,
-          onboarding: true,
+          onboarding,
         }}
         extraClasses="mt-2"
       />
@@ -523,10 +568,19 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                     placeholder="Saisissez le nom de votre produit"
                     value={productCustomName}
                     twoLines={true}
-                    onChangeText={(value: string) =>
-                      setProductCustomName(value)
-                    }
-                    extraClasses="h-[90px]"
+                    onChangeText={(value: string) => {
+                      setProductCustomName(value);
+                      if (errors.productCustomName && value.trim() !== "") {
+                        setErrors((prev) => ({
+                          ...prev,
+                          productCustomName: false,
+                        }));
+                      } else if (!hasChanges) {
+                        setHasChanges(true); // activation du bouton de sauvegarde
+                      }
+                    }}
+                    showError={errors.productCustomName}
+                    height="h-[90px]"
                   />
                 </View>
               </View>
@@ -566,10 +620,20 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                 </Text>
               </View>
             ) : (
-              <TextInput
-                className="bg-white text-black rounded-lg w-36 text-right text-xl leading-5 pr-2"
+              <SimpleInputText
+                placeholder="ex: 100gr"
                 value={weightPerUnit}
-                onChangeText={(value: string) => setWeightPerUnit(value)}
+                height="h-[50px]"
+                textClasses=" text-right pr-1 text-xl"
+                onChangeText={(value: string) => {
+                  setWeightPerUnit(value);
+                  if (errors.weightPerUnit && value.trim() !== "") {
+                    setErrors((prev) => ({ ...prev, weightPerUnit: false }));
+                  } else if (!hasChanges) {
+                    setHasChanges(true); // activation du bouton de sauvegarde
+                  }
+                }}
+                showError={errors.weightPerUnit}
               />
             )}
           </View>
@@ -579,10 +643,20 @@ export default function StocksEditScreen({ navigation, route }: Props) {
               <TextBody1 extraClasses="font-bold">PRIX</TextBody1>
             </View>
             <View className="flex flex-row justify-end items-center mr-2">
-              <TextInput
-                className="bg-white text-black rounded-lg w-36 text-right text-xl leading-5 pr-2"
+              <SimpleInputText
                 value={price}
-                onChangeText={(value: string) => setPrice(value)}
+                height="h-[50px]"
+                textClasses=" text-right pr-1 text-xl"
+                extraClasses="w-24"
+                onChangeText={(value: string) => {
+                  setPrice(value);
+                  if (errors.price && value.trim() !== "") {
+                    setErrors((prev) => ({ ...prev, price: false }));
+                  } else if (!hasChanges) {
+                    setHasChanges(true); // activation du bouton de sauvegarde
+                  }
+                }}
+                showError={errors.price}
                 keyboardType="decimal-pad"
               />
               <Text className="font-bold text-xl text-secondary dark:text-lightbg ml-2">
@@ -603,16 +677,21 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                 size={30}
                 onPressFn={() => handleQuantityChange(-1)}
               />
-              <View className="flex flex-row justify-center w-24">
-                <TextInput
-                  className="bg-white text-black rounded-lg w-14 text-center text-xl leading-5"
+              <View className="flex flex-row justify-center w-16">
+                <SimpleInputText
                   value={stock?.toString() ?? ""}
-                  onChangeText={(value: string) => setStock(Number(value))}
-                  // onFocus={() => {
-                  //   if (stock === 0) {
-                  //     setStock(undefined)
-                  //   }
-                  // }}
+                  height="h-[50px]"
+                  extraClasses="mx-2 w-12"
+                  textClasses=" text-center pr-1 text-xl"
+                  onChangeText={(value: string) => {
+                    setStock(Number(value));
+                    if (errors.stock && value.trim() !== "") {
+                      setErrors((prev) => ({ ...prev, stock: false }));
+                    } else if (!hasChanges) {
+                      setHasChanges(true); // activation du bouton de sauvegarde
+                    }
+                  }}
+                  showError={errors.stock}
                   keyboardType="decimal-pad"
                 />
               </View>
@@ -630,7 +709,10 @@ export default function StocksEditScreen({ navigation, route }: Props) {
             label="DESCRIPTION"
             placeholder="Saisir une description"
             value={description}
-            onChangeText={(value: string) => setDescription(value)}
+            onChangeText={(value: string) => {
+              setDescription(value);
+              setHasChanges(true);
+            }}
             extraClasses="mb-5 h-64"
             numberOfLines={9}
           />
@@ -642,10 +724,20 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                   <TextBody1 extraClasses="font-bold">PRIX AU KILO</TextBody1>
                 </View>
                 <View className="flex flex-row justify-end items-center mr-2">
-                  <TextInput
-                    className="bg-white text-black rounded-lg w-36 text-right text-xl leading-5 pr-2"
+                  <SimpleInputText
                     value={pricePerKilo}
-                    onChangeText={(value: string) => setPricePerKilo(value)}
+                    height="h-[50px]"
+                    textClasses=" text-right pr-1 text-xl"
+                    extraClasses="w-24"
+                    onChangeText={(value: string) => {
+                      setPricePerKilo(value);
+                      if (errors.pricePerKilo && value.trim() !== "") {
+                        setErrors((prev) => ({ ...prev, pricePerKilo: false }));
+                      } else if (!hasChanges) {
+                        setHasChanges(true); // activation du bouton de sauvegarde
+                      }
+                    }}
+                    showError={errors.pricePerKilo}
                     keyboardType="decimal-pad"
                   />
                   <Text className="font-bold text-xl text-secondary dark:text-lightbg ml-2">
@@ -658,9 +750,11 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                 <View className="flex-1">
                   <TextBody1 extraClasses="font-bold">ORIGINE</TextBody1>
                 </View>
-                <TextInput
-                  className="bg-white text-black rounded-xl w-60 text-right text-xl leading-5 pr-2"
+                <SimpleInputText
                   value={origin}
+                  height="h-[50px]"
+                  textClasses=" text-right pr-1 text-xl"
+                  extraClasses="w-60"
                   onChangeText={(value: string) => setOrigin(value)}
                 />
               </View>
@@ -669,9 +763,12 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                 <View className="flex-1">
                   <TextBody1 extraClasses="font-bold">FORMAT</TextBody1>
                 </View>
-                <TextInput
-                  className="bg-white text-black rounded-lg w-60 text-right text-xl leading-5 pr-2"
+                <SimpleInputText
+                  placeholder="ex: sous-vide"
                   value={format}
+                  height="h-[50px]"
+                  textClasses=" text-right pr-1 text-xl"
+                  extraClasses="w-60"
                   onChangeText={(value: string) => setFormat(value)}
                 />
               </View>
@@ -680,9 +777,12 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                 <View className="flex-1">
                   <TextBody1 extraClasses="font-bold">PORTION</TextBody1>
                 </View>
-                <TextInput
-                  className="bg-white text-black rounded-lg w-60 text-right text-xl leading-5 pr-2"
+                <SimpleInputText
+                  placeholder="ex: 1 personne"
                   value={portion}
+                  height="h-[50px]"
+                  textClasses=" text-right pr-1 text-xl"
+                  extraClasses="w-60"
                   onChangeText={(value: string) => setPortion(value)}
                 />
               </View>
@@ -691,9 +791,12 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                 <View className="flex-1">
                   <TextBody1 extraClasses="font-bold">{`DLC A\nRECEPTION`}</TextBody1>
                 </View>
-                <TextInput
-                  className="bg-white text-black rounded-lg w-60 text-right text-xl leading-5 pr-2"
+                <SimpleInputText
+                  placeholder="ex: 3 jours minimum"
                   value={bestBeforeDate}
+                  height="h-[50px]"
+                  textClasses=" text-right pr-1 text-xl"
+                  extraClasses="w-60"
                   onChangeText={(value: string) => setBestBeforeDate(value)}
                 />
               </View>
@@ -770,7 +873,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
         >
           <PrimaryButton
             label="Sauvegarder"
-            disabled={isSaveLoading}
+            disabled={!hasChanges || isSaveLoading}
             onPressFn={handleSaveProduct}
             isLoading={isSaveLoading}
             extraClasses="h-14"

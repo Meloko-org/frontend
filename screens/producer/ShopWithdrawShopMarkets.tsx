@@ -39,9 +39,8 @@ export default function ShopWithdrawShopMarketsScreen({
         <TopBar
           backLabel={backLabel || "Retour modes de retrait"}
           screen={
-            from || onboarding
-              ? "OnboardingShopWithdrawModes"
-              : "ShopWithdrawModes"
+            from ||
+            (onboarding ? "OnboardingShopWithdrawModes" : "ShopWithdrawModes")
           }
           label={screenTitle || "POINTS DE\nVENTE"}
           navigationOverride={navigation}
@@ -60,7 +59,7 @@ export default function ShopWithdrawShopMarketsScreen({
                   (navigation as FromRootStack["navigation"]).navigate(
                     "OnboardingShopWithdrawShopMarketsSearch",
                     {
-                      from: "OnboardingShopWithdrawModes",
+                      from: "OnboardingShopWithdrawShopMarkets",
                       backLabel: "Retour aux points de vente",
                       screenTitle: "RECHERCHE",
                       onboarding: true,
@@ -70,7 +69,7 @@ export default function ShopWithdrawShopMarketsScreen({
                   (navigation as FromProducerTab["navigation"]).navigate(
                     "ShopWithdrawShopMarketsSearch",
                     {
-                      from: "ShopWithdrawModes",
+                      from: "ShopWithdrawShopMarkets",
                       backLabel: "Retour aux points de vente",
                       screenTitle: "RECHERCHE",
                     },
@@ -86,7 +85,7 @@ export default function ShopWithdrawShopMarketsScreen({
                   (navigation as FromRootStack["navigation"]).navigate(
                     "OnboardingShopWithdrawShopMarketsManage",
                     {
-                      from: "OnboardingShopWithdrawModes",
+                      from: "OnboardingShopWithdrawShopMarkets",
                       backLabel: "Retour aux points de vente",
                       screenTitle: "PARAMÈTRES",
                       onboarding: true,
@@ -96,7 +95,7 @@ export default function ShopWithdrawShopMarketsScreen({
                   (navigation as FromProducerTab["navigation"]).navigate(
                     "ShopWithdrawShopMarketsManage",
                     {
-                      from: "ShopWithdrawModes",
+                      from: "ShopWithdrawShopMarkets",
                       backLabel: "Retour aux points de vente",
                       screenTitle: "PARAMÈTRES",
                     },

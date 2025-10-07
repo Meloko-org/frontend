@@ -62,7 +62,7 @@ export default function InputText({
   const { colorScheme, toggleColorScheme } = useColorScheme();
 
   const borderClasses = showError
-    ? "border-danger"
+    ? "border-2 border-danger dark:border-red-500"
     : "border-secondary dark:border-primary/20";
 
   return (

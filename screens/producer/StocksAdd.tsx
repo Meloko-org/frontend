@@ -161,7 +161,7 @@ export default function StocksAddScreen({ navigation, route }: Props) {
                   category: category,
                   family: family,
                   productData: product,
-                  onboarding: true,
+                  onboarding,
                 },
               );
             } else {
@@ -245,14 +245,14 @@ export default function StocksAddScreen({ navigation, route }: Props) {
           <TopBar
             backLabel={backLabel || "Retour aux stocks"}
             screen={
-              from || onboarding
-                ? "OnboardingStockCategories"
-                : "StockCategories"
+              from ||
+              (onboarding ? "OnboardingStockCategories" : "StockCategories")
             }
             label={screenTitle || ""}
             screenParams={{
               category: category,
               family: family,
+              onboarding,
             }}
             extraClasses="mt-2"
           />

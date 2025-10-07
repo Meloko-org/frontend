@@ -191,6 +191,7 @@ export default function ShopWithdrawShopMarketsManageScreen({
   };
 
   console.log("markets :", shopStore?.markets);
+  console.log("from :", from);
 
   return (
     <SafeAreaView
@@ -201,9 +202,10 @@ export default function ShopWithdrawShopMarketsManageScreen({
         <TopBar
           backLabel={backLabel || "Retour points de vente"}
           screen={
-            from || onboarding
+            from ||
+            (onboarding
               ? "OnboardingShopWithdrawShopMarkets"
-              : "ShopWithdrawShopMarkets"
+              : "ShopWithdrawShopMarkets")
           }
           label={screenTitle || "POINTS DE\nVENTE"}
           navigationOverride={navigation}

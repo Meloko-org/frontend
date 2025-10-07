@@ -1,8 +1,9 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import { useAuth } from "@clerk/clerk-expo";
 
-import { useSelector } from "react-redux";
-import { ShopState } from "../../reducers/shop";
+import { useSelector, useDispatch } from "react-redux";
+import { setShopData, ShopState } from "../../reducers/shop";
 
 import { ProducerTabParamList } from "../../types/Navigation";
 import { RootStackParamList } from "../../types/Navigation";
@@ -17,6 +18,9 @@ import TopBar from "../../components/TopBar";
 import OpenScreenButton from "../../components/utils/buttons/OpenScreen";
 import TextBody1 from "../../components/utils/texts/Body1";
 import PrimaryButton from "../../components/utils/buttons/Primary";
+import withdrawTools from "../../modules/withdrawTools";
+import { SheetManager } from "react-native-actions-sheet";
+import Spinner from "../../components/utils/Spinner";
 
 type FromProducerTab = BottomTabScreenProps<
   ProducerTabParamList,
@@ -33,21 +37,34 @@ type Props = FromProducerTab | FromRootStack;
 export default function ShopWithdrawModesScreen({ navigation, route }: Props) {
   const { from, backLabel, screenTitle, onboarding } = route.params || {};
 
+  const { getToken } = useAuth();
+  const dispatch = useDispatch();
+
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
 
-  const [isClickCollectEnable, setClickCollectEnable] = useState<
-    boolean | undefined
-  >(false);
+  /* gère l'état des switch */
+  const [isClickCollectEnable, setClickCollectEnable] =
+    useState<boolean>(false);
   const [isShopMarketsEnable, setShopMarketsEnable] = useState<boolean>(false);
-  const [isDeliveryEnable, setDeliveryEnable] = useState<boolean>(false);
+  // const [isDeliveryEnable, setDeliveryEnable] = useState<boolean>(false);
+
+  /* gère le disabled des boutons */
+  const [isClickCollectOpenable, setClickCollectOpenable] =
+    useState<boolean>(false);
+  const [isShopMarketOpenable, setShopMarketOpenable] =
+    useState<boolean>(false);
+  // const [ isDeliveryOpenable, setDeliveryOpenable ] = useState<boolean>(false)
+
   const [isWithdrawModeSetted, setIsWithdrawModeSetted] =
     useState<boolean>(false);
 
+  const [isSaveLoading, setIsSaveLoading] = useState<boolean>(false);
+
   useEffect(() => {
-    /* gestion des switch des boutons */
     if (shopStore !== null) {
+      /* gestion des switch des boutons */
       if (shopStore.clickCollect) {
         setClickCollectEnable(shopStore.clickCollect.isActive);
       }
@@ -59,6 +76,15 @@ export default function ShopWithdrawModesScreen({ navigation, route }: Props) {
       // if (shopStore.delivery) {
       // 	setDeliveryEnable(shopStore.delivery.isActive)
       // }
+
+      /* gestion du disabled */
+      setClickCollectOpenable(!shopStore.clickCollect.isActive);
+      setShopMarketOpenable(
+        shopStore?.marketsPreviouslyActive &&
+          shopStore?.marketsPreviouslyActive.length > 0
+          ? true
+          : false,
+      );
     }
 
     /* gestion du bouton de validation */
@@ -71,7 +97,74 @@ export default function ShopWithdrawModesScreen({ navigation, route }: Props) {
     }
   }, [shopStore]);
 
-  console.log("SWM shopStore :", shopStore);
+  const handleWithdrawToggle = async (
+    mode: "clickCollect" | "markets",
+    value: boolean,
+  ) => {
+    // conserve la valeur initiale
+    const previousValue =
+      mode === "clickCollect" ? isClickCollectEnable : isShopMarketsEnable;
+
+    setIsSaveLoading(true);
+
+    try {
+      const token = await getToken();
+
+      const values = { mode, value };
+
+      const withdrawResponse = await withdrawTools.activeWithdrawModes(
+        token,
+        values,
+      );
+
+      setIsSaveLoading(false);
+
+      if (withdrawResponse.data === null) {
+        if (mode === "clickCollect") {
+          setClickCollectEnable(previousValue);
+        } else if (mode === "markets") {
+          setShopMarketsEnable(previousValue);
+        }
+
+        SheetManager.show("alert", {
+          payload: {
+            message: "Une erreur est survenue.",
+            alertType: "error",
+          },
+        });
+        return;
+      }
+
+      if (withdrawResponse.success) {
+        dispatch(setShopData(withdrawResponse.data));
+      }
+
+      SheetManager.show("alert", {
+        payload: {
+          message: withdrawResponse.message!,
+          alertType: "success",
+        },
+      });
+    } catch (error) {
+      // rollback en cas d'exception réseau
+      if (mode === "clickCollect") {
+        setClickCollectEnable(previousValue);
+      } else if (mode === "markets") {
+        setShopMarketsEnable(previousValue);
+      }
+
+      SheetManager.show("alert", {
+        payload: {
+          message: "Impossible de sauvegarder les modifications.",
+          alertType: "error",
+        },
+      });
+    } finally {
+      setIsSaveLoading(false);
+    }
+  };
+
+  console.log("SWM shopStore :", shopStore?.marketsPreviouslyActive);
 
   return (
     <SafeAreaView
@@ -82,9 +175,9 @@ export default function ShopWithdrawModesScreen({ navigation, route }: Props) {
         {!onboarding && (
           <TopBar
             backLabel={
-              backLabel || onboarding ? "Retour" : "Retour à la boutique"
+              backLabel || (onboarding ? "Retour" : "Retour à la boutique")
             }
-            screen={from || onboarding ? "Onboarding5" : "ShopProducer"}
+            screen={from || (onboarding ? "Onboarding5" : "ShopProducer")}
             label={screenTitle || "MODES DE\nRETRAIT"}
             screenParams={{ onboarding: true }}
             navigationOverride={navigation}
@@ -109,7 +202,10 @@ Une fois votre boutique en ligne, vous pourrez à tout moment ajouter, modifier,
             switchProps={{
               label: "",
               value: isClickCollectEnable,
-              onValueChange: setClickCollectEnable,
+              onValueChange: (val) => {
+                setClickCollectEnable(val);
+                handleWithdrawToggle("clickCollect", val);
+              },
               extraClasses: "ml-2",
             }}
             onPressFn={() => {
@@ -134,6 +230,7 @@ Une fois votre boutique en ligne, vous pourrez à tout moment ajouter, modifier,
                 );
               }
             }}
+            disabled={isClickCollectOpenable}
             extraClasses="mb-2"
           />
           <OpenScreenButton
@@ -141,7 +238,10 @@ Une fois votre boutique en ligne, vous pourrez à tout moment ajouter, modifier,
             switchProps={{
               label: "",
               value: isShopMarketsEnable,
-              onValueChange: setShopMarketsEnable,
+              onValueChange: (val) => {
+                setShopMarketsEnable(val);
+                handleWithdrawToggle("markets", val);
+              },
               extraClasses: "ml-2",
             }}
             onPressFn={() => {
@@ -152,7 +252,7 @@ Une fois votre boutique en ligne, vous pourrez à tout moment ajouter, modifier,
                     from: "OnboardingShopWithdrawModes",
                     backLabel: "Retour modes de retrait",
                     screenTitle: "POINTS DE\nVENTE",
-                    onboarding: true,
+                    onboarding,
                   },
                 );
               } else {
@@ -166,6 +266,7 @@ Une fois votre boutique en ligne, vous pourrez à tout moment ajouter, modifier,
                 );
               }
             }}
+            disabled={isShopMarketOpenable}
             extraClasses="mb-2"
           />
           {/* <OpenScreenButton
@@ -199,6 +300,7 @@ Une fois votre boutique en ligne, vous pourrez à tout moment ajouter, modifier,
               }
             }}
           /> */}
+          {isSaveLoading && <Spinner />}
         </ScrollView>
       </View>
 

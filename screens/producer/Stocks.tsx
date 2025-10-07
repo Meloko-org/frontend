@@ -164,7 +164,7 @@ export default function StocksScreen({ navigation, route }: Props) {
                   screenTitle: "AJOUTER\nUN PRODUIT",
                   category: category,
                   family: family,
-                  onboarding: true,
+                  onboarding,
                 },
               );
             } else {

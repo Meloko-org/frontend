@@ -159,13 +159,6 @@ export default function StockCategoriesScreen({ navigation, route }: Props) {
     setGlobalCategories(categoriesResponse.data);
   };
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     console.log("youpi")
-
-  //   }, [shopStore?.products, globalCategories, stocksStore])
-  // )
-
   useEffect(() => {
     if (!isFetchLoading) {
       // on détermine les catégories possibles en fonction des types du shop

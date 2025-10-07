@@ -35,9 +35,8 @@ export default function ShopWithdrawDeliveryScreen({
         <TopBar
           backLabel={backLabel || "Retour à l'accueil"}
           screen={
-            from || onboarding
-              ? "OnboardingShopWithdrawModes"
-              : "ShopWithdrawModes"
+            from ||
+            (onboarding ? "OnboardingShopWithdrawModes" : "ShopWithdrawModes")
           }
           label={screenTitle || "CONNEXION\nINSCRIPTION"}
           navigationOverride={navigation}

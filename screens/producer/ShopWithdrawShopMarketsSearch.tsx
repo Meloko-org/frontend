@@ -150,9 +150,10 @@ export default function ShopWithdrawShopMarketsSearchScreen({
         <TopBar
           backLabel={backLabel || "Retour points de vente"}
           screen={
-            from || onboarding
+            from ||
+            (onboarding
               ? "OnboardingShopWithdrawShopMarkets"
-              : "ShopWithdrawShopMarkets"
+              : "ShopWithdrawShopMarkets")
           }
           label={screenTitle || "POINTS DE\nVENTE"}
           navigationOverride={navigation}

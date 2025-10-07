@@ -31,8 +31,6 @@ export default function SelectableTag({
     setToggleOn((prev) => !prev);
   };
 
-  console.log("SELECTABLETAG toggleOn :", toggleOn);
-
   return (
     <TouchableOpacity
       onPress={() => {

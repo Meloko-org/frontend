@@ -174,6 +174,7 @@ type ShopData = {
   reopenDate: Date;
   address: AddressData;
   markets: MarketsData[];
+  marketsPreviouslyActive: string[];
   clickCollect: ClickCollectData;
   notes: NoteData[];
   isPremium: boolean;
@@ -265,7 +266,7 @@ type OpeningHourData = {
 
 type ClickCollectData = {
   instructions: string;
-  isActive: boolean | undefined;
+  isActive: boolean;
   openingHours: OpeningHourData[];
 };
 
