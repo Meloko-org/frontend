@@ -37,7 +37,7 @@ export default function OrderStatus({
     (detail) => detail?.shop?.toString() === shopStore?._id.toString(),
   );
 
-  console.log("orderData :", JSON.stringify(orderData, null, 2));
+  // console.log("orderData :", JSON.stringify(orderData, null, 2));
 
   return (
     <TouchableOpacity onPress={() => onPressFn && onPressFn()}>
@@ -86,7 +86,7 @@ export default function OrderStatus({
               <BadgeSecondary
                 extraClasses="px-2"
                 textClasses="font-bold"
-              >{`${shopDetails?.shopTotalPrice.$numberDecimal} €`}</BadgeSecondary>
+              >{`${shopDetails?.shopTotalPrice} €`}</BadgeSecondary>
             </View>
             <OrderStatusBadge
               extraClasses="py-1 px-1"

@@ -163,8 +163,17 @@ const deleteStocks = async (
   id: string,
 ): Promise<ApiResponse<StockData[]>> => {
   try {
-    const response = await fetch(`${API_ROOT}/stocks/${id}`, {
-      method: "DELETE",
+    /* ancienne méthode */
+    // const response = await fetch(`${API_ROOT}/stocks/${id}`, {
+    //   method: "DELETE",
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //     "Content-Type": "application/json",
+    //   },
+    // });
+
+    const response = await fetch(`${API_ROOT}/stocks/delete/${id}`, {
+      method: "POSt",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",

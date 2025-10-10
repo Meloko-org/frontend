@@ -26,7 +26,7 @@ export default function PostChoiceProductCard({
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`${Number(stock.stock.$numberDecimal) === 0 ? "bg-danger/20" : "bg-white dark:bg-tertiary"} shadow-lg rounded-lg  p-2 mb-2`}
+      className={`${Number(stock.stock) === 0 ? "bg-danger/20" : "bg-white dark:bg-tertiary"} shadow-lg rounded-lg  p-2 mb-2`}
     >
       <View className="flex flex-row items-center w-full">
         <View className="rounded-lg w-1/4">

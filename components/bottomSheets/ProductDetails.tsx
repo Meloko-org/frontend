@@ -65,7 +65,7 @@ export default function ProductDetails(props: SheetProps<"product-details">) {
           }}
           className="pt-3"
         >
-          <PricePer textClasses="text-lg font-bold">{`${props.payload?.stockData?.price.$numberDecimal} € / ${props.payload?.unit}`}</PricePer>
+          <PricePer textClasses="text-lg font-bold">{`${props.payload?.stockData?.price} € / ${props.payload?.unit}`}</PricePer>
 
           <View className="flex flex-row items-center rounded-lg w-auto bg-white m-2">
             <Image
@@ -113,7 +113,7 @@ export default function ProductDetails(props: SheetProps<"product-details">) {
                 </View>
                 <View>
                   <TextHeading3>
-                    {props.payload?.stockData?.pricePerKilo.$numberDecimal} €
+                    {props.payload?.stockData?.pricePerKilo} €
                   </TextHeading3>
                 </View>
               </View>

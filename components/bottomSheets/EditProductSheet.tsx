@@ -91,7 +91,7 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
       // mode création
       if (bulk) {
         setWeightPerUnit(
-          product.weight.measurement.$numberDecimal + " " + product.weight.unit,
+          product.weight.measurement + " " + product.weight.unit,
         );
         setNameAdapted(product.name);
         setFamilyAdpated(product.family.name);
@@ -102,22 +102,20 @@ export default function EditProductSheet(props: SheetProps<"edit-product">) {
     } else if (stock) {
       // mode modification
       if (bulk) {
-        setPrice(Number(stock.price.$numberDecimal));
-        setStock(Number(stock.stock.$numberDecimal));
+        setPrice(Number(stock.price));
+        setStock(Number(stock.stock));
         setWeightPerUnit(
-          stock.product.weight.measurement.$numberDecimal +
-            " " +
-            stock.product.weight.unit,
+          stock.product.weight.measurement + " " + stock.product.weight.unit,
         );
         setTags(stock.tags);
         setNameAdapted(stock.product.name);
         setFamilyAdpated(stock.product.family.name);
         setImageAdapted(stock.product.image);
       } else {
-        setPrice(Number(stock.price.$numberDecimal));
-        setStock(Number(stock.stock.$numberDecimal));
+        setPrice(Number(stock.price));
+        setStock(Number(stock.stock));
         setProductCustomName(stock.productCustomName);
-        setPricePerKilo(Number(stock.pricePerKilo.$numberDecimal));
+        setPricePerKilo(Number(stock.pricePerKilo));
         setOrigin(stock.origin);
         setFormat(stock.format);
         setPortion(stock.portion);

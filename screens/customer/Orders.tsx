@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 import { useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
@@ -154,7 +154,7 @@ export default function OrdersCustomerScreen({
               <TextBody1 centered>
                 {orderTools
                   .getProductCost(
-                    p.product.price.$numberDecimal,
+                    p.product.price,
                     p.quantity,
                     p.product.product.weight.unit,
                   )
@@ -197,7 +197,7 @@ export default function OrdersCustomerScreen({
               </View>
               <View className="pr-1">
                 <TextHeading3>
-                  {parseFloat(cco.shopTotalPrice.$numberDecimal).toFixed(2)} €
+                  {parseFloat(cco.shopTotalPrice).toFixed(2)} €
                 </TextHeading3>
               </View>
             </View>
@@ -263,7 +263,7 @@ export default function OrdersCustomerScreen({
               <TextBody1 centered>
                 {orderTools
                   .getProductCost(
-                    p.product.price.$numberDecimal,
+                    p.product.price,
                     p.quantity,
                     p.product.product.weight.unit,
                   )
@@ -304,7 +304,7 @@ export default function OrdersCustomerScreen({
               </View>
               <View className="pr-1">
                 <TextHeading3>
-                  {parseFloat(mo.shopTotalPrice.$numberDecimal).toFixed(2)} €
+                  {parseFloat(mo.shopTotalPrice).toFixed(2)} €
                 </TextHeading3>
               </View>
             </View>
@@ -385,7 +385,7 @@ export default function OrdersCustomerScreen({
                         extraClasses="px-3 py-1"
                         textClasses="font-bold text-lg"
                       >
-                        {selectedOrder.totalPrice.$numberDecimal}
+                        {selectedOrder.totalPrice}
                       </PriceBadge>
                     </View>
                   </View>

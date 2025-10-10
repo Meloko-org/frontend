@@ -65,8 +65,8 @@ export default function StocksOldScreen({ navigation }: Props) {
     if (data) {
       const formattedData = data.map((item: StockData) => ({
         _id: item?._id,
-        price: parseFloat(item.price.$numberDecimal),
-        stock: parseInt(item.stock.$numberDecimal, 10),
+        price: parseFloat(item.price),
+        stock: parseInt(item.stock, 10),
         shop: item?.shop, // en supposant que shop est déjà formaté selon ShopData
         product: item?.product, // en supposant que product est formaté selon ProductData
         tags: item?.tags, // en supposant que les tags correspondent déjà à TagData[]

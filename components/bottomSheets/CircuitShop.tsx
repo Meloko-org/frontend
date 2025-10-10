@@ -249,10 +249,8 @@ export default function CircuitShop(props: SheetProps<"circuit-shop">) {
               extraClasses="h-24 w-32"
               onPressFn={() =>
                 openMaps(
-                  Number(props.payload?.shop?.address.latitude?.$numberDecimal),
-                  Number(
-                    props.payload?.shop?.address.longitude?.$numberDecimal,
-                  ),
+                  Number(props.payload?.shop?.address.latitude),
+                  Number(props.payload?.shop?.address.longitude),
                   props.payload?.shop?.name,
                 )
               }

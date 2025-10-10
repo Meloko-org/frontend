@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { Text, View } from "react-native";
 import TextBody1 from "../utils/texts/Body1";
 import StarsNotation from "../utils/StarsNotation";
@@ -17,7 +17,7 @@ export default function CardNote(props: NoteProps): JSX.Element {
       <TextBody1 extraClasses="italic font-bold mb-1">{`"${props.note.comment}"`}</TextBody1>
       <StarsNotation
         iconNames={["star", "star-half", "star-o"]}
-        note={Number(props.note.note.$numberDecimal)}
+        note={Number(props.note.note)}
         extraClasses="pb-1"
       />
     </View>

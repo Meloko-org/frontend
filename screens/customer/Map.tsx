@@ -148,8 +148,8 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
         <Marker
           key={`shop-${data?.shop?._id}`}
           coordinate={{
-            latitude: Number(data?.shop?.address.latitude?.$numberDecimal),
-            longitude: Number(data?.shop?.address.longitude?.$numberDecimal),
+            latitude: Number(data?.shop?.address.latitude),
+            longitude: Number(data?.shop?.address.longitude),
           }}
           onPress={() => handleShopMarkerPress(data.shop!._id)}
         />
@@ -161,8 +161,8 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
         <Marker
           key={`market-${data?.market?._id}`}
           coordinate={{
-            latitude: Number(data?.market.address.latitude?.$numberDecimal),
-            longitude: Number(data?.market.address.longitude?.$numberDecimal),
+            latitude: Number(data?.market.address.latitude),
+            longitude: Number(data?.market.address.longitude),
           }}
           pinColor="green"
           onPress={() => {

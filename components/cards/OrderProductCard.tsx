@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import BadgeSecondary from "../utils/badges/Secondary";
 import _Fontawesome from "react-native-vector-icons/FontAwesome6";
@@ -24,6 +24,7 @@ export default function OrderProductCard({
   status,
 }: OrderProductCardProps): JSX.Element {
   const [isCanceled, setIsCanceled] = useState<boolean>(false);
+  // const [ isDeleted, setIsDeleted ] = useState<boolean>(false)
 
   useEffect(() => {
     if (status === "validated" || status === "withdrawn") {
@@ -34,7 +35,18 @@ export default function OrderProductCard({
     if (status === "canceled") {
       setIsCanceled(true);
     }
+
+    // if (orderProductData?.product.isDeleted) {
+    //   setIsDeleted(true)
+    // }
   }, [status]);
+
+  // const isCanceled =
+  //   status === "canceled" ||
+  //   ((status === "validated" || status === "withdrawn") &&
+  //     orderProductData?.isConfirmed === false);
+
+  const isDeleted = !!orderProductData?.product.isDeleted;
 
   const toggleCancel = () => {
     setIsCanceled((prev) => !prev);
@@ -59,6 +71,7 @@ export default function OrderProductCard({
 
   const tags =
     orderProductData?.product.tags &&
+    orderProductData?.product.tags.length > 0 &&
     orderProductData?.product.tags.map((tag) => {
       // console.log("s", s)
       return (
@@ -72,16 +85,18 @@ export default function OrderProductCard({
   const unit =
     orderProductData?.product.product.weight.unit === "gr" ? "kg" : "pièce";
 
-  console.log(
-    "      -->  props orderProductData: ",
-    JSON.stringify(orderProductData, null, 2),
-  );
+  // console.log(
+  //   "ORDERPRODUCTCARDS orderProductData: ",
+  //   JSON.stringify(orderProductData, null, 2),
+  // );
+
+  console.log("ORDERPRODUCTCARD isDeleted :", isDeleted);
 
   return (
     <TouchableOpacity
       onPress={() => {
         if (onPressFn && status === "pending") {
-          onPressFn(orderProductData?.product._id);
+          onPressFn(orderProductData?.product._id!);
           toggleCancel();
         }
       }}
@@ -114,7 +129,7 @@ export default function OrderProductCard({
                 >{`${orderProductData?.product.product.family.name + " " + orderProductData?.product.product.name}`}</TextHeading4>
               </View>
               <View className="flex flex-row">
-                <PricePer extraClasses="h-7 mr-2">{`${orderProductData?.product.price.$numberDecimal + " € / " + unit}`}</PricePer>
+                <PricePer extraClasses="h-7 mr-2">{`${orderProductData?.product.price + " € / " + unit}`}</PricePer>
                 <View className="flex-row flex-wrap">{tags}</View>
               </View>
               <View className="flex flex-row w-full justify-between mt-2">
@@ -125,8 +140,8 @@ export default function OrderProductCard({
                   <View>
                     <TextBody1>
                       {formatQuantity(
-                        orderProductData?.quantity,
-                        orderProductData?.product.product.weight.unit,
+                        orderProductData?.quantity!,
+                        orderProductData?.product.product.weight.unit!,
                       )}
                     </TextBody1>
                   </View>
@@ -138,9 +153,9 @@ export default function OrderProductCard({
                   <View>
                     <TextBody1>
                       {getPrice(
-                        orderProductData?.product.price.$numberDecimal,
-                        orderProductData?.quantity,
-                        orderProductData?.product.product.weight.unit,
+                        orderProductData?.product.price!,
+                        orderProductData?.quantity!,
+                        orderProductData?.product.product.weight.unit!,
                       )}{" "}
                       €
                     </TextBody1>
@@ -151,14 +166,23 @@ export default function OrderProductCard({
           </View>
         </View>
 
-        {isCanceled && (
+        {(isCanceled || isDeleted) && (
           <View className="absolute w-full h-full inset-0">
             <View className="absolute inset-0 opacity-70 w-full h-full bg-black rounded-lg" />
             {status !== "canceled" && (
               <View className="absolute inset-0 flex items-center justify-center h-full w-full">
-                <Text className="text-danger font-bold text-lg rounded-lg bg-lightbg p-1">
-                  Produit annulé
-                </Text>
+                <View>
+                  {isCanceled && (
+                    <Text className="text-danger text-center font-bold text-lg rounded-lg bg-lightbg p-1">
+                      Produit annulé
+                    </Text>
+                  )}
+                  {isDeleted && (
+                    <Text className="text-warning font-bold text-lg rounded-lg bg-lightbg p-1">
+                      Ce produit n'est plus en vente
+                    </Text>
+                  )}
+                </View>
               </View>
             )}
           </View>

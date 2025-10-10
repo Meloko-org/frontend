@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types/Navigation";
+
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { UserTabParamList } from "../types/Navigation";
 
 import { Region } from "react-native-maps";
 import MapView, { Polyline, Marker, Callout } from "react-native-maps";
@@ -21,19 +22,19 @@ import TextBody1 from "../components/utils/texts/Body1";
 import TextHeading3 from "../components/utils/texts/Heading3";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 
-type CircuitMapScreenRouteProp = RouteProp<RootStackParamList, "CircuitMap">;
+type CircuitMapRouteProp = RouteProp<UserTabParamList, "CircuitMap">;
 
-type CircuitMapScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+type CircuitMapNavProp = BottomTabNavigationProp<
+  UserTabParamList,
   "CircuitMap"
 >;
 
 type Props = {
-  navigation: CircuitMapScreenNavigationProp;
+  navigation: CircuitMapNavProp;
+  route: CircuitMapRouteProp;
 };
 
-export default function CircuitMapScreen({ navigation }: Props) {
-  const route = useRoute<CircuitMapScreenRouteProp>();
+export default function CircuitMapScreen({ navigation, route }: Props) {
   const { circuitOptions } = route.params || {};
 
   const mapRef = useRef<MapView>(null);
@@ -78,8 +79,8 @@ export default function CircuitMapScreen({ navigation }: Props) {
     if (shops!.length > 0 && mapRef.current) {
       mapRef.current.fitToCoordinates(
         shops?.map((shop) => ({
-          latitude: Number(shop?.address.latitude?.$numberDecimal),
-          longitude: Number(shop?.address.longitude?.$numberDecimal),
+          latitude: Number(shop?.address.latitude),
+          longitude: Number(shop?.address.longitude),
         })),
         {
           edgePadding: { top: 50, right: 50, left: 50, bottom: 50 },
@@ -177,8 +178,8 @@ export default function CircuitMapScreen({ navigation }: Props) {
             <Marker
               key={shop?._id}
               coordinate={{
-                latitude: Number(shop?.address.latitude?.$numberDecimal),
-                longitude: Number(shop?.address.longitude?.$numberDecimal),
+                latitude: Number(shop?.address.latitude),
+                longitude: Number(shop?.address.longitude),
               }}
             >
               <Callout tooltip onPress={() => handleMarker(shop)}>
@@ -240,8 +241,8 @@ export default function CircuitMapScreen({ navigation }: Props) {
           onPressFn={() =>
             openGoogleMapsCircuit(
               shops!.map((shop) => ({
-                lat: Number(shop?.address.latitude?.$numberDecimal),
-                lng: Number(shop?.address.longitude?.$numberDecimal),
+                lat: Number(shop?.address.latitude),
+                lng: Number(shop?.address.longitude),
               })),
             )
           }

@@ -79,6 +79,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
 
   const [isSaveLoading, setSaveLoading] = useState<boolean>(false);
   const [hasChanges, setHasChanges] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   // variables adapted
   const [nameAdapted, setNameAdapted] = useState<string>();
@@ -452,6 +453,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
     });
 
     if (canDelete) {
+      setIsDeleting(true);
       const token = await getToken();
       const deleteResponse = await stocksTools.deleteStocks(token, id);
 
@@ -462,10 +464,12 @@ export default function StocksEditScreen({ navigation, route }: Props) {
             alertType: "error",
           },
         });
+        setIsDeleting(false);
         return;
       }
 
       dispatch(setProducts(deleteResponse.data!));
+      setIsDeleting(false);
 
       await handleSheetFlow({
         sheet: "alert",
@@ -880,6 +884,14 @@ export default function StocksEditScreen({ navigation, route }: Props) {
           />
         </View>
       </View>
+
+      {isDeleting && (
+        <View className="absolute inset-0 opacity-70 w-full h-full bg-black top-9">
+          <View className="flex justify-center items-center h-full">
+            <Spinner />
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }

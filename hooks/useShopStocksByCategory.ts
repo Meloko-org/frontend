@@ -67,9 +67,7 @@ export function useShopStocksByCategory(): UseShopStocksReturn {
       return {
         category,
         products,
-        hasZeroStock: products.some(
-          (p) => Number(p.stock.$numberDecimal) === 0,
-        ),
+        hasZeroStock: products.some((p) => Number(p.stock) === 0),
         hasSubFamilies: products.some(
           (p) => p.product.family.name !== category.name,
         ),

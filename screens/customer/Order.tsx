@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
+// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+// import { RootStackParamList } from "../../types/Navigation";
+
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { UserTabParamList } from "../../types/Navigation";
 
 import { View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,13 +20,25 @@ import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import CardProduct from "../../components/cards/Product";
 import { UserState } from "../../reducers/user";
 
-type OrderScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "TabNavigatorUser"
+// type OrderScreenNavigationProp = NativeStackNavigationProp<
+//   RootStackParamList,
+//   "TabNavigatorUser"
+// >;
+
+// type Props = {
+//   navigation: OrderScreenNavigationProp;
+// };
+
+type OrderCustomerRouteProp = RouteProp<UserTabParamList, "OrderCustomer">;
+
+type OrderCustomerNavProp = BottomTabNavigationProp<
+  UserTabParamList,
+  "OrderCustomer"
 >;
 
 type Props = {
-  navigation: OrderScreenNavigationProp;
+  navigation: OrderCustomerNavProp;
+  route: OrderCustomerRouteProp;
 };
 
 export default function OrderCustomerScreen({
@@ -88,13 +104,10 @@ export default function OrderCustomerScreen({
             displayMode="order"
             showDirectionButton
             onPressFn={() => {
-              navigation.navigate("TabNavigatorUser", {
-                screen: "ShopUser",
-                params: {
-                  shopId: cco.shop._id,
-                  distance: null,
-                  relevantProducts: [],
-                },
+              navigation.navigate("ShopUser", {
+                shopId: cco.shop._id,
+                distance: null,
+                relevantProducts: [],
               });
             }}
           />
@@ -112,7 +125,7 @@ export default function OrderCustomerScreen({
               <TextBody1>Montant:</TextBody1>
             </View>
             <View>
-              <TextHeading4>{cco.shopTotalPrice.$numberDecimal} €</TextHeading4>
+              <TextHeading4>{cco.shopTotalPrice} €</TextHeading4>
             </View>
           </View>
         </View>
@@ -174,7 +187,7 @@ export default function OrderCustomerScreen({
               <TextBody1>Montant:</TextBody1>
             </View>
             <View>
-              <TextHeading4>{mo.shopTotalPrice.$numberDecimal} €</TextHeading4>
+              <TextHeading4>{mo.shopTotalPrice} €</TextHeading4>
             </View>
           </View>
         </View>
@@ -201,7 +214,7 @@ export default function OrderCustomerScreen({
           extraClasses="mb-4"
         >{`Commande n° ${route.params.orderId.slice(0, 7)}`}</TextHeading4>
         <View className="rounded-lg bg-danger p-3 mb-3">
-          <Text className="font-bold text-white text-center text-[20px]">{`Montant total: ${newOrderDetails?.totalPrice.$numberDecimal} €`}</Text>
+          <Text className="font-bold text-white text-center text-[20px]">{`Montant total: ${newOrderDetails?.totalPrice} €`}</Text>
         </View>
 
         <ScrollView

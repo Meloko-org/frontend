@@ -3,10 +3,14 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { ShopState } from "../../reducers/shop";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
-import { useFocusEffect, useRoute } from "@react-navigation/native";
-import { RouteProp } from "@react-navigation/native";
+// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+// import { RootStackParamList } from "../../types/Navigation";
+// import {  useRoute } from "@react-navigation/native";
+// import { RouteProp } from "@react-navigation/native";
+
+import { useFocusEffect, RouteProp, useRoute } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { ProducerTabParamList } from "../../types/Navigation";
 
 import { PostThemeData, TagData } from "../../types/API";
 import { useCollapsibleSection } from "../../hooks/useCollapsibleSection";
@@ -36,19 +40,30 @@ import StarsNotation from "../../components/utils/StarsNotation";
 import ImageUploader from "../../components/utils/ImageUploader";
 import VideoThumbnail from "../../components/utils/VideoThumbnail";
 
-type CreatePostScreenRouteProp = RouteProp<RootStackParamList, "CreatePost">;
+// type CreatePostScreenRouteProp = RouteProp<RootStackParamList, "CreatePost">;
 
-type CreatePostScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+// type CreatePostScreenNavigationProp = NativeStackNavigationProp<
+//   RootStackParamList,
+//   "CreatePost"
+// >;
+
+// type Props = {
+//   navigation: CreatePostScreenNavigationProp;
+// };
+
+type CreatePostRouteProp = RouteProp<ProducerTabParamList, "CreatePost">;
+
+type CreatePostNavProp = BottomTabNavigationProp<
+  ProducerTabParamList,
   "CreatePost"
 >;
 
 type Props = {
-  navigation: CreatePostScreenNavigationProp;
+  navigation: CreatePostNavProp;
+  route: CreatePostRouteProp;
 };
 
-export default function CreatePostScreen({ navigation }: Props) {
-  const route = useRoute<CreatePostScreenRouteProp>();
+export default function CreatePostScreen({ navigation, route }: Props) {
   const { from, backLabel, screenTitle, stock, note, activity } =
     route.params || {};
 
@@ -230,12 +245,10 @@ export default function CreatePostScreen({ navigation }: Props) {
               </View>
 
               <View
-                className={`${stock.stock.$numberDecimal === "0" ? "bg-danger/50" : "bg-white dark:bg-tertiary"} flex flex-row border rounded-lg p-1 border-white  dark:border-tertiary justify-center mb-5`}
+                className={`${stock.stock === "0" ? "bg-danger/50" : "bg-white dark:bg-tertiary"} flex flex-row border rounded-lg p-1 border-white  dark:border-tertiary justify-center mb-5`}
               >
                 <TextBody1>Stock actuel : </TextBody1>
-                <TextBody1 extraClasses="font-bold">
-                  {stock.stock.$numberDecimal}
-                </TextBody1>
+                <TextBody1 extraClasses="font-bold">{stock.stock}</TextBody1>
               </View>
 
               <View className="">
@@ -276,7 +289,7 @@ export default function CreatePostScreen({ navigation }: Props) {
               <View className="flex flex-row justify-center items-center my-1">
                 <StarsNotation
                   iconNames={["star", "star-half-o", "star-o"]}
-                  note={note.note.$numberDecimal}
+                  note={note.note}
                   extraClasses=""
                 />
               </View>

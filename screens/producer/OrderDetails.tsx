@@ -1,50 +1,47 @@
-import React, { useEffect, useState } from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
+import React, { JSX, useEffect, useState } from "react";
+import { useAuth } from "@clerk/clerk-expo";
+
 import { RouteProp, useRoute } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { ProducerTabParamList } from "../../types/Navigation";
 
 import { useSelector, UseSelector } from "react-redux";
-import { useAuth } from "@clerk/clerk-expo";
-import { useColorScheme } from "nativewind";
+import { ShopState } from "../../reducers/shop";
 
-import { ScrollView } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Alert, View } from "react-native";
-import TextHeading3 from "../../components/utils/texts/Heading3";
 import { OrderData, ProductData, ProductDetail } from "../../types/API";
-
-import OrderStatus from "../../components/cards/OrderStatus";
-import TextBody1 from "../../components/utils/texts/Body1";
 
 import orderTools from "../../modules/orderTools";
 import globalTools from "../../modules/globalTools";
+
+import { ScrollView } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { SheetManager } from "react-native-actions-sheet";
+
+import { Alert, View } from "react-native";
+import TextHeading3 from "../../components/utils/texts/Heading3";
+import OrderStatus from "../../components/cards/OrderStatus";
+import TextBody1 from "../../components/utils/texts/Body1";
 import OrderProductCard from "../../components/cards/OrderProductCard";
 import CustomButton from "../../components/utils/buttons/Custom";
-import { ShopState } from "../../reducers/shop";
 import TextBody2 from "../../components/utils/texts/Body2";
 import Spinner from "../../components/utils/Spinner";
 import TopBar from "../../components/TopBar";
-import { SheetManager } from "react-native-actions-sheet";
 
-type OrderDetailsScreenRouteProp = RouteProp<
-  RootStackParamList,
-  "OrderDetails"
->;
+type OrderDetailsRouteProp = RouteProp<ProducerTabParamList, "OrderDetails">;
 
-type OrderDetailsScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+type OrderDetailsNavProp = BottomTabNavigationProp<
+  ProducerTabParamList,
   "OrderDetails"
 >;
 
 type Props = {
-  navigation: OrderDetailsScreenNavigationProp;
+  navigation: OrderDetailsNavProp;
+  route: OrderDetailsRouteProp;
 };
 
-export default function OrderDetailsScreen({ navigation }: Props) {
-  const route = useRoute<OrderDetailsScreenRouteProp>();
+export default function OrderDetailsScreen({ navigation, route }: Props) {
   const { from, backLabel, screenTitle, orderId } = route.params || {};
 
-  const { colorScheme, toggleColorScheme } = useColorScheme();
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
@@ -83,7 +80,7 @@ export default function OrderDetailsScreen({ navigation }: Props) {
       );
 
       console.log(
-        "orderResponse :",
+        "ORDERDETAILS :",
         JSON.stringify(orderResponse.data, null, 2),
       );
 
@@ -212,6 +209,7 @@ export default function OrderDetailsScreen({ navigation }: Props) {
               textClasses="text-lightbg font-bold text-lg"
               onPressFn={() =>
                 handleUpdateOrder("validated", (product) => {
+                  console.log("ORDERDETAIL product :", product);
                   if (!canceledProducts.includes(product.product._id)) {
                     console.log("   -->  canceled :", canceledProducts);
                     console.log("   -->  id :", product.product._id);
@@ -265,17 +263,17 @@ export default function OrderDetailsScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
+      <TopBar
+        backLabel={backLabel || "Retour au tableau"}
+        screen={from || "businessCenter"}
+        label={screenTitle || "COMMANDES\nEN ATTENTE"}
+        extraClasses="mt-2 mb-5"
+      />
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         className="w-full flex-1 pb-5"
       >
-        <TopBar
-          backLabel={backLabel || "Retour au tableau"}
-          screen={from || "businessCenter"}
-          label={screenTitle || "COMMANDES\nEN ATTENTE"}
-          extraClasses="mt-2"
-        />
-
         <View className="mb-3">
           <TextHeading3 centered>Détail commande</TextHeading3>
         </View>

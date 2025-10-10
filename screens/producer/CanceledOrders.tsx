@@ -45,11 +45,11 @@ export default function CanceledOrdersScreen({ navigation, route }: Props) {
 
   const onRefresh = async () => {
     setIsRefreshing(true);
-    await fetchPendingOrders(1); // recharge la première page
+    await fetchCanceledOrders(1); // recharge la première page
     setIsRefreshing(false);
   };
 
-  const fetchPendingOrders = async (page = 1) => {
+  const fetchCanceledOrders = async (page = 1) => {
     setIsLoading(true);
     const token = await getToken();
     const pendingResponse = await businessTools.getOrders(
@@ -83,12 +83,12 @@ export default function CanceledOrdersScreen({ navigation, route }: Props) {
 
   useFocusEffect(
     React.useCallback(() => {
-      fetchPendingOrders(1);
+      fetchCanceledOrders(1);
     }, []),
   );
 
   const loadMoreOrders = async () => {
-    fetchPendingOrders(currentPage + 1);
+    fetchCanceledOrders(currentPage + 1);
   };
 
   const handlePressCard = (order: OrderData) => {
@@ -106,7 +106,7 @@ export default function CanceledOrdersScreen({ navigation, route }: Props) {
         backLabel={backLabel || "Retour au tableau"}
         screen={from || "BusinessCenter"}
         label={screenTitle || "COMMANDES\nANNULEES"}
-        extraClasses="mt-2"
+        extraClasses="mt-2 mb-5"
       />
 
       <View className="px-3">

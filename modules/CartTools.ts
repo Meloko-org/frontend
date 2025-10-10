@@ -11,10 +11,7 @@ const getTotalCost = (cartStore: CartData[]) => {
             ? currentValue.quantity / 1000
             : currentValue.quantity;
 
-        return (
-          quantity * Number(currentValue.stockData.price.$numberDecimal) +
-          accumulator
-        );
+        return quantity * Number(currentValue.stockData.price) + accumulator;
       }, 0);
       allShopCost += cartTotalCost;
     });

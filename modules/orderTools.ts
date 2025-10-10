@@ -62,7 +62,14 @@ const getOrderDetailsById = async (
   }
 };
 
-const validateOrder = async (token: string, values: string, id: string) => {
+const validateOrder = async (
+  token: string | null,
+  values: {
+    order: OrderData;
+    status: "pending" | "withdrawn" | "canceled" | "validated";
+  },
+  id: string,
+) => {
   try {
     const response = await fetch(`${API_ROOT}/orders/${id}`, {
       method: "PUT",

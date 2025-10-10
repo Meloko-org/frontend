@@ -46,11 +46,11 @@ export default function ValidatedOrdersScreen({ navigation, route }: Props) {
 
   const onRefresh = async () => {
     setIsRefreshing(true);
-    await fetchPendingOrders(1); // recharge la première page
+    await fetchValidatedOrders(1); // recharge la première page
     setIsRefreshing(false);
   };
 
-  const fetchPendingOrders = async (page = 1) => {
+  const fetchValidatedOrders = async (page = 1) => {
     setIsLoading(true);
     const token = await getToken();
     const pendingResponse = await businessTools.getOrders(
@@ -84,12 +84,12 @@ export default function ValidatedOrdersScreen({ navigation, route }: Props) {
 
   useFocusEffect(
     React.useCallback(() => {
-      fetchPendingOrders(1);
+      fetchValidatedOrders(1);
     }, []),
   );
 
   const loadMoreOrders = async () => {
-    fetchPendingOrders(currentPage + 1);
+    fetchValidatedOrders(currentPage + 1);
   };
 
   const handlePressCard = (order: OrderData) => {

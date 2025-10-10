@@ -198,9 +198,8 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
           end: now,
         })
       ) {
-        const price = parseFloat(
-          order.detail.shopTotalPrice?.$numberDecimal || "0",
-        );
+        const price = order.detail.shopTotalPrice || 0;
+
         revenus += price;
         count++;
       }
@@ -221,6 +220,8 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
     //   params: { orderId },
     // });
   };
+
+  console.log("BUSINESS lastorder : ", lastOrder);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -254,7 +255,7 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
                 </View>
                 <View className="flex-none">
                   <TextBody1>
-                    {lastOrder?.detail.shopTotalPrice.$numberDecimal + " €"}
+                    {lastOrder?.detail.shopTotalPrice + " €"}
                   </TextBody1>
                 </View>
               </View>

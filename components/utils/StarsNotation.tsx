@@ -20,7 +20,7 @@ export default function StarsNotation(props: StarsNotationProps): JSX.Element {
       const path = props.shopData?.notes;
       if (path) {
         for (let i = 0; i < path?.length!; i++) {
-          calcul += parseFloat(path[i].note.$numberDecimal);
+          calcul += parseFloat(path[i].note);
         }
         calcul /= path.length;
         return calcul;

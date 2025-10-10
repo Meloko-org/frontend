@@ -56,10 +56,7 @@ export default function WithdrawModesScreen({ navigation }) {
               ? currentValue.quantity / 1000
               : currentValue.quantity;
 
-          return (
-            quantity * Number(currentValue.stockData.price.$numberDecimal) +
-            accumulator
-          );
+          return quantity * Number(currentValue.stockData.price) + accumulator;
         }, 0);
         allShopsCost += cartTotalCost;
       });
@@ -104,12 +101,12 @@ export default function WithdrawModesScreen({ navigation }) {
           // market: null,
         }),
       );
-      setSelectedShop(selectedShop?.shop);
+      setSelectedShop(selectedShop?.shop!);
       setSelectMarketModalVisible(true);
     } else {
       dispatch(
         updateWithdrawMode({
-          shopId: selectedShop?.shop._id,
+          shopId: selectedShop?.shop?._id!,
           withdrawMode: value,
           withdrawMarket: null,
           withdrawDay: null,

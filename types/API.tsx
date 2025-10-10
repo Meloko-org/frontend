@@ -7,7 +7,7 @@ type OrderData = {
       products: [
         {
           _id: string;
-          product: [StockData];
+          product: StockData;
           quantity: number;
           isConfirmed: boolean;
         },
@@ -17,13 +17,14 @@ type OrderData = {
       withdrawDay: string;
       market: MarketData;
       shop: ShopData;
-      shopTotalPrice: { $numberDecimal: string };
+      shopTotalPrice: number;
       status: string;
     },
   ];
   isWithdraw: boolean;
   isPaid: boolean;
-  totalPrice: { $numberDecimal: string };
+  stripePIId: string;
+  totalPrice: number;
   createdAt: Date;
 };
 
@@ -75,8 +76,8 @@ type address = {
   address2: string | null;
   postalCode: string;
   city: string;
-  latitude: { $numberDecimal: string };
-  longitude: { $numberDecimal: string };
+  latitude: number;
+  longitude: number;
 };
 
 type MarketData = {
@@ -121,6 +122,7 @@ type StockData = {
   description: string;
   image: string;
   tags: TagData[];
+  isDeleted: boolean;
 };
 
 type TagData = {
@@ -150,7 +152,7 @@ type CartData = {
 
 type NoteData = {
   _id: string;
-  note: { $numberDecimal: string } | number | any;
+  note: number | number | any;
   user: UserData;
   shop: string;
   comment: string;
@@ -276,8 +278,8 @@ type AddressData = {
   postalCode: string | null;
   city: string | null;
   country: string | null;
-  latitude?: { $numberDecimal: string };
-  longitude?: { $numberDecimal: string };
+  latitude?: number;
+  longitude?: number;
 };
 
 type UserAddressData = {
@@ -338,7 +340,7 @@ type OrderSummary = {
   };
   detail: {
     status: string;
-    shopTotalPrice: { $numberDecimal: string };
+    shopTotalPrice: number;
   };
 };
 

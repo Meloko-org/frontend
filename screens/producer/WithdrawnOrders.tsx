@@ -46,11 +46,11 @@ export default function WithdrawnOrdersScreen({ navigation, route }: Props) {
 
   const onRefresh = async () => {
     setIsRefreshing(true);
-    await fetchPendingOrders(1); // recharge la première page
+    await fetchWithdrawnOrders(1); // recharge la première page
     setIsRefreshing(false);
   };
 
-  const fetchPendingOrders = async (page = 1) => {
+  const fetchWithdrawnOrders = async (page = 1) => {
     setIsLoading(true);
     const token = await getToken();
     const pendingResponse = await businessTools.getOrders(
@@ -84,12 +84,12 @@ export default function WithdrawnOrdersScreen({ navigation, route }: Props) {
 
   useFocusEffect(
     React.useCallback(() => {
-      fetchPendingOrders(1);
+      fetchWithdrawnOrders(1);
     }, []),
   );
 
   const loadMoreOrders = async () => {
-    fetchPendingOrders(currentPage + 1);
+    fetchWithdrawnOrders(currentPage + 1);
   };
 
   const handlePressCard = (order: OrderData) => {

@@ -117,7 +117,7 @@ export default function CardProduct({
                   {stockData && quantity
                     ? orderTools
                         .getProductCost(
-                          stockData?.price.$numberDecimal,
+                          stockData?.price,
                           quantity,
                           stockData?.product.weight.unit,
                         )
@@ -125,7 +125,7 @@ export default function CardProduct({
                     : "null"}
                 </PriceBadge>
               ) : (
-                <PricePer>{`${stockData?.price.$numberDecimal} € / ${unit}`}</PricePer>
+                <PricePer>{`${stockData?.price} € / ${unit}`}</PricePer>
               )}
             </View>
           </View>
