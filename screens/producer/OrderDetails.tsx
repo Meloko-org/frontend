@@ -209,10 +209,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
               textClasses="text-lightbg font-bold text-lg"
               onPressFn={() =>
                 handleUpdateOrder("validated", (product) => {
-                  console.log("ORDERDETAIL product :", product);
                   if (!canceledProducts.includes(product.product._id)) {
-                    console.log("   -->  canceled :", canceledProducts);
-                    console.log("   -->  id :", product.product._id);
                     return { ...product, isConfirmed: true };
                   }
                   return product;
@@ -289,7 +286,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                 <View className="rounded-lg border bg-white dark:bg-tertiary p-2">
                   <View className="flex flex-row w-full items-center">
                     <View className="w-2/6">
-                      <TextBody2>Place de marché :</TextBody2>
+                      <TextBody2>Point de vente :</TextBody2>
                     </View>
                     <View className="w-4/6">
                       <TextBody1>{withdrawMarket}</TextBody1>

@@ -314,7 +314,7 @@ type ProducerData = {
 } | null;
 
 type ProductDetail = {
-  product: string | StockData;
+  product: StockData;
   quantity: number;
   isConfirmed: boolean | null;
 };

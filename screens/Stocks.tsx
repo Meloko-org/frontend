@@ -1,3 +1,5 @@
+// screen remplacée par la screen /producer/stocks
+
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, UseSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
@@ -6,7 +8,7 @@ import { ShopState } from "../reducers/shop";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/Navigation";
 
-import { StockData } from "../types/API";
+import { ProductData, ShopData, StockData, TagData } from "../types/API";
 import stocksTools from "../modules/stocksTools";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -44,6 +46,14 @@ export default function StocksOldScreen({ navigation }: Props) {
   const [isFetchLoading, setIsFetchLoading] = useState<boolean>(true);
   const [shouldSave, setShouldSave] = useState<Boolean>(false);
   const [stocks, setStocks] = useState<StockData[]>([]);
+  // const [stocks, setStocks] = useState<{
+  //   _id: string;
+  //   price: number;
+  //   stock: number;
+  //   product: ProductData;
+  //   shop: ShopData;
+  //   tags: TagData[];
+  // }[]>([]);
   const [tempPrices, setTempPrices] = useState<{ [key: string]: string }>({});
   const [categories, setCategories] = useState<string[]>([]);
 
@@ -61,17 +71,20 @@ export default function StocksOldScreen({ navigation }: Props) {
   );
 
   const fetchStocks = async () => {
-    const data = await stocksTools.getStocksByShop(shopId);
-    if (data) {
-      const formattedData = data.map((item: StockData) => ({
-        _id: item?._id,
-        price: parseFloat(item.price),
-        stock: parseInt(item.stock, 10),
-        shop: item?.shop, // en supposant que shop est déjà formaté selon ShopData
-        product: item?.product, // en supposant que product est formaté selon ProductData
-        tags: item?.tags, // en supposant que les tags correspondent déjà à TagData[]
-      }));
-      setStocks(formattedData);
+    const stockResponse = await stocksTools.getStocksByShop(shopId!);
+    if (stockResponse.success) {
+      if (stockResponse.data && stockResponse?.data?.length > 0) {
+        const formattedData = stockResponse.data?.map((item: StockData) => ({
+          _id: item?._id,
+          price: item.price,
+          stock: item.stock,
+          shop: item?.shop, // en supposant que shop est déjà formaté selon ShopData
+          product: item?.product, // en supposant que product est formaté selon ProductData
+          tags: item?.tags, // en supposant que les tags correspondent déjà à TagData[]
+        }));
+        setStocks(formattedData);
+      }
+
       setIsFetchLoading(false);
     }
   };
@@ -169,11 +182,7 @@ export default function StocksOldScreen({ navigation }: Props) {
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <View className="flex flex-row mb-5 mt-3">
         <BackLabelButton
-          onPressFn={() =>
-            navigation.navigate("TabNavigatorProducer", {
-              screen: "Shop",
-            })
-          }
+          onPressFn={() => navigation.navigate("ShopProducer")}
           extraClasses="ml-5 p-1"
         >
           Retour à la boutique
