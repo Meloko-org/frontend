@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import BadgeSecondary from "../utils/badges/Secondary";
 import StarsNotation from "../utils/StarsNotation";
@@ -14,7 +14,7 @@ type ShopSearchResultCardProps = {
   withdrawData?: object[];
   onPressFn?: ((event: GestureResponderEvent) => void) | undefined;
   extraClasses?: string;
-  displayMode?: "bottomSheet" | "mapCallout" | "order";
+  displayMode?: "bottomSheet" | "mapCallout" | "order" | "bookmark";
   showDirectionButton?: boolean;
 };
 
@@ -28,10 +28,17 @@ export default function ShopSearchResultCard({
   displayMode,
   showDirectionButton,
 }: ShopSearchResultCardProps): JSX.Element {
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(true);
+
+  const handleBookmark = async () => {};
+
   return (
     <TouchableOpacity onPress={onPressFn}>
       <View
-        className={`${extraClasses} ${displayMode === "bottomSheet" || displayMode === "order" ? "rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary" : "p-2"} flex flex-row w-full`}
+        className={`
+          ${extraClasses} 
+          ${displayMode === "bottomSheet" || displayMode === "order" ? "rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary" : "p-2"} 
+          flex flex-row w-full`}
       >
         <View className="flex flex-row items-center w-4/5">
           {displayMode !== "order" && (
@@ -81,6 +88,15 @@ export default function ShopSearchResultCard({
               (displayMode === "bottomSheet" && (
                 <BadgeSecondary extraClasses="px-1">{`${shopData?.stocks?.length} produit${shopData?.stocks?.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
               ))}
+            {displayMode === "bookmark" && (
+              <IconButton
+                iconName={isBookmarked ? "heart" : "heart-o"}
+                iconFamily="FontAwesomeIcon"
+                iconColor="#98B66E"
+                extraClasses="h-10"
+                onPressFn={handleBookmark}
+              />
+            )}
           </View>
         </View>
         {showDirectionButton && (
@@ -88,7 +104,7 @@ export default function ShopSearchResultCard({
             <IconButton
               iconName="location-arrow"
               onPressFn={() => console.log("open google map")}
-              extraClasses="w-[50px] h-[50px] bg-success"
+              extraClasses="w-[50px] h-[50px] bg-primary"
             />
           </View>
         )}

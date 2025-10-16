@@ -41,7 +41,8 @@ export default function BookmarksScreen({ navigation }: Props) {
               key={sr?._id}
               shopData={sr}
               extraClasses="mb-2"
-              displayMode="bottomSheet"
+              displayMode="bookmark"
+              showDirectionButton={true}
               onPressFn={() => {
                 SheetManager.show("shop-details", {
                   payload: {
@@ -57,7 +58,7 @@ export default function BookmarksScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <View className="p-3 flex flex-column h-full">
+      <View className="p-3 flex flex-column h-full mt-2">
         {producersList.length > 0 ? (
           <>
             <TextHeading3 centered extraClasses="my-5">
