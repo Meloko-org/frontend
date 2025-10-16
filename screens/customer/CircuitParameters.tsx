@@ -1,48 +1,58 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 
+import {
+  CompositeNavigationProp,
+  RouteProp,
+  useRoute,
+} from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types/Navigation";
+import { RootStackParamList, UserTabParamList } from "../../types/Navigation";
 
-import { CircuitOptionsData, ShopFeaturesData } from "../types/API";
+import { CircuitOptionsData, ShopFeaturesData } from "../../types/API";
 import useMyPosition, {
   getAddressCoordinates,
-} from "../helpers/AddressHelpers";
+} from "../../helpers/AddressHelpers";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Slider } from "@miblanchard/react-native-slider";
 import { SheetManager } from "react-native-actions-sheet";
 
 import { Text, View, StyleSheet } from "react-native";
-import TextHeading2 from "../components/utils/texts/Heading2";
-import TextBody2 from "../components/utils/texts/Body2";
-import InputText from "../components/utils/inputs/Text";
-import IconButton from "../components/utils/buttons/Icon";
-import Spinner from "../components/utils/Spinner";
-import InputRadioGroup from "../components/utils/inputs/radioGroup";
-import typesTools from "../modules/typesTools";
-import SwitchInput from "../components/utils/inputs/Switch";
+import TextHeading2 from "../../components/utils/texts/Heading2";
+import TextBody2 from "../../components/utils/texts/Body2";
+import InputText from "../../components/utils/inputs/Text";
+import IconButton from "../../components/utils/buttons/Icon";
+import Spinner from "../../components/utils/Spinner";
+import InputRadioGroup from "../../components/utils/inputs/radioGroup";
+import typesTools from "../../modules/typesTools";
+import SwitchInput from "../../components/utils/inputs/Switch";
 import { ScrollView } from "react-native-gesture-handler";
-import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
+import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import { isEnabled } from "react-native/Libraries/Performance/Systrace";
-import TextBody1 from "../components/utils/texts/Body1";
-import featuresTools from "../modules/featuresTools";
+import TextBody1 from "../../components/utils/texts/Body1";
+import featuresTools from "../../modules/featuresTools";
 
 import { StatusBar } from "expo-status-bar";
 
 import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
-import TextHeading4 from "../components/utils/texts/Heading4";
-import CircuitMapScreen from "./CircuitMap";
+import TextHeading4 from "../../components/utils/texts/Heading4";
+import CircuitMapScreen from "./../CircuitMap";
 
-import { useColorScheme } from "nativewind";
-
-type CircuitParametersScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+type CircuitParametersRouteProp = RouteProp<
+  UserTabParamList,
   "CircuitParameters"
 >;
 
+type CircuitParametersNavProp = CompositeNavigationProp<
+  BottomTabNavigationProp<UserTabParamList, "CircuitParameters">,
+  NativeStackNavigationProp<RootStackParamList>
+>;
+
 type Props = {
-  navigation: CircuitParametersScreenNavigationProp;
+  navigation: CircuitParametersNavProp;
+  route: CircuitParametersRouteProp;
 };
 
 export default function CircuitParametersScreen({ navigation }: Props) {
@@ -407,9 +417,9 @@ export default function CircuitParametersScreen({ navigation }: Props) {
                       <View className="flex flex-row items-center">
                         <View
                           className="
-												border border-lightbg dark:border-darkbg rounded-lg w-8 h-8
-												bg-primary
-												flex items-center justify-center"
+                                                border border-lightbg dark:border-darkbg rounded-lg w-8 h-8
+                                                bg-primary
+                                                flex items-center justify-center"
                         >
                           <FontAwesome5Icon
                             name={feature.icon}
@@ -444,22 +454,3 @@ export default function CircuitParametersScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  bgDark: {
-    // flex: 1,
-    backgroundColor: "#262E20",
-    // padding: 10,
-  },
-  iconDark: {
-    color: "#fff",
-  },
-  bgLight: {
-    // flex: 1,
-    backgroundColor: "#FCFFF0",
-    // padding: 10,
-  },
-  iconLight: {
-    color: "#000",
-  },
-});

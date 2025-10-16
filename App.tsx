@@ -27,8 +27,6 @@ import { useColorScheme } from "nativewind";
 import HomeScreen from "./screens/Home";
 import SignUpScreen from "./screens/Signup";
 import SignInScreen from "./screens/Signin";
-import CircuitParametersScreen from "./screens/CircuitParameters";
-import CircuitMapScreen from "./screens/CircuitMap";
 import Onboarding0Screen from "./screens/Onboarding0";
 import Onboarding1Screen from "./screens/Onboarding1";
 import Onboarding2Screen from "./screens/Onboarding2";
@@ -40,6 +38,8 @@ import ComponentsScreen from "./screens/Components";
 /* Tab USER screens */
 import MapCustomerScreen from "./screens/customer/Map";
 import CartScreen from "./screens/customer/Cart";
+import CircuitParametersScreen from "./screens/customer/CircuitParameters";
+import CircuitMapScreen from "./screens/customer/CircuitMap";
 import BookmarksScreen from "./screens/customer/Bookmarks";
 import UserProfileScreen from "./screens/customer/Profile";
 import UserProfileInformationsScreen from "./screens/customer/ProfileInformations";
