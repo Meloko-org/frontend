@@ -91,6 +91,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
             alertType: "error",
           },
         });
+
         navigation.navigate(from);
       } else {
         setOrder(orderResponse.data!);

@@ -1,9 +1,21 @@
-import { useAuth } from "@clerk/clerk-expo";
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useAuth } from "@clerk/clerk-expo";
+
+import {
+  CompositeNavigationProp,
+  RouteProp,
+  useRoute,
+} from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import {
+  ProducerTabParamList,
+  RootStackParamList,
+  UserTabParamList,
+} from "../../types/Navigation";
+
 import { useSelector, useDispatch } from "react-redux";
 import { ModeState, changeMode } from "../../reducers/mode";
-import { useColorScheme } from "nativewind";
-
 import { UserState, updateUser, resetUser } from "../../reducers/user";
 import {
   ProducerState,
@@ -15,15 +27,16 @@ import { emptyCart } from "../../reducers/cart";
 
 import producerTools from "../../modules/producerTools";
 
-import { RouteProp } from "@react-navigation/native";
-import { CompositeNavigationProp } from "@react-navigation/native";
-import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import {
-  ProducerTabParamList,
-  RootStackParamList,
-} from "../../types/Navigation"; // <-- ton fichier de types
+// import { RouteProp } from "@react-navigation/native";
+// import { CompositeNavigationProp } from "@react-navigation/native";
+// import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+// import {
+//   ProducerTabParamList,
+//   RootStackParamList,
+// } from "../../types/Navigation"; // <-- ton fichier de types
 
+import { useColorScheme } from "nativewind";
 import { SheetManager } from "react-native-actions-sheet";
 
 /* Eléments graphiques */
@@ -46,7 +59,10 @@ import ColorSchemeButton from "../../components/utils/buttons/ColorScheme";
 
 type ProducerProfileNavProp = CompositeNavigationProp<
   BottomTabNavigationProp<ProducerTabParamList, "ProducerProfile">,
-  NativeStackNavigationProp<RootStackParamList>
+  CompositeNavigationProp<
+    NativeStackNavigationProp<RootStackParamList>,
+    BottomTabNavigationProp<UserTabParamList>
+  >
 >;
 
 type ProducerProfileRouteProp = RouteProp<
@@ -59,7 +75,7 @@ type Props = {
   route: ProducerProfileRouteProp;
 };
 
-export default function ProducerProfileScreen({ navigation }: Props) {
+export default function ProducerProfileScreen({ navigation, route }: Props) {
   const dispatch = useDispatch();
   const modeStore = useSelector(
     (state: { mode: ModeState }) => state.mode.value,
@@ -166,10 +182,17 @@ export default function ProducerProfileScreen({ navigation }: Props) {
       dispatch(emptyCart());
       dispatch(resetProducerData());
       dispatch(resetShopData());
+
       navigation.navigate("Home");
     } catch (err) {
-      console.error(JSON.stringify(err, null, 2));
+      console.error(err);
     }
+  };
+
+  const switchUser = () => {
+    navigation.navigate("TabNavigatorUser", {
+      screen: "UserProfile",
+    });
   };
 
   const handleProducerUpdate = async () => {
@@ -204,18 +227,11 @@ export default function ProducerProfileScreen({ navigation }: Props) {
           alertType: "success",
         },
       });
-
-      setProducerSaveLoading(false);
     } catch (error) {
       console.error(error);
+    } finally {
       setProducerSaveLoading(false);
     }
-  };
-
-  const switchUser = () => {
-    navigation.navigate("TabNavigatorUser", {
-      screen: "UserProfile",
-    });
   };
 
   const toggleMode = () => {

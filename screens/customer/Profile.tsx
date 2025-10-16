@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
-import { useState, useEffect } from "react";
 import { useColorScheme } from "nativewind";
 
+import {
+  CompositeNavigationProp,
+  RouteProp,
+  useRoute,
+} from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
+import {
+  ProducerTabParamList,
+  RootStackParamList,
+  UserTabParamList,
+} from "../../types/Navigation";
 
 import { useSelector, useDispatch } from "react-redux";
 import { UserState, updateUser, resetUser } from "../../reducers/user";
@@ -37,13 +46,19 @@ import TextHeading4 from "../../components/utils/texts/Heading4";
 import IconButton from "../../components/utils/buttons/Icon";
 const FontAwesome = _Fontawesome as React.ElementType;
 
-type ProfileScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "TabNavigatorUser"
+type UserProfileNavProp = CompositeNavigationProp<
+  BottomTabNavigationProp<UserTabParamList, "UserProfile">,
+  CompositeNavigationProp<
+    NativeStackNavigationProp<RootStackParamList>,
+    BottomTabNavigationProp<ProducerTabParamList>
+  >
 >;
 
+type UserProfileRouteProp = RouteProp<UserTabParamList, "UserProfile">;
+
 type Props = {
-  navigation: ProfileScreenNavigationProp;
+  navigation: UserProfileNavProp;
+  route: UserProfileRouteProp;
 };
 
 export default function UserProfileScreen({ navigation }: Props) {
@@ -152,7 +167,7 @@ export default function UserProfileScreen({ navigation }: Props) {
       dispatch(resetShopData());
       navigation.navigate("Home");
     } catch (err) {
-      console.error(JSON.stringify(err, null, 2));
+      console.error(err);
     }
   };
 
@@ -169,11 +184,15 @@ export default function UserProfileScreen({ navigation }: Props) {
   };
 
   const handleBookmarksPress = () => {
-    navigation.navigate("BookmarksCustomer");
+    navigation.navigate("Bookmarks");
   };
 
   const handleSearchPress = () => {
     navigation.navigate("MapCustomer");
+  };
+
+  const handleCircuitMap = () => {
+    navigation.navigate("CircuitParameters");
   };
 
   const toggleMode = () => {
@@ -254,7 +273,7 @@ export default function UserProfileScreen({ navigation }: Props) {
                         iconName="car"
                         iconSize={50}
                         iconColor="#FFF"
-                        onPressFn={() => console.log("button pressed")}
+                        onPressFn={handleCircuitMap}
                         buttonType="label-icon-top"
                         label="Visiter"
                         buttonBackground={true}

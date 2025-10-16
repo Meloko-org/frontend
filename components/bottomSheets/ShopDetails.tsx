@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 
+import { useSelector, useDispatch } from "react-redux";
+import { updateUser, UserState } from "../../reducers/user";
+
 // import ImageView from "react-native-image-viewing"
 import { useVideoPlayer, VideoView } from "expo-video";
 
@@ -13,6 +16,7 @@ import ActionSheet, {
 import TextHeading3 from "../utils/texts/Heading3";
 import IconButton from "../utils/buttons/Icon";
 import MainButton from "../utils/buttons/MainButton";
+import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
 import TextHeading2 from "../utils/texts/Heading2";
 import TextBody1 from "../utils/texts/Body1";
 import TextBody2 from "../utils/texts/Body2";
@@ -22,22 +26,24 @@ import CrewMemberCard from "../cards/CrewMember";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ThumbnailCarousel from "../utils/ThumbnailCarousel";
 import ImageViewerModal from "../modals/user/ImageViewer";
+import Spinner from "../utils/Spinner";
+import bookmarksTools from "../../modules/bookmarksTools";
 
 export default function ShopDetails(props: SheetProps<"shop-details">) {
   const insets = useSafeAreaInsets();
 
+  const userStore = useSelector(
+    (state: { user: UserState }) => state.user.value,
+  );
+  const dispatch = useDispatch();
+
   const { signOut, isSignedIn, getToken } = useAuth();
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isBookmarking, setIsBookmarking] = useState<boolean>(false);
 
   const shop = props.payload?.shop;
   const isPremium = props.payload?.shop?.isPremium;
 
-  // temporaire
-  // const localSource = require("../../assets/videos/video1.mp4");
-
-  // gestion de l'image Viewer
-  // const [ isImageViewerVisible, setIsImageViewerVisible ] = useState<boolean>(false)
-  // const [ currentIndex, setCurrentIndex ] = useState(0)
   const [isViewerVisible, setViewerVisible] = useState<boolean>(false);
   const [initialIndex, setInitialIndex] = useState(0);
 
@@ -70,7 +76,36 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
         );
       });
 
-  const handleBookmarkPress = () => {};
+  useEffect(() => {
+    if (
+      userStore.bookmarks &&
+      userStore.bookmarks.some((bookmark) => bookmark?._id === shop?._id)
+    ) {
+      setIsBookmarked(true);
+    }
+  }, [userStore]);
+
+  const handleBookmarkPress = async () => {
+    try {
+      setIsBookmarking(true);
+      const token = await getToken();
+      const bookmarkResponse = await bookmarksTools.updateBookmarks(
+        token,
+        shop?._id,
+      );
+
+      if (bookmarkResponse.success) {
+        setIsBookmarked(!isBookmarked);
+        dispatch(updateUser(bookmarkResponse.data!));
+      } else {
+        throw new Error(bookmarkResponse.message);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsBookmarking(false);
+    }
+  };
 
   return (
     <ActionSheet
@@ -86,7 +121,7 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
     >
       <View className="bg-lightbg dark:bg-darkbg">
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View className="flex flex-row px-3 mt-2 mb-5">
+          <View className="flex flex-row px-3 mt-4 mb-5">
             <View className="">
               <Image
                 source={
@@ -102,20 +137,35 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
               />
             </View>
             <View className="flex flex-grow justify-center">
-              <TextHeading2 extraClasses="" centered>
-                {props.payload?.shop?.name}
-              </TextHeading2>
-            </View>
-            <View className="flex flex-column justify-center">
-              {isSignedIn && (
-                <IconButton
-                  iconName={isBookmarked ? "heart" : "heart-o"}
-                  iconFamily="FontAwesomeIcon"
-                  iconColor="#98B66E"
-                  extraClasses="h-10"
-                  onPressFn={handleBookmarkPress}
-                />
-              )}
+              <View>
+                <TextHeading3 extraClasses="" centered>
+                  {props.payload?.shop?.name}
+                </TextHeading3>
+              </View>
+              <View className="flex flex-row">
+                <View className="flex-grow items-center justify-center">
+                  {shop?.isPremium && (
+                    <FontAwesome5Icon
+                      name="crown"
+                      size={25}
+                      color="#FAA200"
+                      className=""
+                      // style={{ left: 5 }}
+                    />
+                  )}
+                </View>
+                <View className="flex flex-column justify-center">
+                  {isSignedIn && (
+                    <IconButton
+                      iconName={isBookmarked ? "heart" : "heart-o"}
+                      iconFamily="FontAwesomeIcon"
+                      iconColor="#98B66E"
+                      extraClasses="h-10"
+                      onPressFn={handleBookmarkPress}
+                    />
+                  )}
+                </View>
+              </View>
             </View>
           </View>
 
@@ -255,6 +305,12 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
         images={shop!.photos}
         initialIndex={initialIndex}
       />
+
+      {isBookmarking && (
+        <View className="absolute top-0 w-full h-full flex items-center justify-center bg-darkbg/80">
+          <Spinner />
+        </View>
+      )}
     </ActionSheet>
   );
 }

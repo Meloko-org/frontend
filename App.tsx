@@ -23,17 +23,34 @@ import {
 import _FontAwesome from "react-native-vector-icons/FontAwesome5";
 import { useColorScheme } from "nativewind";
 
+/* STACK screens */
 import HomeScreen from "./screens/Home";
-import MapCustomerScreen from "./screens/customer/Map";
 import SignUpScreen from "./screens/Signup";
 import SignInScreen from "./screens/Signin";
+import CircuitParametersScreen from "./screens/CircuitParameters";
+import CircuitMapScreen from "./screens/CircuitMap";
+import Onboarding0Screen from "./screens/Onboarding0";
+import Onboarding1Screen from "./screens/Onboarding1";
+import Onboarding2Screen from "./screens/Onboarding2";
+import Onboarding3Screen from "./screens/Onboarding3";
+import Onboarding4Screen from "./screens/Onboarding4";
+import Onboarding5Screen from "./screens/Onboarding5";
+import StocksOldScreen from "./screens/Stocks";
+import ComponentsScreen from "./screens/Components";
+/* Tab USER screens */
+import MapCustomerScreen from "./screens/customer/Map";
 import CartScreen from "./screens/customer/Cart";
 import BookmarksScreen from "./screens/customer/Bookmarks";
 import UserProfileScreen from "./screens/customer/Profile";
 import UserProfileInformationsScreen from "./screens/customer/ProfileInformations";
 import UserProfileAddressesScreen from "./screens/customer/ProfileAddresses";
+import ShopUserScreen from "./screens/customer/Shop";
+import WithdrawModesUserScreen from "./screens/customer/WithdrawModes";
+import OrderCustomerScreen from "./screens/customer/Order";
+import PaymentCustomerScreen from "./screens/customer/Payment";
+import OrdersCustomerScreen from "./screens/customer/Orders";
+/* Tab PRODUCER screens*/
 import ShopProducerScreen from "./screens/producer/Shop";
-import BusinessScreen from "./screens/Business";
 import BusinessCenterScreen from "./screens/producer/BusinessCenter";
 import PendingOrdersScreen from "./screens/producer/PendingOrders";
 import ValidatedOrdersScreen from "./screens/producer/ValidatedOrders";
@@ -41,14 +58,6 @@ import WithdrawnOrdersScreen from "./screens/producer/WithdrawnOrders";
 import CanceledOrdersScreen from "./screens/producer/CanceledOrders";
 import AllOrdersScreen from "./screens/producer/AllOrders";
 import ProducerProfileScreen from "./screens/producer/Profile";
-import StocksOldScreen from "./screens/Stocks";
-import ComponentsScreen from "./screens/Components";
-import ShopUserScreen from "./screens/customer/Shop";
-import WithdrawModesUserScreen from "./screens/customer/WithdrawModes";
-import OrderCustomerScreen from "./screens/customer/Order";
-import PaymentCustomerScreen from "./screens/customer/Payment";
-import OrdersCustomerScreen from "./screens/customer/Orders";
-import SalesScreen from "./screens/Sales";
 import ShopDetailsScreen from "./screens/producer/ShopDetails";
 import PremiumOptionsScreen from "./screens/producer/PremiumOptions";
 import ShopOfflineScreen from "./screens/producer/ShopOffline";
@@ -77,14 +86,6 @@ import PostFrequencyScreen from "./screens/producer/PostFrequency";
 import PostHashtagsScreen from "./screens/producer/PostHashtags";
 import OrderDetailsScreen from "./screens/producer/OrderDetails";
 import StocksEditScreen from "./screens/producer/StockEdit";
-import CircuitParametersScreen from "./screens/CircuitParameters";
-import CircuitMapScreen from "./screens/CircuitMap";
-import Onboarding0Screen from "./screens/Onboarding0";
-import Onboarding1Screen from "./screens/Onboarding1";
-import Onboarding2Screen from "./screens/Onboarding2";
-import Onboarding3Screen from "./screens/Onboarding3";
-import Onboarding4Screen from "./screens/Onboarding4";
-import Onboarding5Screen from "./screens/Onboarding5";
 import ProducerContactScreen from "./screens/producer/ProducerContact";
 
 import { Provider } from "react-redux";
@@ -192,7 +193,7 @@ const TabNavigatorUser: React.FC = () => {
             iconName = "car";
           } else if (route.name === "Cart") {
             iconName = "shopping-basket";
-          } else if (route.name === "BookmarksCustomer") {
+          } else if (route.name === "Bookmarks") {
             iconName = "heart";
           } else if (route.name === "UserProfile") {
             iconName = "user-circle";
@@ -219,7 +220,7 @@ const TabNavigatorUser: React.FC = () => {
       />
       <UserTab.Screen name="Cart" component={CartScreen} />
       <UserTab.Screen
-        name="BookmarksCustomer"
+        name="Bookmarks"
         component={BookmarksScreen}
         options={{ title: "Favoris" }}
       />

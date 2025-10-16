@@ -151,7 +151,7 @@ type ProducerTabParamList = {
   ProducerProfile: undefined;
   StocksOld: undefined;
   OrderDetails: {
-    from?: string;
+    from?: keyof ProducerTabParamList;
     backLabel?: string;
     screenTitle?: string;
     orderId: string;

@@ -32,15 +32,6 @@ import { emptyCart } from "../reducers/cart";
 import { changeMode, ModeState } from "../reducers/mode";
 import SignInScreen from "./Signin";
 
-// type HomeScreenNavigationProp = NativeStackNavigationProp<
-//   RootStackParamList,
-//   "Home"
-// >;
-
-// type Props = {
-//   navigation: HomeScreenNavigationProp;
-// };
-
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 export default function HomeScreen({ navigation }: Props) {

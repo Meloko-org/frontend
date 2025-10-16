@@ -7,6 +7,7 @@ export type UserState = {
 
 const initialState: UserState = {
   value: {
+    _id: null,
     email: null,
     firstname: null,
     lastname: null,
@@ -38,6 +39,7 @@ export const userSlice = createSlice({
     },
     resetUser: (state: UserState): void => {
       state.value = {
+        _id: null,
         email: null,
         firstname: null,
         lastname: null,

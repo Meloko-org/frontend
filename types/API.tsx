@@ -289,12 +289,12 @@ type UserAddressData = {
 };
 
 type UserData = {
-  _id: string;
+  _id: string | null;
   email: string | null;
   firstname: string | null;
   lastname: string | null;
   avatar: string | null;
-  bookmarks: object[] | null;
+  bookmarks: ShopData[] | null;
   favSearch: object[] | null;
   orders: object[];
   clerkPasswordEnabled: boolean | null | undefined;

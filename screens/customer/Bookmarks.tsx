@@ -1,31 +1,55 @@
+import React from "react";
+
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { UserTabParamList } from "../../types/Navigation";
+
+import { useDispatch, useSelector } from "react-redux";
 import { Text, StyleSheet, View, SafeAreaView, ScrollView } from "react-native";
 import CardProducer from "../../components/cards/ProducerSearchResult";
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import ButtonPrimaryStart from "../../components/utils/buttons/PrimaryStart";
-export default function BookmarksScreen({ navigation }) {
-  const userStore = useSelector((state: { user }) => state.user.value);
+import { ShopData } from "../../types/API";
+import { UserState } from "../../reducers/user";
+import TextHeading3 from "../../components/utils/texts/Heading3";
+import { SheetManager } from "react-native-actions-sheet";
+
+type BookmarksRouteProp = RouteProp<UserTabParamList, "Bookmarks">;
+
+type BookmarksNavProp = BottomTabNavigationProp<UserTabParamList, "Bookmarks">;
+
+type Props = {
+  navigation: BookmarksNavProp;
+  route: BookmarksRouteProp;
+};
+
+export default function BookmarksScreen({ navigation }: Props) {
+  const userStore = useSelector(
+    (state: { user: UserState }) => state.user.value,
+  );
+
+  console.log(
+    "BOOKMARKS userStore :",
+    JSON.stringify(userStore?.bookmarks, null, 2),
+  );
 
   const producersList =
     userStore && userStore.bookmarks
       ? userStore.bookmarks.map((sr: ShopData) => {
           return (
             <CardProducer
+              key={sr?._id}
               shopData={sr}
+              extraClasses="mb-2"
+              displayMode="bottomSheet"
               onPressFn={() => {
-                navigation.navigate("TabNavigatorUser", {
-                  screen: "ShopUser",
-                  params: {
-                    shopId: sr._id,
-                    distance: null,
-                    relevantProducts: [],
+                SheetManager.show("shop-details", {
+                  payload: {
+                    shop: sr,
+                    showButtons: true,
                   },
                 });
               }}
-              key={sr._id}
-              extraClasses="mb-2"
-              displayMode="bottomSheet"
             />
           );
         })
@@ -36,23 +60,23 @@ export default function BookmarksScreen({ navigation }) {
       <View className="p-3 flex flex-column h-full">
         {producersList.length > 0 ? (
           <>
-            <TextHeading2 extraClasses="mb-3">
+            <TextHeading3 centered extraClasses="my-5">
               Vos producteurs favoris
-            </TextHeading2>
+            </TextHeading3>
             <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
               {producersList}
             </ScrollView>
           </>
         ) : (
-          <View className="h-full justify-center items-center">
-            <TextHeading2 extraClasses="mb-4">
+          <View className="h-full justify-center items-center px-3">
+            <TextHeading3 centered extraClasses="mb-4 px-4">
               Vous n'avez pas de favoris :(
-            </TextHeading2>
+            </TextHeading3>
             <ButtonPrimaryStart
               label="Trouver un producteur"
               iconName="arrow-left"
-              onPressFn={() => navigation.navigate("SearchCustomer")}
-              extraClasses="w-full"
+              onPressFn={() => navigation.navigate("MapCustomer")}
+              extraClasses="w-full h-14"
             />
           </View>
         )}

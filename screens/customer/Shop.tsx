@@ -1,11 +1,12 @@
-import { Image, View } from "react-native";
-import Modal from "react-native-modal";
-import { ScrollView } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
-import { StyleSheet } from "react-native";
+import { useAuth } from "@clerk/clerk-expo";
+
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { UserTabParamList } from "../../types/Navigation";
+
+import bookmarksTools from "../../modules/bookmarksTools";
+import shopTools from "../../modules/shopTools";
 import {
   ShopData,
   ProductData,
@@ -16,7 +17,16 @@ import {
 } from "../../types/API";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser, UserState } from "../../reducers/user";
-import { useAuth } from "@clerk/clerk-expo";
+
+import { SheetManager } from "react-native-actions-sheet";
+import Modal from "react-native-modal";
+import { ScrollView } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
+// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+// import { RootStackParamList } from "../../types/Navigation";
+// import { RouteProp, useRoute } from "@react-navigation/native";
+
+import { StyleSheet, Image, View } from "react-native";
 
 import StarsNotation from "../../components/utils/StarsNotation";
 import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
@@ -30,26 +40,22 @@ import CardProduct from "../../components/cards/Product";
 import ProductCategory from "../../components/cards/ProductCategory";
 import CardNote from "../../components/cards/Note";
 import BackLabelButton from "../../components/utils/buttons/BackLabel";
-import { RouteProp, useRoute } from "@react-navigation/native";
 import TextHeading3 from "../../components/utils/texts/Heading3";
-import shopTools from "../../modules/shopTools";
-import { SheetManager } from "react-native-actions-sheet";
+import Spinner from "../../components/utils/Spinner";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
-type ShopUserScreenRouteProp = RouteProp<RootStackParamList, "ShopUser">;
+type ShopUserRouteProp = RouteProp<UserTabParamList, "ShopUser">;
 
-type ShopUserScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "ShopUser"
->;
+type ShopUserNavProp = BottomTabNavigationProp<UserTabParamList, "ShopUser">;
 
 type Props = {
-  navigation: ShopUserScreenNavigationProp;
+  navigation: ShopUserNavProp;
+  route: ShopUserRouteProp;
 };
 
-export default function ShopUserScreen({ navigation }: Props) {
-  const route = useRoute<ShopUserScreenRouteProp>();
+export default function ShopUserScreen({ navigation, route }: Props) {
+  // const route = useRoute<ShopUserScreenRouteProp>();
   const { shopId, relevantProducts, distance, sheetId } = route.params;
 
   const dispatch = useDispatch();
@@ -69,6 +75,8 @@ export default function ShopUserScreen({ navigation }: Props) {
     useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const [isBookmarking, setIsBookmarking] = useState<boolean>(false);
 
   // Shop recovery
   useEffect(() => {
@@ -91,7 +99,7 @@ export default function ShopUserScreen({ navigation }: Props) {
     if (
       userStore.bookmarks &&
       shopData &&
-      userStore.bookmarks.some((i) => i._id === shopData._id)
+      userStore.bookmarks.some((i) => i?._id === shopData._id)
     ) {
       setIsBookmarked(true);
     } else {
@@ -99,57 +107,39 @@ export default function ShopUserScreen({ navigation }: Props) {
     }
   }, [userStore, shopData, route.params]);
 
-  const handleBookmarkPress = async (): Promise<void> => {
-    isBookmarked ? removeFromBookmark() : addToBookmark();
-  };
-
-  const addToBookmark = async () => {
+  const updateBookmarks = async () => {
     try {
+      setIsBookmarking(true);
       const token = await getToken();
-      const response = await fetch(
-        `${API_ROOT}/users/bookmarks/${shopData?._id}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            mode: "cors",
-          },
-        },
+
+      const bookmarkResponse = await bookmarksTools.updateBookmarks(
+        token,
+        shopId,
       );
-      const data = await response.json();
+
+      if (!bookmarkResponse.success) {
+        SheetManager.show("alert", {
+          payload: {
+            message: bookmarkResponse.message!,
+            alertType: "error",
+          },
+        });
+        return;
+      }
+
       setIsBookmarked(true);
-      dispatch(updateUser(data.user));
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const removeFromBookmark = async () => {
-    try {
-      const token = await getToken();
-      const response = await fetch(
-        `${API_ROOT}/users/bookmarks/${shopData?._id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            mode: "cors",
-          },
+      dispatch(updateUser(bookmarkResponse.data!));
+      SheetManager.show("alert", {
+        payload: {
+          message: bookmarkResponse.message!,
+          alertType: "success",
         },
-      );
-      const data = await response.json();
-      setIsBookmarked(false);
-      dispatch(updateUser(data.user));
+      });
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsBookmarking(false);
     }
-  };
-
-  const handleAllResultsPress = async (): Promise<void> => {
-    // setIsSearchResultsModalVisible(true);
-    setIsModalVisible(true);
   };
 
   // Sorting products from categories by clicking
@@ -226,7 +216,7 @@ export default function ShopUserScreen({ navigation }: Props) {
     );
   });
 
-  // console.log("SHOPUSER: selectedCategoryProducts :", JSON.stringify(selectedCategoryProducts, null, 2))
+  console.log("SHOPUSER: shopId :", shopId);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -238,16 +228,16 @@ export default function ShopUserScreen({ navigation }: Props) {
         />
       </View>
 
-      <View className="">
+      <View className="mb-5">
         <ScrollView showsVerticalScrollIndicator={false} className="px-3 mb-5">
           {shopData && (
             <View className="flex-1">
               <View>
                 <View className="flex flex-row item-center justify-center">
                   <View className="flex flex-row items-center">
-                    <TextHeading2 extraClasses="" centered>
+                    <TextHeading3 extraClasses="" centered>
                       {shopData.name}
-                    </TextHeading2>
+                    </TextHeading3>
 
                     {shopData.isPremium && (
                       <FontAwesome5Icon
@@ -301,7 +291,7 @@ export default function ShopUserScreen({ navigation }: Props) {
                         iconFamily="FontAwesomeIcon"
                         iconColor="#98B66E"
                         extraClasses="h-10"
-                        onPressFn={handleBookmarkPress}
+                        onPressFn={updateBookmarks}
                       />
                     )}
                     <IconButton
@@ -324,12 +314,20 @@ export default function ShopUserScreen({ navigation }: Props) {
 
               <View className="flex flex-row w-full justify-evenly mb-3">
                 {shopData.clickCollect && (
-                  <BadgeSecondary extraClasses="p-1" uppercase>
+                  <BadgeSecondary
+                    extraClasses="p-1"
+                    textClasses="text-xs"
+                    uppercase
+                  >
                     Click & collect
                   </BadgeSecondary>
                 )}
                 {shopData.markets.length > 0 && (
-                  <BadgeSecondary extraClasses="p-1" uppercase>
+                  <BadgeSecondary
+                    extraClasses="p-1"
+                    textClasses="text-xs"
+                    uppercase
+                  >
                     Point de vente
                   </BadgeSecondary>
                 )}
@@ -351,29 +349,23 @@ export default function ShopUserScreen({ navigation }: Props) {
           )} */}
 
           {searchProduct.length > 0 && (
-            <View>
+            <View className="mt-5">
               <TextHeading3 centered>Votre recherche</TextHeading3>
               <View className="my-3">{searchProduct.slice(0, 4)}</View>
               <ButtonPrimaryEnd
                 label={`Tous les résultats (${searchProduct.length})`}
                 iconName="arrow-right"
-                extraClasses="h-14"
+                extraClasses="h-14 mb-5"
                 onPressFn={() => setIsSearchResultsModalVisible(true)}
               />
             </View>
           )}
 
-          <View className="mt-5">
+          <View className="my-5">
             <TextHeading3 centered extraClasses="w-full">
               Rayons
             </TextHeading3>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={[
-                "my-3 flex flex-row justify-start items-center",
-              ]}
-            >
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View className="p-2 flex flex-row">{categories}</View>
             </ScrollView>
           </View>
@@ -388,8 +380,14 @@ export default function ShopUserScreen({ navigation }: Props) {
           onModalHide={() => setIsSearchResultsModalVisible(false)}
           style={{ margin: 0 }}
         >
-          <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-            <View className="flex flex-row justify-between items-center">
+          <SafeAreaView
+            className="bg-lightbg flex-1 dark:bg-darkbg"
+            edges={["right", "left", "top"]}
+          >
+            <View
+              style={{ flex: 1 }}
+              className="flex flex-row justify-between items-center"
+            >
               <BackLabelButton
                 backLabel="Retour"
                 onPressFn={() => setIsSearchResultsModalVisible(false)}
@@ -397,12 +395,12 @@ export default function ShopUserScreen({ navigation }: Props) {
               />
               <View className="grow">
                 <TextHeading3 centered extraClasses="">
-                  Tous vos résultats
+                  Tous les produits
                 </TextHeading3>
               </View>
             </View>
 
-            <View className="p-3">
+            <View style={{ flex: 10 }} className="px-3 py-1">
               <ScrollView
                 showsVerticalScrollIndicator={false}
                 className="w-full"
@@ -424,37 +422,41 @@ export default function ShopUserScreen({ navigation }: Props) {
         }}
         style={{ margin: 0 }}
       >
-        <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-          <View className="flex flex-row justify-between items-center">
+        <SafeAreaView
+          className="bg-lightbg flex-1 dark:bg-darkbg"
+          edges={["right", "left", "top"]}
+        >
+          <View
+            style={{ flex: 1 }}
+            className="flex flex-row justify-between items-center"
+          >
             <BackLabelButton
               backLabel="Retour"
               onPressFn={() => setIsModalVisible(false)}
               extraClasses="ml-3 pr-2"
             />
-            <View className="mr-3">
+            <View className="mr-3 flex flex-row items-center">
+              <TextBody1>Tous les produits : </TextBody1>
               <TextHeading3 extraClasses="">{selectedCategory}</TextHeading3>
             </View>
           </View>
 
-          <TextHeading4 centered extraClasses="mb-1">
+          {/* <TextHeading4 centered extraClasses="mb-1">
             Tous les produits
-          </TextHeading4>
-          <View className="p-3">
+          </TextHeading4> */}
+          <View style={{ flex: 10 }} className="px-3 py-1">
             <ScrollView showsVerticalScrollIndicator={false} className="w-full">
               {categoryProducts}
             </ScrollView>
           </View>
         </SafeAreaView>
       </Modal>
+
+      {isBookmarking && (
+        <View className="absolute top-0 w-full h-full flex items-center justify-center bg-darkbg/80 mt-[39px]">
+          <Spinner />
+        </View>
+      )}
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  contentContainer: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "center",
-  },
-});
