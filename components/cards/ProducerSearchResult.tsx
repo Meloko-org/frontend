@@ -1,11 +1,13 @@
 import React, { JSX, useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { useAuth } from "@clerk/clerk-expo";
+import { Image, Linking, Text, TouchableOpacity, View } from "react-native";
 import BadgeSecondary from "../utils/badges/Secondary";
 import StarsNotation from "../utils/StarsNotation";
 import IconButton from "../utils/buttons/Icon";
 import _Fontawesome from "react-native-vector-icons/FontAwesome6";
 import { GestureResponderEvent } from "react-native";
 import { ShopData, ShopResultData } from "../../types/API";
+import bookmarksTools from "../../modules/bookmarksTools";
 
 type ShopSearchResultCardProps = {
   shopData: ShopData;
@@ -13,6 +15,7 @@ type ShopSearchResultCardProps = {
   distance?: number;
   withdrawData?: object[];
   onPressFn?: ((event: GestureResponderEvent) => void) | undefined;
+  onBookmarkPressFn?: (shopId: string) => void;
   extraClasses?: string;
   displayMode?: "bottomSheet" | "mapCallout" | "order" | "bookmark";
   showDirectionButton?: boolean;
@@ -24,13 +27,21 @@ export default function ShopSearchResultCard({
   distance,
   withdrawData,
   onPressFn,
+  onBookmarkPressFn,
   extraClasses,
   displayMode,
   showDirectionButton,
 }: ShopSearchResultCardProps): JSX.Element {
-  const [isBookmarked, setIsBookmarked] = useState<boolean>(true);
+  // const [isBookmarked, setIsBookmarked] = useState<boolean>(true);
 
-  const handleBookmark = async () => {};
+  const handleGoogleMap = () => {
+    const destination = `${shopData?.address.latitude}, ${shopData?.address.longitude}`;
+
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
+    Linking.openURL(url);
+  };
+
+  console.log(shopData?.address.latitude, " ", shopData?.address.longitude);
 
   return (
     <TouchableOpacity onPress={onPressFn}>
@@ -90,11 +101,13 @@ export default function ShopSearchResultCard({
               ))}
             {displayMode === "bookmark" && (
               <IconButton
-                iconName={isBookmarked ? "heart" : "heart-o"}
+                iconName={"heart"}
                 iconFamily="FontAwesomeIcon"
                 iconColor="#98B66E"
                 extraClasses="h-10"
-                onPressFn={handleBookmark}
+                onPressFn={() => {
+                  onBookmarkPressFn?.(shopData?._id!);
+                }}
               />
             )}
           </View>
@@ -103,7 +116,7 @@ export default function ShopSearchResultCard({
           <View className="flex flex-row justify-center items-center w-1/5">
             <IconButton
               iconName="location-arrow"
-              onPressFn={() => console.log("open google map")}
+              onPressFn={handleGoogleMap}
               extraClasses="w-[50px] h-[50px] bg-primary"
             />
           </View>

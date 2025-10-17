@@ -127,6 +127,11 @@ export default function ShopUserScreen({ navigation, route }: Props) {
         return;
       }
 
+      console.log(
+        "SHOP :",
+        JSON.stringify(bookmarkResponse.data?.bookmarks, null, 2),
+      );
+
       setIsBookmarked(true);
       dispatch(updateUser(bookmarkResponse.data!));
       SheetManager.show("alert", {

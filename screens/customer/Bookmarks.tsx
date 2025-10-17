@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "@clerk/clerk-expo";
 
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
@@ -10,9 +11,11 @@ import CardProducer from "../../components/cards/ProducerSearchResult";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import ButtonPrimaryStart from "../../components/utils/buttons/PrimaryStart";
 import { ShopData } from "../../types/API";
-import { UserState } from "../../reducers/user";
+import { updateUser, UserState } from "../../reducers/user";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import { SheetManager } from "react-native-actions-sheet";
+import bookmarksTools from "../../modules/bookmarksTools";
+import Spinner from "../../components/utils/Spinner";
 
 type BookmarksRouteProp = RouteProp<UserTabParamList, "Bookmarks">;
 
@@ -24,48 +27,76 @@ type Props = {
 };
 
 export default function BookmarksScreen({ navigation }: Props) {
+  const { getToken } = useAuth();
+  const dispatch = useDispatch();
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
   );
 
-  console.log(
-    "BOOKMARKS userStore :",
-    JSON.stringify(userStore?.bookmarks, null, 2),
-  );
+  const [shops, setShops] = useState<ShopData[]>([]);
+  const [isBookmarking, setIsBookmarking] = useState<boolean>(false);
 
-  const producersList =
-    userStore && userStore.bookmarks
-      ? userStore.bookmarks.map((sr: ShopData) => {
-          return (
-            <CardProducer
-              key={sr?._id}
-              shopData={sr}
-              extraClasses="mb-2"
-              displayMode="bookmark"
-              showDirectionButton={true}
-              onPressFn={() => {
-                SheetManager.show("shop-details", {
-                  payload: {
-                    shop: sr,
-                    showButtons: true,
-                  },
-                });
-              }}
-            />
-          );
-        })
-      : [];
+  const handleRemoveBookmark = async (shopId: string) => {
+    try {
+      setIsBookmarking(true);
+      const token = await getToken();
+      const bookmarkResponse = await bookmarksTools.updateBookmarks(
+        token,
+        shopId,
+      );
+
+      if (bookmarkResponse.success) {
+        dispatch(updateUser(bookmarkResponse.data!));
+      } else {
+        throw new Error(bookmarkResponse.message);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsBookmarking(false);
+    }
+  };
+
+  // console.log(
+  //   "BOOKMARKS userStore :",
+  //   JSON.stringify(userStore?.bookmarks, null, 2),
+  // );
+
+  useEffect(() => {
+    if (userStore.bookmarks) {
+      setShops(userStore.bookmarks);
+    } else {
+      setShops([]);
+    }
+  }, [userStore]);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <View className="p-3 flex flex-column h-full mt-2">
-        {producersList.length > 0 ? (
+        {shops.length > 0 ? (
           <>
             <TextHeading3 centered extraClasses="my-5">
               Vos producteurs favoris
             </TextHeading3>
             <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
-              {producersList}
+              {shops.map((shop) => (
+                <CardProducer
+                  key={shop?._id}
+                  shopData={shop}
+                  extraClasses="mb-2"
+                  displayMode="bookmark"
+                  showDirectionButton={true}
+                  onPressFn={() => {
+                    SheetManager.show("shop-details", {
+                      payload: {
+                        shop: shop,
+                        showButtons: true,
+                      },
+                    });
+                  }}
+                  onBookmarkPressFn={handleRemoveBookmark}
+                />
+              ))}
             </ScrollView>
           </>
         ) : (
@@ -82,6 +113,12 @@ export default function BookmarksScreen({ navigation }: Props) {
           </View>
         )}
       </View>
+
+      {isBookmarking && (
+        <View className="absolute w-full h-full flex items-center justify-center bg-darkbg/80">
+          <Spinner />
+        </View>
+      )}
     </SafeAreaView>
   );
 }

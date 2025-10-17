@@ -38,7 +38,7 @@ import { StatusBar } from "expo-status-bar";
 
 import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
 import TextHeading4 from "../../components/utils/texts/Heading4";
-import CircuitMapScreen from "./../CircuitMap";
+import CircuitMapScreen from "./CircuitMap";
 
 type CircuitParametersRouteProp = RouteProp<
   UserTabParamList,
