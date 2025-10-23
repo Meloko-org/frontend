@@ -59,10 +59,10 @@ export default function CardProduct({
     });
   };
 
-  console.log(
-    "CARDPRODUCT: stockData :",
-    stockData?.product.family.productsTypes,
-  );
+  // console.log(
+  //   "CARDPRODUCT: stockData :",
+  //   stockData?.product.family.productsTypes,
+  // );
 
   const isBulk =
     stockData?.product.family.productsTypes.includes("bulk") ?? false;

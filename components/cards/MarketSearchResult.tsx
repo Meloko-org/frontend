@@ -26,7 +26,7 @@ export default function MarketSearchResultCard({
   isHighlighted,
   showDirectionButton,
 }: MarketSearchResultCardProps): JSX.Element {
-  console.log("highlighted :", isHighlighted);
+  // console.log("highlighted :", isHighlighted);
 
   return (
     <TouchableOpacity onPress={onPressFn}>

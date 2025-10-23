@@ -1,13 +1,18 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { MarketResultData } from "../types/API";
 
 export type mapMarketResultsState = {
   selectedMarketId: string | null;
-  isSearchActive: boolean;
+  isMarketSearchActive: boolean;
+  isNavigating: boolean;
+  resultsList: MarketResultData[];
 };
 
 const initialState: mapMarketResultsState = {
   selectedMarketId: null,
-  isSearchActive: false,
+  isMarketSearchActive: false,
+  isNavigating: false,
+  resultsList: [],
 };
 
 export const mapMarketResultsSlice = createSlice({
@@ -17,12 +22,30 @@ export const mapMarketResultsSlice = createSlice({
     setSelectedMarketId: (state, action: PayloadAction<string | null>) => {
       state.selectedMarketId = action.payload;
     },
-    setIsSearchActive: (state, action: PayloadAction<boolean>) => {
-      state.isSearchActive = action.payload;
+    setIsMarketSearchActive: (state, action: PayloadAction<boolean>) => {
+      state.isMarketSearchActive = action.payload;
+    },
+    setIsMarketNavigating: (state, action: PayloadAction<boolean>) => {
+      state.isNavigating = action.payload;
+    },
+    setMarketResultsList: (
+      state,
+      action: PayloadAction<MarketResultData[]>,
+    ) => {
+      state.resultsList = action.payload;
+    },
+    clearMarketResultsList: (state) => {
+      state.resultsList = [];
     },
   },
 });
 
-export const { setSelectedMarketId, setIsSearchActive } =
-  mapMarketResultsSlice.actions;
+export const {
+  setSelectedMarketId,
+  setIsMarketSearchActive,
+  setIsMarketNavigating,
+  setMarketResultsList,
+  clearMarketResultsList,
+} = mapMarketResultsSlice.actions;
+
 export default mapMarketResultsSlice.reducer;

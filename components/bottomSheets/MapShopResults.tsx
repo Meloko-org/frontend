@@ -7,8 +7,10 @@ import React, {
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  clearShopResultsList,
   mapShopResultsState,
-  setIsSearchActive,
+  setIsShopNavigating,
+  setIsShopSearchActive,
   setSelectedShopId,
 } from "../../reducers/mapShopResults";
 import { closeIfOpen } from "../../helpers/sheetHelpers";
@@ -21,6 +23,7 @@ import ActionSheet, {
   SheetProps,
   getSheetStack,
   ActionSheetRef,
+  useSheetPayload,
 } from "react-native-actions-sheet";
 import TextHeading4 from "../utils/texts/Heading4";
 import BackLabelButton from "../utils/buttons/BackLabel";
@@ -35,19 +38,23 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
       state.mapShopResults.selectedShopId,
   );
 
+  const isShopSearchActive = useSelector(
+    (state: { mapShopResults: mapShopResultsState }) =>
+      state.mapShopResults.isShopSearchActive,
+  );
+
   const isMarketSearchActive = useSelector(
     (state: { mapMarketResults: mapMarketResultsState }) =>
-      state.mapMarketResults.isSearchActive,
+      state.mapMarketResults.isMarketSearchActive,
   );
 
   const actionSheetRef = useRef<ActionSheetRef>(null);
   const flatListRef = useRef<FlatList>(null);
+  const isNavigatingRef = useRef(false); // pour distinguer d'une fermeture sèche ou suivie d'une navigation
 
   const shops: ShopResultData[] = props.payload?.resultsList ?? [];
 
   const [snapIndex, setSnapIndex] = useState(0);
-
-  // const [ activeSheet, setActiveSheet ] = useState<"shop" | "market" | null>(null)
 
   const getFlatListHeight = () => {
     switch (snapIndex) {
@@ -87,7 +94,6 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
       );
 
       if (index !== -1) {
-        console.log("youpi", index);
         flatListRef.current?.scrollToIndex({
           index: Number(index),
           animated: true,
@@ -96,6 +102,36 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
       }
     }
   }, [selectedShopId]);
+
+  const onShopPress = async (item: ShopResultData) => {
+    isNavigatingRef.current = true;
+    const sheetId = getSheetStack()[0].id;
+
+    await SheetManager.hide("map-shop-results", {
+      payload: {
+        confirmed: true,
+        isGoingBack: false,
+      },
+    });
+
+    props.payload?.navigation.navigate("ShopUser", {
+      shopId: item.shop!._id,
+      distance: item.distance,
+      relevantProducts: item.relevantProducts,
+      sheetId,
+    });
+  };
+
+  const onBackFn = async () => {
+    console.log("backButton press");
+    isNavigatingRef.current = true;
+    await SheetManager.hide("map-shop-results", {
+      payload: {
+        confirmed: true,
+        isGoingBack: true,
+      },
+    });
+  };
 
   return (
     <ActionSheet
@@ -110,28 +146,58 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
       overdrawEnabled={false}
       closeOnPressBack={true}
       onClose={() => {
-        console.log("SHOP onClose: marketSearchActive :", isMarketSearchActive);
-        dispatch(setIsSearchActive(false));
-        if (!isMarketSearchActive) {
-          props.payload?.mapSearchBoxRef.current?.openSearch();
+        console.log(
+          "sheet shop : onClose triggered (reason ?), isNavigatingRef:",
+          isNavigatingRef,
+        );
+        dispatch(setIsShopSearchActive(false));
+        // si fermeture sèche
+        if (!isNavigatingRef.current) {
+          console.log(
+            "------------------------------------------------------------------------- sheet shop : fermeture sèche",
+          );
+          dispatch(setIsShopNavigating(false));
+          dispatch(clearShopResultsList());
+          if (!isMarketSearchActive) {
+            props.payload?.mapSearchBoxRef.current?.openSearch();
+          }
+          // si suivie d'une navigation
+        } else {
+          console.log(
+            "------------------------------------------------------------------------- sheet shop: navigation",
+          );
+          dispatch(setIsShopNavigating(true));
+          isNavigatingRef.current = false;
         }
       }}
-      onOpen={() => dispatch(setIsSearchActive(true))}
+      onOpen={() => {
+        if (!isShopSearchActive) dispatch(setIsShopSearchActive(true));
+      }}
       id={props.sheetId}
       ref={actionSheetRef}
     >
       <View className="h-full bg-lightbg dark:bg-darkbg">
-        <View className="px-3 w-full">
-          {props.payload?.onBackFn && (
+        {props.payload?.backButton && (
+          <View className="px-3 mt-2">
+            <BackLabelButton
+              backLabel="Retour aux points de vente"
+              onPressFn={onBackFn}
+            />
+          </View>
+        )}
+
+        {/* {props.payload?.onBackFn && (
+          <View className="px-3 mt-2">
             <BackLabelButton
               backLabel="Retour aux points de vente"
               onPressFn={props.payload.onBackFn}
             />
-          )}
-          <TextHeading4 centered extraClasses="my-3 h-10">
-            {`${props.payload?.resultsList.length.toString()} Producteur(s)`}
-          </TextHeading4>
-        </View>
+          </View>
+        )} */}
+
+        <TextHeading4 centered extraClasses="my-3 h-10">
+          {`${props.payload?.resultsList.length.toString()} Producteur(s)`}
+        </TextHeading4>
 
         <View className={`h-[${getFlatListHeight()}]`}>
           <FlatList
@@ -148,16 +214,7 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
                 shopData={item.shop}
                 results={item.relevantProducts.length}
                 distance={item.distance}
-                onPressFn={() => {
-                  const sheetId = getSheetStack()[0].id;
-                  closeIfOpen(sheetId);
-                  props.payload?.navigation.navigate("ShopUser", {
-                    shopId: item.shop!._id,
-                    distance: item.distance,
-                    relevantProducts: item.relevantProducts,
-                    sheetId,
-                  });
-                }}
+                onPressFn={() => onShopPress(item)}
                 isHighlighted={item.shop?._id === selectedShopId}
                 extraClasses="mb-1"
                 displayMode="bottomSheet"

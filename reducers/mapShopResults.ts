@@ -1,13 +1,18 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ShopResultData } from "../types/API";
 
 export type mapShopResultsState = {
   selectedShopId: string | null;
-  isSearchActive: boolean;
+  isShopSearchActive: boolean;
+  isNavigating: boolean;
+  resultsList: ShopResultData[];
 };
 
 const initialState: mapShopResultsState = {
   selectedShopId: null,
-  isSearchActive: false,
+  isShopSearchActive: false,
+  isNavigating: false,
+  resultsList: [],
 };
 
 export const mapShopResultsSlice = createSlice({
@@ -17,12 +22,27 @@ export const mapShopResultsSlice = createSlice({
     setSelectedShopId: (state, action: PayloadAction<string | null>) => {
       state.selectedShopId = action.payload;
     },
-    setIsSearchActive: (state, action: PayloadAction<boolean>) => {
-      state.isSearchActive = action.payload;
+    setIsShopSearchActive: (state, action: PayloadAction<boolean>) => {
+      state.isShopSearchActive = action.payload;
+    },
+    setIsShopNavigating: (state, action: PayloadAction<boolean>) => {
+      state.isNavigating = action.payload;
+    },
+    setShopResultsList: (state, action: PayloadAction<ShopResultData[]>) => {
+      state.resultsList = action.payload;
+    },
+    clearShopResultsList: (state) => {
+      state.resultsList = [];
     },
   },
 });
 
-export const { setSelectedShopId, setIsSearchActive } =
-  mapShopResultsSlice.actions;
+export const {
+  setSelectedShopId,
+  setIsShopSearchActive,
+  setIsShopNavigating,
+  setShopResultsList,
+  clearShopResultsList,
+} = mapShopResultsSlice.actions;
+
 export default mapShopResultsSlice.reducer;

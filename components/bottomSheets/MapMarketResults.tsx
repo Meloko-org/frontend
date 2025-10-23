@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
-  setIsSearchActive,
+  setIsMarketSearchActive,
   setSelectedMarketId,
   mapMarketResultsState,
 } from "../../reducers/mapMarketResults";
@@ -18,17 +18,28 @@ import TextHeading4 from "../utils/texts/Heading4";
 import MarketSearchResultCard from "../cards/MarketSearchResult";
 import { MarketResultData, ShopResultData } from "../../types/API";
 import { handleSheetFlow } from "../../helpers/sheetHelpers";
+import { clearMarketResultsList } from "../../reducers/mapMarketResults";
+import {
+  clearShopResultsList,
+  setShopResultsList,
+} from "../../reducers/mapShopResults";
 
 export default function MapMarketResults(
   props: SheetProps<"map-market-results">,
 ) {
   const dispatch = useDispatch();
+
+  const isMarketSearchActive = useSelector(
+    (state: { mapMarketResults: mapMarketResultsState }) =>
+      state.mapMarketResults.isMarketSearchActive,
+  );
   const selectedMarketId = useSelector(
     (state: { mapMarketResults: mapMarketResultsState }) =>
       state.mapMarketResults.selectedMarketId,
   );
 
   const actionSheetRef = useRef<ActionSheetRef>(null);
+  const isNavigatingRef = useRef(false); // pour distinguer d'une fermeture sèche ou suivie d'une navigation
   const flatListRef = useRef<FlatList>(null);
   const [snapIndex, setSnapIndex] = useState(0);
 
@@ -89,7 +100,8 @@ export default function MapMarketResults(
   }, [selectedMarketId]);
 
   const onMarketPress = async (shops: any[]) => {
-    isMarketSheetActiveRef.current = true;
+    console.log("onpress");
+    // isMarketSheetActiveRef.current = true;
     // reconstruction d'un objet de type ShopResultData
     const transformedShops: ShopResultData[] = shops.map((shop, index) => {
       const { matchedStocks, ...cleanShop } = shop;
@@ -100,24 +112,36 @@ export default function MapMarketResults(
       };
     });
 
-    await handleSheetFlow({
-      sheet: "map-shop-results",
+    // dispatch(setShopResultsList(transformedShops))
+    isNavigatingRef.current = true;
+
+    await SheetManager.hide("map-market-results", {
       payload: {
+        confirmed: true,
         resultsList: transformedShops,
-        navigation,
-        mapSearchBoxRef,
-        onBackFn: () => {
-          handleSheetFlow({
-            sheet: "map-market-results",
-            payload: {
-              resultsList: markets,
-              navigation,
-              mapSearchBoxRef,
-            },
-          });
-        },
       },
     });
+
+    // await handleSheetFlow({
+    //   sheet: "map-shop-results",
+    //   closeBefore: "map-market-results",
+    //   payload: {
+    //     resultsList: transformedShops,
+    //     navigation,
+    //     mapSearchBoxRef,
+    //     onBackFn: () => {
+    //       handleSheetFlow({
+    //         sheet: "map-market-results",
+    //         closeBefore: "map-shop-results",
+    //         payload: {
+    //           resultsList: markets,
+    //           navigation,
+    //           mapSearchBoxRef,
+    //         },
+    //       });
+    //     },
+    //   },
+    // });
   };
 
   return (
@@ -133,21 +157,26 @@ export default function MapMarketResults(
       overdrawEnabled={false}
       closeOnPressBack={true}
       onClose={() => {
-        console.log(
-          "MAPMARKETRESULTS : onClose marketSheetActive :",
-          isMarketSheetActiveRef,
-        );
-        if (isMarketSheetActiveRef.current === false) {
-          console.log("youpi");
-          dispatch(setIsSearchActive(false));
+        dispatch(setIsMarketSearchActive(false));
+        if (!isNavigatingRef.current) {
           console.log(
-            "marketsheet : mapsearchboxRef :",
-            props.payload?.mapSearchBoxRef.current,
+            "------------------------------------------------------------------------- sheet market : fermeture sèche",
           );
+          // if (isMarketSheetActiveRef.current === false) {
+          dispatch(clearMarketResultsList());
+          dispatch(clearShopResultsList());
           props.payload?.mapSearchBoxRef.current?.openSearch();
+          // }
+        } else {
+          console.log(
+            "------------------------------------------------------------------------- sheet market : navigation",
+          );
+          isNavigatingRef.current = false;
         }
       }}
-      onOpen={() => dispatch(setIsSearchActive(true))}
+      onOpen={() => {
+        if (!isMarketSearchActive) dispatch(setIsMarketSearchActive(true));
+      }}
       id={props.sheetId}
       ref={actionSheetRef}
     >

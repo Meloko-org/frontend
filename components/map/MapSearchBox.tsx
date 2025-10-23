@@ -5,6 +5,11 @@ import React, {
   forwardRef,
 } from "react";
 import * as Location from "expo-location";
+
+import { useSelector, useDispatch } from "react-redux";
+import { mapShopResultsState } from "../../reducers/mapShopResults";
+import { mapMarketResultsState } from "../../reducers/mapMarketResults";
+
 import { useCollapsibleSection } from "../../hooks/useCollapsibleSection";
 
 import { MarketResultData, ShopResultData } from "../../types/API";
@@ -17,9 +22,6 @@ import { Slider } from "@miblanchard/react-native-slider";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import InputButtonGroup from "../utils/inputs/radioGroup";
 import Spinner from "../utils/Spinner";
-import { useSelector } from "react-redux";
-import { mapShopResultsState } from "../../reducers/mapShopResults";
-import { mapMarketResultsState } from "../../reducers/mapMarketResults";
 
 type userPosition = {
   latitude: number;
@@ -37,7 +39,7 @@ type searchOptions = {
 };
 
 type Props = {
-  refrechResultsFn?: (
+  refreshResultsFn?: (
     type: string,
     newShopResults: ShopResultData[] | null,
     newMarketResults: MarketResultData[] | null,
@@ -45,9 +47,10 @@ type Props = {
 };
 
 const MapSearchBox = forwardRef(function MapSearchBox(
-  { refrechResultsFn }: Props,
+  { refreshResultsFn }: Props,
   ref: React.Ref<{ toggleSearch: () => void; openSearch: () => void }>,
 ) {
+  const dispatch = useDispatch();
   const searchSection = useCollapsibleSection();
 
   useImperativeHandle(ref, () => ({
@@ -55,21 +58,43 @@ const MapSearchBox = forwardRef(function MapSearchBox(
       searchSection.toggle();
     },
     openSearch: () => {
-      console.log("MAPSEARCHBOX isOpen :", searchSection.isOpen);
+      // console.log("MAPSEARCHBOX isOpen :", searchSection.isOpen);
       if (!searchSection.isOpen) {
         searchSection.toggle();
       }
     },
   }));
 
+  /* ShopSearchStore */
   const isShopSearchActive = useSelector(
     (state: { mapShopResults: mapShopResultsState }) =>
-      state.mapShopResults.isSearchActive,
+      state.mapShopResults.isShopSearchActive,
   );
 
+  const storedShopResults = useSelector(
+    (state: { mapShopResults: mapShopResultsState }) =>
+      state.mapShopResults.resultsList,
+  );
+
+  const isShopNavigating = useSelector(
+    (state: { mapShopResults: mapShopResultsState }) =>
+      state.mapShopResults.isNavigating,
+  );
+
+  /* MarketSearchStore */
   const isMarketSearchActive = useSelector(
     (state: { mapMarketResults: mapMarketResultsState }) =>
-      state.mapMarketResults.isSearchActive,
+      state.mapMarketResults.isMarketSearchActive,
+  );
+
+  const storedMarketResults = useSelector(
+    (state: { mapMarketResults: mapMarketResultsState }) =>
+      state.mapMarketResults.resultsList,
+  );
+
+  const isMarketNavigating = useSelector(
+    (state: { mapMarketResults: mapMarketResultsState }) =>
+      state.mapMarketResults.isNavigating,
   );
 
   const [isSearchLoading, setIsSearchLoading] = useState(false);
@@ -222,11 +247,17 @@ const MapSearchBox = forwardRef(function MapSearchBox(
 
       // console.log("databack :", JSON.stringify(data, null, 2));
 
-      if (refrechResultsFn) {
+      if (refreshResultsFn) {
         if (searchOptions.searchType === "shop") {
-          refrechResultsFn("shop", data.shopResults, null);
+          console.log(
+            "------------------------------------------------------------------------- refreshResultsFn shop",
+          );
+          refreshResultsFn("shop", data.shopResults, null);
         } else {
-          refrechResultsFn("market", null, data.marketResults);
+          console.log(
+            "------------------------------------------------------------------------- refreshResultsFn market",
+          );
+          refreshResultsFn("market", null, data.marketResults);
         }
       }
 
@@ -243,11 +274,14 @@ const MapSearchBox = forwardRef(function MapSearchBox(
     }
   }, []);
 
-  console.log("MAPSEARCHBOX: shopSearchActive :", isShopSearchActive);
-  console.log("MAPSEARCHBOX: marketsearchActive :", isMarketSearchActive);
+  // console.log("------------ MAPSEARCHBOX -----------------------------");
+  // console.log("               shopSearchActive :", isShopSearchActive);
+  // console.log("               marketsearchActive :", isMarketSearchActive);
+  // console.log("               storedResults length: ", storedShopResults.length)
 
-  if (isShopSearchActive || isMarketSearchActive) return null;
-
+  // une recherche (shop ou market) est active, ou s'il y a des résultats stockés, on retourne null
+  // if (isShopNavigating || isMarketNavigating) return null;
+  // sinon on retourne le composant
   return (
     <>
       <View className={`rounded-lg bg-lightbg p-2 dark:bg-tertiary`}>

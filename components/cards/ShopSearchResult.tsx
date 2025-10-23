@@ -59,13 +59,13 @@ export default function ShopSearchResultCard({
                   {shopData?.name}
                 </Text>
               </View>
-              <View className="mr-2">
-                {distance && (
+              {typeof distance === "number" && distance !== 0 && (
+                <View className="mr-2">
                   <Text className="text-xs text-darkbg dark:text-lightbg">
                     {`${distance.toFixed(2)} km`}
                   </Text>
-                )}
-              </View>
+                </View>
+              )}
             </View>
             <StarsNotation
               iconNames={["star", "star-half", "star-o"]}
@@ -84,6 +84,7 @@ export default function ShopSearchResultCard({
             )}
           </View>
         </View>
+
         {showDirectionButton && (
           <View className="flex flex-row justify-center items-center w-1/5">
             <IconButton

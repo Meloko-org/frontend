@@ -6,70 +6,107 @@ import React, {
   useMemo,
 } from "react";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
+import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { UserTabParamList } from "../../types/Navigation";
+
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearShopResultsList,
+  mapShopResultsState,
+  setIsShopSearchActive,
+  setSelectedShopId,
+  setShopResultsList,
+} from "../../reducers/mapShopResults";
+import {
+  clearMarketResultsList,
+  mapMarketResultsState,
+  setIsMarketNavigating,
+  setIsMarketSearchActive,
+  setMarketResultsList,
+  setSelectedMarketId,
+} from "../../reducers/mapMarketResults";
 
 import { Region } from "react-native-maps";
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
 
-import {
-  ActionSheetRef,
-  getSheetStack,
-  SheetManager,
-} from "react-native-actions-sheet";
 import { MarketResultData, ShopResultData } from "../../types/API";
-import { closeIfOpen, handleSheetFlow } from "../../helpers/sheetHelpers";
+import { handleSheetFlow } from "../../helpers/sheetHelpers";
 
-import { View, Text, StyleSheet, Platform } from "react-native";
-import ShopSearchResultCard from "../../components/cards/ShopSearchResult";
-import MarketSearchResultCard from "../../components/cards/MarketSearchResult";
-import ShopMarkerCard from "../../components/cards/ShopMarkerCard";
+import { View, Platform } from "react-native";
 import MapSearchBox from "../../components/map/MapSearchBox";
 import { SafeAreaView } from "react-native-safe-area-context";
-import MarketMarkerCard from "../../components/cards/MarketMarker";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  mapShopResultsState,
-  setSelectedShopId,
-} from "../../reducers/mapShopResults";
-import {
-  mapMarketResultsState,
-  setSelectedMarketId,
-} from "../../reducers/mapMarketResults";
+import { SheetManager } from "react-native-actions-sheet";
 
 type userPosition = {
   latitude: number;
   longitude: number;
 } | null;
 
-type MapProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList>;
+type MarketSheetPromiseResult = {
+  confirmed: boolean;
+  resultsList: ShopResultData[];
 };
 
-export default function MapCustomerScreen({ navigation }: MapProps) {
+type ShopSheetPromiseResult = {
+  confirmed: boolean;
+  isGoingBack: boolean;
+};
+
+type MapCustomerRouteProp = RouteProp<UserTabParamList, "MapCustomer">;
+
+type MapCustomerNavProp = BottomTabNavigationProp<
+  UserTabParamList,
+  "MapCustomer"
+>;
+
+type Props = {
+  navigation: MapCustomerNavProp;
+  route: MapCustomerRouteProp;
+};
+
+export default function MapCustomerScreen({ navigation, route }: Props) {
   const dispatch = useDispatch();
 
   const [currentPosition, setCurrentPosition] = useState<userPosition>(null);
   const [region, setRegion] = useState<Region | undefined>(undefined);
 
+  /* ShopSearchStore */
   const isShopSearchActive = useSelector(
     (state: { mapShopResults: mapShopResultsState }) =>
-      state.mapShopResults.isSearchActive,
+      state.mapShopResults.isShopSearchActive,
   );
 
+  const storedShopResults = useSelector(
+    (state: { mapShopResults: mapShopResultsState }) =>
+      state.mapShopResults.resultsList,
+  );
+
+  const isShopNavigating = useSelector(
+    (state: { mapShopResults: mapShopResultsState }) =>
+      state.mapShopResults.isNavigating,
+  );
+
+  /* MarketSearchStore */
   const isMarketSearchActive = useSelector(
     (state: { mapMarketResults: mapMarketResultsState }) =>
-      state.mapMarketResults.isSearchActive,
+      state.mapMarketResults.isMarketSearchActive,
   );
 
-  // stockage des résultats venant de mapSearchBox
-  const [shopResults, setShopResults] = useState<ShopResultData[] | null>([]);
-  const [marketResults, setMarketResults] = useState<MarketResultData[] | null>(
-    [],
+  const storedMarketResults = useSelector(
+    (state: { mapMarketResults: mapMarketResultsState }) =>
+      state.mapMarketResults.resultsList,
   );
+
+  const isMarketNavigating = useSelector(
+    (state: { mapMarketResults: mapMarketResultsState }) =>
+      state.mapMarketResults.isNavigating,
+  );
+
   // nécessaire pour le retour de map-shop-results à map-markets-results
   const stockedMarketResultsRef = useRef<MarketResultData[]>([]);
+
   const mapSearchBoxRef = useRef<{
     toggleSearch: () => void;
     openSearch: () => void;
@@ -91,48 +128,84 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
         });
       }
     })();
-
-    // if (route.params && route.params.searchResults) {
-    //   setSearchResults(route.params.searchResults);
-    // }
   }, []);
 
-  // s'il n'y a plus de recherche en cours, on efface les potentiels résultats précédents
   useEffect(() => {
-    if (!isShopSearchActive) {
-      setShopResults(null);
+    if (
+      storedShopResults &&
+      storedShopResults.length > 0 &&
+      isShopSearchActive
+    ) {
+      handleShopSheet();
     }
-    if (!isMarketSearchActive) {
-      setMarketResults(null);
+  }, [storedShopResults, isShopSearchActive]);
+
+  // const onBackFn = () => {
+  //   console.log("youpi")
+  //   dispatch(setIsShopSearchActive(false))
+  // }
+
+  const handleShopSheet = async () => {
+    try {
+      const shopSheetPromise = (await SheetManager.show("map-shop-results", {
+        payload: {
+          resultsList: storedShopResults,
+          navigation,
+          mapSearchBoxRef,
+          backButton: storedMarketResults.length > 0 ? true : undefined,
+        },
+      })) as ShopSheetPromiseResult;
+
+      if (shopSheetPromise && shopSheetPromise.confirmed) {
+        if (storedMarketResults && storedMarketResults.length > 0) {
+          console.log(
+            "Réouverture de marketSheet, goingBack:",
+            shopSheetPromise.isGoingBack,
+          );
+          if (shopSheetPromise.isGoingBack) {
+            dispatch(setIsMarketSearchActive(true));
+          } else {
+            dispatch(setIsMarketSearchActive(false));
+          }
+        }
+      }
+    } catch (error) {
+      console.warn("Erreur de shopSheet: ", error);
     }
-  }, [isShopSearchActive, isMarketSearchActive]);
+  };
 
   useEffect(() => {
-    if (shopResults && shopResults?.length > 0) {
-      handleSheetFlow({
-        sheet: "map-shop-results",
-        payload: {
-          resultsList: shopResults,
-          navigation: navigation,
-          mapSearchBoxRef,
-        },
-      });
+    if (
+      storedMarketResults &&
+      storedMarketResults.length > 0 &&
+      isMarketSearchActive
+    ) {
+      handleMarketSheet();
     }
-  }, [shopResults]);
+  }, [storedMarketResults, isMarketSearchActive]);
 
-  useEffect(() => {
-    if (marketResults && marketResults.length > 0) {
-      stockedMarketResultsRef.current = marketResults;
-      handleSheetFlow({
-        sheet: "map-market-results",
-        payload: {
-          resultsList: marketResults,
-          navigation: navigation,
-          mapSearchBoxRef,
+  const handleMarketSheet = async () => {
+    try {
+      const marketSheetPromise = (await SheetManager.show(
+        "map-market-results",
+        {
+          payload: {
+            resultsList: storedMarketResults,
+            navigation,
+            mapSearchBoxRef,
+          },
         },
-      });
+      )) as MarketSheetPromiseResult;
+
+      if (marketSheetPromise && marketSheetPromise.confirmed) {
+        dispatch(setIsMarketSearchActive(false));
+        dispatch(setIsShopSearchActive(true));
+        dispatch(setShopResultsList(marketSheetPromise.resultsList));
+      }
+    } catch (error) {
+      console.warn("Erreur de marketSheet: ", error);
     }
-  }, [marketResults]);
+  };
 
   const handleShopMarkerPress = (shopId: string) => {
     dispatch(setSelectedShopId(shopId));
@@ -143,8 +216,12 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
   };
 
   const markers = useMemo(() => {
-    if (shopResults && shopResults.length > 0) {
-      return shopResults.map((data, i) => (
+    if (
+      storedShopResults &&
+      storedShopResults.length > 0 &&
+      isShopSearchActive
+    ) {
+      return storedShopResults.map((data, i) => (
         <Marker
           key={`shop-${data?.shop?._id}`}
           coordinate={{
@@ -156,8 +233,12 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
       ));
     }
 
-    if (marketResults && marketResults.length > 0) {
-      return marketResults.map((data, i) => (
+    if (
+      storedMarketResults &&
+      storedMarketResults.length > 0 &&
+      isMarketSearchActive
+    ) {
+      return storedMarketResults.map((data, i) => (
         <Marker
           key={`market-${data?.market?._id}`}
           coordinate={{
@@ -173,9 +254,22 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
     }
 
     return null;
-  }, [shopResults, marketResults]);
+  }, [
+    storedShopResults,
+    storedMarketResults,
+    isMarketSearchActive,
+    isShopSearchActive,
+  ]);
 
-  // console.log("MAPCUSTOMER: marketResults :", marketResults);
+  console.log("MAP -----------------------------");
+  console.log("    SHOP:");
+  console.log("         shopSearchActive :", isShopSearchActive);
+  console.log("         results stored: ", storedShopResults.length);
+  console.log("         isNavigating: ", isShopNavigating);
+  console.log("    MARKET:");
+  console.log("         marketsearchActive :", isMarketSearchActive);
+  console.log("         results stored: ", storedMarketResults.length);
+  console.log("         isNavigating: ", isMarketNavigating);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -191,52 +285,56 @@ export default function MapCustomerScreen({ navigation }: MapProps) {
       </MapView>
 
       <View className="absolute top-[90px] px-3 w-full">
-        <MapSearchBox
-          ref={mapSearchBoxRef}
-          refrechResultsFn={(
-            type: string,
-            newShopResults: ShopResultData[] | null,
-            newMarketResults: MarketResultData[] | null,
-          ) => {
-            const hasShopResults = newShopResults && newShopResults.length > 0;
-            const hasMarketResults =
-              newMarketResults && newMarketResults.length > 0;
+        {!isShopSearchActive && !isMarketSearchActive && (
+          <MapSearchBox
+            ref={mapSearchBoxRef}
+            refreshResultsFn={(
+              type: string,
+              newShopResults: ShopResultData[] | null,
+              newMarketResults: MarketResultData[] | null,
+            ) => {
+              const hasShopResults =
+                newShopResults && newShopResults.length > 0;
+              const hasMarketResults =
+                newMarketResults && newMarketResults.length > 0;
 
-            if (type === "shop") {
-              if (!hasShopResults) {
-                setShopResults([]);
-                handleSheetFlow({
-                  sheet: "map-empty-search-results",
-                  payload: {
-                    searchType: "producteur",
-                    onRetry: () => {
-                      mapSearchBoxRef.current?.toggleSearch();
+              if (type === "shop") {
+                dispatch(setIsShopSearchActive(true));
+                if (!hasShopResults) {
+                  dispatch(setShopResultsList([]));
+                  handleSheetFlow({
+                    sheet: "map-empty-search-results",
+                    payload: {
+                      searchType: "producteur",
+                      onRetry: () => {
+                        mapSearchBoxRef.current?.toggleSearch();
+                      },
                     },
-                  },
-                });
+                  });
+                } else {
+                  dispatch(setShopResultsList(newShopResults));
+                  dispatch(clearMarketResultsList());
+                }
               } else {
-                setShopResults(newShopResults);
-                setMarketResults(null);
-              }
-            } else {
-              setShopResults(null);
-              if (!hasMarketResults) {
-                handleSheetFlow({
-                  sheet: "map-empty-search-results",
-                  payload: {
-                    searchType: "point de vente",
-                    onRetry: () => {
-                      mapSearchBoxRef.current?.toggleSearch();
+                dispatch(setIsMarketSearchActive(true));
+                if (!hasMarketResults) {
+                  handleSheetFlow({
+                    sheet: "map-empty-search-results",
+                    payload: {
+                      searchType: "point de vente",
+                      onRetry: () => {
+                        mapSearchBoxRef.current?.toggleSearch();
+                      },
                     },
-                  },
-                });
-              } else {
-                setMarketResults(newMarketResults);
-                setShopResults(null);
+                  });
+                } else {
+                  dispatch(setMarketResultsList(newMarketResults));
+                  dispatch(clearShopResultsList());
+                }
               }
-            }
-          }}
-        />
+            }}
+          />
+        )}
       </View>
     </SafeAreaView>
   );

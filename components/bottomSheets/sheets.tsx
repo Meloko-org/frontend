@@ -1,6 +1,6 @@
 import React, { JSX } from "react";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import type { RootStackParamList } from "../../types/Navigation";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import type { UserTabParamList } from "../../types/Navigation";
 import {
   registerSheet,
   RouteDefinition,
@@ -74,8 +74,9 @@ declare module "react-native-actions-sheet" {
     "map-shop-results": SheetDefinition<{
       payload: {
         resultsList: ShopResultData[];
-        navigation: NativeStackNavigationProp<RootStackParamList>;
-        onBackFn?: () => void;
+        navigation: BottomTabNavigationProp<UserTabParamList>;
+        // onBackFn?: () => void;
+        backButton?: boolean;
         mapSearchBoxRef: React.RefObject<{
           toggleSearch: () => void;
           openSearch: () => void;
@@ -85,7 +86,7 @@ declare module "react-native-actions-sheet" {
     "map-market-results": SheetDefinition<{
       payload: {
         resultsList: MarketResultData[];
-        navigation: NativeStackNavigationProp<RootStackParamList>;
+        navigation: BottomTabNavigationProp<UserTabParamList>;
         mapSearchBoxRef: React.RefObject<{
           toggleSearch: () => void;
           openSearch: () => void;

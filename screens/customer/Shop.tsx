@@ -42,6 +42,7 @@ import CardNote from "../../components/cards/Note";
 import BackLabelButton from "../../components/utils/buttons/BackLabel";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import Spinner from "../../components/utils/Spinner";
+import { setIsShopSearchActive } from "../../reducers/mapShopResults";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -221,14 +222,19 @@ export default function ShopUserScreen({ navigation, route }: Props) {
     );
   });
 
-  console.log("SHOPUSER: shopId :", shopId);
+  // console.log("SHOPUSER: shopId :", shopId);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <View className="flex flex-row mb-2 mt-2">
         <BackLabelButton
           backLabel="Retour aux résultats"
-          onPressFn={() => navigation.goBack()}
+          onPressFn={() => {
+            if (sheetId) {
+              dispatch(setIsShopSearchActive(true));
+            }
+            navigation.goBack();
+          }}
           extraClasses="ml-3 pr-2"
         />
       </View>
