@@ -204,7 +204,7 @@ const TabNavigatorUser: React.FC = () => {
           );
         },
         tabBarActiveTintColor: "#98B66E",
-        tabBarInactiveTintColor: "#262E20",
+        tabBarInactiveTintColor: colorScheme === "dark" ? "#FCFFF0" : "#262E20",
         tabBarShowLabel: false,
         headerShown: false,
         tabBarStyle: {
