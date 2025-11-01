@@ -182,14 +182,14 @@ function getOrderStatus(order: OrderData): GlobalOrderStatus {
 
 // calcule le prix du produit commandé
 const getProductCost = (
-  price: string | undefined,
+  price: number,
   quantity: number,
   unit: string | undefined,
 ) => {
   if (unit === "gr") {
     quantity /= 1000;
   }
-  return Number(price) * quantity;
+  return price * quantity;
 };
 
 export default {

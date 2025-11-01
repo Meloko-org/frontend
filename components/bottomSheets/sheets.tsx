@@ -62,6 +62,7 @@ declare module "react-native-actions-sheet" {
     "product-details": SheetDefinition<{
       payload: {
         stockData?: StockData;
+        shopData: ShopData;
         unit: string;
       };
     }>;

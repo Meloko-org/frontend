@@ -1,7 +1,12 @@
+import React, { useState, useEffect } from "react";
+
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { UserTabParamList } from "../../types/Navigation";
+
 import { View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState, useEffect } from "react";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,8 +21,37 @@ import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import ButtonPrimaryStart from "../../components/utils/buttons/PrimaryStart";
 import ButtonSecondaryStart from "../../components/utils/buttons/SecondaryStart";
 import CartTools from "../../modules/CartTools";
+import { mapShopResultsState } from "../../reducers/mapShopResults";
+import TextHeading4 from "../../components/utils/texts/Heading4";
+import TextBody2 from "../../components/utils/texts/Body2";
+import TextBody1 from "../../components/utils/texts/Body1";
 
-export default function CartScreen({ navigation }) {
+type CartRouteProp = RouteProp<UserTabParamList, "Cart">;
+
+type CartNavProp = BottomTabNavigationProp<UserTabParamList, "Cart">;
+
+type Props = {
+  navigation: CartNavProp;
+  route: CartRouteProp;
+};
+
+export default function CartScreen({ navigation }: Props) {
+  /* ShopSearchStore */
+  const isShopSearchActive = useSelector(
+    (state: { mapShopResults: mapShopResultsState }) =>
+      state.mapShopResults.isShopSearchActive,
+  );
+
+  const storedShopResults = useSelector(
+    (state: { mapShopResults: mapShopResultsState }) =>
+      state.mapShopResults.resultsList,
+  );
+
+  const isShopNavigating = useSelector(
+    (state: { mapShopResults: mapShopResultsState }) =>
+      state.mapShopResults.isNavigating,
+  );
+
   const cartStore = useSelector(
     (state: { cart: CartState }) => state.cart.value,
   );
@@ -36,51 +70,91 @@ export default function CartScreen({ navigation }) {
       return (
         <CardProduct
           stockData={p.stockData}
+          shopData={cart.shop}
           key={p.stockData._id}
-          extraClasses="mb-1"
+          extraClasses="mb-2"
           displayMode="cart"
+          quantity={p.quantity}
           quantityControllable
           showImage
         />
       );
     });
 
+    let subTotal = 0;
+    const productsCost = cart.products.reduce((accumulator, currentValue) => {
+      const quantity =
+        currentValue.stockData.product.weight.unit === "gr"
+          ? currentValue.quantity / 1000
+          : currentValue.quantity;
+
+      return quantity * Number(currentValue.stockData.price) + accumulator;
+    }, 0);
+    subTotal += productsCost;
+
     return (
-      <View className="mb-3" key={cart.shop._id}>
-        <TextHeading3 centered extraClasses="mb-3">
-          {cart.shop.name}
-        </TextHeading3>
+      <View className="mb-5" key={cart.shop?._id}>
+        <TextHeading4 centered extraClasses="mb-2 pb-1 bg-night rounded-lg">
+          {cart.shop?.name}
+        </TextHeading4>
         {productsByShop}
+        <View className="flex flex-row justify-center items-center">
+          <TextBody1 extraClasses="mr-5">Sous-total:</TextBody1>
+          <TextHeading4>{subTotal.toFixed(2)} €</TextHeading4>
+        </View>
       </View>
     );
   });
 
   const handleWithdrawModePress = () => {
-    navigation.navigate("TabNavigatorUser", {
-      screen: "WithdrawModesUser",
-    });
+    navigation.navigate("WithdrawModes");
   };
 
   console.log("------------- CARTSCREEN ----------------------------");
-  console.log("cartStore: ", JSON.stringify(cartStore, null, 2));
+  console.log(
+    "cartStore: ",
+    JSON.stringify(
+      cartStore.map((elt) => ({
+        shop: elt.shop?.name,
+        products: elt.products.map((pdt) => ({
+          name: pdt.stockData.productCustomName
+            ? pdt.stockData.productCustomName
+            : pdt.stockData.product.name,
+          quantity: pdt.quantity,
+        })),
+      })),
+      null,
+      2,
+    ),
+  );
+
+  // console.log("    SHOP:");
+  // console.log("         shopSearchActive :", isShopSearchActive);
+  // console.log("         results stored: ", storedShopResults.length);
+  // console.log("         isNavigating: ", isShopNavigating);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <View className="p-3 flex flex-column h-full">
         {products.length > 0 ? (
           <>
-            <TextHeading2 extraClasses="mb-4" centered>
-              Votre panier
+            <TextHeading2 extraClasses="mb-5" centered>
+              Mon panier
             </TextHeading2>
             <ScrollView>
               {products}
-              <TextHeading3 extraClasses="py-3 text-right">{`TOTAL: ${cartTotal.toFixed(2)}€`}</TextHeading3>
+              <View className="px-3 bg-night rounded-lg my-5">
+                <TextHeading3
+                  centered
+                  extraClasses="py-3 text-right"
+                >{`TOTAL: ${cartTotal?.toFixed(2)}€`}</TextHeading3>
+              </View>
 
               <ButtonPrimaryEnd
                 label="Mes modes de retrait"
                 iconName="arrow-right"
                 onPressFn={handleWithdrawModePress}
-                extraClasses="mb-3"
+                extraClasses="mt-5 mb-3 h-14"
               />
 
               <ButtonSecondaryStart
@@ -88,19 +162,13 @@ export default function CartScreen({ navigation }) {
                 iconName="arrow-left"
                 disabled={false}
                 isLoading={false}
-                onPressFn={() =>
-                  navigation.navigate("TabNavigatorUser", {
-                    screen: "Search",
-                    params: {
-                      search: {},
-                    },
-                  })
-                }
+                onPressFn={() => navigation.navigate("MapCustomer")}
+                extraClasses="h-14"
               />
             </ScrollView>
           </>
         ) : (
-          <View className="h-full justify-center items-center">
+          <View className="h-full justify-center items-center px-3">
             <TextHeading2 extraClasses="mb-4">
               Votre panier est vide :(
             </TextHeading2>
@@ -108,10 +176,8 @@ export default function CartScreen({ navigation }) {
               label="Continuer vos achats"
               disabled={false}
               iconName="arrow-left"
-              onPressFn={() =>
-                navigation.navigate("TabNavigatorUser", { screen: "ShopUser" })
-              }
-              extraClasses="w-full"
+              onPressFn={() => navigation.navigate("MapCustomer")}
+              extraClasses="h-14"
             />
           </View>
         )}

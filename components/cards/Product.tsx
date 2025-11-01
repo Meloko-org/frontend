@@ -14,7 +14,7 @@ import {
   decreaseCartQuantity,
   CartState,
 } from "../../reducers/cart";
-import { StockData } from "../../types/API";
+import { ShopData, StockData } from "../../types/API";
 import TextBody1 from "../utils/texts/Body1";
 import PricePer from "../utils/badges/Dark";
 import PriceBadge from "../utils/badges/Price";
@@ -27,6 +27,7 @@ import CartControlButton from "../utils/buttons/CartControlButton";
 
 type CardProductProps = {
   stockData?: StockData;
+  shopData: ShopData;
   quantity?: number;
   onPressFn?: ((event: GestureResponderEvent) => void) | undefined;
   extraClasses?: string;
@@ -37,6 +38,7 @@ type CardProductProps = {
 
 export default function CardProduct({
   stockData,
+  shopData,
   quantity,
   onPressFn,
   extraClasses,
@@ -54,6 +56,7 @@ export default function CardProduct({
     SheetManager.show("product-details", {
       payload: {
         stockData: stockData,
+        shopData: shopData,
         unit: unit,
       },
     });
@@ -75,12 +78,14 @@ export default function CardProduct({
 
   const unit = stockData?.product.weight.unit === "gr" ? "kg" : "la pièce";
 
+  // console.log("PRODUCTCARD cart :", JSON.stringify(cartStore, null, 2))
+
   return (
     <>
       <TouchableOpacity
         onPress={showProductDetailsBottomSheet}
         activeOpacity={0.8}
-        className={`${extraClasses} rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary flex flex-row w-full`}
+        className={`${extraClasses} rounded-lg shadow-sm bg-white px-2 dark:bg-tertiary flex flex-row w-full`}
       >
         <View className="flex flex-row items-center w-full">
           <View className="flex flex-row w-4/5">
@@ -108,7 +113,7 @@ export default function CardProduct({
             >
               <TextBody1 extraClasses="mb-1">{productName}</TextBody1>
 
-              {displayMode === "detail" ? (
+              {displayMode === "detail" || displayMode === "cart" ? (
                 <PriceBadge
                   colour="bg-secondary"
                   extraClasses="px-2 py-1"
@@ -130,12 +135,15 @@ export default function CardProduct({
             </View>
           </View>
 
-          <View className="w-1/5 flex flex-column justify-center items-center">
-            <CartControlButton
-              stockData={stockData!}
-              quantityControllable={quantityControllable}
-            />
-          </View>
+          {displayMode !== "withdraw" && (
+            <View className="w-1/5 flex flex-column justify-center items-center">
+              <CartControlButton
+                stockData={stockData!}
+                shopData={shopData}
+                quantityControllable={quantityControllable}
+              />
+            </View>
+          )}
         </View>
       </TouchableOpacity>
     </>

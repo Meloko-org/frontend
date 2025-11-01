@@ -52,6 +52,7 @@ export default function ProductDetails(props: SheetProps<"product-details">) {
           <View className="w-1/5 flex flex-column justify-center items-center">
             <CartControlButton
               stockData={props.payload?.stockData!}
+              shopData={props.payload?.shopData!}
               quantityControllable={true}
             />
           </View>

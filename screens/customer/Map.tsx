@@ -130,6 +130,18 @@ export default function MapCustomerScreen({ navigation, route }: Props) {
     })();
   }, []);
 
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     if (
+  //       storedShopResults &&
+  //       storedShopResults.length > 0 &&
+  //       isShopSearchActive
+  //     ) {
+  //       handleShopSheet();
+  //     }
+  //   }, [storedShopResults, isShopSearchActive])
+  // )
+
   useEffect(() => {
     if (
       storedShopResults &&
@@ -139,11 +151,6 @@ export default function MapCustomerScreen({ navigation, route }: Props) {
       handleShopSheet();
     }
   }, [storedShopResults, isShopSearchActive]);
-
-  // const onBackFn = () => {
-  //   console.log("youpi")
-  //   dispatch(setIsShopSearchActive(false))
-  // }
 
   const handleShopSheet = async () => {
     try {
@@ -173,6 +180,18 @@ export default function MapCustomerScreen({ navigation, route }: Props) {
       console.warn("Erreur de shopSheet: ", error);
     }
   };
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     if (
+  //       storedMarketResults &&
+  //       storedMarketResults.length > 0 &&
+  //       isMarketSearchActive
+  //     ) {
+  //       handleMarketSheet();
+  //     }
+  //   }, [storedMarketResults, isMarketSearchActive])
+  // )
 
   useEffect(() => {
     if (
@@ -260,6 +279,12 @@ export default function MapCustomerScreen({ navigation, route }: Props) {
     isMarketSearchActive,
     isShopSearchActive,
   ]);
+
+  // useFocusEffect(
+  //   useCallback(() => {
+
+  //   }, [])
+  // )
 
   console.log("MAP -----------------------------");
   console.log("    SHOP:");

@@ -4,31 +4,33 @@ import { GestureResponderEvent } from "react-native";
 import { ProductCategoryCardData, ProductData } from "../../types/API";
 
 type CardProductCategoryProps = {
-  category: ProductCategoryCardData;
+  object: ProductCategoryCardData;
   extraClasses?: string;
   onPressFn: ((name: string) => void) | undefined;
 };
 
-export default function ProductCategory(
-  props: CardProductCategoryProps,
-): JSX.Element {
+export default function ProductCategory({
+  object,
+  onPressFn,
+  extraClasses,
+}: CardProductCategoryProps): JSX.Element {
   return (
     <TouchableOpacity
-      onPress={() => props.onPressFn && props.onPressFn(props.category.name)}
-      className={`${props.extraClasses && props.extraClasses} w-[150px] bg-white shadow-sm rounded-lg dark:bg-tertiary`}
+      onPress={() => onPressFn && onPressFn(object.category.name)}
+      className={`${extraClasses && extraClasses} w-[150px] bg-white shadow-sm rounded-lg dark:bg-tertiary`}
     >
       <Image
-        source={{ uri: props.category.image }}
+        source={{ uri: object.category.image }}
         resizeMode="cover"
         className="w-full h-20 rounded-t-lg"
       />
       <View className="rounded-b-lg p-2">
         <Text className="text-base font-bold dark:text-lightbg">
-          {props.category.name}
+          {object.category.name}
         </Text>
         <Text className="text-xs uppercase dark:text-lightbg">
-          {props.category.products?.length} produit
-          {props.category.products!.length > 1 && "s"}
+          {object.stocks?.length} produit
+          {object.stocks!.length > 1 && "s"}
         </Text>
       </View>
     </TouchableOpacity>

@@ -6,6 +6,7 @@ import {
   MarketsData,
   AddressData,
   CrewMember,
+  FullShopData,
 } from "../types/API";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
@@ -185,7 +186,7 @@ const updateShopOffline = async (
   }
 };
 
-const getStocksByshopAndCategory = async (
+const getStocksByShopAndCategory = async (
   shopId: string | undefined,
   categoryName: string,
 ) => {
@@ -439,6 +440,44 @@ const getShopInfos = async (
   }
 };
 
+/* Récupérer les données d'un shop, ses catégories de produits
+  et tous les produits par catégorie pendant le processus d'achat 
+*/
+const getFullShopById = async (
+  shopId: string,
+): Promise<ApiResponse<FullShopData>> => {
+  try {
+    const response = await fetch(`${API_ROOT}/shops/${shopId}`, {
+      method: "GET",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: impossible de récupérer les données.`,
+      };
+    }
+
+    const data = await response.json();
+
+    return data.success
+      ? { success: true, data: data.fullShop }
+      : { success: false, data: null, message: data.message };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      data: null,
+      message: "Une erreur est survenue lors de la récupération des données.",
+    };
+  }
+};
+
 const getMarkets = async (
   city: string,
   radius: number[],
@@ -477,7 +516,7 @@ const getMarkets = async (
   }
 };
 
-const getMarketById = async (marketId: string): Promise<MarketData> => {
+const getMarketById = async (marketId: string): Promise<MarketData | null> => {
   try {
     const response = await fetch(`${API_ROOT}/shops/markets/${marketId}`, {
       method: "GET",
@@ -490,7 +529,7 @@ const getMarketById = async (marketId: string): Promise<MarketData> => {
     return data;
   } catch (error) {
     console.log(error);
-    // return
+    return null;
   }
 };
 
@@ -501,7 +540,8 @@ export default {
   updateShopTypes,
   updateShopFeatures,
   getShopInfos,
-  getStocksByshopAndCategory,
+  getFullShopById,
+  getStocksByShopAndCategory,
   updateClickCollect,
   getMarkets,
   addShopMarkets,

@@ -167,12 +167,12 @@ type UserTabParamList = {
   UserProfileInformations: undefined;
   UserProfileAddresses: undefined;
   ShopUser: {
-    shopId: string | undefined;
+    shopId: string;
     distance: number | undefined;
     relevantProducts: StockData[];
     sheetId: string;
   };
-  WithdrawModesUser: undefined;
+  WithdrawModes: undefined;
   OrdersCustomer: undefined;
   PaymentCustomer: undefined;
   BookmarksCustomer: undefined;

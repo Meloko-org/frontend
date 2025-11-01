@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { StockData } from "../../../types/API";
+import { ShopData, StockData } from "../../../types/API";
 import {
   addProductToCart,
   CartState,
@@ -13,12 +13,14 @@ import IconButton from "./Icon";
 
 type CartControlButtonProps = {
   stockData: StockData;
+  shopData: ShopData;
   quantityControllable?: boolean;
   extraClasses?: string;
 };
 
 export default function CartControlButton({
   stockData,
+  shopData,
   quantityControllable,
   extraClasses,
 }: CartControlButtonProps) {
@@ -27,7 +29,7 @@ export default function CartControlButton({
     (state: { cart: CartState }) => state.cart.value,
   );
 
-  const shopId = stockData.shop?._id;
+  const shopId = shopData?._id;
   const stockId = stockData._id;
   const unit = stockData.product.weight.unit;
   const increment = unit === "gr" ? 100 : 1;
@@ -48,7 +50,7 @@ export default function CartControlButton({
   const handleAddToCart = () => {
     dispatch(
       addProductToCart({
-        shop: stockData.shop,
+        shop: shopData,
         stockData,
         quantity: increment,
       }),
@@ -56,11 +58,15 @@ export default function CartControlButton({
   };
 
   const handleIncrease = () => {
-    dispatch(increaseCartQuantity({ shopId, stockId, increment }));
+    if (shopId) {
+      dispatch(increaseCartQuantity({ shopId, stockId, increment }));
+    }
   };
 
   const handleDecrease = () => {
-    dispatch(decreaseCartQuantity({ shopId, stockId, decrement: increment }));
+    if (shopId) {
+      dispatch(decreaseCartQuantity({ shopId, stockId, decrement: increment }));
+    }
   };
 
   if (cartProduct) {
@@ -82,6 +88,10 @@ export default function CartControlButton({
       </View>
     );
   }
+
+  // console.log("CARTBUTTON shopId: ", shopId)
+  // console.log("CARTBUTTON cartstore :", JSON.stringify(cartStore, null ,2))
+  // console.log("CARTBUTTON stockdata :", JSON.stringify(stockData, null, 2))
 
   return (
     <IconButton

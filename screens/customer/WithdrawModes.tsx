@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { UserTabParamList } from "../../types/Navigation";
+
 import { useDispatch, useSelector } from "react-redux";
 import { CartState, updateWithdrawMode } from "../../reducers/cart";
 
 import { MarketData, ShopData } from "../../types/API";
 
-import { View, Modal } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { View, Modal } from "react-native";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import CardProduct from "../../components/cards/Product";
@@ -26,7 +31,19 @@ import TextBody1 from "../../components/utils/texts/Body1";
 
 type SelectedMarkets = {};
 
-export default function WithdrawModesScreen({ navigation }) {
+type WithdrawModesRouteProp = RouteProp<UserTabParamList, "WithdrawModes">;
+
+type WithdrawModesNavProp = BottomTabNavigationProp<
+  UserTabParamList,
+  "WithdrawModes"
+>;
+
+type Props = {
+  navigation: WithdrawModesNavProp;
+  route: WithdrawModesRouteProp;
+};
+
+export default function WithdrawModesScreen({ navigation, route }: Props) {
   // Import the Clerk Auth functions
   const { isSignedIn, getToken } = useAuth();
   const dispatch = useDispatch();
@@ -62,20 +79,21 @@ export default function WithdrawModesScreen({ navigation }) {
       });
       setCartTotal(allShopsCost);
       setIsPaymentDisabledButton(cartStore.some((c) => !c.withdrawMode));
-    } else {
-      navigation.navigate("TabNavigatorUser", {
-        screen: "Accueil",
-        params: {
-          search: {
-            address: null,
-            query: null,
-            radius: null,
-            userPosition: null,
-          },
-          searchResults: [],
-        },
-      });
     }
+    // else {
+    //   navigation.navigate("TabNavigatorUser", {
+    //     screen: "Accueil",
+    //     params: {
+    //       search: {
+    //         address: null,
+    //         query: null,
+    //         radius: null,
+    //         userPosition: null,
+    //       },
+    //       searchResults: [],
+    //     },
+    //   });
+    // }
   }, [cartStore]);
 
   const handleSelectedModePress = (
@@ -94,15 +112,17 @@ export default function WithdrawModesScreen({ navigation }) {
     );*/
 
     if (value === "market") {
-      dispatch(
-        updateWithdrawMode({
-          shopId: selectedShop?.shop._id,
-          withdrawMode: value,
-          // market: null,
-        }),
-      );
-      setSelectedShop(selectedShop?.shop!);
-      setSelectMarketModalVisible(true);
+      if (selectedShop?.shop?._id) {
+        dispatch(
+          updateWithdrawMode({
+            shopId: selectedShop?.shop?._id,
+            withdrawMode: value,
+            // market: null,
+          }),
+        );
+        setSelectedShop(selectedShop?.shop!);
+        setSelectMarketModalVisible(true);
+      }
     } else {
       dispatch(
         updateWithdrawMode({
@@ -119,13 +139,16 @@ export default function WithdrawModesScreen({ navigation }) {
 
   const products = cartStore.map((cart) => {
     if (cart) {
+      const shopData = cart.shop;
       const productsByShop = cart.products.map((p) => {
         return (
           <CardProduct
             stockData={p.stockData}
+            shopData={shopData}
             key={p.stockData._id}
             extraClasses="mb-1"
-            displayMode="cart"
+            displayMode="withdraw"
+            showImage={true}
           />
         );
       });
@@ -135,7 +158,7 @@ export default function WithdrawModesScreen({ navigation }) {
       cart.shop?.markets &&
         cart.shop?.markets.length > 0 &&
         withdrawModeButtonData.push({
-          label: "Marchés locaux",
+          label: "Points de vente",
           value: "market",
           selected: cart.withdrawMode === "market" ? true : false,
         });
@@ -150,7 +173,7 @@ export default function WithdrawModesScreen({ navigation }) {
       return (
         <View className="mb-3" key={cart.shop?._id}>
           <View className="flex-row justify-center items-center mb-1">
-            <View className="flex flex-row w-3/12 justify-end items-end h-full">
+            <View className="flex flex-row w-3/12 justify-end items-center h-full">
               <TextBody1 extraClasses="">Vendeur: </TextBody1>
             </View>
             <View className="w-9/12">
@@ -206,7 +229,10 @@ export default function WithdrawModesScreen({ navigation }) {
   console.log(
     "------------------------------- WITHDRAWMODES --------------------------------------------------------------------",
   );
-  console.log("CARTSTORE -> ", cartStore);
+  console.log(
+    "WITHDRAWMODES cartStore -> ",
+    JSON.stringify(cartStore, null, 2),
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -224,13 +250,11 @@ export default function WithdrawModesScreen({ navigation }) {
             disabled={isPaymentDisabledButton}
             label="Passer au paiement"
             iconName="arrow-right"
-            extraClasses=" mb-3"
+            extraClasses=" mb-3 h-14"
             onPressFn={() => {
               !isSignedIn
                 ? setIsSigninModalVisible(true)
-                : navigation.navigate("TabNavigatorUser", {
-                    screen: "PaymentCustomer",
-                  });
+                : navigation.navigate("PaymentCustomer");
             }}
           />
           <ButtonSecondaryStart
@@ -238,12 +262,8 @@ export default function WithdrawModesScreen({ navigation }) {
             iconName="arrow-left"
             disabled={false}
             isLoading={false}
-            onPressFn={() =>
-              navigation.navigate("TabNavigatorUser", {
-                screen: "Cart",
-              })
-            }
-            extraClasses="mb-3"
+            onPressFn={() => navigation.navigate("Cart")}
+            extraClasses="mb-3 h-14"
           />
         </ScrollView>
       </View>

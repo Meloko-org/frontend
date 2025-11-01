@@ -62,8 +62,13 @@ type ProductCategoryData = {
   type: string;
 };
 
-type ProductCategoryCardData = ProductCategoryData & {
-  products?: ProductData[];
+// type ProductCategoryCardData = ProductCategoryData & {
+//   products?: ProductData[];
+// };
+
+type ProductCategoryCardData = {
+  category: ProductCategoryData;
+  stocks: StockData[];
 };
 
 type ProductsTypesByCategory = {
@@ -159,6 +164,22 @@ type NoteData = {
   source: string;
   photo: string | null;
   createdAt: Date;
+};
+
+type CategoryData = {
+  _id: string;
+  name: string;
+  description: string;
+  image: string;
+  type: string;
+};
+
+type FullShopData = {
+  shop: ShopData;
+  categories: {
+    category: CategoryData;
+    stocks: StockData[];
+  }[];
 };
 
 type ShopData = {
@@ -502,6 +523,8 @@ export type {
   UserAddressData,
   ProductData,
   CardProductData,
+  CategoryData,
+  FullShopData,
   ShopData,
   CrewMember,
   SocialNetworkData,

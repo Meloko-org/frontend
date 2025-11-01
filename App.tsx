@@ -45,7 +45,7 @@ import UserProfileScreen from "./screens/customer/Profile";
 import UserProfileInformationsScreen from "./screens/customer/ProfileInformations";
 import UserProfileAddressesScreen from "./screens/customer/ProfileAddresses";
 import ShopUserScreen from "./screens/customer/Shop";
-import WithdrawModesUserScreen from "./screens/customer/WithdrawModes";
+import WithdrawModesScreen from "./screens/customer/WithdrawModes";
 import OrderCustomerScreen from "./screens/customer/Order";
 import PaymentCustomerScreen from "./screens/customer/Payment";
 import OrdersCustomerScreen from "./screens/customer/Orders";
@@ -184,6 +184,7 @@ const TabNavigatorUser: React.FC = () => {
   return (
     <UserTab.Navigator
       screenOptions={({ route }) => ({
+        unmountOnBlur: false,
         tabBarIcon: ({ color, size }) => {
           let iconName: string = "";
 
@@ -249,8 +250,8 @@ const TabNavigatorUser: React.FC = () => {
         options={{ tabBarButton: () => null }}
       />
       <UserTab.Screen
-        name="WithdrawModesUser"
-        component={WithdrawModesUserScreen}
+        name="WithdrawModes"
+        component={WithdrawModesScreen}
         options={{ tabBarButton: () => null }}
       />
       <UserTab.Screen

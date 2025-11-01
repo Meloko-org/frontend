@@ -14,7 +14,9 @@ import {
   ProductCategoryData,
   ProductCategoryCardData,
   CardProductData,
+  CategoryData,
 } from "../../types/API";
+import { setIsShopSearchActive } from "../../reducers/mapShopResults";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser, UserState } from "../../reducers/user";
 
@@ -22,16 +24,10 @@ import { SheetManager } from "react-native-actions-sheet";
 import Modal from "react-native-modal";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-// import { RootStackParamList } from "../../types/Navigation";
-// import { RouteProp, useRoute } from "@react-navigation/native";
 
-import { StyleSheet, Image, View } from "react-native";
-
+import { Image, View } from "react-native";
 import StarsNotation from "../../components/utils/StarsNotation";
 import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
-import TextHeading2 from "../../components/utils/texts/Heading2";
-import TextHeading4 from "../../components/utils/texts/Heading4";
 import TextBody1 from "../../components/utils/texts/Body1";
 import BadgeSecondary from "../../components/utils/badges/Secondary";
 import IconButton from "../../components/utils/buttons/Icon";
@@ -42,7 +38,6 @@ import CardNote from "../../components/cards/Note";
 import BackLabelButton from "../../components/utils/buttons/BackLabel";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import Spinner from "../../components/utils/Spinner";
-import { setIsShopSearchActive } from "../../reducers/mapShopResults";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -56,7 +51,6 @@ type Props = {
 };
 
 export default function ShopUserScreen({ navigation, route }: Props) {
-  // const route = useRoute<ShopUserScreenRouteProp>();
   const { shopId, relevantProducts, distance, sheetId } = route.params;
 
   const dispatch = useDispatch();
@@ -66,17 +60,22 @@ export default function ShopUserScreen({ navigation, route }: Props) {
   const { signOut, isSignedIn, getToken } = useAuth();
 
   const [shopData, setShopData] = useState<ShopData>(null);
+  const [categoriesObjects, setCategoriesObjects] = useState<
+    ProductCategoryCardData[]
+  >([]);
   const [searchProducts, setSearchProducts] = useState<StockData[]>([]);
   const [shopDistance, setShopDistance] = useState<number | null>(null);
+
   const [selectedCategoryProducts, setSelectedCategoryProducts] = useState<
     StockData[]
   >([]);
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [isSearchResultsModalVisible, setIsSearchResultsModalVisible] =
-    useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [isSearchResultsModalVisible, setIsSearchResultsModalVisible] =
+    useState<boolean>(false);
+
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [isBookmarking, setIsBookmarking] = useState<boolean>(false);
 
   // Shop recovery
@@ -87,13 +86,22 @@ export default function ShopUserScreen({ navigation, route }: Props) {
       setSearchProducts(relevantProducts);
     }
 
-    fetch(`${API_ROOT}/shops/${shopId}`)
-      .then((resp) => resp.json())
-      .then((data) => {
-        if (data.result) {
-          setShopData(data.shop);
-        }
-      });
+    (async () => {
+      const fullShopResponse = await shopTools.getFullShopById(shopId);
+
+      if (fullShopResponse.success && fullShopResponse.data) {
+        setShopData(fullShopResponse.data.shop);
+        setCategoriesObjects(fullShopResponse.data.categories);
+      }
+    })();
+
+    // fetch(`${API_ROOT}/shops/${shopId}`)
+    //   .then((resp) => resp.json())
+    //   .then((data) => {
+    //     if (data.result) {
+    //       setShopData(data.shop);
+    //     }
+    //   });
   }, [route.params]);
 
   useEffect(() => {
@@ -150,7 +158,7 @@ export default function ShopUserScreen({ navigation, route }: Props) {
 
   // Sorting products from categories by clicking
   const handleCategoryClick = async (categoryName: string) => {
-    const stocksResponse = await shopTools.getStocksByshopAndCategory(
+    const stocksResponse = await shopTools.getStocksByShopAndCategory(
       shopId,
       categoryName,
     );
@@ -167,6 +175,17 @@ export default function ShopUserScreen({ navigation, route }: Props) {
     setIsModalVisible(true);
   };
 
+  const handleCategoryPress = (categoryId: string) => {
+    const categoryObject = categoriesObjects.find(
+      (obj) => obj.category._id === categoryId,
+    );
+    if (categoryObject) {
+      setSelectedCategoryProducts(categoryObject.stocks);
+      setSelectedCategory(categoryObject.category.name);
+      setIsModalVisible(true);
+    }
+  };
+
   const topComments =
     shopData &&
     shopData.notes
@@ -180,15 +199,28 @@ export default function ShopUserScreen({ navigation, route }: Props) {
       });
 
   // Formatting category
+  // const categories =
+  //   shopData &&
+  //   shopData.notes &&
+  //   shopData.categories.map((category: ProductCategoryCardData) => {
+  //     return (
+  //       <ProductCategory
+  //         category={category}
+  //         onPressFn={() => handleCategoryClick(category.name)}
+  //         key={category._id}
+  //         extraClasses="mr-2"
+  //       />
+  //     );
+  //   });
+
   const categories =
-    shopData &&
-    shopData.notes &&
-    shopData.categories.map((category: ProductCategoryCardData) => {
+    categoriesObjects.length > 0 &&
+    categoriesObjects.map((object: ProductCategoryCardData) => {
       return (
         <ProductCategory
-          category={category}
-          onPressFn={() => handleCategoryClick(category.name)}
-          key={category._id}
+          key={object.category._id}
+          object={object}
+          onPressFn={() => handleCategoryPress(object.category._id)}
           extraClasses="mr-2"
         />
       );
@@ -199,8 +231,9 @@ export default function ShopUserScreen({ navigation, route }: Props) {
     return (
       <CardProduct
         stockData={stockData}
+        shopData={shopData}
         key={stockData._id}
-        extraClasses="mb-1"
+        extraClasses="mb-2"
         displayMode="shop"
         quantityControllable
         showImage
@@ -208,11 +241,12 @@ export default function ShopUserScreen({ navigation, route }: Props) {
     );
   });
 
-  // Formatting shop product click
+  // Formatting shop product click (for the modal: Produits de la catégorie)
   const categoryProducts = selectedCategoryProducts.map((stockData) => {
     return (
       <CardProduct
         stockData={stockData}
+        shopData={shopData}
         key={stockData._id}
         extraClasses="mb-1"
         displayMode="shop"
@@ -223,6 +257,8 @@ export default function ShopUserScreen({ navigation, route }: Props) {
   });
 
   // console.log("SHOPUSER: shopId :", shopId);
+  // console.log("SHOPUSER shopData :", JSON.stringify(relevantProducts, null, 2))
+  // console.log("SHOPUSER categoriesObjects :", categoriesObjects)
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -447,7 +483,7 @@ export default function ShopUserScreen({ navigation, route }: Props) {
               extraClasses="ml-3 pr-2"
             />
             <View className="mr-3 flex flex-row items-center">
-              <TextBody1>Tous les produits : </TextBody1>
+              <TextBody1>Produits du rayon: </TextBody1>
               <TextHeading3 extraClasses="">{selectedCategory}</TextHeading3>
             </View>
           </View>

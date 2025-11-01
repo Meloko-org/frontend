@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CartData, ShopData, StockData } from "../types/API";
+
 export type CartState = {
   value: CartData[];
 };
@@ -35,7 +36,7 @@ export const cartSlice = createSlice({
       const shop = state.value.find(
         (c) => c.shop?._id === action.payload?.shop?._id,
       );
-      console.log("adding to cart", action.payload);
+      // console.log("adding to cart", action.payload);
       if (shop) {
         shop.products.push({
           stockData: action.payload.stockData,
