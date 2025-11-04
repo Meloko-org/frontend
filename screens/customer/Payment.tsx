@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
+import React, { useState, useEffect, JSX } from "react";
+
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { UserTabParamList } from "../../types/Navigation";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -16,13 +18,16 @@ import CartTools from "../../modules/CartTools";
 import { CartState } from "../../reducers/cart";
 import { UserState } from "../../reducers/user";
 
-type PaymentScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+type PaymentCustomerRouteProp = RouteProp<UserTabParamList, "PaymentCustomer">;
+
+type PaymentCustomerNavProp = BottomTabNavigationProp<
+  UserTabParamList,
   "PaymentCustomer"
 >;
 
 type Props = {
-  navigation: PaymentScreenNavigationProp;
+  navigation: PaymentCustomerNavProp;
+  route: PaymentCustomerRouteProp;
 };
 
 export default function PaymentCustomerScreen({
@@ -110,6 +115,7 @@ export default function PaymentCustomerScreen({
           totalCartAmount={cartTotal}
           navigation={navigation}
           disabled={!user.firstname || !user.lastname}
+          extraClasses="h-14 mt-5 mb-3"
         />
 
         <ButtonSecondaryStart
@@ -117,11 +123,8 @@ export default function PaymentCustomerScreen({
           iconName="arrow-left"
           isLoading={false}
           disabled={false}
-          onPressFn={() =>
-            navigation.navigate("TabNavigatorUser", {
-              screen: "WithdrawModesUser",
-            })
-          }
+          onPressFn={() => navigation.navigate("WithdrawModes")}
+          extraClasses="h-14"
         />
       </View>
     </SafeAreaView>

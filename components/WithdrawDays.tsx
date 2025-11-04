@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { View } from "react-native";
 import WeekDay from "./WeekDay";
-import { OpeningHoursData } from "../types/API";
+import { OpeningHourData } from "../types/API";
 
 type WithdrawDaysProps = {
-  openingHours: OpeningHoursData[];
+  openingHours: OpeningHourData[];
   onDaySelect: (day: number) => void;
   isEnabled: boolean;
+  highlightedDay?: number | null;
   extraClasses?: string;
 };
 
@@ -14,16 +15,21 @@ export default function WithdrawDays({
   openingHours,
   onDaySelect,
   isEnabled,
+  highlightedDay,
   extraClasses,
 }: WithdrawDaysProps): JSX.Element {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (highlightedDay) setSelectedDay(highlightedDay);
+  }, [highlightedDay]);
 
   const getCurrentDayIndex = () => {
     const currentDate = new Date();
     return currentDate.getDay() === 0 ? 6 : currentDate.getDay() - 1;
   };
 
-  const sortDaysByCurrent = (days: OpeningHoursData[]) => {
+  const sortDaysByCurrent = (days: OpeningHourData[]) => {
     const currentDayIndex = getCurrentDayIndex();
     const dayOrder = [
       ...days.slice(currentDayIndex),

@@ -16,6 +16,7 @@ type StripPaymentButtonProps = {
   totalCartAmount: number | undefined;
   navigation: {};
   disabled: boolean;
+  extraClasses?: string;
 };
 
 export default function StripePaymentButton(props: StripPaymentButtonProps) {
@@ -161,7 +162,7 @@ export default function StripePaymentButton(props: StripPaymentButtonProps) {
         iconName={props.iconName}
         onPressFn={() => openPaymentSheet()}
         isLoading={isPaymentScreenLoading}
-        extraClasses="mb-3"
+        extraClasses={props.extraClasses}
       />
     </StripeProvider>
   );

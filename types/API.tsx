@@ -100,6 +100,7 @@ type MarketData = {
 // };
 
 type MarketsData = {
+  _id: string;
   market: MarketData;
   isActive: boolean;
   openingHours: OpeningHourData[];
@@ -149,9 +150,9 @@ type CartData = {
     stockData: StockData;
     quantity: number;
   }[];
-  withdrawMode: "market" | "clickCollect" | null | undefined;
+  withdrawMode: "market" | "clickCollect" | "shipping" | null | undefined;
   withdrawMarket?: string | null;
-  withdrawDay?: string | null;
+  withdrawDay?: number | null;
   market?: MarketData;
 };
 

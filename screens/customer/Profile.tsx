@@ -172,7 +172,9 @@ export default function UserProfileScreen({ navigation }: Props) {
   };
 
   const switchProducer = () => {
-    navigation.navigate("ProducerProfile");
+    navigation.navigate("TabNavigatorProducer", {
+      screen: "ProducerProfile",
+    });
   };
 
   const handleOrdersPress = () => {

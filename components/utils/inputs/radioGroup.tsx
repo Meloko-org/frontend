@@ -1,9 +1,10 @@
 import React, { useState, useEffect, JSX } from "react";
 import { TouchableOpacity, Text, View } from "react-native";
 
-type InputRadioGroupData = {
+// le type est exporté et non placé dans API.tsx car il est spécifique à ce composant
+export type InputRadioGroupData<T extends string = string> = {
   label: string;
-  value: string;
+  value: T;
   selected: boolean;
   iconName?: string;
 };

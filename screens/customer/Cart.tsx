@@ -94,7 +94,10 @@ export default function CartScreen({ navigation }: Props) {
 
     return (
       <View className="mb-5" key={cart.shop?._id}>
-        <TextHeading4 centered extraClasses="mb-2 pb-1 bg-night rounded-lg">
+        <TextHeading4
+          centered
+          extraClasses="mb-2 pb-1 bg-night/20 dark:bg-night rounded-lg"
+        >
           {cart.shop?.name}
         </TextHeading4>
         {productsByShop}
@@ -111,22 +114,23 @@ export default function CartScreen({ navigation }: Props) {
   };
 
   console.log("------------- CARTSCREEN ----------------------------");
-  console.log(
-    "cartStore: ",
-    JSON.stringify(
-      cartStore.map((elt) => ({
-        shop: elt.shop?.name,
-        products: elt.products.map((pdt) => ({
-          name: pdt.stockData.productCustomName
-            ? pdt.stockData.productCustomName
-            : pdt.stockData.product.name,
-          quantity: pdt.quantity,
-        })),
-      })),
-      null,
-      2,
-    ),
-  );
+  // console.log(
+  //   "cartStore: ",
+  //   JSON.stringify(
+  //     cartStore.map((elt) => ({
+  //       key: elt.shop?._id,
+  //       shop: elt.shop,
+  //       products: elt.products.map((pdt) => ({
+  //         name: pdt.stockData.productCustomName
+  //           ? pdt.stockData.productCustomName
+  //           : pdt.stockData.product.name,
+  //         quantity: pdt.quantity,
+  //       })),
+  //     })),
+  //     null,
+  //     2,
+  //   ),
+  // );
 
   // console.log("    SHOP:");
   // console.log("         shopSearchActive :", isShopSearchActive);

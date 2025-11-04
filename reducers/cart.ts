@@ -7,12 +7,12 @@ export type CartState = {
 
 type CartPayload = {
   shopId: string;
-  stockId: string;
+  stockId?: string;
   increment?: number;
   decrement?: number;
-  withdrawMode?: "market" | "clickCollect" | null | undefined;
+  withdrawMode?: "market" | "clickCollect" | "shipping" | null | undefined;
   withdrawMarket?: string | null;
-  withdrawDay?: string | null;
+  withdrawDay?: number | null;
 };
 
 type addProductToCartPayload = {

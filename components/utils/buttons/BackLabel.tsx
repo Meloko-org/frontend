@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { TouchableOpacity, View } from "react-native";
 import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
 import { GestureResponderEvent } from "react-native";
