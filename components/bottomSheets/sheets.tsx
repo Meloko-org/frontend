@@ -31,6 +31,7 @@ import EditPostText from "./EditPostText";
 import ProgrammedPostPreview from "./ProgrammedPostPreview";
 import PublishedPost from "./PublishedPost";
 import CircuitShop from "./CircuitShop";
+import SignInRequired from "./SignInRequired";
 
 registerSheet("alert", CustomAlert);
 registerSheet("product-details", ProductDetails);
@@ -48,6 +49,7 @@ registerSheet("edit-post-text", EditPostText);
 registerSheet("programmed-post-preview", ProgrammedPostPreview);
 registerSheet("published-post", PublishedPost);
 registerSheet("circuit-shop", CircuitShop);
+registerSheet("signin-required", SignInRequired);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -57,6 +59,13 @@ declare module "react-native-actions-sheet" {
       payload: {
         message: string;
         alertType: "info" | "success" | "error" | "warning";
+      };
+    }>;
+    "signin-required": SheetDefinition<{
+      payload: {
+        context: "profile" | "bookmarks" | "circuit";
+        from: string;
+        next: string;
       };
     }>;
     "product-details": SheetDefinition<{

@@ -44,6 +44,7 @@ import _Fontawesome from "react-native-vector-icons/FontAwesome";
 import ColorSchemeButton from "../../components/utils/buttons/ColorScheme";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import IconButton from "../../components/utils/buttons/Icon";
+import TextHeading3 from "../../components/utils/texts/Heading3";
 const FontAwesome = _Fontawesome as React.ElementType;
 
 type UserProfileNavProp = CompositeNavigationProp<
@@ -81,31 +82,20 @@ export default function UserProfileScreen({ navigation }: Props) {
     (state: { shop: ShopState }) => state.shop.value,
   );
 
-  const [isSigninModalVisible, setIsSigninModalVisible] =
-    useState<boolean>(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
-  const [isUserSaveLoading, setUserSaveLoading] = useState(false);
 
   useEffect(() => {
-    if (!isSignedIn) {
-      // à modifier
-      navigation.navigate("SignIn", {
-        from: "Home",
-        backLabel: "Accueil",
-        screenTitle: `CONNEXION\nINSCRIPTION`,
-        next: "UserProfile",
-      });
-    } else {
+    if (isSignedIn) {
       fetchData();
       setFirstname(userStore.firstname!);
       setLastname(userStore.lastname!);
       setEmail(userStore.email!);
     }
-  }, [userStore, isSignedIn, dispatch]);
+  }, [userStore, isSignedIn]);
 
   const fetchData = async () => {
     try {
@@ -134,29 +124,6 @@ export default function UserProfileScreen({ navigation }: Props) {
     }
   };
 
-  const handleSaveUser = async () => {
-    try {
-      setUserSaveLoading(true);
-      const token = await getToken();
-      const values = email
-        ? { email, firstname, lastname }
-        : { email: null, firstname, lastname };
-      const data = await userTools.updateUser(token, values);
-
-      if (data) {
-        Alert.alert(
-          "Mise à jour de votre profil",
-          "Votre profil à bien été mis à jour.",
-        );
-        dispatch(updateUser(data));
-      }
-      setUserSaveLoading(false);
-    } catch (error) {
-      console.error(error);
-      setUserSaveLoading(false);
-    }
-  };
-
   // Signout the user from Clerk
   const onSignoutPress = async () => {
     try {
@@ -182,7 +149,11 @@ export default function UserProfileScreen({ navigation }: Props) {
   };
 
   const handlePersonalInfoPress = () => {
-    navigation.navigate("UserProfileInformations");
+    navigation.navigate("UserProfileInformations", {
+      from: "UserProfile",
+      backLabel: "Retour au compte",
+      screenTitle: "MES INFORMATIONS",
+    });
   };
 
   const handleBookmarksPress = () => {
@@ -199,127 +170,149 @@ export default function UserProfileScreen({ navigation }: Props) {
 
   const toggleMode = () => {
     setColorScheme(colorScheme === "light" ? "dark" : "light");
-    console.log("toggle colorScheme :", colorScheme);
     const displayMode = modeStore.mode === "light" ? "dark" : "light";
     dispatch(changeMode(displayMode));
-    // dispatch(changeMode(colorScheme))
   };
 
   console.log("PROFILE modeStore.mode :", modeStore.mode);
   console.log("PROFILE colorScheme :", colorScheme);
+  console.log("les adresses :", userStore.addresses);
 
   return (
-    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      {isSignedIn && (
+    <SafeAreaView
+      className="flex-1 bg-lightbg dark:bg-darkbg"
+      edges={["right", "left", "top"]}
+    >
+      {isSignedIn ? (
         <>
-          <View className="flex-1">
-            <ScrollView
-              contentContainerStyle={{ flexGrow: 1 }}
-              showsVerticalScrollIndicator={false}
-              className="flex h-full w-full p-3"
-            >
-              <View className="flex flex-row items-center mb-5">
-                <View className="">
-                  <ColorSchemeButton
-                    iconName={colorScheme === "dark" ? "sun" : "moon"}
-                    iconFamily="FontAwesome5Icon"
-                    size={40}
-                    onPressFn={toggleMode}
-                  />
-                </View>
-                <View className="flex-grow">
-                  <TextHeading4 centered>{`MON COMPTE`}</TextHeading4>
-                </View>
-                <View className="">
-                  <IconButton
-                    iconName="sign-in-alt"
-                    iconFamily="FontAwesome5Icon"
-                    iconColor="#98B66E"
-                    size={40}
-                    onPressFn={onSignoutPress}
-                    extraClasses="border border-primary p-1"
-                  />
-                </View>
+          {/* TopBar */}
+          <View style={{ flex: 1.5 }}>
+            <View className="flex flex-row items-center mb-5 px-3">
+              <View className="">
+                <ColorSchemeButton
+                  iconName={colorScheme === "dark" ? "sun" : "moon"}
+                  iconFamily="FontAwesome5Icon"
+                  size={40}
+                  onPressFn={toggleMode}
+                />
               </View>
-
-              <View className="mt-5">
-                <OpenScreenButton
-                  label="Mes commandes"
-                  onPressFn={handleOrdersPress}
-                  extraClasses="mb-1"
+              <View className="flex-grow">
+                <TextHeading4 centered>{`MON COMPTE`}</TextHeading4>
+              </View>
+              <View className="">
+                <IconButton
+                  iconName="sign-in-alt"
+                  iconFamily="FontAwesome5Icon"
+                  iconColor="#98B66E"
+                  size={40}
+                  onPressFn={onSignoutPress}
+                  extraClasses="border border-primary p-1"
                 />
+              </View>
+            </View>
+          </View>
 
-                <OpenScreenButton
-                  label="Mes alertes"
-                  onPressFn={() => console.log("pressed button")}
-                  extraClasses="mb-1"
-                />
+          <View style={{ flex: 8.5 }}>
+            <View className="mt-5 px-3">
+              <OpenScreenButton
+                label="Mes commandes"
+                onPressFn={handleOrdersPress}
+                extraClasses="mb-1"
+              />
 
-                <View className="my-4">
-                  <View className="flex flex-row justify-around">
-                    <View>
-                      <MainButton
-                        iconName="magnifying-glass"
-                        iconSize={50}
-                        iconColor="#FFF"
-                        iconFamily="FontAwesome6Icon"
-                        onPressFn={handleSearchPress}
-                        buttonType="label-icon-top"
-                        label="Rechercher"
-                        buttonBackground={true}
-                        extraClasses="py-2 w-24"
-                      ></MainButton>
-                    </View>
-                    <View>
-                      <MainButton
-                        iconName="car"
-                        iconSize={50}
-                        iconColor="#FFF"
-                        onPressFn={handleCircuitMap}
-                        buttonType="label-icon-top"
-                        label="Visiter"
-                        buttonBackground={true}
-                        extraClasses="py-2 w-24"
-                      ></MainButton>
-                    </View>
-                    <View>
-                      <MainButton
-                        iconName="heart"
-                        iconSize={50}
-                        iconColor="#FFF"
-                        onPressFn={handleBookmarksPress}
-                        buttonType="label-icon-top"
-                        label="Favoris"
-                        buttonBackground={true}
-                        extraClasses="py-2 w-24"
-                      ></MainButton>
-                    </View>
+              <OpenScreenButton
+                label="Mes alertes"
+                onPressFn={() => console.log("pressed button")}
+                extraClasses="mb-1"
+              />
+
+              <View className="my-4">
+                <View className="flex flex-row justify-around">
+                  <View>
+                    <MainButton
+                      iconName="magnifying-glass"
+                      iconSize={50}
+                      iconColor="#FFF"
+                      iconFamily="FontAwesome6Icon"
+                      onPressFn={handleSearchPress}
+                      buttonType="label-icon-top"
+                      label="Rechercher"
+                      buttonBackground={true}
+                      extraClasses="py-2 w-24"
+                    ></MainButton>
+                  </View>
+                  <View>
+                    <MainButton
+                      iconName="car"
+                      iconSize={50}
+                      iconColor="#FFF"
+                      onPressFn={handleCircuitMap}
+                      buttonType="label-icon-top"
+                      label="Visiter"
+                      buttonBackground={true}
+                      extraClasses="py-2 w-24"
+                    ></MainButton>
+                  </View>
+                  <View>
+                    <MainButton
+                      iconName="heart"
+                      iconSize={50}
+                      iconColor="#FFF"
+                      onPressFn={handleBookmarksPress}
+                      buttonType="label-icon-top"
+                      label="Favoris"
+                      buttonBackground={true}
+                      extraClasses="py-2 w-24"
+                    ></MainButton>
                   </View>
                 </View>
-
-                <OpenScreenButton
-                  label="Mes informations"
-                  onPressFn={handlePersonalInfoPress}
-                  extraClasses="mb-1"
-                />
-                <OpenScreenButton
-                  label="Nous contacter"
-                  onPressFn={() => console.log("pressed button")}
-                  extraClasses="mb-1"
-                />
               </View>
-            </ScrollView>
+
+              <OpenScreenButton
+                label="Mes informations"
+                onPressFn={handlePersonalInfoPress}
+                extraClasses="mb-1"
+              />
+              <OpenScreenButton
+                label="Nous contacter"
+                onPressFn={() => console.log("pressed button")}
+                extraClasses="mb-1"
+              />
+            </View>
           </View>
 
-          <View className="absolute bottom-0 flex items-center w-full">
-            <CustomButton
-              label="Basculer en mode Producteur"
-              extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-5 px-5 h-[60px]"
-              textClasses="text-lightbg dark:text-tertiary text-lg font-bold"
-              onPressFn={switchProducer}
-            />
+          <View style={{ flex: 1.5 }}>
+            <View className="px-3">
+              <CustomButton
+                label="Basculer en mode Producteur"
+                extraClasses="bg-tertiary dark:bg-lightbg rounded-full my-5 px-5 h-[60px]"
+                textClasses="text-lightbg dark:text-tertiary text-lg font-bold"
+                onPressFn={switchProducer}
+              />
+            </View>
           </View>
         </>
+      ) : (
+        <View className="flex justify-center items-center h-full px-3">
+          <TextHeading3 centered extraClasses="mb-5">
+            {`Connectez-vous\npour voir votre profil.`}
+          </TextHeading3>
+          <View className="px-5">
+            <ButtonPrimaryEnd
+              label="Connexion"
+              iconName="sign-in-alt"
+              extraClasses="h-14 mt-5"
+              onPressFn={() =>
+                navigation.navigate("SignIn", {
+                  from: "UserProfile",
+                  backLabel: "Accueil",
+                  screenTitle: `CONNEXION\nINSCRIPTION`,
+                  next: "UserProfile",
+                })
+              }
+            />
+          </View>
+        </View>
       )}
     </SafeAreaView>
   );

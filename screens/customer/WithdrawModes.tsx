@@ -388,7 +388,7 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
                 ? navigation.navigate("SignIn", {
                     from: "WithdrawModes",
                     backLabel: "Retour aux modes de retrait",
-                    screenTitle: "connection",
+                    screenTitle: `CONNEXION\nINSCRIPTION`,
                     next: "PaymentCustomer",
                   })
                 : navigation.navigate("PaymentCustomer");

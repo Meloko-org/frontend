@@ -164,8 +164,16 @@ type UserTabParamList = {
   Cart: undefined;
   Bookmarks: undefined;
   UserProfile: undefined;
-  UserProfileInformations: undefined;
-  UserProfileAddresses: undefined;
+  UserProfileInformations: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+  };
+  UserProfileAddresses: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+  };
   ShopUser: {
     shopId: string;
     distance: number | undefined;

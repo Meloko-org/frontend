@@ -7,6 +7,8 @@ import ActionSheet, {
 } from "react-native-actions-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import globalTools from "../../modules/globalTools";
+
 import { View, Image } from "react-native";
 
 import TextBody1 from "../utils/texts/Body1";
@@ -14,7 +16,6 @@ import NetworkIcon from "../utils/NetworkIcon";
 import TextHeading3 from "../utils/texts/Heading3";
 import TagBadge from "../utils/badges/Tag";
 import SecondaryButton from "../utils/buttons/Secondary";
-import globalTools from "../../modules/globalTools";
 
 export default function PublishedPost(props: SheetProps<"published-post">) {
   const insets = useSafeAreaInsets();

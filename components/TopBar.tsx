@@ -2,7 +2,11 @@ import React, { JSX, useEffect } from "react";
 
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ProducerTabParamList, RootStackParamList } from "../types/Navigation";
+import {
+  ProducerTabParamList,
+  RootStackParamList,
+  UserTabParamList,
+} from "../types/Navigation";
 
 import TextHeading4 from "./utils/texts/Heading4";
 import { View, Text, LayoutChangeEvent } from "react-native";
@@ -18,7 +22,8 @@ type TopBarProps = {
   extraClasses?: string;
   navigationOverride?:
     | NativeStackNavigationProp<RootStackParamList>
-    | BottomTabNavigationProp<ProducerTabParamList>;
+    | BottomTabNavigationProp<ProducerTabParamList>
+    | BottomTabNavigationProp<UserTabParamList>;
 };
 
 export default function TopBar({

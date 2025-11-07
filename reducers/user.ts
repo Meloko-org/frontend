@@ -34,6 +34,12 @@ export const userSlice = createSlice({
     ): void => {
       state.value.addresses = action.payload;
     },
+    setDefaultAddress: (
+      state: UserState,
+      action: PayloadAction<UserAddressData[]>,
+    ): void => {
+      state.value.addresses = action.payload;
+    },
     addOrder: (state: UserState, action: PayloadAction<OrderData>): void => {
       state.value.orders.push(action.payload);
     },
@@ -57,6 +63,11 @@ export const userSlice = createSlice({
   },
 });
 
-export const { updateUser, addOrder, resetUser, updateUserAddresses } =
-  userSlice.actions;
+export const {
+  updateUser,
+  addOrder,
+  resetUser,
+  updateUserAddresses,
+  setDefaultAddress,
+} = userSlice.actions;
 export default userSlice.reducer;

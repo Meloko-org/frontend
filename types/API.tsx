@@ -306,8 +306,9 @@ type AddressData = {
 
 type UserAddressData = {
   _id?: string;
-  name: String;
+  name: string;
   address: AddressData;
+  isDefault: boolean;
 };
 
 type UserData = {

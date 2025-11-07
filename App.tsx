@@ -5,10 +5,14 @@ import { ClerkProvider, ClerkLoaded } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 // import { ModalProvider } from "./context/ModalContext";
-import { SheetProvider } from "react-native-actions-sheet";
+import { SheetManager, SheetProvider } from "react-native-actions-sheet";
 import "./components/bottomSheets/sheets";
 
-import { NavigationContainer } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  useNavigationState,
+} from "@react-navigation/native";
+import { navigationRef } from "./navigation/navigationRef";
 import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
@@ -106,6 +110,7 @@ import mapMarketResults from "./reducers/mapMarketResults";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import React from "react";
+import { AuthProvider, useAuthContext } from "./hooks/useAuthContext";
 
 const reducers = combineReducers({
   user,
@@ -179,8 +184,16 @@ if (!publishableKey) {
 }
 
 const TabNavigatorUser: React.FC = () => {
+  const { isSignedIn } = useAuthContext();
   const { colorScheme } = useColorScheme();
   const tabBarBackgroundColor = colorScheme === "dark" ? "#444C3D" : "#FFF";
+
+  // récupère le nom de la screen courante
+  const currentRouteName = useNavigationState((state) => {
+    const route = state.routes[state.index];
+    return route.name;
+  });
+
   return (
     <UserTab.Navigator
       screenOptions={({ route }) => ({
@@ -215,17 +228,71 @@ const TabNavigatorUser: React.FC = () => {
       })}
     >
       <UserTab.Screen name="MapCustomer" component={MapCustomerScreen} />
+
+      {/* Onglet protégé */}
       <UserTab.Screen
         name="CircuitParameters"
         component={CircuitParametersScreen}
+        options={{ title: "Circuit" }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            if (!isSignedIn) {
+              e.preventDefault();
+              SheetManager.show("signin-required", {
+                payload: {
+                  context: "circuit",
+                  from: currentRouteName,
+                  next: "CircuitParameters",
+                },
+              });
+            }
+          },
+        })}
       />
+
       <UserTab.Screen name="Cart" component={CartScreen} />
+
+      {/* Onglet protégé */}
       <UserTab.Screen
         name="Bookmarks"
         component={BookmarksScreen}
         options={{ title: "Favoris" }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            if (!isSignedIn) {
+              e.preventDefault();
+              SheetManager.show("signin-required", {
+                payload: {
+                  context: "bookmarks",
+                  from: currentRouteName,
+                  next: "Bookmarks",
+                },
+              });
+            }
+          },
+        })}
       />
-      <UserTab.Screen name="UserProfile" component={UserProfileScreen} />
+
+      {/* Onglet protégé */}
+      <UserTab.Screen
+        name="UserProfile"
+        component={UserProfileScreen}
+        options={{ title: "compte" }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            if (!isSignedIn) {
+              e.preventDefault();
+              SheetManager.show("signin-required", {
+                payload: {
+                  context: "profile",
+                  from: currentRouteName,
+                  next: "UserProfile",
+                },
+              });
+            }
+          },
+        })}
+      />
 
       <UserTab.Screen
         name="CircuitMap"
@@ -507,95 +574,97 @@ export default function App() {
             tokenCache={tokenCache}
             publishableKey={publishableKey}
           >
-            <ClerkLoaded>
-              <SafeAreaProvider>
-                <SheetProvider>
-                  <NavigationContainer>
-                    <Stack.Navigator screenOptions={options}>
-                      <Stack.Screen name="Home" component={HomeScreen} />
-                      <Stack.Screen name="SignUp" component={SignUpScreen} />
-                      <Stack.Screen name="SignIn" component={SignInScreen} />
-                      <Stack.Screen
-                        name="Onboarding0"
-                        component={Onboarding0Screen}
-                      />
-                      <Stack.Screen
-                        name="Onboarding1"
-                        component={Onboarding1Screen}
-                      />
-                      <Stack.Screen
-                        name="Onboarding2"
-                        component={Onboarding2Screen}
-                      />
-                      <Stack.Screen
-                        name="Onboarding3"
-                        component={Onboarding3Screen}
-                      />
-                      <Stack.Screen
-                        name="Onboarding4"
-                        component={Onboarding4Screen}
-                      />
-                      <Stack.Screen
-                        name="Onboarding5"
-                        component={Onboarding5Screen}
-                      />
-                      <Stack.Screen
-                        name="OnboardingShopWithdrawModes"
-                        component={ShopWithdrawModesScreen}
-                      />
-                      <Stack.Screen
-                        name="OnboardingShopWithdrawClickcollect"
-                        component={ShopWithdrawClickcollectScreen}
-                      />
-                      <Stack.Screen
-                        name="OnboardingShopWithdrawShopMarkets"
-                        component={ShopWithdrawShopMarketsScreen}
-                      />
-                      <Stack.Screen
-                        name="OnboardingShopWithdrawShopMarketsManage"
-                        component={ShopWithdrawShopMarketsManageScreen}
-                      />
-                      <Stack.Screen
-                        name="OnboardingShopWithdrawShopMarketsSearch"
-                        component={ShopWithdrawShopMarketsSearchScreen}
-                      />
-                      <Stack.Screen
-                        name="OnboardingShopWithdrawDelivery"
-                        component={ShopWithdrawDeliveryScreen}
-                      />
-                      <Stack.Screen
-                        name="OnboardingStocks"
-                        component={StocksScreen}
-                      />
-                      <Stack.Screen
-                        name="OnboardingStocksAdd"
-                        component={StocksAddScreen}
-                      />
-                      <Stack.Screen
-                        name="OnboardingStocksEdit"
-                        component={StocksEditScreen}
-                      />
-                      <Stack.Screen
-                        name="OnboardingStockCategories"
-                        component={StockCategoriesScreen}
-                      />
-                      <Stack.Screen
-                        name="OnboardingStockFamilies"
-                        component={StockFamiliesScreen}
-                      />
-                      <Stack.Screen
-                        name="TabNavigatorUser"
-                        component={TabNavigatorUser}
-                      />
-                      <Stack.Screen
-                        name="TabNavigatorProducer"
-                        component={TabNavigatorProducer}
-                      />
-                    </Stack.Navigator>
-                  </NavigationContainer>
-                </SheetProvider>
-              </SafeAreaProvider>
-            </ClerkLoaded>
+            <AuthProvider>
+              <ClerkLoaded>
+                <SafeAreaProvider>
+                  <SheetProvider>
+                    <NavigationContainer ref={navigationRef}>
+                      <Stack.Navigator screenOptions={options}>
+                        <Stack.Screen name="Home" component={HomeScreen} />
+                        <Stack.Screen name="SignUp" component={SignUpScreen} />
+                        <Stack.Screen name="SignIn" component={SignInScreen} />
+                        <Stack.Screen
+                          name="Onboarding0"
+                          component={Onboarding0Screen}
+                        />
+                        <Stack.Screen
+                          name="Onboarding1"
+                          component={Onboarding1Screen}
+                        />
+                        <Stack.Screen
+                          name="Onboarding2"
+                          component={Onboarding2Screen}
+                        />
+                        <Stack.Screen
+                          name="Onboarding3"
+                          component={Onboarding3Screen}
+                        />
+                        <Stack.Screen
+                          name="Onboarding4"
+                          component={Onboarding4Screen}
+                        />
+                        <Stack.Screen
+                          name="Onboarding5"
+                          component={Onboarding5Screen}
+                        />
+                        <Stack.Screen
+                          name="OnboardingShopWithdrawModes"
+                          component={ShopWithdrawModesScreen}
+                        />
+                        <Stack.Screen
+                          name="OnboardingShopWithdrawClickcollect"
+                          component={ShopWithdrawClickcollectScreen}
+                        />
+                        <Stack.Screen
+                          name="OnboardingShopWithdrawShopMarkets"
+                          component={ShopWithdrawShopMarketsScreen}
+                        />
+                        <Stack.Screen
+                          name="OnboardingShopWithdrawShopMarketsManage"
+                          component={ShopWithdrawShopMarketsManageScreen}
+                        />
+                        <Stack.Screen
+                          name="OnboardingShopWithdrawShopMarketsSearch"
+                          component={ShopWithdrawShopMarketsSearchScreen}
+                        />
+                        <Stack.Screen
+                          name="OnboardingShopWithdrawDelivery"
+                          component={ShopWithdrawDeliveryScreen}
+                        />
+                        <Stack.Screen
+                          name="OnboardingStocks"
+                          component={StocksScreen}
+                        />
+                        <Stack.Screen
+                          name="OnboardingStocksAdd"
+                          component={StocksAddScreen}
+                        />
+                        <Stack.Screen
+                          name="OnboardingStocksEdit"
+                          component={StocksEditScreen}
+                        />
+                        <Stack.Screen
+                          name="OnboardingStockCategories"
+                          component={StockCategoriesScreen}
+                        />
+                        <Stack.Screen
+                          name="OnboardingStockFamilies"
+                          component={StockFamiliesScreen}
+                        />
+                        <Stack.Screen
+                          name="TabNavigatorUser"
+                          component={TabNavigatorUser}
+                        />
+                        <Stack.Screen
+                          name="TabNavigatorProducer"
+                          component={TabNavigatorProducer}
+                        />
+                      </Stack.Navigator>
+                    </NavigationContainer>
+                  </SheetProvider>
+                </SafeAreaProvider>
+              </ClerkLoaded>
+            </AuthProvider>
           </ClerkProvider>
         </GestureHandlerRootView>
       </PersistGate>

@@ -1,5 +1,5 @@
-import React from "react";
-import { Text, View } from "react-native";
+import React, { JSX, useEffect, useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 import { UserAddressData } from "../../types/API";
 import { useAuth } from "@clerk/clerk-expo";
 
@@ -7,45 +7,72 @@ import MainButton from "../utils/buttons/MainButton";
 import userTools from "../../modules/userTools";
 import { updateUserAddresses, UserState } from "../../reducers/user";
 import { useSelector, useDispatch } from "react-redux";
+import { SheetManager } from "react-native-actions-sheet";
 
 type AddressProps = {
   address: UserAddressData;
+  onPressFn: (id: string) => void;
   extraClasses?: string;
 };
 
-export default function Address(props: AddressProps): JSX.Element {
+export default function Address({
+  address,
+  onPressFn,
+  extraClasses,
+}: AddressProps): JSX.Element {
   const { signOut, isSignedIn, getToken } = useAuth();
 
   const dispatch = useDispatch();
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
   );
+
   const removeUserAddress = async () => {
     try {
       const token = await getToken();
       // store producer info in the store
-      const newAddressResponse = await userTools.removeUserAddress(
+      const removeResponse = await userTools.removeUserAddress(
         token,
-        props.address._id,
+        address._id!,
       );
 
-      if (!newAddressResponse.success) {
-        console.error(newAddressResponse.message);
+      if (!removeResponse.success) {
+        SheetManager.show("alert", {
+          payload: {
+            message: removeResponse.message!,
+            alertType: "error",
+          },
+        });
         return;
       }
 
-      dispatch(updateUserAddresses(newAddressResponse.user.addresses));
+      dispatch(updateUserAddresses(removeResponse.data));
+
+      SheetManager.show("alert", {
+        payload: {
+          message: "Adresse supprimée.",
+          alertType: "success",
+        },
+      });
     } catch (error) {
       console.error(error);
     }
   };
+
   return (
-    <View className="mb-2">
-      <View className="bg-primary p-3 rounded-t-lg">
+    <TouchableOpacity
+      onPress={() => {
+        if (!address.isDefault && onPressFn) {
+          onPressFn(address._id!);
+        }
+      }}
+      className={`${extraClasses}`}
+    >
+      <View
+        className={`${address.isDefault ? "bg-primary" : "bg-night"} p-3 rounded-t-lg`}
+      >
         <View className="flex-row justify-between">
-          <Text className=" text-white font-bold text-lg">
-            {props.address.name}
-          </Text>
+          <Text className=" text-white font-bold text-lg">{address.name}</Text>
           <MainButton
             buttonType="icon"
             iconName="trash"
@@ -55,13 +82,15 @@ export default function Address(props: AddressProps): JSX.Element {
         </View>
       </View>
       <View className="bg-tertiary rounded-b-lg p-3">
-        <Text className="text-white">{props.address.address.address1}</Text>
-        <Text className="text-white">{props.address.address.address2}</Text>
+        <Text className="text-white">{address.address.address1}</Text>
+        {address.address.address2 && (
+          <Text className="text-white">{address.address.address2}</Text>
+        )}
         <Text className="text-white">
-          {props.address.address.postalCode}, {props.address.address.city}
+          {address.address.postalCode}, {address.address.city}
         </Text>
-        <Text className="text-white">{props.address.address.country}</Text>
+        <Text className="text-white">{address.address.country}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
