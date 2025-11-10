@@ -11,6 +11,7 @@ import {
   ProductData,
   ShopCategoriesWithFamiliesData,
   StockData,
+  UserAddressData,
 } from "./API";
 
 type ProducerTabParamList = {
@@ -173,6 +174,8 @@ type UserTabParamList = {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
+    next?: string;
+    selectAddressFn?: (address: UserAddressData) => void;
   };
   ShopUser: {
     shopId: string;
@@ -180,9 +183,17 @@ type UserTabParamList = {
     relevantProducts: StockData[];
     sheetId: string;
   };
-  WithdrawModes: undefined;
+  WithdrawModes: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+  };
   OrdersCustomer: undefined;
-  PaymentCustomer: undefined;
+  PaymentCustomer: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+  };
   BookmarksCustomer: undefined;
   OrderCustomer: undefined;
 

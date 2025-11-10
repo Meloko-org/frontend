@@ -11,13 +11,17 @@ import { SheetManager } from "react-native-actions-sheet";
 
 type AddressProps = {
   address: UserAddressData;
-  onPressFn: (id: string) => void;
+  onPressFn?: (id: string) => void;
+  onSelectAddressFn?: (address: UserAddressData) => void;
+  deletable?: boolean;
   extraClasses?: string;
 };
 
 export default function Address({
   address,
   onPressFn,
+  onSelectAddressFn,
+  deletable = true,
   extraClasses,
 }: AddressProps): JSX.Element {
   const { signOut, isSignedIn, getToken } = useAuth();
@@ -59,26 +63,29 @@ export default function Address({
     }
   };
 
+  const handlePress = () => {
+    if (onSelectAddressFn) {
+      onSelectAddressFn(address);
+    } else if (!address.isDefault && onPressFn) {
+      onPressFn(address._id!);
+    }
+  };
+
   return (
-    <TouchableOpacity
-      onPress={() => {
-        if (!address.isDefault && onPressFn) {
-          onPressFn(address._id!);
-        }
-      }}
-      className={`${extraClasses}`}
-    >
+    <TouchableOpacity onPress={handlePress} className={`${extraClasses}`}>
       <View
         className={`${address.isDefault ? "bg-primary" : "bg-night"} p-3 rounded-t-lg`}
       >
         <View className="flex-row justify-between">
           <Text className=" text-white font-bold text-lg">{address.name}</Text>
-          <MainButton
-            buttonType="icon"
-            iconName="trash"
-            iconColor="#FFFFFF"
-            onPressFn={removeUserAddress}
-          ></MainButton>
+          {deletable && (
+            <MainButton
+              buttonType="icon"
+              iconName="trash"
+              iconColor="#FFFFFF"
+              onPressFn={removeUserAddress}
+            />
+          )}
         </View>
       </View>
       <View className="bg-tertiary rounded-b-lg p-3">

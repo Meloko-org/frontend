@@ -34,6 +34,7 @@ import SignInScreen from "../Signin";
 import SelectMarketModal from "../../components/modals/user/SelectMarket";
 import TextBody1 from "../../components/utils/texts/Body1";
 import { NativeStackNavigatorProps } from "@react-navigation/native-stack/lib/typescript/src/types";
+import TopBar from "../../components/TopBar";
 
 type SelectedMarkets = {};
 
@@ -65,6 +66,7 @@ type Props = {
 };
 
 export default function WithdrawModesScreen({ navigation, route }: Props) {
+  const { from, backLabel, screenTitle } = route.params || [];
   // Import the Clerk Auth functions
   const { isSignedIn, getToken } = useAuth();
   const dispatch = useDispatch();
@@ -303,13 +305,21 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
   // console.log(cartStore)
 
   return (
-    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <View className="p-3 flex-1">
-        <View>
-          <TextHeading2 extraClasses="mb-4" centered>
-            Modes de retrait
-          </TextHeading2>
-        </View>
+    <SafeAreaView
+      className="flex-1 bg-lightbg dark:bg-darkbg"
+      edges={["right", "left", "top"]}
+    >
+      {/* TopBar */}
+      <View style={{ flex: 1 }}>
+        <TopBar
+          backLabel={backLabel || "Retour au panier"}
+          screen={from || "Cart"}
+          label={screenTitle || "MODEs DE RETRAIT"}
+          extraClasses="mt-2 mb-5"
+        />
+      </View>
+
+      <View style={{ flex: 9 }} className="p-3">
         <TextBody1 centered extraClasses="mb-5">
           Choisissez le mode de retrait pour chaque vendeur
         </TextBody1>
@@ -377,32 +387,30 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
               extraClasses="py-2"
             >{`TOTAL: ${cartTotal?.toFixed(2)}€`}</TextHeading3>
           </View>
-
-          <ButtonPrimaryEnd
-            disabled={isPaymentDisabledButton}
-            label="Passer au paiement"
-            iconName="arrow-right"
-            extraClasses=" mb-3 h-14"
-            onPressFn={() => {
-              !isSignedIn
-                ? navigation.navigate("SignIn", {
-                    from: "WithdrawModes",
-                    backLabel: "Retour aux modes de retrait",
-                    screenTitle: `CONNEXION\nINSCRIPTION`,
-                    next: "PaymentCustomer",
-                  })
-                : navigation.navigate("PaymentCustomer");
-            }}
-          />
-          <ButtonSecondaryStart
-            label="Retour au panier"
-            iconName="arrow-left"
-            disabled={false}
-            isLoading={false}
-            onPressFn={() => navigation.navigate("Cart")}
-            extraClasses="mb-3 h-14"
-          />
         </ScrollView>
+      </View>
+
+      <View style={{ flex: 1 }} className="p-3">
+        <ButtonPrimaryEnd
+          disabled={isPaymentDisabledButton}
+          label="Passer au paiement"
+          iconName="arrow-right"
+          extraClasses=" mb-3 h-14"
+          onPressFn={() => {
+            !isSignedIn
+              ? navigation.navigate("SignIn", {
+                  from: "WithdrawModes",
+                  backLabel: "Retour aux modes de retrait",
+                  screenTitle: `CONNEXION\nINSCRIPTION`,
+                  next: "PaymentCustomer",
+                })
+              : navigation.navigate("PaymentCustomer", {
+                  from: "WithdrawModes",
+                  backLabel: "Retour aux modes de retrait",
+                  screenTitle: "PAIEMENT",
+                });
+          }}
+        />
       </View>
 
       <SelectMarketModal

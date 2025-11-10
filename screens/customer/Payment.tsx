@@ -17,6 +17,13 @@ import ButtonSecondaryStart from "../../components/utils/buttons/SecondaryStart"
 import CartTools from "../../modules/CartTools";
 import { CartState } from "../../reducers/cart";
 import { UserState } from "../../reducers/user";
+import TopBar from "../../components/TopBar";
+import { UserData } from "@clerk/types";
+import Address from "../../components/cards/Address";
+import TextBody1 from "../../components/utils/texts/Body1";
+import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
+import { UserAddressData } from "../../types/API";
+import ButtonSecondaryEnd from "../../components/utils/buttons/SecondaryEnd";
 
 type PaymentCustomerRouteProp = RouteProp<UserTabParamList, "PaymentCustomer">;
 
@@ -32,7 +39,10 @@ type Props = {
 
 export default function PaymentCustomerScreen({
   navigation,
+  route,
 }: Props): JSX.Element {
+  const { from, backLabel, screenTitle } = route.params || [];
+
   const cartStore = useSelector(
     (state: { cart: CartState }) => state.cart.value,
   );
@@ -40,10 +50,19 @@ export default function PaymentCustomerScreen({
     (state: { user: UserState }) => state.user.value,
   );
   const [cartTotal, setCartTotal] = useState<number | undefined>(0);
-  const [user, setUser] = useState({});
+  const [firstname, setFirstname] = useState<string>(userStore.firstname || "");
+  const [lastname, setLastname] = useState<string>(userStore.lastname || "");
+  const [billingAddress, setBillingAddress] = useState<UserAddressData | null>(
+    null,
+  );
 
   useEffect(() => {
-    setUser({ ...userStore });
+    const defaultAddress =
+      userStore.addresses &&
+      userStore.addresses.length > 0 &&
+      userStore.addresses.find((adr) => adr.isDefault === true);
+
+    if (defaultAddress) setBillingAddress(defaultAddress);
   }, []);
 
   useEffect(() => {
@@ -52,21 +71,35 @@ export default function PaymentCustomerScreen({
   }, [cartStore]);
 
   console.log("------------- PAYMENTSCREEN ------------------------------");
-  console.log("cartstore in payment: ", cartStore);
-  console.log("userStore in payment :", userStore);
+  console.log(
+    "cartStore :",
+    JSON.stringify(
+      cartStore.map((c) => c.shop),
+      null,
+      2,
+    ),
+  );
 
   return (
-    <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-      <View className="p-3">
+    <SafeAreaView
+      className="bg-lightbg flex-1 dark:bg-darkbg"
+      edges={["right", "left", "top"]}
+    >
+      {/* TopBar */}
+      <View style={{ flex: 1 }}>
+        <TopBar
+          backLabel={backLabel || "Retour aux modes de retrait"}
+          screen={from || "WithdrawModes"}
+          label={screenTitle || "PAIEMENT"}
+          extraClasses="mt-2 mb-5"
+        />
+      </View>
+
+      <View style={{ flex: 8.5 }} className="p-3">
         <TextHeading2 extraClasses="mb-3">Facturation</TextHeading2>
         <InputText
-          value={user.firstname}
-          onChangeText={(newFirstname: string) =>
-            setUser((prevState) => ({
-              ...prevState,
-              firstname: newFirstname,
-            }))
-          }
+          value={firstname}
+          onChangeText={(newFirstname: string) => setFirstname(newFirstname)}
           placeholder="Votre prénom"
           label="Prénom"
           autoCapitalize="none"
@@ -74,57 +107,76 @@ export default function PaymentCustomerScreen({
         />
 
         <InputText
-          value={user.lastname}
-          onChangeText={(newLastname: string) =>
-            setUser((prevState) => ({
-              ...prevState,
-              lastname: newLastname,
-            }))
-          }
+          value={lastname}
+          onChangeText={(newLastname: string) => setLastname(newLastname)}
           placeholder="Votre nom"
           label="Nom"
           autoCapitalize="none"
-          extraClasses="w-full mb-2"
+          extraClasses="w-full mb-5"
         />
 
-        <InputText
-          value={user.address}
-          onChangeText={(newAddress: string) =>
-            setUser((prevState) => ({
-              ...prevState,
-              address: newAddress,
-            }))
-          }
-          placeholder="Votre adresse"
-          label="Adresse"
-          autoCapitalize="none"
-          extraClasses="w-full mb-2"
-        />
+        {billingAddress ? (
+          <>
+            <Address
+              address={billingAddress}
+              deletable={false}
+              onPressFn={() => {}}
+              extraClasses="mb-5"
+            />
+            <ButtonSecondaryEnd
+              label={`Changer ou ajouter\nune adresse`}
+              iconName="address-book"
+              iconFamily="FontAwesomeIcon"
+              onPressFn={() =>
+                navigation.navigate("UserProfileAddresses", {
+                  from: "PaymentCustomer",
+                  backLabel: "Retour au paiement",
+                  screenTitle: "CHANGER D'ADRESSE",
+                  selectAddressFn: (selectedAddress) => {
+                    console.log("youpi");
+                    setBillingAddress(selectedAddress);
+                    navigation.navigate("PaymentCustomer", {
+                      from: "withdrawModes",
+                      backLabel: "Retour aux modes de retrait",
+                      screenTitle: "PAIEMENT",
+                    });
+                  },
+                })
+              }
+              extraClasses="h-20 mb-5"
+            />
+          </>
+        ) : (
+          <>
+            <TextBody1
+              centered
+              extraClasses="mb-5"
+            >{`vous n'avez pas encore\nd'adresse enregistrée.`}</TextBody1>
+            <ButtonSecondaryEnd
+              label="Créer une adresse"
+              iconName="address-card"
+              iconFamily="FontAwesomeIcon"
+              onPressFn={() =>
+                navigation.navigate("UserProfileAddresses", {
+                  from: "PaymentCustomer",
+                  backLabel: "Retour au paiement",
+                  screenTitle: "CREER UNE ADRESSE",
+                })
+              }
+            />
+          </>
+        )}
+      </View>
 
-        {/* {cartTotal && ( */}
-        {/* <View className="flex flex-row items-center justify-between my-5">
-            <View><TextHeading3>Montant total: </TextHeading3></View>
-            <View><TextHeading2>{cartTotal.toFixed(2)} €</TextHeading2></View>
-          </View> */}
-        {/* )} */}
-
+      <View style={{ flex: 1.5 }} className="px-3">
         <StripePaymentButton
           label="Payer"
           iconName="credit-card"
-          user={user}
+          user={userStore}
           totalCartAmount={cartTotal}
           navigation={navigation}
-          disabled={!user.firstname || !user.lastname}
+          disabled={!firstname || !lastname}
           extraClasses="h-14 mt-5 mb-3"
-        />
-
-        <ButtonSecondaryStart
-          label="Modes de retrait"
-          iconName="arrow-left"
-          isLoading={false}
-          disabled={false}
-          onPressFn={() => navigation.navigate("WithdrawModes")}
-          extraClasses="h-14"
         />
       </View>
     </SafeAreaView>

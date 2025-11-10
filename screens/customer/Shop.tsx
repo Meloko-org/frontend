@@ -198,21 +198,6 @@ export default function ShopUserScreen({ navigation, route }: Props) {
         );
       });
 
-  // Formatting category
-  // const categories =
-  //   shopData &&
-  //   shopData.notes &&
-  //   shopData.categories.map((category: ProductCategoryCardData) => {
-  //     return (
-  //       <ProductCategory
-  //         category={category}
-  //         onPressFn={() => handleCategoryClick(category.name)}
-  //         key={category._id}
-  //         extraClasses="mr-2"
-  //       />
-  //     );
-  //   });
-
   const categories =
     categoriesObjects.length > 0 &&
     categoriesObjects.map((object: ProductCategoryCardData) => {

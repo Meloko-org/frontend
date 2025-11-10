@@ -25,7 +25,7 @@ type ButtonSecondaryEndProps = {
   extraClasses?: string;
   disabled?: boolean;
   onPressFn: ((event: GestureResponderEvent) => void) | undefined;
-  isLoading: boolean;
+  isLoading?: boolean;
 };
 
 const iconLibraries = {

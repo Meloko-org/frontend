@@ -15,6 +15,7 @@ import BecomePremium from "./BecomePremium";
 import {
   MarketData,
   MarketResultData,
+  NoteData,
   ProductData,
   ShopData,
   ShopResultData,
@@ -32,6 +33,7 @@ import ProgrammedPostPreview from "./ProgrammedPostPreview";
 import PublishedPost from "./PublishedPost";
 import CircuitShop from "./CircuitShop";
 import SignInRequired from "./SignInRequired";
+import Note from "./Note";
 
 registerSheet("alert", CustomAlert);
 registerSheet("product-details", ProductDetails);
@@ -50,6 +52,7 @@ registerSheet("programmed-post-preview", ProgrammedPostPreview);
 registerSheet("published-post", PublishedPost);
 registerSheet("circuit-shop", CircuitShop);
 registerSheet("signin-required", SignInRequired);
+registerSheet("note", Note);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -164,6 +167,11 @@ declare module "react-native-actions-sheet" {
         shop: ShopData;
       };
       returnValue: ShopData;
+    }>;
+    note: SheetDefinition<{
+      payload: {
+        note: NoteData;
+      };
     }>;
   }
 }

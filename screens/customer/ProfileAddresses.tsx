@@ -59,7 +59,8 @@ export default function UserProfileAddressesScreen({
   navigation,
   route,
 }: Props) {
-  const { from, backLabel, screenTitle } = route.params || [];
+  const { from, backLabel, screenTitle, next, selectAddressFn } =
+    route.params || [];
 
   // Import the Clerk Auth functions
   const { signOut, isSignedIn, getToken } = useAuth();
@@ -98,10 +99,6 @@ export default function UserProfileAddressesScreen({
   const handleDefaultAddress = async (id: string) => {
     console.log("id passée :", id);
     setIsDefaultAddressSaving(true);
-    // setAddresses((prev) => prev.map((adr) => ({
-    //   ...adr,
-    //   isDefault: adr._id === id
-    // })))
 
     try {
       const token = await getToken();
@@ -185,7 +182,7 @@ export default function UserProfileAddressesScreen({
   console.log(
     "------------------------------- ADRESSES --------------------------------------------------------------------",
   );
-  console.log("userStoreaddresses :", JSON.stringify(userStore, null, 2));
+  // console.log("userStoreaddresses :", JSON.stringify(userStore, null, 2));
   // console.log(" mes adresses :", addresses)
 
   return (
@@ -333,9 +330,20 @@ export default function UserProfileAddressesScreen({
               <TextHeading4 centered extraClasses="mb-3">
                 Adresses enregistrées
               </TextHeading4>
-              <TextBody1
-                centered
-              >{`Cliquez sur une adresse\npour en faire l'adresse par défaut.`}</TextBody1>
+
+              {selectAddressFn ? (
+                <>
+                  <TextBody1
+                    centered
+                  >{`Cliquez sur une adresse\npour modifier l'adresse de facturation.`}</TextBody1>
+                </>
+              ) : (
+                <>
+                  <TextBody1
+                    centered
+                  >{`Cliquez sur une adresse\npour en faire l'adresse par défaut.`}</TextBody1>
+                </>
+              )}
             </View>
 
             <FlatList
@@ -346,7 +354,10 @@ export default function UserProfileAddressesScreen({
               renderItem={({ item }) => (
                 <Address
                   address={item}
-                  onPressFn={handleDefaultAddress}
+                  onPressFn={
+                    !selectAddressFn ? handleDefaultAddress : undefined
+                  }
+                  onSelectAddressFn={selectAddressFn}
                   extraClasses="mb-2"
                 />
               )}

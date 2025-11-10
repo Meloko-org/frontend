@@ -110,7 +110,11 @@ export default function CartScreen({ navigation }: Props) {
   });
 
   const handleWithdrawModePress = () => {
-    navigation.navigate("WithdrawModes");
+    navigation.navigate("WithdrawModes", {
+      from: "Cart",
+      backLabel: "Retour au panier",
+      screenTitle: "MODES DE RETRAIT",
+    });
   };
 
   console.log("------------- CARTSCREEN ----------------------------");
