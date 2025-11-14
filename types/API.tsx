@@ -1,6 +1,26 @@
 type OrderData = {
   _id: string;
   user: UserData;
+  billingAddress: {
+    name: string;
+    address1: string;
+    address2: string;
+    postalCode: string;
+    city: string;
+    country: string;
+    latitude: number;
+    longitude: number;
+  };
+  shippingAddress: {
+    name: string;
+    address1: string;
+    address2: string;
+    postalCode: string;
+    city: string;
+    country: string;
+    latitude: number;
+    longitude: number;
+  };
   details: [
     {
       _id: string;
@@ -9,22 +29,33 @@ type OrderData = {
           _id: string;
           product: StockData;
           quantity: number;
+          unitPriceTTC: number;
+          unitPriceHT: number;
+          vatRate: number;
+          vatAMount: number;
+          totalPriceTTC: number;
           isConfirmed: boolean;
         },
       ];
       withdrawMode: string;
       withdrawMarket: string;
-      withdrawDay: string;
+      withdrawDay: number;
       market: MarketData;
       shop: ShopData;
-      shopTotalPrice: number;
+      shopTotalHT: number;
+      shopTotalVAT: number;
+      shopTotalTTC: number;
       status: string;
     },
   ];
   isWithdraw: boolean;
   isPaid: boolean;
+  paymentMethod: string;
   stripePIId: string;
-  totalPrice: number;
+  totalHT: number;
+  totalVAT: number;
+  totalTTC: number;
+  invoiceNumber: string;
   createdAt: Date;
 };
 
@@ -144,8 +175,19 @@ type TagCategoryData = {
   color: string;
 };
 
+type LightShopData = {
+  _id: string;
+  name: string;
+  siret: string;
+  logo: string;
+  address: AddressData;
+  markets: MarketsData[];
+  clickCollect: ClickCollectData;
+  shipping: string;
+};
+
 type CartData = {
-  shop: ShopData;
+  shop: LightShopData;
   products: {
     stockData: StockData;
     quantity: number;
@@ -319,7 +361,7 @@ type UserData = {
   avatar: string | null;
   bookmarks: ShopData[] | null;
   favSearch: object[] | null;
-  orders: object[];
+  orders: OrderData[];
   clerkPasswordEnabled: boolean | null | undefined;
   producer: ProducerData | null;
   addresses: UserAddressData[] | null;
@@ -528,6 +570,7 @@ export type {
   CategoryData,
   FullShopData,
   ShopData,
+  LightShopData,
   CrewMember,
   SocialNetworkData,
   NetworksData,

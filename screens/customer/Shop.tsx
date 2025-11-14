@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { UserTabParamList } from "../../types/Navigation";
 
@@ -15,6 +15,7 @@ import {
   ProductCategoryCardData,
   CardProductData,
   CategoryData,
+  FullShopData,
 } from "../../types/API";
 import { setIsShopSearchActive } from "../../reducers/mapShopResults";
 import { useDispatch, useSelector } from "react-redux";
@@ -39,7 +40,7 @@ import BackLabelButton from "../../components/utils/buttons/BackLabel";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import Spinner from "../../components/utils/Spinner";
 
-const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
+// const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
 type ShopUserRouteProp = RouteProp<UserTabParamList, "ShopUser">;
 
@@ -59,7 +60,7 @@ export default function ShopUserScreen({ navigation, route }: Props) {
   );
   const { signOut, isSignedIn, getToken } = useAuth();
 
-  const [shopData, setShopData] = useState<ShopData>(null);
+  const [shopData, setShopData] = useState<ShopData | undefined>(undefined);
   const [categoriesObjects, setCategoriesObjects] = useState<
     ProductCategoryCardData[]
   >([]);
@@ -78,7 +79,7 @@ export default function ShopUserScreen({ navigation, route }: Props) {
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [isBookmarking, setIsBookmarking] = useState<boolean>(false);
 
-  // Shop recovery
+  // peuple les states shopDistance, searchProducts, shopData et categoriesObjects
   useEffect(() => {
     distance ? setShopDistance(Number(distance.toFixed(2))) : null;
 
@@ -90,20 +91,14 @@ export default function ShopUserScreen({ navigation, route }: Props) {
       const fullShopResponse = await shopTools.getFullShopById(shopId);
 
       if (fullShopResponse.success && fullShopResponse.data) {
+        console.log("shop recovered");
         setShopData(fullShopResponse.data.shop);
         setCategoriesObjects(fullShopResponse.data.categories);
       }
     })();
-
-    // fetch(`${API_ROOT}/shops/${shopId}`)
-    //   .then((resp) => resp.json())
-    //   .then((data) => {
-    //     if (data.result) {
-    //       setShopData(data.shop);
-    //     }
-    //   });
   }, [route.params]);
 
+  // définit si un shop est bookmarked ou pas
   useEffect(() => {
     if (
       userStore.bookmarks &&
@@ -156,25 +151,6 @@ export default function ShopUserScreen({ navigation, route }: Props) {
     }
   };
 
-  // Sorting products from categories by clicking
-  const handleCategoryClick = async (categoryName: string) => {
-    const stocksResponse = await shopTools.getStocksByShopAndCategory(
-      shopId,
-      categoryName,
-    );
-
-    if (!stocksResponse.success) {
-      console.warn(stocksResponse.message);
-      return;
-    }
-
-    console.log("SHOPUSER: stocksResponse :", stocksResponse.data);
-
-    setSelectedCategoryProducts(stocksResponse.data);
-    setSelectedCategory(categoryName);
-    setIsModalVisible(true);
-  };
-
   const handleCategoryPress = (categoryId: string) => {
     const categoryObject = categoriesObjects.find(
       (obj) => obj.category._id === categoryId,
@@ -211,283 +187,304 @@ export default function ShopUserScreen({ navigation, route }: Props) {
       );
     });
 
-  // Formatting search product
-  const searchProduct = searchProducts?.map((stockData, i) => {
-    return (
-      <CardProduct
-        stockData={stockData}
-        shopData={shopData}
-        key={stockData._id}
-        extraClasses="mb-2"
-        displayMode="shop"
-        quantityControllable
-        showImage
-      />
-    );
-  });
-
-  // Formatting shop product click (for the modal: Produits de la catégorie)
-  const categoryProducts = selectedCategoryProducts.map((stockData) => {
-    return (
-      <CardProduct
-        stockData={stockData}
-        shopData={shopData}
-        key={stockData._id}
-        extraClasses="mb-1"
-        displayMode="shop"
-        quantityControllable
-        showImage
-      />
-    );
-  });
-
-  // console.log("SHOPUSER: shopId :", shopId);
-  // console.log("SHOPUSER shopData :", JSON.stringify(relevantProducts, null, 2))
-  // console.log("SHOPUSER categoriesObjects :", categoriesObjects)
+  console.log(
+    " un product par cat :",
+    JSON.stringify(
+      categoriesObjects.map((c) => c.stocks[0]),
+      null,
+      2,
+    ),
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <View className="flex flex-row mb-2 mt-2">
-        <BackLabelButton
-          backLabel="Retour aux résultats"
-          onPressFn={() => {
-            if (sheetId) {
-              dispatch(setIsShopSearchActive(true));
-            }
-            navigation.goBack();
-          }}
-          extraClasses="ml-3 pr-2"
-        />
-      </View>
-
-      <View className="mb-5">
-        <ScrollView showsVerticalScrollIndicator={false} className="px-3 mb-5">
-          {shopData && (
-            <View className="flex-1">
-              <View>
-                <View className="flex flex-row item-center justify-center">
-                  <View className="flex flex-row items-center">
-                    <TextHeading3 extraClasses="" centered>
-                      {shopData.name}
-                    </TextHeading3>
-
-                    {shopData.isPremium && (
-                      <FontAwesome5Icon
-                        name="crown"
-                        size={25}
-                        color="#FAA200"
-                        className=""
-                        style={{ left: 5 }}
-                      />
-                    )}
-                  </View>
-                </View>
-
-                <View className="flex flex-row justify-center">
-                  <StarsNotation
-                    iconNames={["star", "star-half", "star-o"]}
-                    shopData={shopData}
-                    extraClasses="mb-4"
-                  />
-                  {shopDistance && (
-                    <TextBody1>{` - ${shopDistance} km`}</TextBody1>
-                  )}
-                </View>
-
-                <View className="flex flex-row items-center mb-2">
-                  <View className="w-2/6">
-                    <Image
-                      source={
-                        shopData?.logo
-                          ? { uri: shopData?.logo }
-                          : require("../../assets/icon.png")
-                      }
-                      className="rounded-lg border border-primary w-24 h-24"
-                      alt={`photo du point de vente ${shopData?.name}`}
-                      resizeMode="cover"
-                      width={112}
-                      height={112}
-                    />
-                  </View>
-
-                  <View
-                    className={`w-3/6 flex flex-row justify-start pr-1 h-full`}
-                  >
-                    <TextBody1>{shopData.shortDesc}</TextBody1>
-                  </View>
-
-                  <View className="w-1/6 flex flex-column justify-center">
-                    {isSignedIn && (
-                      <IconButton
-                        iconName={isBookmarked ? "heart" : "heart-o"}
-                        iconFamily="FontAwesomeIcon"
-                        iconColor="#98B66E"
-                        extraClasses="h-10"
-                        onPressFn={updateBookmarks}
-                      />
-                    )}
-                    <IconButton
-                      iconName="eye"
-                      iconFamily="FontAwesome5Icon"
-                      buttonColor="bg-primary"
-                      extraClasses="h-10"
-                      onPressFn={() => {
-                        SheetManager.show("shop-details", {
-                          payload: {
-                            shop: shopData,
-                            showButtons: false,
-                          },
-                        });
-                      }}
-                    />
-                  </View>
-                </View>
-              </View>
-
-              <View className="flex flex-row w-full justify-evenly mb-3">
-                {shopData.clickCollect && (
-                  <BadgeSecondary
-                    extraClasses="p-1"
-                    textClasses="text-xs"
-                    uppercase
-                  >
-                    Click & collect
-                  </BadgeSecondary>
-                )}
-                {shopData.markets.length > 0 && (
-                  <BadgeSecondary
-                    extraClasses="p-1"
-                    textClasses="text-xs"
-                    uppercase
-                  >
-                    Point de vente
-                  </BadgeSecondary>
-                )}
-                {/* ajouter la livraison */}
-              </View>
-            </View>
-          )}
-
-          {/* {topComments && (
-            <View className="mb-3">
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.contentContainer}
-              >
-                <View className="p-2 flex flex-row">{topComments}</View>
-              </ScrollView>
-            </View>
-          )} */}
-
-          {searchProduct.length > 0 && (
-            <View className="mt-5">
-              <TextHeading3 centered>Votre recherche</TextHeading3>
-              <View className="my-3">{searchProduct.slice(0, 4)}</View>
-              <ButtonPrimaryEnd
-                label={`Tous les résultats (${searchProduct.length})`}
-                iconName="arrow-right"
-                extraClasses="h-14 mb-5"
-                onPressFn={() => setIsSearchResultsModalVisible(true)}
-              />
-            </View>
-          )}
-
-          <View className="my-5">
-            <TextHeading3 centered extraClasses="w-full">
-              Rayons
-            </TextHeading3>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View className="p-2 flex flex-row">{categories}</View>
-            </ScrollView>
-          </View>
-        </ScrollView>
-      </View>
-
-      {/* Modal Résultats de recherche */}
-      {searchProduct.length > 0 && (
-        <Modal
-          isVisible={isSearchResultsModalVisible}
-          coverScreen={false}
-          onModalHide={() => setIsSearchResultsModalVisible(false)}
-          style={{ margin: 0 }}
-        >
-          <SafeAreaView
-            className="bg-lightbg flex-1 dark:bg-darkbg"
-            edges={["right", "left", "top"]}
-          >
-            <View
-              style={{ flex: 1 }}
-              className="flex flex-row justify-between items-center"
-            >
-              <BackLabelButton
-                backLabel="Retour"
-                onPressFn={() => setIsSearchResultsModalVisible(false)}
-                extraClasses="ml-3 pr-2"
-              />
-              <View className="grow">
-                <TextHeading3 centered extraClasses="">
-                  Tous les produits
-                </TextHeading3>
-              </View>
-            </View>
-
-            <View style={{ flex: 10 }} className="px-3 py-1">
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                className="w-full"
-              >
-                {searchProduct}
-              </ScrollView>
-            </View>
-          </SafeAreaView>
-        </Modal>
-      )}
-
-      {/* Modal Produits de la catégorie */}
-      <Modal
-        isVisible={isModalVisible}
-        coverScreen={false}
-        onModalHide={() => {
-          setIsModalVisible(false);
-          setSelectedCategory(null);
-        }}
-        style={{ margin: 0 }}
-      >
-        <SafeAreaView
-          className="bg-lightbg flex-1 dark:bg-darkbg"
-          edges={["right", "left", "top"]}
-        >
-          <View
-            style={{ flex: 1 }}
-            className="flex flex-row justify-between items-center"
-          >
-            <BackLabelButton
-              backLabel="Retour"
-              onPressFn={() => setIsModalVisible(false)}
-              extraClasses="ml-3 pr-2"
-            />
-            <View className="mr-3 flex flex-row items-center">
-              <TextBody1>Produits du rayon: </TextBody1>
-              <TextHeading3 extraClasses="">{selectedCategory}</TextHeading3>
-            </View>
-          </View>
-
-          {/* <TextHeading4 centered extraClasses="mb-1">
-            Tous les produits
-          </TextHeading4> */}
-          <View style={{ flex: 10 }} className="px-3 py-1">
-            <ScrollView showsVerticalScrollIndicator={false} className="w-full">
-              {categoryProducts}
-            </ScrollView>
-          </View>
-        </SafeAreaView>
-      </Modal>
-
-      {isBookmarking && (
-        <View className="absolute top-0 w-full h-full flex items-center justify-center bg-darkbg/80 mt-[39px]">
+      {!shopData ? (
+        <View className="flex items-center justify-center w-full h-full">
           <Spinner />
         </View>
+      ) : (
+        <>
+          {(() => {
+            const lightShop = shopTools.getLightShop(shopData);
+
+            const searchProduct = searchProducts?.map((stockData, i) => {
+              return (
+                <CardProduct
+                  stockData={stockData}
+                  shopData={lightShop}
+                  key={stockData._id}
+                  extraClasses="mb-2"
+                  displayMode="shop"
+                  quantityControllable
+                  showImage
+                />
+              );
+            });
+
+            const categoryProducts = selectedCategoryProducts.map(
+              (stockData) => {
+                return (
+                  <CardProduct
+                    stockData={stockData}
+                    shopData={lightShop}
+                    key={stockData._id}
+                    extraClasses="mb-1"
+                    displayMode="shop"
+                    quantityControllable
+                    showImage
+                  />
+                );
+              },
+            );
+
+            return (
+              <>
+                <View className="flex flex-row mb-2 mt-2">
+                  <BackLabelButton
+                    backLabel="Retour aux résultats"
+                    onPressFn={() => {
+                      if (sheetId) {
+                        dispatch(setIsShopSearchActive(true));
+                      }
+                      navigation.goBack();
+                    }}
+                    extraClasses="ml-3 pr-2"
+                  />
+                </View>
+
+                <View className="mb-5">
+                  <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    className="px-3 mb-5"
+                  >
+                    {shopData && (
+                      <View className="flex-1">
+                        <View>
+                          <View className="flex flex-row item-center justify-center">
+                            <View className="flex flex-row items-center">
+                              <TextHeading3 extraClasses="" centered>
+                                {shopData.name}
+                              </TextHeading3>
+
+                              {shopData.isPremium && (
+                                <FontAwesome5Icon
+                                  name="crown"
+                                  size={25}
+                                  color="#FAA200"
+                                  className=""
+                                  style={{ left: 5 }}
+                                />
+                              )}
+                            </View>
+                          </View>
+
+                          <View className="flex flex-row justify-center">
+                            <StarsNotation
+                              iconNames={["star", "star-half", "star-o"]}
+                              shopData={shopData}
+                              extraClasses="mb-4"
+                            />
+                            {shopDistance && (
+                              <TextBody1>{` - ${shopDistance} km`}</TextBody1>
+                            )}
+                          </View>
+
+                          <View className="flex flex-row items-center mb-2">
+                            <View className="w-2/6">
+                              <Image
+                                source={
+                                  shopData?.logo
+                                    ? { uri: shopData?.logo }
+                                    : require("../../assets/icon.png")
+                                }
+                                className="rounded-lg border border-primary w-24 h-24"
+                                alt={`photo du point de vente ${shopData?.name}`}
+                                resizeMode="cover"
+                                width={112}
+                                height={112}
+                              />
+                            </View>
+
+                            <View
+                              className={`w-3/6 flex flex-row justify-start pr-1 h-full`}
+                            >
+                              <TextBody1>{shopData.shortDesc}</TextBody1>
+                            </View>
+
+                            <View className="w-1/6 flex flex-column justify-center">
+                              {isSignedIn && (
+                                <IconButton
+                                  iconName={isBookmarked ? "heart" : "heart-o"}
+                                  iconFamily="FontAwesomeIcon"
+                                  iconColor="#98B66E"
+                                  extraClasses="h-10"
+                                  onPressFn={updateBookmarks}
+                                />
+                              )}
+                              <IconButton
+                                iconName="eye"
+                                iconFamily="FontAwesome5Icon"
+                                buttonColor="bg-primary"
+                                extraClasses="h-10"
+                                onPressFn={() => {
+                                  SheetManager.show("shop-details", {
+                                    payload: {
+                                      shop: shopData,
+                                      showButtons: false,
+                                    },
+                                  });
+                                }}
+                              />
+                            </View>
+                          </View>
+                        </View>
+
+                        <View className="flex flex-row w-full justify-evenly mb-3">
+                          {shopData.clickCollect && (
+                            <BadgeSecondary
+                              extraClasses="p-1"
+                              textClasses="text-xs"
+                              uppercase
+                            >
+                              Click & collect
+                            </BadgeSecondary>
+                          )}
+                          {shopData.markets.length > 0 && (
+                            <BadgeSecondary
+                              extraClasses="p-1"
+                              textClasses="text-xs"
+                              uppercase
+                            >
+                              Point de vente
+                            </BadgeSecondary>
+                          )}
+                          {/* ajouter la livraison */}
+                        </View>
+                      </View>
+                    )}
+
+                    {searchProduct.length > 0 && (
+                      <View className="mt-5">
+                        <TextHeading3 centered>Votre recherche</TextHeading3>
+                        <View className="my-3">
+                          {searchProduct.slice(0, 4)}
+                        </View>
+                        <ButtonPrimaryEnd
+                          label={`Tous les résultats (${searchProduct.length})`}
+                          iconName="arrow-right"
+                          extraClasses="h-14 mb-5"
+                          onPressFn={() => setIsSearchResultsModalVisible(true)}
+                        />
+                      </View>
+                    )}
+
+                    <View className="my-5">
+                      <TextHeading3 centered extraClasses="w-full">
+                        Rayons
+                      </TextHeading3>
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                      >
+                        <View className="p-2 flex flex-row">{categories}</View>
+                      </ScrollView>
+                    </View>
+                  </ScrollView>
+                </View>
+
+                {/* Modal Résultats de recherche */}
+                {searchProduct.length > 0 && (
+                  <Modal
+                    isVisible={isSearchResultsModalVisible}
+                    coverScreen={false}
+                    onModalHide={() => setIsSearchResultsModalVisible(false)}
+                    style={{ margin: 0 }}
+                  >
+                    <SafeAreaView
+                      className="bg-lightbg flex-1 dark:bg-darkbg"
+                      edges={["right", "left", "top"]}
+                    >
+                      <View
+                        style={{ flex: 1 }}
+                        className="flex flex-row justify-between items-center"
+                      >
+                        <BackLabelButton
+                          backLabel="Retour"
+                          onPressFn={() =>
+                            setIsSearchResultsModalVisible(false)
+                          }
+                          extraClasses="ml-3 pr-2"
+                        />
+                        <View className="grow">
+                          <TextHeading3 centered extraClasses="">
+                            Tous les produits
+                          </TextHeading3>
+                        </View>
+                      </View>
+
+                      <View style={{ flex: 10 }} className="px-3 py-1">
+                        <ScrollView
+                          showsVerticalScrollIndicator={false}
+                          className="w-full"
+                        >
+                          {searchProduct}
+                        </ScrollView>
+                      </View>
+                    </SafeAreaView>
+                  </Modal>
+                )}
+
+                {/* Modal Produits de la catégorie */}
+                <Modal
+                  isVisible={isModalVisible}
+                  coverScreen={false}
+                  onModalHide={() => {
+                    setIsModalVisible(false);
+                    setSelectedCategory(null);
+                  }}
+                  style={{ margin: 0 }}
+                >
+                  <SafeAreaView
+                    className="bg-lightbg flex-1 dark:bg-darkbg"
+                    edges={["right", "left", "top"]}
+                  >
+                    <View
+                      style={{ flex: 1 }}
+                      className="flex flex-row justify-between items-center"
+                    >
+                      <BackLabelButton
+                        backLabel="Retour"
+                        onPressFn={() => setIsModalVisible(false)}
+                        extraClasses="ml-3 pr-2"
+                      />
+                      <View className="mr-3 flex flex-row items-center">
+                        <TextBody1>Produits du rayon: </TextBody1>
+                        <TextHeading3 extraClasses="">
+                          {selectedCategory}
+                        </TextHeading3>
+                      </View>
+                    </View>
+
+                    <View style={{ flex: 10 }} className="px-3 py-1">
+                      <ScrollView
+                        showsVerticalScrollIndicator={false}
+                        className="w-full"
+                      >
+                        {categoryProducts}
+                      </ScrollView>
+                    </View>
+                  </SafeAreaView>
+                </Modal>
+
+                {isBookmarking && (
+                  <View className="absolute top-0 w-full h-full flex items-center justify-center bg-darkbg/80 mt-[39px]">
+                    <Spinner />
+                  </View>
+                )}
+              </>
+            );
+          })()}
+        </>
       )}
     </SafeAreaView>
   );

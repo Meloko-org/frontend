@@ -1,5 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CartData, ShopData, StockData } from "../types/API";
+import {
+  AddressData,
+  CartData,
+  ClickCollectData,
+  LightShopData,
+  MarketsData,
+  ShopData,
+  StockData,
+} from "../types/API";
 
 export type CartState = {
   value: CartData[];
@@ -16,7 +24,7 @@ type CartPayload = {
 };
 
 type addProductToCartPayload = {
-  shop: ShopData;
+  shop: LightShopData;
   stockData: StockData;
   quantity: number;
 };
@@ -36,19 +44,32 @@ export const cartSlice = createSlice({
       const shop = state.value.find(
         (c) => c.shop?._id === action.payload?.shop?._id,
       );
-      // console.log("adding to cart", action.payload);
+
       if (shop) {
         shop.products.push({
           stockData: action.payload.stockData,
           quantity: action.payload.quantity,
         });
       } else {
+        const { shop, stockData, quantity } = action.payload;
+
+        const lightShop = {
+          _id: shop._id,
+          name: shop.name,
+          logo: shop.logo,
+          siret: shop.siret,
+          address: shop.address,
+          markets: shop.markets,
+          clickCollect: shop.clickCollect,
+          shipping: shop.shipping,
+        };
+
         state.value.push({
-          shop: action.payload.shop,
+          shop: lightShop,
           products: [
             {
-              stockData: action.payload.stockData,
-              quantity: action.payload.quantity,
+              stockData: stockData,
+              quantity: quantity,
             },
           ],
           withdrawMode: null,

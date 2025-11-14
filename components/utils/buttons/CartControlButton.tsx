@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { ShopData, StockData } from "../../../types/API";
+import { LightShopData, ShopData, StockData } from "../../../types/API";
 import {
   addProductToCart,
   CartState,
@@ -10,10 +10,12 @@ import {
 import { TouchableOpacity, View, Text } from "react-native";
 import BadgeGrey from "../badges/Grey";
 import IconButton from "./Icon";
+import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
+import shopTools from "../../../modules/shopTools";
 
 type CartControlButtonProps = {
   stockData: StockData;
-  shopData: ShopData;
+  shopData: LightShopData;
   quantityControllable?: boolean;
   extraClasses?: string;
 };
@@ -48,7 +50,6 @@ export default function CartControlButton({
   };
 
   const handleAddToCart = () => {
-    console.log("CARTCONTROLBUTTON :", shopData?.name);
     dispatch(
       addProductToCart({
         shop: shopData,
@@ -77,39 +78,18 @@ export default function CartControlButton({
       >
         {quantityControllable && (
           <TouchableOpacity className="px-3 rounded" onPress={handleIncrease}>
-            <Text className="text-3xl text-darkbg dark:text-lightbg">+</Text>
+            <FontAwesome5Icon name="plus" size={25} color="#98B66E" />
           </TouchableOpacity>
         )}
         <BadgeGrey extraClasses="px-2">{formatQuantity(quantity)}</BadgeGrey>
         {quantityControllable && (
           <TouchableOpacity className="px-4 rounded" onPress={handleDecrease}>
-            <Text className="text-3xl text-darkbg dark:text-lightbg">-</Text>
+            <FontAwesome5Icon name="minus" size={25} color="#98B66E" />
           </TouchableOpacity>
         )}
       </View>
     );
   }
-
-  // console.log("CARTBUTTON shopId: ", shopId)
-  // console.log("CARTBUTTON cartstore :", JSON.stringify(cartStore, null ,2))
-  // console.log("CARTBUTTON stockdata :", JSON.stringify(stockData, null, 2))
-  // console.log(
-  //   "CARTCONTROLBUTTON cartStore: ",
-  //   JSON.stringify(
-  //     cartStore.map((elt) => ({
-  //       key: elt.shop?._id,
-  //       shop: elt.shop,
-  //       products: elt.products.map((pdt) => ({
-  //         name: pdt.stockData.productCustomName
-  //           ? pdt.stockData.productCustomName
-  //           : pdt.stockData.product.name,
-  //         quantity: pdt.quantity,
-  //       })),
-  //     })),
-  //     null,
-  //     2,
-  //   ),
-  // );
 
   return (
     <IconButton

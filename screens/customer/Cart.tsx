@@ -59,9 +59,11 @@ export default function CartScreen({ navigation }: Props) {
 
   useEffect(() => {
     if (cartStore.length > 0) {
-      let allShopsCost = CartTools.getTotalCost(cartStore);
+      // let allShopsCost = CartTools.getTotalCost(cartStore);
+      // setCartTotal(allShopsCost);
 
-      setCartTotal(allShopsCost);
+      const total = CartTools.getCartTotal(cartStore);
+      setCartTotal(total);
     }
   }, [cartStore]);
 
@@ -81,16 +83,18 @@ export default function CartScreen({ navigation }: Props) {
       );
     });
 
-    let subTotal = 0;
-    const productsCost = cart.products.reduce((accumulator, currentValue) => {
-      const quantity =
-        currentValue.stockData.product.weight.unit === "gr"
-          ? currentValue.quantity / 1000
-          : currentValue.quantity;
+    // let subTotal = 0;
+    // const productsCost = cart.products.reduce((accumulator, currentValue) => {
+    //   const quantity =
+    //     currentValue.stockData.product.weight.unit === "gr"
+    //       ? currentValue.quantity / 1000
+    //       : currentValue.quantity;
 
-      return quantity * Number(currentValue.stockData.price) + accumulator;
-    }, 0);
-    subTotal += productsCost;
+    //   return quantity * Number(currentValue.stockData.price) + accumulator;
+    // }, 0);
+    // subTotal += productsCost / 100;
+
+    const subTotal = CartTools.getShopSubtotal(cart);
 
     return (
       <View className="mb-5" key={cart.shop?._id}>

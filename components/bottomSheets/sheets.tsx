@@ -13,6 +13,7 @@ import MapShopResults from "./MapShopResults";
 import MapMarketResults from "./MapMarketResults";
 import BecomePremium from "./BecomePremium";
 import {
+  LightShopData,
   MarketData,
   MarketResultData,
   NoteData,
@@ -74,7 +75,7 @@ declare module "react-native-actions-sheet" {
     "product-details": SheetDefinition<{
       payload: {
         stockData?: StockData;
-        shopData: ShopData;
+        shopData: LightShopData;
         unit: string;
       };
     }>;

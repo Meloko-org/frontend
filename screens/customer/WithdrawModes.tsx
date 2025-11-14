@@ -13,28 +13,31 @@ import { RootStackParamList, UserTabParamList } from "../../types/Navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { CartState, updateWithdrawMode } from "../../reducers/cart";
 
-import { MarketData, MarketsData, ShopData, StockData } from "../../types/API";
+import {
+  LightShopData,
+  MarketData,
+  MarketsData,
+  ShopData,
+  StockData,
+} from "../../types/API";
 
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { View, Image, Modal } from "react-native";
-import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import CardProduct from "../../components/cards/Product";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
-import StripePaymentButton from "../../components/utils/buttons/StripePayment";
 import InputRadioGroup, {
   InputRadioGroupData,
 } from "../../components/utils/inputs/radioGroup";
 import Market from "../../components/cards/Market";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import ButtonSecondaryStart from "../../components/utils/buttons/SecondaryStart";
-import SignInScreen from "../Signin";
 import SelectMarketModal from "../../components/modals/user/SelectMarket";
 import TextBody1 from "../../components/utils/texts/Body1";
-import { NativeStackNavigatorProps } from "@react-navigation/native-stack/lib/typescript/src/types";
 import TopBar from "../../components/TopBar";
+import CartTools from "../../modules/CartTools";
 
 type SelectedMarkets = {};
 
@@ -73,17 +76,15 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
   const cartStore = useSelector(
     (state: { cart: CartState }) => state.cart.value,
   );
-  const [cartTotal, setCartTotal] = useState<number>(0);
+  const [cartTotal, setCartTotal] = useState<number | undefined>(0);
 
   const [isSelectMarketModalVisible, setSelectMarketModalVisible] =
     useState<boolean>(false);
 
-  // const [isMarketSelectModalVisible, setIsMarketSelectModalVisible] =
-  // useState<boolean>(false);
-  const [isSigninModalVisible, setIsSigninModalVisible] =
-    useState<boolean>(false);
-  const [selectedShop, setSelectedShop] = useState<ShopData | null>(null);
-  const [selectedMarket, setSelectedMarket] = useState<MarketData | null>(null);
+  // const [isSigninModalVisible, setIsSigninModalVisible] =
+  //   useState<boolean>(false);
+  const [selectedShop, setSelectedShop] = useState<LightShopData | null>(null);
+  // const [selectedMarket, setSelectedMarket] = useState<MarketData | null>(null);
   const [isPaymentDisabledButton, setIsPaymentDisabledButton] = useState(false);
 
   const weekDays = [
@@ -151,35 +152,10 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
 
   useEffect(() => {
     if (cartStore.length > 0) {
-      let allShopsCost = 0;
-      cartStore.forEach((c) => {
-        const cartTotalCost = c.products.reduce((accumulator, currentValue) => {
-          const quantity =
-            currentValue.stockData.product.weight.unit === "gr"
-              ? currentValue.quantity / 1000
-              : currentValue.quantity;
-
-          return quantity * Number(currentValue.stockData.price) + accumulator;
-        }, 0);
-        allShopsCost += cartTotalCost;
-      });
+      const allShopsCost = CartTools.getTotalCost(cartStore);
       setCartTotal(allShopsCost);
       setIsPaymentDisabledButton(cartStore.some((c) => !c.withdrawMode));
     }
-    // else {
-    //   navigation.navigate("TabNavigatorUser", {
-    //     screen: "Accueil",
-    //     params: {
-    //       search: {
-    //         address: null,
-    //         query: null,
-    //         radius: null,
-    //         userPosition: null,
-    //       },
-    //       searchResults: [],
-    //     },
-    //   });
-    // }
   }, [cartStore]);
 
   const handleSelectedModePress = (
@@ -213,7 +189,7 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
     } else if (value === "shipping") {
       dispatch(
         updateWithdrawMode({
-          shopId: selectedShop?.shop?._id!,
+          shopId: selectedShop?._id!,
           withdrawMode: value,
         }),
       );
@@ -302,7 +278,7 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
     "withdrawDay: ",
     cartStore.find((cart) => cart.shop?._id === selectedShop?._id)?.withdrawDay,
   );
-  // console.log(cartStore)
+  console.log("cartStore complet :", JSON.stringify(cartStore, null, 2));
 
   return (
     <SafeAreaView
@@ -415,7 +391,7 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
 
       <SelectMarketModal
         isVisible={isSelectMarketModalVisible}
-        shop={selectedShop}
+        shop={selectedShop!}
         onCloseFn={() => setSelectMarketModalVisible(false)}
       />
     </SafeAreaView>

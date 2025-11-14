@@ -7,7 +7,12 @@ import {
   updateWithdrawMode,
 } from "../../../reducers/cart";
 
-import { MarketsData, MarketData, ShopData } from "../../../types/API";
+import {
+  MarketsData,
+  MarketData,
+  ShopData,
+  LightShopData,
+} from "../../../types/API";
 import shopTools from "../../../modules/shopTools";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,7 +28,7 @@ import BackLabelButton from "../../utils/buttons/BackLabel";
 
 type SelectMarketModalProps = {
   isVisible: boolean;
-  shop: ShopData;
+  shop: LightShopData;
   onCloseFn: (bool: boolean) => void;
 };
 

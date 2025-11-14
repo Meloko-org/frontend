@@ -180,16 +180,17 @@ function getOrderStatus(order: OrderData): GlobalOrderStatus {
   return "pending";
 }
 
-// calcule le prix du produit commandé
+// retourne le prix en euros du produit commandé en fonction de unit
 const getProductCost = (
-  price: number,
+  priceInCents: number,
   quantity: number,
   unit: string | undefined,
 ) => {
   if (unit === "gr") {
-    quantity /= 1000;
+    const kg = quantity / 1000;
+    return (priceInCents * kg) / 100;
   }
-  return price * quantity;
+  return (priceInCents * quantity) / 100;
 };
 
 export default {

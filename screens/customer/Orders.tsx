@@ -3,8 +3,9 @@ import { useAuth } from "@clerk/clerk-expo";
 import { useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { UserTabParamList } from "../../types/Navigation";
 
 import { UserState } from "../../reducers/user";
 import { OrderData } from "../../types/API";
@@ -34,13 +35,16 @@ import QRCodeModal from "../../components/modals/user/QRCodeModal";
 import TextBody2 from "../../components/utils/texts/Body2";
 import PriceBadge from "../../components/utils/badges/Price";
 
-type OrdersScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "TabNavigatorUser"
+type OrdersRouteProp = RouteProp<UserTabParamList, "OrdersCustomer">;
+
+type OrdersNavProp = BottomTabNavigationProp<
+  UserTabParamList,
+  "OrdersCustomer"
 >;
 
 type Props = {
-  navigation: OrdersScreenNavigationProp;
+  navigation: OrdersNavProp;
+  route: OrdersRouteProp;
 };
 
 export default function OrdersCustomerScreen({

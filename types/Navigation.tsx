@@ -181,21 +181,23 @@ type UserTabParamList = {
     shopId: string;
     distance: number | undefined;
     relevantProducts: StockData[];
-    sheetId: string;
+    sheetId: string | undefined;
   };
   WithdrawModes: {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
   };
-  OrdersCustomer: undefined;
+  OrderCustomer: {
+    orderId: string;
+  };
   PaymentCustomer: {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
   };
   BookmarksCustomer: undefined;
-  OrderCustomer: undefined;
+  OrdersCustomer: undefined;
 
   CircuitParameters: undefined;
   CircuitMap: {

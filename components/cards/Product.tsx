@@ -14,7 +14,7 @@ import {
   decreaseCartQuantity,
   CartState,
 } from "../../reducers/cart";
-import { ShopData, StockData } from "../../types/API";
+import { LightShopData, ShopData, StockData } from "../../types/API";
 import TextBody1 from "../utils/texts/Body1";
 import PricePer from "../utils/badges/Dark";
 import PriceBadge from "../utils/badges/Price";
@@ -24,10 +24,11 @@ import { useColorScheme } from "nativewind";
 import orderTools from "../../modules/orderTools";
 import { SheetManager } from "react-native-actions-sheet";
 import CartControlButton from "../utils/buttons/CartControlButton";
+import CartTools from "../../modules/CartTools";
 
 type CardProductProps = {
   stockData?: StockData;
-  shopData: ShopData;
+  shopData: LightShopData;
   quantity?: number;
   onPressFn?: ((event: GestureResponderEvent) => void) | undefined;
   extraClasses?: string;
@@ -57,15 +58,10 @@ export default function CardProduct({
       payload: {
         stockData: stockData,
         shopData: shopData,
-        unit: unit,
+        unit: unitLabel,
       },
     });
   };
-
-  // console.log(
-  //   "CARDPRODUCT: stockData :",
-  //   stockData?.product.family.productsTypes,
-  // );
 
   const isBulk =
     stockData?.product.family.productsTypes.includes("bulk") ?? false;
@@ -76,7 +72,8 @@ export default function CardProduct({
 
   const productImage = !isBulk ? stockData?.image : stockData?.product.image;
 
-  const unit = stockData?.product.weight.unit === "gr" ? "kg" : "la pièce";
+  const isWeightProduct = stockData?.product.weight.unit === "gr";
+  const unitLabel = isWeightProduct ? "kg" : "la pièce";
 
   // console.log("PRODUCTCARD cart :", JSON.stringify(cartStore, null, 2))
 
@@ -85,7 +82,7 @@ export default function CardProduct({
       <TouchableOpacity
         onPress={showProductDetailsBottomSheet}
         activeOpacity={0.8}
-        className={`${extraClasses} rounded-lg shadow-sm bg-white px-2 dark:bg-tertiary flex flex-row w-full`}
+        className={`${extraClasses} rounded-lg shadow-sm bg-white px-2 py-1 dark:bg-tertiary flex flex-row w-full`}
       >
         <View className="flex flex-row items-center w-full">
           <View className="flex flex-row w-4/5">
@@ -120,17 +117,20 @@ export default function CardProduct({
                   textClasses="font-bold"
                 >
                   {stockData && quantity
+                    ? CartTools.getProductTotal(stockData, quantity).toFixed(2)
+                    : "0.00"}
+                  {/* {stockData && quantity
                     ? orderTools
                         .getProductCost(
-                          stockData?.price,
+                          stockData!.price,
                           quantity,
                           stockData?.product.weight.unit,
                         )
                         .toFixed(2)
-                    : "null"}
+                    : "0.00"} */}
                 </PriceBadge>
               ) : (
-                <PricePer>{`${stockData?.price} € / ${unit}`}</PricePer>
+                <PricePer>{`${(stockData?.price! / 100).toFixed(2)} € / ${unitLabel}`}</PricePer>
               )}
             </View>
           </View>

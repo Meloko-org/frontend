@@ -19,15 +19,8 @@ import CardProducer from "../../components/cards/ProducerSearchResult";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import CardProduct from "../../components/cards/Product";
 import { UserState } from "../../reducers/user";
-
-// type OrderScreenNavigationProp = NativeStackNavigationProp<
-//   RootStackParamList,
-//   "TabNavigatorUser"
-// >;
-
-// type Props = {
-//   navigation: OrderScreenNavigationProp;
-// };
+import { OrderData } from "../../types/API";
+import shopTools from "../../modules/shopTools";
 
 type OrderCustomerRouteProp = RouteProp<UserTabParamList, "OrderCustomer">;
 
@@ -45,10 +38,12 @@ export default function OrderCustomerScreen({
   route,
   navigation,
 }: Props): JSX.Element {
+  const { orderId } = route.params;
+
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
   );
-  const [newOrderDetails, setNewOrderDetails] = useState(null);
+  const [newOrder, setNewOrder] = useState<OrderData | undefined>(undefined);
 
   const weekDays = [
     "Lundi",
@@ -61,20 +56,18 @@ export default function OrderCustomerScreen({
   ];
 
   useEffect(() => {
-    const newOrder = userStore.orders.find(
-      (o) => o._id === route.params.orderId,
-    );
-    setNewOrderDetails(newOrder);
+    const newOrder = userStore.orders.find((o) => o._id === orderId);
+    setNewOrder(newOrder);
   }, [route.params]);
 
   let clickCollectOrdersDisplay = <></>;
   let marketOrdersDisplay = <></>;
 
-  if (newOrderDetails) {
-    const clickCollectOrders = newOrderDetails.details.filter(
+  if (newOrder) {
+    const clickCollectOrders = newOrder.details.filter(
       (d) => d.withdrawMode === "clickCollect",
     );
-    const marketOrders = newOrderDetails.details.filter(
+    const marketOrders = newOrder.details.filter(
       (d) => d.withdrawMode === "market",
     );
 
@@ -82,11 +75,9 @@ export default function OrderCustomerScreen({
       const productList = cco.products.map((p) => {
         return (
           <CardProduct
-            stockData={{
-              ...p.product,
-              notes: cco.shop.notes,
-              quantity: p.quantity,
-            }}
+            stockData={p.product}
+            shopData={shopTools.getLightShop(cco.shop)}
+            quantity={p.quantity}
             key={p.product._id}
             extraClasses="mb-1"
             displayMode="detail"
@@ -99,15 +90,16 @@ export default function OrderCustomerScreen({
           <CardProducer
             shopData={cco.shop}
             withdrawData={cco.products}
-            key={cco.shop._id}
+            key={cco.shop?._id}
             extraClasses="mb-1"
             displayMode="order"
             showDirectionButton
             onPressFn={() => {
               navigation.navigate("ShopUser", {
-                shopId: cco.shop._id,
-                distance: null,
+                shopId: cco.shop!._id,
+                distance: undefined,
                 relevantProducts: [],
+                sheetId: undefined,
               });
             }}
           />
@@ -125,7 +117,7 @@ export default function OrderCustomerScreen({
               <TextBody1>Montant:</TextBody1>
             </View>
             <View>
-              <TextHeading4>{cco.shopTotalPrice} €</TextHeading4>
+              <TextHeading4>{cco.shopTotalTTC} €</TextHeading4>
             </View>
           </View>
         </View>
@@ -137,11 +129,8 @@ export default function OrderCustomerScreen({
       const productList = mo.products.map((p) => {
         return (
           <CardProduct
-            stockData={{
-              ...p.product,
-              notes: mo.shop.notes,
-              quantity: p.quantity,
-            }}
+            stockData={p.product}
+            shopData={shopTools.getLightShop(mo.shop)}
             key={p.product._id}
             extraClasses="mb-1"
             displayMode="detail"
@@ -153,18 +142,16 @@ export default function OrderCustomerScreen({
           <CardProducer
             shopData={mo.shop}
             withdrawData={mo.products}
-            key={mo.shop._id}
+            key={mo.shop?._id}
             extraClasses="mb-1"
             displayMode="order"
             showDirectionButton
             onPressFn={() => {
-              navigation.navigate("TabNavigatorUser", {
-                screen: "ShopUser",
-                params: {
-                  shopId: mo.shop._id,
-                  distance: null,
-                  relevantProducts: [],
-                },
+              navigation.navigate("ShopUser", {
+                shopId: mo.shop!._id,
+                distance: undefined,
+                relevantProducts: [],
+                sheetId: undefined,
               });
             }}
           />
@@ -187,7 +174,7 @@ export default function OrderCustomerScreen({
               <TextBody1>Montant:</TextBody1>
             </View>
             <View>
-              <TextHeading4>{mo.shopTotalPrice} €</TextHeading4>
+              <TextHeading4>{mo.shopTotalTTC} €</TextHeading4>
             </View>
           </View>
         </View>
@@ -196,8 +183,8 @@ export default function OrderCustomerScreen({
   }
 
   console.log("----------- ORDERCUSTOMERSCREEN ---------------------------");
-  console.log("nexOrderDetails: ", newOrderDetails);
-  // console.log(route.params.orderId)
+  console.log("nexOrderDetails: ", newOrder);
+  console.log("orders :", JSON.stringify(userStore.orders, null, 2));
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -212,9 +199,9 @@ export default function OrderCustomerScreen({
         <TextHeading4
           centered
           extraClasses="mb-4"
-        >{`Commande n° ${route.params.orderId.slice(0, 7)}`}</TextHeading4>
+        >{`Commande n° ${newOrder?.invoiceNumber}`}</TextHeading4>
         <View className="rounded-lg bg-danger p-3 mb-3">
-          <Text className="font-bold text-white text-center text-[20px]">{`Montant total: ${newOrderDetails?.totalPrice} €`}</Text>
+          <Text className="font-bold text-white text-center text-[20px]">{`Montant total: ${newOrder?.totalTTC} €`}</Text>
         </View>
 
         <ScrollView

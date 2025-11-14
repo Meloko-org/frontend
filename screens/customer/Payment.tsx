@@ -18,7 +18,6 @@ import CartTools from "../../modules/CartTools";
 import { CartState } from "../../reducers/cart";
 import { UserState } from "../../reducers/user";
 import TopBar from "../../components/TopBar";
-import { UserData } from "@clerk/types";
 import Address from "../../components/cards/Address";
 import TextBody1 from "../../components/utils/texts/Body1";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
@@ -52,9 +51,14 @@ export default function PaymentCustomerScreen({
   const [cartTotal, setCartTotal] = useState<number | undefined>(0);
   const [firstname, setFirstname] = useState<string>(userStore.firstname || "");
   const [lastname, setLastname] = useState<string>(userStore.lastname || "");
-  const [billingAddress, setBillingAddress] = useState<UserAddressData | null>(
-    null,
-  );
+  const [billingAddress, setBillingAddress] = useState<
+    UserAddressData | undefined
+  >(undefined);
+
+  // évolution future
+  const [shippingAddress, setShippingAddress] = useState<
+    UserAddressData | undefined
+  >(undefined);
 
   useEffect(() => {
     const defaultAddress =
@@ -71,14 +75,15 @@ export default function PaymentCustomerScreen({
   }, [cartStore]);
 
   console.log("------------- PAYMENTSCREEN ------------------------------");
-  console.log(
-    "cartStore :",
-    JSON.stringify(
-      cartStore.map((c) => c.shop),
-      null,
-      2,
-    ),
-  );
+  // console.log(
+  //   "cartStore :",
+  //   JSON.stringify(
+  //     cartStore.map((c) => c.shop),
+  //     null,
+  //     2,
+  //   ),
+  // );
+  // console.log("cartStore user :", cartStore)
 
   return (
     <SafeAreaView
@@ -136,7 +141,7 @@ export default function PaymentCustomerScreen({
                     console.log("youpi");
                     setBillingAddress(selectedAddress);
                     navigation.navigate("PaymentCustomer", {
-                      from: "withdrawModes",
+                      from: "WithdrawModes",
                       backLabel: "Retour aux modes de retrait",
                       screenTitle: "PAIEMENT",
                     });
@@ -172,10 +177,13 @@ export default function PaymentCustomerScreen({
         <StripePaymentButton
           label="Payer"
           iconName="credit-card"
-          user={userStore}
+          firstname={firstname}
+          lastname={lastname}
+          billingAddress={billingAddress!}
+          shippingAddress={shippingAddress!}
           totalCartAmount={cartTotal}
           navigation={navigation}
-          disabled={!firstname || !lastname}
+          disabled={!firstname || !lastname || !billingAddress}
           extraClasses="h-14 mt-5 mb-3"
         />
       </View>

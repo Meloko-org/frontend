@@ -7,6 +7,7 @@ import {
   AddressData,
   CrewMember,
   FullShopData,
+  LightShopData,
 } from "../types/API";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
@@ -533,6 +534,24 @@ const getMarketById = async (marketId: string): Promise<MarketData | null> => {
   }
 };
 
+/*
+  Cette fonction sert à ne récupérer que les informations nécessaire pour le panier et
+  donc les informations qui seront stockées dans le cartStore pour ne pas y stocker trop d'infos.
+ */
+const getLightShop = (shop: ShopData): LightShopData => {
+  console.log("getShopLight :", shop);
+  return {
+    _id: shop!._id,
+    name: shop!.name,
+    logo: shop!.logo,
+    siret: shop!.siret,
+    address: shop!.address,
+    markets: shop!.markets,
+    clickCollect: shop!.clickCollect,
+    shipping: shop!.shipping,
+  };
+};
+
 export default {
   updateShop,
   createOrUpdateShop,
@@ -547,4 +566,5 @@ export default {
   addShopMarkets,
   updateShopMarkets,
   getMarketById,
+  getLightShop,
 };
