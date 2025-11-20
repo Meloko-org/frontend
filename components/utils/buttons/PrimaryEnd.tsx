@@ -107,7 +107,7 @@ export default function ButtonPrimaryEnd({
     <TouchableOpacity
       className={`
 					${extraClasses} 
-					${disabled ? "bg-primary/60" : "bg-primary/90"}
+					${disabled ? "bg-primary/40" : "bg-primary/90"}
 					relative flex flex-row rounded-lg shadow-sm py-1 justify-center items-center px-2 w-min
 				`}
       onPress={onPressFn}

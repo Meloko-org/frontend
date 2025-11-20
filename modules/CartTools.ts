@@ -15,34 +15,40 @@ const getShopSubtotal = (cartShop: CartData) => {
   }, 0);
 };
 
+/* return price in cents */
 const getCartTotal = (cartStore: CartData[]) => {
   return cartStore.reduce((acc, shopCart) => {
     return acc + getShopSubtotal(shopCart);
   }, 0);
 };
 
-const getTotalCost = (cartStore: CartData[]) => {
-  if (cartStore.length > 0) {
-    let allShopCost = 0;
-    cartStore.forEach((c) => {
-      const cartTotalCost = c.products.reduce((accumulator, currentValue) => {
-        // définit la quantité selon que le produit est vendu au kilo ou à la pièce
-        const quantity =
-          currentValue.stockData.product.weight.unit === "gr"
-            ? currentValue.quantity / 1000
-            : currentValue.quantity;
-
-        return quantity * Number(currentValue.stockData.price) + accumulator;
-      }, 0);
-      allShopCost += cartTotalCost / 100;
-    });
-    return allShopCost;
-  }
+const getCartTotalInCents = (cartStore: CartData[]) => {
+  return getCartTotal(cartStore) * 100;
 };
+
+// const getTotalCost = (cartStore: CartData[]) => {
+//   if (cartStore.length > 0) {
+//     let allShopCost = 0;
+//     cartStore.forEach((c) => {
+//       const cartTotalCost = c.products.reduce((accumulator, currentValue) => {
+//         // définit la quantité selon que le produit est vendu au kilo ou à la pièce
+//         const quantity =
+//           currentValue.stockData.product.weight.unit === "gr"
+//             ? currentValue.quantity / 1000
+//             : currentValue.quantity;
+
+//         return quantity * Number(currentValue.stockData.price) + accumulator;
+//       }, 0);
+//       allShopCost += cartTotalCost / 100;
+//     });
+//     return allShopCost;
+//   }
+// };
 
 export default {
   getProductTotal,
   getShopSubtotal,
   getCartTotal,
-  getTotalCost,
+  getCartTotalInCents,
+  // getTotalCost,
 };

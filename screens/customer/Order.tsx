@@ -21,6 +21,7 @@ import CardProduct from "../../components/cards/Product";
 import { UserState } from "../../reducers/user";
 import { OrderData } from "../../types/API";
 import shopTools from "../../modules/shopTools";
+import orderTools from "../../modules/orderTools";
 
 type OrderCustomerRouteProp = RouteProp<UserTabParamList, "OrderCustomer">;
 
@@ -81,6 +82,7 @@ export default function OrderCustomerScreen({
             key={p.product._id}
             extraClasses="mb-1"
             displayMode="detail"
+            showImage={true}
           />
         );
       });
@@ -117,7 +119,9 @@ export default function OrderCustomerScreen({
               <TextBody1>Montant:</TextBody1>
             </View>
             <View>
-              <TextHeading4>{cco.shopTotalTTC} €</TextHeading4>
+              <TextHeading4>
+                {orderTools.getPriceInEuros(cco.shopTotalTTC).toFixed(2)} €
+              </TextHeading4>
             </View>
           </View>
         </View>
@@ -134,6 +138,7 @@ export default function OrderCustomerScreen({
             key={p.product._id}
             extraClasses="mb-1"
             displayMode="detail"
+            showImage={true}
           />
         );
       });
@@ -174,7 +179,9 @@ export default function OrderCustomerScreen({
               <TextBody1>Montant:</TextBody1>
             </View>
             <View>
-              <TextHeading4>{mo.shopTotalTTC} €</TextHeading4>
+              <TextHeading4>
+                {orderTools.getPriceInEuros(mo.shopTotalTTC).toFixed(2)} €
+              </TextHeading4>
             </View>
           </View>
         </View>
@@ -183,8 +190,9 @@ export default function OrderCustomerScreen({
   }
 
   console.log("----------- ORDERCUSTOMERSCREEN ---------------------------");
+  console.log("orderId :", orderId);
   console.log("nexOrderDetails: ", newOrder);
-  console.log("orders :", JSON.stringify(userStore.orders, null, 2));
+  // console.log("orders :", JSON.stringify(userStore.orders, null, 2));
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -201,7 +209,7 @@ export default function OrderCustomerScreen({
           extraClasses="mb-4"
         >{`Commande n° ${newOrder?.invoiceNumber}`}</TextHeading4>
         <View className="rounded-lg bg-danger p-3 mb-3">
-          <Text className="font-bold text-white text-center text-[20px]">{`Montant total: ${newOrder?.totalTTC} €`}</Text>
+          <Text className="font-bold text-white text-center text-[20px]">{`Montant total: ${orderTools.getPriceInEuros(newOrder!.totalTTC).toFixed(2)} €`}</Text>
         </View>
 
         <ScrollView

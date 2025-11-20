@@ -193,6 +193,10 @@ const getProductCost = (
   return (priceInCents * quantity) / 100;
 };
 
+const getPriceInEuros = (price: number) => {
+  return price / 100;
+};
+
 export default {
   getOrderDetailsById,
   validateOrder,
@@ -200,4 +204,5 @@ export default {
   getOrderStatus,
   buildUpdatedOrder,
   getProductCost,
+  getPriceInEuros,
 };

@@ -85,7 +85,7 @@ export default function CardProduct({
         className={`${extraClasses} rounded-lg shadow-sm bg-white px-2 py-1 dark:bg-tertiary flex flex-row w-full`}
       >
         <View className="flex flex-row items-center w-full">
-          <View className="flex flex-row w-4/5">
+          <View className="flex flex-row w-4/5 items-center">
             {showImage && (
               <View className="flex flex-row items-center rounded-sm w-auto h-full">
                 <Image
@@ -94,7 +94,7 @@ export default function CardProduct({
                       ? { uri: productImage }
                       : require("../../assets/icon.png")
                   }
-                  className="rounded-lg w-20 h-20"
+                  className={`rounded-lg ${displayMode === "detail" ? "w-12 h-12" : "w-20 h-20"}`}
                   alt={`Illustration du produit ${stockData?.product.name}`}
                   resizeMode="cover"
                   width={72}
@@ -135,7 +135,7 @@ export default function CardProduct({
             </View>
           </View>
 
-          {displayMode !== "withdraw" && (
+          {displayMode !== "withdraw" && displayMode !== "detail" && (
             <View className="w-1/5 flex flex-column justify-center items-center">
               <CartControlButton
                 stockData={stockData!}

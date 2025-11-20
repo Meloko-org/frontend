@@ -113,7 +113,7 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
           selected: cart.withdrawMode === "market",
         });
       }
-      if (shop!.clickCollect) {
+      if (shop!.clickCollect.isActive) {
         modes.push({
           label: "Click&Collect",
           value: "clickCollect",
@@ -152,7 +152,7 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
 
   useEffect(() => {
     if (cartStore.length > 0) {
-      const allShopsCost = CartTools.getTotalCost(cartStore);
+      const allShopsCost = CartTools.getCartTotal(cartStore);
       setCartTotal(allShopsCost);
       setIsPaymentDisabledButton(cartStore.some((c) => !c.withdrawMode));
     }
@@ -167,7 +167,7 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
 
     const selectedShop = cartStore.find((c) => c.shop?._id === shopId)?.shop;
 
-    console.log("selectedShop :", selectedShop?.name);
+    // console.log("selectedShop :", selectedShop?.name);
 
     if (value === "market") {
       if (selectedShop) {
@@ -278,7 +278,7 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
     "withdrawDay: ",
     cartStore.find((cart) => cart.shop?._id === selectedShop?._id)?.withdrawDay,
   );
-  console.log("cartStore complet :", JSON.stringify(cartStore, null, 2));
+  console.log("cartStore complet :", JSON.stringify(cartStore[0], null, 2));
 
   return (
     <SafeAreaView

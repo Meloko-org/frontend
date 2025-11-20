@@ -1,22 +1,19 @@
 import { StripeProvider, useStripe } from "@stripe/stripe-react-native";
 import React, { useState, useEffect } from "react";
-import { useAuth } from "@clerk/clerk-expo";
 
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { UserTabParamList } from "../../../types/Navigation";
 
+import { Alert } from "react-native";
+import ButtonPrimaryEnd from "./PrimaryEnd";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser, UserState } from "../../../reducers/user";
 import { CartState, emptyCart } from "../../../reducers/cart";
-
-import { AddressData, UserAddressData, UserData } from "../../../types/API";
+import { useAuth } from "@clerk/clerk-expo";
 import userTools from "../../../modules/userTools";
-import stripeTools from "../../../modules/stripeTools";
-
+import { AddressData, UserAddressData, UserData } from "../../../types/API";
 import { SheetManager } from "react-native-actions-sheet";
-
-import { Alert } from "react-native";
-import ButtonPrimaryEnd from "./PrimaryEnd";
+import stripeTools from "../../../modules/stripeTools";
 
 type StripPaymentButtonProps = {
   label: string;

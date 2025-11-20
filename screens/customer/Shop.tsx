@@ -187,14 +187,14 @@ export default function ShopUserScreen({ navigation, route }: Props) {
       );
     });
 
-  console.log(
-    " un product par cat :",
-    JSON.stringify(
-      categoriesObjects.map((c) => c.stocks[0]),
-      null,
-      2,
-    ),
-  );
+  // console.log(
+  //   " un product par cat :",
+  //   JSON.stringify(
+  //     categoriesObjects.map((c) => c.stocks[0]),
+  //     null,
+  //     2,
+  //   ),
+  // );
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

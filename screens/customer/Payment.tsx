@@ -70,20 +70,21 @@ export default function PaymentCustomerScreen({
   }, []);
 
   useEffect(() => {
-    let allShopsCost = CartTools.getTotalCost(cartStore);
+    let allShopsCost = CartTools.getCartTotal(cartStore);
     setCartTotal(allShopsCost);
   }, [cartStore]);
 
   console.log("------------- PAYMENTSCREEN ------------------------------");
-  // console.log(
-  //   "cartStore :",
-  //   JSON.stringify(
-  //     cartStore.map((c) => c.shop),
-  //     null,
-  //     2,
-  //   ),
-  // );
-  // console.log("cartStore user :", cartStore)
+  console.log(
+    "cartStore :",
+    JSON.stringify(
+      cartStore.map((c) => c.products),
+      null,
+      2,
+    ),
+  );
+  // console.log("cartStore user :", JSON.stringify(cartStore, null, 2))
+  console.log("cartTotal :", cartTotal);
 
   return (
     <SafeAreaView
