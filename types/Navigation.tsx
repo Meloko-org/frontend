@@ -6,6 +6,7 @@ import {
   ActivityPostData,
   CircuitOptionsData,
   NoteData,
+  OrderData,
   PostThemeData,
   ProductCategoryData,
   ProductData,
@@ -178,9 +179,9 @@ type UserTabParamList = {
     selectAddressFn?: (address: UserAddressData) => void;
   };
   ShopUser: {
-    shopId: string;
+    shopId: string | undefined;
     distance: number | undefined;
-    relevantProducts: StockData[];
+    relevantProducts: StockData[] | [];
     sheetId: string | undefined;
   };
   WithdrawModes: {
@@ -197,7 +198,11 @@ type UserTabParamList = {
     screenTitle?: string;
   };
   BookmarksCustomer: undefined;
-  OrdersCustomer: undefined;
+  OrdersCustomer: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+  };
 
   CircuitParameters: undefined;
   CircuitMap: {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import _Fontawesome from "react-native-vector-icons/FontAwesome6";
 import { GestureResponderEvent } from "react-native";
@@ -40,17 +40,24 @@ export default function CardOrder(props: CardOrderProps): JSX.Element {
       onPress={(value) => props.onPressFn && props.onPressFn(value)}
     >
       <View
-        className={`${props.extraClasses} rounded-lg shadow-sm bg-white p-2 flex flex-row w-full dark:bg-tertiary`}
+        className={`${props.extraClasses} rounded-lg shadow-sm bg-white p-2 w-full dark:bg-tertiary`}
       >
-        <View className="flex flex-row justify-between items-center w-full">
-          <View className={`h-full px-2 items-start`}>
-            <TextHeading4>{`Commande n° ${props.orderData._id.slice(0, 7)}`}</TextHeading4>
-            <TextBody2 extraClasses="mb-2">
-              {globalTools.formatDateToFr(props.orderData.createdAt)}
-            </TextBody2>
-            <BadgeSecondary extraClasses="px-1">{`${nbProducts()} produit${nbProducts() > 1 ? "s" : ""} chez ${props.orderData.details.length} producteur${props.orderData.details.length > 1 ? "s" : ""}`}</BadgeSecondary>
+        <View className="mb-2">
+          <TextHeading4>{`Commande n° ${props.orderData.invoiceNumber}`}</TextHeading4>
+        </View>
+
+        <View className="flex flex-row items-center gap-x-2">
+          <View className="flex-grow">
+            <View>
+              <TextBody2 extraClasses="ml-2 mb-1">
+                {globalTools.formatDateToFr(props.orderData.createdAt)}
+              </TextBody2>
+            </View>
+            <View className="self-start">
+              <BadgeSecondary extraClasses="">{`${nbProducts()} produit${nbProducts() > 1 ? "s" : ""} chez ${props.orderData.details.length} producteur${props.orderData.details.length > 1 ? "s" : ""}`}</BadgeSecondary>
+            </View>
           </View>
-          <View className="pr-1 flex flex-row justify-start items-center h-full">
+          <View className="w-auto">
             <BadgeWithdrawStatus
               type={status as BadgeWithdrawStatusProps["type"]}
             />

@@ -176,7 +176,7 @@ export default function PaymentCustomerScreen({
 
       <View style={{ flex: 1.5 }} className="px-3">
         <StripePaymentButton
-          label="Payer"
+          label={`Payer ${cartTotal!.toFixed(2)} €`}
           iconName="credit-card"
           firstname={firstname}
           lastname={lastname}

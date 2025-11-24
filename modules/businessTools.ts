@@ -44,6 +44,7 @@ const getOrderSummary = async (
   }
 };
 
+/* récupère les orders d'un producer */
 const getOrders = async (
   token: string | null,
   type: "pending" | "validated" | "withdrawn" | "canceled" | "all",
@@ -55,10 +56,10 @@ const getOrders = async (
       `${API_ROOT}/business/orders?type=${type}&page=${page}&limit=${limit}`,
       {
         method: "GET",
+        mode: "cors",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-          mode: "cors",
         },
       },
     );

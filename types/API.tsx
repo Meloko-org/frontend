@@ -526,6 +526,16 @@ type CircuitParamsData = {
   totalDuration: string;
 };
 
+type StatusData =
+  | "pending"
+  | "partialValidated"
+  | "validated"
+  | "partialWithdrawn"
+  | "withdrawn"
+  | "partialCanceled"
+  | "canceled"
+  | "all";
+
 /* types spéciaux pour la création ou l'update des produits en fonction du type bulk ou classic */
 
 // bulk / création
@@ -610,6 +620,7 @@ export type {
   CircuitOptionsData,
   ShopFeaturesData,
   CircuitParamsData,
+  StatusData,
   CreateBulkStockPayload,
   UpdateBulkStockPayload,
   CreateClassicStockPayload,

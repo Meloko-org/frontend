@@ -145,7 +145,11 @@ export default function UserProfileScreen({ navigation }: Props) {
   };
 
   const handleOrdersPress = () => {
-    navigation.navigate("OrdersCustomer");
+    navigation.navigate("OrdersCustomer", {
+      backLabel: "Retour au compte",
+      from: "UserProfile",
+      screenTitle: "MES COMMANDES",
+    });
   };
 
   const handlePersonalInfoPress = () => {
@@ -215,6 +219,11 @@ export default function UserProfileScreen({ navigation }: Props) {
           <View style={{ flex: 8.5 }}>
             <View className="mt-5 px-3">
               <OpenScreenButton
+                label="Mes informations"
+                onPressFn={handlePersonalInfoPress}
+                extraClasses="mb-1"
+              />
+              <OpenScreenButton
                 label="Mes commandes"
                 onPressFn={handleOrdersPress}
                 extraClasses="mb-1"
@@ -267,12 +276,6 @@ export default function UserProfileScreen({ navigation }: Props) {
                   </View>
                 </View>
               </View>
-
-              <OpenScreenButton
-                label="Mes informations"
-                onPressFn={handlePersonalInfoPress}
-                extraClasses="mb-1"
-              />
               <OpenScreenButton
                 label="Nous contacter"
                 onPressFn={() => console.log("pressed button")}

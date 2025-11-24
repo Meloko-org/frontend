@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { Text, View } from "react-native";
 import TextHeading4 from "../texts/Heading4";
 import TextBody2 from "../texts/Body2";

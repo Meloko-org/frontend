@@ -13,10 +13,17 @@ export default function BadgeSecondary(
 ): JSX.Element {
   return (
     <View
-      className={`${props.extraClasses} flex justify-center rounded-lg border w-fit bg-lightbg border-primary dark:bg-tertiary `}
+      className={`
+        ${props.extraClasses} 
+        flex justify-center 
+        px-2
+        rounded-lg 
+        border border-primary 
+        bg-lightbg dark:bg-tertiary
+      `}
     >
       <Text
-        className={`${props.uppercase && "uppercase"} ${props.textClasses} text-darkbg dark:text-lightbg text-center w-fit`}
+        className={`${props.uppercase && "uppercase"} ${props.textClasses} text-darkbg dark:text-lightbg text-center`}
       >
         {props.children}
       </Text>

@@ -44,21 +44,22 @@ export default function StripePaymentButton({
   extraClasses,
 }: StripPaymentButtonProps) {
   const dispatch = useDispatch();
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
-  const [loading, setLoading] = useState(false);
-  const [publishableKey, setPublishableKey] = useState<string | undefined>("");
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
   );
   const cartStore = useSelector(
     (state: { cart: CartState }) => state.cart.value,
   );
-  const [isPaymentScreenLoading, setIsPaymentScreenLoading] = useState(false);
 
   // Import the public api root address
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
-
   const { getToken } = useAuth();
+  const [isPaymentScreenLoading, setIsPaymentScreenLoading] = useState(false);
+
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const [loading, setLoading] = useState(false);
+
+  const [publishableKey, setPublishableKey] = useState<string | undefined>("");
 
   const fetchPublishableKey = async () => {
     const key = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY;
@@ -115,12 +116,7 @@ export default function StripePaymentButton({
         return;
       } else {
         dispatch(emptyCart());
-        console.log("avant fetchData");
         await fetchData();
-
-        console.log("juste avant redirection vers orderCostumerScreen");
-        console.log("order :", order);
-
         navigation.navigate("OrderCustomer", {
           orderId: order._id,
         });
@@ -150,21 +146,21 @@ export default function StripePaymentButton({
   const initializePaymentSheet = async () => {
     try {
       /* envoie des données au backend */
-      const { paymentIntent, ephemeralKey, customer, order } =
-        await fetchPaymentSheetParams();
+      const {
+        customerSessionClientSecret,
+        paymentIntent,
+        ephemeralKey,
+        customer,
+        order,
+      } = await fetchPaymentSheetParams();
 
       /* appel initPaymentSheet du skd Stripe */
       const { error } = await initPaymentSheet({
         merchantDisplayName: "Meloko SAS",
         customerId: customer,
-        customerEphemeralKeySecret: ephemeralKey,
+        // customerEphemeralKeySecret: ephemeralKey,
         paymentIntentClientSecret: paymentIntent,
-        // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
-        //methods that complete payment after a delay, like SEPA Debit and Sofort.
-        // allowsDelayedPaymentMethods: true,
-        // defaultBillingDetails: {
-        //   name: `${user.firstname} ${user.lastname}`,
-        // }
+        customerSessionClientSecret,
       });
 
       if (error) {
@@ -200,7 +196,18 @@ export default function StripePaymentButton({
   const fetchPaymentSheetParams = async () => {
     const token = await getToken();
 
-    const response = await fetch(`${API_ROOT}/stripe/paymentIntent`, {
+    const sessionResponse = await fetch(`${API_ROOT}/stripe/customer-session`, {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const { customerSessionClientSecret } = await sessionResponse.json();
+
+    const paymentResponse = await fetch(`${API_ROOT}/stripe/payment-sheet`, {
       method: "POST",
       mode: "cors",
       headers: {
@@ -216,9 +223,9 @@ export default function StripePaymentButton({
     });
 
     /* Interception d'une erreur lors de la création du paiement */
-    if (!response.ok) {
+    if (!paymentResponse.ok) {
       setIsPaymentScreenLoading(false);
-      const errorData = await response.json().catch(() => ({})); // sécurité
+      const errorData = await paymentResponse.json().catch(() => ({})); // sécurité
       const message =
         errorData.error ||
         "Une erreur est survenue pendant la préparation du paiement.";
@@ -228,9 +235,10 @@ export default function StripePaymentButton({
     console.log("fetchPaymentSheetParams ok");
 
     const { paymentIntent, ephemeralKey, customer, order } =
-      await response.json();
+      await paymentResponse.json();
 
     return {
+      customerSessionClientSecret,
       paymentIntent,
       ephemeralKey,
       customer,
@@ -247,8 +255,6 @@ export default function StripePaymentButton({
 
       if (userResponse.success && userResponse.data) {
         dispatch(updateUser(userResponse.data));
-        console.log("dispatch updateUser done");
-        console.log("les orders :", userResponse.data.orders);
       }
     } catch (error) {
       console.error(error);
@@ -257,7 +263,7 @@ export default function StripePaymentButton({
 
   console.log(" ----------- STRIPE PAYMENT -------------------- ");
   console.log("cart amount :", totalCartAmount);
-  console.log("userStore Orders :", userStore.orders);
+  // console.log("userStore Orders :", userStore.orders);
 
   return (
     <StripeProvider

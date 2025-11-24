@@ -22,6 +22,7 @@ import { UserState } from "../../reducers/user";
 import { OrderData } from "../../types/API";
 import shopTools from "../../modules/shopTools";
 import orderTools from "../../modules/orderTools";
+import Spinner from "../../components/utils/Spinner";
 
 type OrderCustomerRouteProp = RouteProp<UserTabParamList, "OrderCustomer">;
 
@@ -59,10 +60,10 @@ export default function OrderCustomerScreen({
   useEffect(() => {
     const newOrder = userStore.orders.find((o) => o._id === orderId);
     setNewOrder(newOrder);
-  }, [route.params]);
+  }, [route.params, userStore.orders]);
 
-  let clickCollectOrdersDisplay = <></>;
-  let marketOrdersDisplay = <></>;
+  let clickCollectOrdersDisplay: React.ReactNode = null;
+  let marketOrdersDisplay: React.ReactNode = null;
 
   if (newOrder) {
     const clickCollectOrders = newOrder.details.filter(
@@ -189,10 +190,15 @@ export default function OrderCustomerScreen({
     });
   }
 
-  console.log("----------- ORDERCUSTOMERSCREEN ---------------------------");
-  console.log("orderId :", orderId);
-  console.log("nexOrderDetails: ", newOrder);
-  // console.log("orders :", JSON.stringify(userStore.orders, null, 2));
+  if (!newOrder) {
+    return (
+      <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
+        <View className="flex w-full h-hull">
+          <Spinner />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

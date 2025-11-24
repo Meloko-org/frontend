@@ -8,20 +8,57 @@ import {
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
-const getOrdersByUser = async (token: string, id: string) => {
+const getOrdersByUser = async (
+  token: string | null,
+  status:
+    | "pending"
+    | "partialValidated"
+    | "validated"
+    | "partialWithdrawn"
+    | "withdrawn"
+    | "partialCanceled"
+    | "canceled"
+    | "all",
+  page = 1,
+  limit = 10,
+) => {
   try {
-    const response = await fetch(`${API_ROOT}/orders/user/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+    const response = await fetch(
+      `${API_ROOT}/orders/user?status=${status}&page=${page}&limit=${limit}`,
+      {
+        method: "GET",
         mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: `Erreur ${response.status}: Impossible de récupérer les données.`,
+      };
+    }
+
     const data = await response.json();
-    return data;
+
+    return data.success
+      ? {
+          success: true,
+          orders: data.orders,
+          total: data.total,
+          page: data.page,
+          totalPages: data.totalPages,
+        }
+      : { success: false, message: data.message };
   } catch (error) {
     console.log(error);
+    return {
+      success: false,
+      message: "Une erreur s'est produite lors de la récupération des données.",
+    };
   }
 };
 

@@ -8,12 +8,12 @@ import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { UserTabParamList } from "../../types/Navigation";
 
 import { UserState } from "../../reducers/user";
-import { OrderData } from "../../types/API";
+import { OrderData, StatusData } from "../../types/API";
 
 import orderTools from "../../modules/orderTools";
 import globalTools from "../../modules/globalTools";
 
-import { View, Modal, Alert, Text, TextBase } from "react-native";
+import { View, Modal, Alert, Text, TextBase, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 
@@ -34,6 +34,10 @@ import TextBody1 from "../../components/utils/texts/Body1";
 import QRCodeModal from "../../components/modals/user/QRCodeModal";
 import TextBody2 from "../../components/utils/texts/Body2";
 import PriceBadge from "../../components/utils/badges/Price";
+import TopBar from "../../components/TopBar";
+import { SheetManager } from "react-native-actions-sheet";
+import SquareButton from "../../components/utils/buttons/SquareButton";
+import OrderFilters from "../../components/utils/OrderFilters";
 
 type OrdersRouteProp = RouteProp<UserTabParamList, "OrdersCustomer">;
 
@@ -49,41 +53,110 @@ type Props = {
 
 export default function OrdersCustomerScreen({
   navigation,
+  route,
 }: Props): JSX.Element {
+  const { backLabel, from, screenTitle } = route.params;
+
   const { getToken } = useAuth();
-  const userStore = useSelector(
-    (state: { user: UserState }) => state.user.value,
-  );
+
+  const [status, setStatus] = useState<StatusData>("all");
+  const limit = 10;
+
+  const [fetchedOrders, setFetchedOrders] = useState<OrderData[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const [isOrderDetailModalVisible, setIsOrderDetailModalVisible] =
     useState<boolean>(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState<OrderData | undefined>(
+    undefined,
+  );
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [fetchedOrders, setFetchedOrders] = useState();
   const [isQRCodeModalVisible, setQRCodeModalVisible] =
     useState<boolean>(false);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (page = 1) => {
     try {
+      setIsLoading(true);
       const token = await getToken();
-      const ordersPromise = await orderTools.getOrdersByUser(
+      const ordersResponse = await orderTools.getOrdersByUser(
         token,
-        userStore._id,
+        status,
+        page,
+        limit,
       );
-      const orderCards = ordersPromise.map((o: OrderData) => {
-        console.log("o :", JSON.stringify(o, null, 2));
-        return (
-          <CardOrder
-            key={o._id}
-            orderData={o}
-            extraClasses="mb-2"
-            onPressFn={() => handleOrderDetailPress(o)}
-          />
-        );
-      });
-      setFetchedOrders(orderCards);
+
+      if (!ordersResponse.success) {
+        SheetManager.show("alert", {
+          payload: {
+            message: ordersResponse?.orders.message,
+            alertType: "error",
+          },
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (ordersResponse.orders.length === 0) {
+        let message;
+        switch (status) {
+          case "pending":
+            message = "Aucune commande en attende.";
+            break;
+          case "partialValidated":
+            message = "Aucune commande partiellement validée.";
+            break;
+          case "validated":
+            message = "Aucune commande validée.";
+            break;
+          case "partialWithdrawn":
+            message = "Aucune commande partiellement retirée.";
+            break;
+          case "withdrawn":
+            message = "Aucune commande retirée.";
+            break;
+          case "partialCanceled":
+            message = "Aucune commande partiellement annulée.";
+            break;
+          case "canceled":
+            message = "Aucune commande annulée.";
+            break;
+          case "all":
+            message = "Aucune commande.";
+            break;
+        }
+        setFetchedOrders([]);
+        SheetManager.show("alert", {
+          payload: {
+            message,
+            alertType: "warning",
+          },
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (page === 1) {
+        setFetchedOrders(ordersResponse.orders);
+      } else {
+        setFetchedOrders((prev) => [...prev, ...ordersResponse.orders]);
+      }
+
+      setCurrentPage(ordersResponse.page);
+      setTotalPages(ordersResponse.totalPages);
     } catch (error) {
       console.error("Erreur lors de la récupération des commandes.");
+
+      SheetManager.show("alert", {
+        payload: {
+          message:
+            "Une erreur est survenue. Impossible de contacter le serveur.",
+          alertType: "error",
+        },
+      });
     } finally {
       setIsLoading(false);
     }
@@ -97,9 +170,19 @@ export default function OrdersCustomerScreen({
 
   useFocusEffect(
     React.useCallback(() => {
-      fetchOrders();
-    }, []),
+      fetchOrders(1);
+    }, [status]),
   );
+
+  const loadMoreOrders = async () => {
+    fetchOrders(currentPage + 1);
+  };
+
+  const onRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchOrders(1); // recharge la première page
+    setIsRefreshing(false);
+  };
 
   const handleQRCodePress = (id: string) => {
     setSelectedOrderId(id);
@@ -111,8 +194,8 @@ export default function OrdersCustomerScreen({
     setSelectedOrderId(null);
   };
 
-  let clickCollectOrdersDisplay = <></>;
-  let marketOrdersDisplay = <></>;
+  let clickCollectOrdersDisplay: React.ReactNode = null;
+  let marketOrdersDisplay: React.ReactNode = null;
 
   if (selectedOrder) {
     const clickCollectOrders = selectedOrder.details.filter(
@@ -123,21 +206,6 @@ export default function OrdersCustomerScreen({
     );
 
     clickCollectOrdersDisplay = clickCollectOrders.map((cco) => {
-      // const productList = cco.products.map((p) => {
-      //   return (
-      //     <CardProduct
-      //       stockData={{
-      //         ...p.product,
-      //         notes: cco.shop.notes,
-      //         quantity: p.quantity,
-      //       }}
-      //       key={p.product._id}
-      //       extraClasses="mb-1"
-      //       displayMode="detail"
-      //     />
-      //   );
-      // });
-
       const productList = cco.products.map((p) => {
         return (
           <View className="flex flex-row justify-between items-center w-full px-2">
@@ -175,19 +243,17 @@ export default function OrdersCustomerScreen({
           <CardProducer
             shopData={cco.shop}
             withdrawData={cco.products}
-            key={cco.shop._id}
+            key={cco.shop?._id}
             extraClasses="mb-1"
             displayMode="order"
             showDirectionButton
             onPressFn={() => {
               setIsOrderDetailModalVisible(false);
-              navigation.navigate("TabNavigatorUser", {
-                screen: "ShopUser",
-                params: {
-                  shopId: cco.shop._id,
-                  distance: null,
-                  relevantProducts: [],
-                },
+              navigation.navigate("ShopUser", {
+                shopId: cco.shop?._id,
+                distance: undefined,
+                relevantProducts: [],
+                sheetId: undefined,
               });
             }}
           />
@@ -200,9 +266,7 @@ export default function OrdersCustomerScreen({
                 <TextHeading4>Total :</TextHeading4>
               </View>
               <View className="pr-1">
-                <TextHeading3>
-                  {parseFloat(cco.shopTotalPrice).toFixed(2)} €
-                </TextHeading3>
+                <TextHeading3>{cco.shopTotalTTC.toFixed(2)} €</TextHeading3>
               </View>
             </View>
           </View>
@@ -339,120 +403,151 @@ export default function OrdersCustomerScreen({
   }
 
   console.log("orders :", JSON.stringify(fetchedOrders, null, 2));
+  console.log("status :", status);
 
   return (
-    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <View className="flex-1">
-        <TextHeading2 centered extraClasses="mt-2 mb-2">
-          Mes commandes
-        </TextHeading2>
+    <SafeAreaView
+      className="flex-1 bg-lightbg dark:bg-darkbg"
+      edges={["right", "left", "top"]}
+    >
+      <View style={{ flex: 1 }}>
+        <TopBar
+          backLabel={backLabel || "Retour au compte"}
+          screen={from || "UserProfile"}
+          label={screenTitle || "MES COMMANDES"}
+          extraClasses="mt-2 mb-5"
+        />
+      </View>
 
-        <ScrollView className="flex-1">
-          <View className="p-3">
-            {isLoading ? <Spinner /> : fetchedOrders}
+      <View style={{ flex: 1 }} className="flex flex-row justify-center px-3">
+        <OrderFilters
+          status={status}
+          size={30}
+          onChange={(s) => setStatus(s)}
+        />
+      </View>
 
-            {/* {orders} */}
+      <View style={{ flex: 8 }} className="px-3">
+        <FlatList
+          data={fetchedOrders}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <CardOrder
+              key={item._id}
+              orderData={item}
+              extraClasses="mb-2"
+              onPressFn={() => handleOrderDetailPress(item)}
+            />
+          )}
+          onEndReached={() => {
+            if (currentPage < totalPages) {
+              loadMoreOrders();
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={isLoading ? <Spinner /> : null}
+          refreshing={isRefreshing}
+          onRefresh={onRefresh}
+        />
+      </View>
+
+      <Modal
+        visible={isOrderDetailModalVisible}
+        animationType="slide"
+        onRequestClose={() => setIsOrderDetailModalVisible(false)}
+        className="p-3"
+      >
+        <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
+          <View className="flex flex-row mb-1 mt-3">
+            <BackLabelButton
+              onPressFn={() => setIsOrderDetailModalVisible(false)}
+              extraClasses="ml-5"
+            >
+              Retour aux commandes
+            </BackLabelButton>
           </View>
-        </ScrollView>
-
-        <Modal
-          visible={isOrderDetailModalVisible}
-          animationType="slide"
-          onRequestClose={() => setIsOrderDetailModalVisible(false)}
-          className="p-3"
-        >
-          <SafeAreaView className="bg-lightbg flex-1 dark:bg-darkbg">
-            <View className="flex flex-row mb-1 mt-3">
-              <BackLabelButton
-                onPressFn={() => setIsOrderDetailModalVisible(false)}
-                extraClasses="ml-5"
-              >
-                Retour aux commandes
-              </BackLabelButton>
-            </View>
-            <View className="flex-1 p-3 justify-center items-center">
-              {selectedOrder && (
-                <>
-                  <TextHeading3
-                    extraClasses="mb-1"
-                    centered
-                  >{`Commande n° ${selectedOrder._id.slice(0, 7)}`}</TextHeading3>
-                  <View className="flex flex-row w-full items-center justify-around">
-                    <View>
-                      <TextHeading4 extraClasses="mb-1" centered>
-                        {new Date(selectedOrder.createdAt).toLocaleString()}
-                      </TextHeading4>
-                    </View>
-                    <View>
-                      <PriceBadge
-                        colour="bg-tertiary"
-                        extraClasses="px-3 py-1"
-                        textClasses="font-bold text-lg"
-                      >
-                        {selectedOrder.totalPrice}
-                      </PriceBadge>
-                    </View>
+          <View className="flex-1 p-3 justify-center items-center">
+            {selectedOrder && (
+              <>
+                <TextHeading3
+                  extraClasses="mb-1"
+                  centered
+                >{`Commande n° ${selectedOrder._id.slice(0, 7)}`}</TextHeading3>
+                <View className="flex flex-row w-full items-center justify-around">
+                  <View>
+                    <TextHeading4 extraClasses="mb-1" centered>
+                      {new Date(selectedOrder.createdAt).toLocaleString()}
+                    </TextHeading4>
                   </View>
+                  <View>
+                    <PriceBadge
+                      colour="bg-tertiary"
+                      extraClasses="px-3 py-1"
+                      textClasses="font-bold text-lg"
+                    >
+                      {selectedOrder.totalTTC}
+                    </PriceBadge>
+                  </View>
+                </View>
 
-                  <BadgeWithdrawStatus
-                    type={orderTools.getOrderStatus(selectedOrder)}
-                    extraClasses="mb-5"
-                  />
-                  <ScrollView showsVerticalScrollIndicator={false}>
-                    <View className="items-center">
-                      {clickCollectOrdersDisplay.length > 0 && (
-                        <>
-                          <TextHeading4 centered extraClasses="mb-2">
-                            Retrait en Click & Collect
-                          </TextHeading4>
-                          {/* <ButtonPrimaryEnd
+                <BadgeWithdrawStatus
+                  type={orderTools.getOrderStatus(selectedOrder)}
+                  extraClasses="mb-5"
+                />
+                <ScrollView showsVerticalScrollIndicator={false}>
+                  <View className="items-center">
+                    {clickCollectOrdersDisplay && (
+                      <>
+                        <TextHeading4 centered extraClasses="mb-2">
+                          Retrait en Click & Collect
+                        </TextHeading4>
+                        {/* <ButtonPrimaryEnd
                             label="Itinéraire optimal"
                             iconName="location-arrow"
                             onPressFn={() => console.log("open google map")}
                             extraClasses="w-80 mb-3"
                           /> */}
-                        </>
-                      )}
-                      {clickCollectOrdersDisplay}
+                      </>
+                    )}
+                    {clickCollectOrdersDisplay}
 
-                      {marketOrdersDisplay.length > 0 && (
-                        <TextHeading4 centered extraClasses="mb-2">
-                          Retrait sur Marchés locaux
-                        </TextHeading4>
-                      )}
-                      {marketOrdersDisplay}
-                    </View>
-                    <View>
-                      {selectedOrder.details.length > 1 && (
-                        <View className="flex flex-row justify-center items-center w-full">
-                          <View className="p-2 rounded-lg border border-darkbg dark:border-lightbg">
-                            <TextBody1 extraClasses="px-3 mb-2">
-                              Optimisez vos trajets et calculez un itinéraire
-                              optimal pour récupérer tous vos achats.
-                            </TextBody1>
-                            <ButtonPrimaryEnd
-                              label="Itinéraire optimal"
-                              iconName="location-arrow"
-                              onPressFn={() => console.log("open google map")}
-                              extraClasses=""
-                            />
-                          </View>
+                    {marketOrdersDisplay && (
+                      <TextHeading4 centered extraClasses="mb-2">
+                        Retrait sur Marchés locaux
+                      </TextHeading4>
+                    )}
+                    {marketOrdersDisplay}
+                  </View>
+                  <View>
+                    {selectedOrder.details.length > 1 && (
+                      <View className="flex flex-row justify-center items-center w-full">
+                        <View className="p-2 rounded-lg border border-darkbg dark:border-lightbg">
+                          <TextBody1 extraClasses="px-3 mb-2">
+                            Optimisez vos trajets et calculez un itinéraire
+                            optimal pour récupérer tous vos achats.
+                          </TextBody1>
+                          <ButtonPrimaryEnd
+                            label="Itinéraire optimal"
+                            iconName="location-arrow"
+                            onPressFn={() => console.log("open google map")}
+                            extraClasses=""
+                          />
                         </View>
-                      )}
-                    </View>
-                  </ScrollView>
-                </>
-              )}
-            </View>
+                      </View>
+                    )}
+                  </View>
+                </ScrollView>
+              </>
+            )}
+          </View>
 
-            <QRCodeModal
-              visible={isQRCodeModalVisible}
-              onClose={closeQRCodeModal}
-              id={selectedOrderId}
-            />
-          </SafeAreaView>
-        </Modal>
-      </View>
+          <QRCodeModal
+            visible={isQRCodeModalVisible}
+            onClose={closeQRCodeModal}
+            id={selectedOrderId}
+          />
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
