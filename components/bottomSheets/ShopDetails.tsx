@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -12,6 +12,7 @@ import ActionSheet, {
   SheetProps,
   ScrollView,
   FlatList,
+  ActionSheetRef,
 } from "react-native-actions-sheet";
 import TextHeading3 from "../utils/texts/Heading3";
 import IconButton from "../utils/buttons/Icon";
@@ -28,9 +29,11 @@ import ThumbnailCarousel from "../utils/ThumbnailCarousel";
 import ImageViewerModal from "../modals/user/ImageViewer";
 import Spinner from "../utils/Spinner";
 import bookmarksTools from "../../modules/bookmarksTools";
+import CloseSheetButton from "../utils/buttons/CloseSheet";
 
 export default function ShopDetails(props: SheetProps<"shop-details">) {
   const insets = useSafeAreaInsets();
+  const shopSheetRef = useRef<ActionSheetRef>(null);
 
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
@@ -109,6 +112,7 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
 
   return (
     <ActionSheet
+      ref={shopSheetRef}
       safeAreaInsets={insets}
       snapPoints={[100]}
       indicatorStyle={{ backgroundColor: "#000000" }}
@@ -121,8 +125,8 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
     >
       <View className="bg-lightbg dark:bg-darkbg">
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View className="flex flex-row px-3 mt-4 mb-5">
-            <View className="">
+          <View className="flex flex-row w-full px-3 mt-3 mb-5">
+            <View className="w-[30%]">
               <Image
                 source={
                   props.payload?.shop?.logo
@@ -136,35 +140,43 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
                 height={112}
               />
             </View>
-            <View className="flex flex-grow justify-center">
-              <View>
-                <TextHeading3 extraClasses="" centered>
-                  {props.payload?.shop?.name}
-                </TextHeading3>
-              </View>
-              <View className="flex flex-row">
-                <View className="flex-grow items-center justify-center">
+            <View className="w-[60%] flex-row items-center">
+              <View className="w-full">
+                <View>
+                  <TextHeading3 extraClasses="" centered>
+                    {props.payload?.shop?.name}
+                  </TextHeading3>
+                </View>
+                <View className="felx flex-row justify-center">
                   {shop?.isPremium && (
                     <FontAwesome5Icon
                       name="crown"
                       size={25}
                       color="#FAA200"
                       className=""
-                      // style={{ left: 5 }}
                     />
                   )}
                 </View>
-                <View className="flex flex-column justify-center">
-                  {isSignedIn && (
-                    <IconButton
-                      iconName={isBookmarked ? "heart" : "heart-o"}
-                      iconFamily="FontAwesomeIcon"
-                      iconColor="#98B66E"
-                      extraClasses="h-10"
-                      onPressFn={handleBookmarkPress}
-                    />
-                  )}
-                </View>
+              </View>
+            </View>
+            <View className="w-[10%]">
+              <View className="">
+                <CloseSheetButton
+                  onPressFn={() => {
+                    shopSheetRef.current?.hide();
+                  }}
+                />
+              </View>
+              <View className="flex-grow items-end justify-end">
+                {isSignedIn && (
+                  <IconButton
+                    iconName={isBookmarked ? "heart" : "heart-o"}
+                    iconFamily="FontAwesomeIcon"
+                    iconColor="#98B66E"
+                    extraClasses="h-10"
+                    onPressFn={handleBookmarkPress}
+                  />
+                )}
               </View>
             </View>
           </View>

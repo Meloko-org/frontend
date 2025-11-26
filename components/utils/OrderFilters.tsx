@@ -26,7 +26,7 @@ export default function OrderFilters({ status, onChange, size }: Props) {
         const isActive = status === key;
 
         return (
-          <View>
+          <View key={key}>
             <SquareButton
               key={key}
               color={color}

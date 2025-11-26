@@ -162,7 +162,7 @@ const buildUpdatedOrder = ({
 
 type GlobalOrderStatus =
   | "pending"
-  | "partialPending"
+  | "partialValidated"
   | "validated"
   | "partialWithdrawn"
   | "withdrawn"

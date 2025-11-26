@@ -19,13 +19,13 @@ export default function OrderStatusBadge(
   const backgroundColor = () => {
     switch (true) {
       case props.status === "pending":
-        return "bg-warning";
+        return "bg-pending";
       case props.status === "validated":
-        return "bg-emerald-800";
+        return "bg-validated";
       case props.status === "withdrawn":
-        return "bg-primary";
+        return "bg-withdrawn";
       case props.status === "canceled":
-        return "bg-danger";
+        return "bg-canceled";
     }
   };
   return (

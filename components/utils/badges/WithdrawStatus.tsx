@@ -6,7 +6,7 @@ import TextBody2 from "../texts/Body2";
 export type BadgeWithdrawStatusProps = {
   type:
     | "pending"
-    | "partialPending"
+    | "partialValidated"
     | "validated"
     | "partialWithdrawn"
     | "withdrawn"
@@ -21,19 +21,19 @@ export default function BadgeWithdraw(
   const backgroundColor = () => {
     switch (true) {
       case props.type === "pending":
-        return "bg-stone-800";
-      case props.type === "partialPending":
-        return "bg-stone-700";
+        return "bg-pending";
+      case props.type === "partialValidated":
+        return "bg-partialValidated";
       case props.type === "validated":
-        return "bg-emerald-800";
+        return "bg-validated";
       case props.type === "partialWithdrawn":
-        return "bg-cyan-950";
+        return "bg-partialWithdrawn";
       case props.type === "withdrawn":
-        return "bg-success";
+        return "bg-withdrawn";
       case props.type === "partialCanceled":
-        return "bg-warning";
+        return "bg-partialCanceled";
       case props.type === "canceled":
-        return "bg-danger";
+        return "bg-canceled";
     }
   };
   return (
@@ -42,7 +42,7 @@ export default function BadgeWithdraw(
     >
       <TextBody2 extraClasses="text-lightbg font-bold uppercase">
         {props.type === "pending" && `attende de\nvalidation`}
-        {props.type === "partialPending" && `validation\npartielle`}
+        {props.type === "partialValidated" && `validation\npartielle`}
         {props.type === "validated" && `à retirer`}
         {props.type === "partialWithdrawn" && `retrait\npartiel`}
         {props.type === "withdrawn" && `retirée`}

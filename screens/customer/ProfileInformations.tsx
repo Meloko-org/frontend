@@ -100,10 +100,19 @@ export default function UserProfileInformationsScreen({
       const values = email
         ? { email, firstname, lastname }
         : { email: null, firstname, lastname };
-      const data = await userTools.updateUser(token, values);
+      const userResponse = await userTools.updateUser(token, values);
 
-      if (data) {
-        dispatch(updateUser(data));
+      if (!userResponse.success && userResponse.message) {
+        SheetManager.show("alert", {
+          payload: {
+            message: userResponse.message,
+            alertType: "error",
+          },
+        });
+      }
+
+      if (userResponse.data) {
+        dispatch(updateUser(userResponse.data));
         SheetManager.show("alert", {
           payload: {
             message: "Votre profil à bien été mis à jour.",

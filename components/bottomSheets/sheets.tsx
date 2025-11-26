@@ -17,6 +17,7 @@ import {
   MarketData,
   MarketResultData,
   NoteData,
+  OrderData,
   ProductData,
   ShopData,
   ShopResultData,
@@ -35,6 +36,7 @@ import PublishedPost from "./PublishedPost";
 import CircuitShop from "./CircuitShop";
 import SignInRequired from "./SignInRequired";
 import Note from "./Note";
+import OrderDetails from "./OrderDetails";
 
 registerSheet("alert", CustomAlert);
 registerSheet("product-details", ProductDetails);
@@ -54,6 +56,7 @@ registerSheet("published-post", PublishedPost);
 registerSheet("circuit-shop", CircuitShop);
 registerSheet("signin-required", SignInRequired);
 registerSheet("note", Note);
+registerSheet("order-details", OrderDetails);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -83,6 +86,11 @@ declare module "react-native-actions-sheet" {
       payload: {
         shop?: ShopData;
         showButtons: boolean;
+      };
+    }>;
+    "order-details": SheetDefinition<{
+      payload: {
+        order: OrderData;
       };
     }>;
     "map-shop-results": SheetDefinition<{

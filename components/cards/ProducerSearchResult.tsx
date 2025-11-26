@@ -41,8 +41,6 @@ export default function ShopSearchResultCard({
     Linking.openURL(url);
   };
 
-  console.log(shopData?.address.latitude, " ", shopData?.address.longitude);
-
   return (
     <TouchableOpacity onPress={onPressFn}>
       <View

@@ -23,7 +23,7 @@ export default function BackLabelButton({
         <View className="pl-2">
           <FontAwesome5Icon name="angle-left" size={30} color="#98B66E" />
         </View>
-        <View className="flex-grow">
+        <View className="flex-grow mr-2">
           <TextBody1 extraClasses="pl-2">{backLabel}</TextBody1>
         </View>
       </View>
