@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, JSX } from "react";
 import SelectDropdown from "react-native-select-dropdown";
 import { View, Text, StyleSheet } from "react-native";
 import TextBody2 from "./utils/texts/Body2";

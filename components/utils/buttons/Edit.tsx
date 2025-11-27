@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { Text, TouchableOpacity } from "react-native";
 import _Fontawesome from "react-native-vector-icons/FontAwesome";
 
