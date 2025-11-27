@@ -417,9 +417,9 @@ export default function CircuitParametersScreen({ navigation }: Props) {
                       <View className="flex flex-row items-center">
                         <View
                           className="
-                                                border border-lightbg dark:border-darkbg rounded-lg w-8 h-8
-                                                bg-primary
-                                                flex items-center justify-center"
+                            border border-lightbg dark:border-darkbg rounded-lg w-8 h-8
+                            bg-primary
+                            flex items-center justify-center"
                         >
                           <FontAwesome5Icon
                             name={feature.icon}

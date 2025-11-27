@@ -397,7 +397,7 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
               </View>
               <View>
                 {order.details.length > 1 && (
-                  <View className="flex flex-row justify-center items-center w-full mb-5">
+                  <View className="flex flex-row justify-center items-center w-full my-5">
                     <View className="p-2 rounded-lg border border-darkbg dark:border-lightbg">
                       <TextBody1 extraClasses="px-3 mb-2">
                         Optimisez vos trajets et calculez un itinéraire optimal
@@ -416,12 +416,6 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
             </ScrollView>
           </>
         )}
-
-        {/* <QRCodeModal
-					visible={isQRCodeModalVisible}
-					onClose={closeQRCodeModal}
-					id={orderId}
-				/> */}
       </View>
     </ActionSheet>
   );

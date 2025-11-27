@@ -8,6 +8,7 @@ import userTools from "../../modules/userTools";
 import { updateUserAddresses, UserState } from "../../reducers/user";
 import { useSelector, useDispatch } from "react-redux";
 import { SheetManager } from "react-native-actions-sheet";
+import TextBody2 from "../utils/texts/Body2";
 
 type AddressProps = {
   address: UserAddressData;
@@ -76,8 +77,16 @@ export default function Address({
       <View
         className={`${address.isDefault ? "bg-primary" : "bg-night"} p-3 rounded-t-lg`}
       >
-        <View className="flex-row justify-between">
-          <Text className=" text-white font-bold text-lg">{address.name}</Text>
+        <View className="flex-row justify-between items-center">
+          <View className="flex flex-row items-center">
+            <Text className=" text-white font-bold text-lg">
+              {address.name}
+            </Text>
+            {address.isDefault && (
+              <TextBody2 extraClasses="ml-2">(Adresse principale)</TextBody2>
+            )}
+          </View>
+
           {deletable && (
             <MainButton
               buttonType="icon"

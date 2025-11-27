@@ -175,6 +175,7 @@ export default function OrdersCustomerScreen({
         <OrderFilters
           status={status}
           size={30}
+          iconSize={20}
           onChange={(s) => setStatus(s)}
         />
       </View>

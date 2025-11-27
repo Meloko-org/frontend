@@ -2,7 +2,13 @@ import React, { useEffect, useRef } from "react";
 import { Animated, Pressable } from "react-native";
 import { StatusData } from "../../../types/API";
 
+import { iconLibraries, IconLibraryName } from "../../iconLibraries";
+
 type Props = {
+  iconName: string;
+  iconFamily?: IconLibraryName;
+  iconColor?: string;
+  iconSize: number;
   color: string;
   size: number; // ex: 40
   isActive: boolean;
@@ -11,6 +17,10 @@ type Props = {
 };
 
 export default function SquareButton({
+  iconName,
+  iconFamily,
+  iconColor,
+  iconSize,
   color,
   size,
   isActive,
@@ -28,6 +38,10 @@ export default function SquareButton({
     }).start();
   }, [isActive, scale]);
 
+  const IconComponent = iconFamily
+    ? iconLibraries[iconFamily]
+    : iconLibraries["FontAwesome5Icon"];
+
   return (
     <Pressable onPress={() => onPressFn(status)}>
       <Animated.View
@@ -40,7 +54,17 @@ export default function SquareButton({
           justifyContent: "center",
         }}
       >
-        <Animated.View className={`${color} rounded-lg w-full h-full`} />
+        <Animated.View
+          className={`${color} rounded-lg w-full h-full flex items-center justify-center`}
+        >
+          {IconComponent && (
+            <IconComponent
+              name={iconName}
+              size={iconSize ? iconSize : 25}
+              color={iconColor}
+            />
+          )}
+        </Animated.View>
       </Animated.View>
     </Pressable>
   );
