@@ -321,6 +321,7 @@ type ShopResultData = {
 //   | [];
 
 type PeriodData = {
+  _id: string;
   openingTime: string | null;
   closingTime: string | null;
 };

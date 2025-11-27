@@ -30,10 +30,51 @@ import ImageViewerModal from "../modals/user/ImageViewer";
 import Spinner from "../utils/Spinner";
 import bookmarksTools from "../../modules/bookmarksTools";
 import CloseSheetButton from "../utils/buttons/CloseSheet";
+import BadgeSecondary from "../utils/badges/Secondary";
+import React from "react";
+
+type ClickCollectInfosData = {
+  instructions: string | undefined;
+  days: {
+    key: number;
+    day: number;
+    periods: {
+      key: string;
+      open: string | null;
+      close: string | null;
+    }[];
+  }[];
+};
+
+type MarketsInfosData = {
+  markets: {
+    key: string;
+    name: string;
+    days: {
+      key: number;
+      day: number;
+      periods: {
+        key: string;
+        open: string | null;
+        close: string | null;
+      }[];
+    }[];
+  }[];
+};
 
 export default function ShopDetails(props: SheetProps<"shop-details">) {
   const insets = useSafeAreaInsets();
   const shopSheetRef = useRef<ActionSheetRef>(null);
+
+  const dayLabels = [
+    "Lundi",
+    "Mardi",
+    "Mercredi",
+    "Jeudi",
+    "Vendredi",
+    "Samedi",
+    "Dimanche",
+  ];
 
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
@@ -46,6 +87,8 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
 
   const shop = props.payload?.shop;
   const isPremium = props.payload?.shop?.isPremium;
+  // const clickCollect = props.payload?.shop?.clickCollect;
+  // const markets = props.payload?.shop?.markets;
 
   const [isViewerVisible, setViewerVisible] = useState<boolean>(false);
   const [initialIndex, setInitialIndex] = useState(0);
@@ -59,6 +102,54 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
   const player = useVideoPlayer(shop!.video[0], (player) => {
     player.staysActiveInBackground = false;
   });
+
+  /* gestion des infos de click & collect */
+  const clickCollect = props.payload?.shop?.clickCollect;
+
+  let clickCollectInfos: ClickCollectInfosData | null = null;
+
+  if (clickCollect?.isActive) {
+    clickCollectInfos = {
+      instructions: clickCollect.instructions,
+      days: clickCollect.openingHours.map((o) => ({
+        key: o.day,
+        day: o.day,
+        periods: o.periods.map((p) => ({
+          key: p._id,
+          open: p.openingTime,
+          close: p.closingTime,
+        })),
+      })),
+    };
+  }
+
+  /* gestion des infos des markets */
+  const markets = props.payload?.shop?.markets;
+
+  const hasMarketActive = props.payload?.shop?.markets.some(
+    (m) => m.isActive === true,
+  );
+
+  const marketsInfos: MarketsInfosData = {
+    markets:
+      markets
+        ?.filter((m) => m.isActive)
+        .map((m) => ({
+          key: m.market._id,
+          name: m.market.name,
+          days: m.openingHours.map((o) => ({
+            key: o.day,
+            day: o.day,
+            periods: o.periods.map((p) => ({
+              key: p._id,
+              open: p.openingTime,
+              close: p.closingTime,
+            })),
+          })),
+        })) ?? [],
+  };
+
+  console.log("markets :", marketsInfos);
 
   const members =
     props.payload?.shop?.crew &&
@@ -299,6 +390,111 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
               />
             </View>
           )}
+
+          <View className="px-3 my-5">
+            <TextHeading3 centered extraClasses="mb-5">
+              Modes de retrait
+            </TextHeading3>
+
+            {/* Click & Collect */}
+            {clickCollect?.isActive && (
+              <View className="mb-5">
+                <BadgeSecondary uppercase extraClasses="mb-2">
+                  click & collect
+                </BadgeSecondary>
+                <TextBody1 centered extraClasses="font-bold mb-1">
+                  Jours de retrait
+                </TextBody1>
+                <View className="flex flex-row justify-center mb-5">
+                  <View className="w-64">
+                    {clickCollectInfos?.days.map((d) => (
+                      <View
+                        key={d.key}
+                        className="flex flex-row rounded-lg bg-tertiary mb-1"
+                      >
+                        <View className="w-[40%] flex flex-row items-center justify-center rounded-l-lg bg-primary">
+                          <TextBody1 centered>{dayLabels[d.day - 1]}</TextBody1>
+                        </View>
+                        <View className="w-[60%]">
+                          {d.periods.map((p) => {
+                            if (p.open) {
+                              return (
+                                <TextBody1 key={p.key} centered>
+                                  {p.open} - {p.close}
+                                </TextBody1>
+                              );
+                            } else {
+                              return (
+                                <TextBody1 key={p.key} centered>
+                                  Fermé
+                                </TextBody1>
+                              );
+                            }
+                          })}
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+                <TextBody1 centered extraClasses="font-bold mb-1">
+                  Instructions
+                </TextBody1>
+                <TextBody1 centered>
+                  {clickCollectInfos?.instructions}
+                </TextBody1>
+              </View>
+            )}
+
+            {/* Markets */}
+            {hasMarketActive && (
+              <View className="my-5">
+                <BadgeSecondary uppercase extraClasses="mb-2">
+                  points de vente
+                </BadgeSecondary>
+                {marketsInfos &&
+                  marketsInfos.markets.map((i) => (
+                    <React.Fragment key={i.key}>
+                      <TextBody1 centered extraClasses="font-bold mb-1">
+                        {i.name}
+                      </TextBody1>
+                      <View className="flex flex-row justify-center mb-5">
+                        <View className="w-64">
+                          {i.days.map((d) => (
+                            <View
+                              key={d.key}
+                              className="flex flex-row rounded-lg bg-tertiary mb-1"
+                            >
+                              <View className="w-[40%] flex flex-row items-center justify-center rounded-l-lg bg-primary">
+                                <TextBody1 centered>
+                                  {dayLabels[d.day - 1]}
+                                </TextBody1>
+                              </View>
+                              <View className="w-[60%]">
+                                {d.periods.map((p) => {
+                                  if (p.open) {
+                                    return (
+                                      <TextBody1 key={p.key} centered>
+                                        {p.open} - {p.close}
+                                      </TextBody1>
+                                    );
+                                  } else {
+                                    return (
+                                      <TextBody1 key={p.key} centered>
+                                        Absent
+                                      </TextBody1>
+                                    );
+                                  }
+                                })}
+                              </View>
+                            </View>
+                          ))}
+                        </View>
+                      </View>
+                    </React.Fragment>
+                  ))}
+              </View>
+            )}
+          </View>
 
           {isPremium && members!.length > 0 && (
             <View className="px-3 my-5">

@@ -24,11 +24,22 @@ import ButtonPrimaryEnd from "../utils/buttons/PrimaryEnd";
 import Spinner from "../utils/Spinner";
 import CloseSheetButton from "../utils/buttons/CloseSheet";
 import { useRef } from "react";
+import IconButton from "../utils/buttons/Icon";
 
 export default function OrderDetails(props: SheetProps<"order-details">) {
   const sheetRef = useRef<ActionSheetRef>(null);
 
   const order = props.payload?.order;
+
+  const dayLabels = [
+    "Lundi",
+    "Mardi",
+    "Mercredi",
+    "Jeudi",
+    "Vendredi",
+    "Samedi",
+    "Dimanche",
+  ];
 
   let clickCollectOrdersDisplay: React.ReactNode = null;
   let marketOrdersDisplay: React.ReactNode = null;
@@ -134,6 +145,12 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
     });
 
     marketOrdersDisplay = marketOrders.map((mo) => {
+      const market = mo.shop?.markets.find(
+        (m) => m.market.name === mo.withdrawMarket,
+      );
+      const marketLat = market?.market.address.latitude;
+      const marketLon = market?.market.address.longitude;
+
       const productList = mo.products.map((p) => {
         return (
           <View
@@ -175,7 +192,7 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
             withdrawData={mo.products}
             extraClasses="mb-1"
             displayMode="order"
-            showDirectionButton
+            showDirectionButton={false}
             onPressFn={() => {
               SheetManager.show("shop-details", {
                 payload: {
@@ -185,6 +202,38 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
               });
             }}
           />
+
+          <View className="flex flex-row items-center rounded-lg px-3 py-1 bg-premiumbg mb-1">
+            <View className="w-5/6">
+              <View className="flex flex-row items-center">
+                <View className="">
+                  <TextBody2>Point de vente : </TextBody2>
+                </View>
+                <View className="w-auto">
+                  <TextBody1 extraClasses="font-bold">
+                    {mo.withdrawMarket}
+                  </TextBody1>
+                </View>
+              </View>
+              <View className="flex flex-row items-center">
+                <View className="">
+                  <TextBody2>Jour de retrait : </TextBody2>
+                </View>
+                <View className="">
+                  <TextBody1 extraClasses="font-bold">
+                    {dayLabels[mo.withdrawDay - 1]}
+                  </TextBody1>
+                </View>
+              </View>
+            </View>
+            <View className="w-1/6">
+              <IconButton
+                iconName="location-arrow"
+                onPressFn={() => handleGoogleMap(marketLat, marketLon)}
+                extraClasses="w-[50px] h-[50px] bg-primary"
+              />
+            </View>
+          </View>
 
           <View className="w-full divide-y divide-dashed divide-black dark:divide-white mt-1">
             <View className="mb-1">{productList}</View>
@@ -224,7 +273,13 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
     });
   }
 
-  const handleQRCodePress = (id: string) => {};
+  const handleQRCodePress = (id: string) => {
+    SheetManager.show("qr-code", {
+      payload: {
+        orderId: id,
+      },
+    });
+  };
 
   const handleOptimalRoute = () => {
     if (!order) return;
@@ -244,6 +299,23 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
       url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&waypoints=${waypoints}&travelmode=driving`;
     }
     console.log("Generated Maps URL:", url);
+    Linking.openURL(url);
+  };
+
+  const handleGoogleMap = (
+    lat: number | undefined,
+    lon: number | undefined,
+  ) => {
+    if (!lat || !lon) {
+      SheetManager.show("alert", {
+        payload: {
+          message: `Impossible d'utiliser Google Maps:\ndes coordonnées sont manquantes.`,
+          alertType: "error",
+        },
+      });
+    }
+    const destination = `${lat},${lon}`;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
     Linking.openURL(url);
   };
 

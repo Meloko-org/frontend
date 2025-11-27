@@ -18,7 +18,6 @@ import Spinner from "../../components/utils/Spinner";
 import TopBar from "../../components/TopBar";
 import { SheetManager } from "react-native-actions-sheet";
 import OrderFilters from "../../components/utils/OrderFilters";
-import OrderDetailsModal from "../../components/modals/user/OrderDetails";
 
 type OrdersRouteProp = RouteProp<UserTabParamList, "OrdersCustomer">;
 
@@ -49,12 +48,6 @@ export default function OrdersCustomerScreen({
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const [isOrderDetailModalVisible, setIsOrderDetailModalVisible] =
-    useState<boolean>(false);
-  const [selectedOrder, setSelectedOrder] = useState<OrderData | undefined>(
-    undefined,
-  );
 
   const fetchOrders = async (page = 1) => {
     try {
@@ -140,14 +133,7 @@ export default function OrdersCustomerScreen({
     }
   };
 
-  // const handleOrderDetailPress = (order: OrderData) => {
-  //   console.log(order._id)
-  //   setSelectedOrder(order);
-  //   setIsOrderDetailModalVisible(true);
-  // };
-
   const handleOrderDetailPress = (order: OrderData) => {
-    console.log("youpi");
     SheetManager.show("order-details", {
       payload: {
         order,
@@ -216,16 +202,6 @@ export default function OrdersCustomerScreen({
           onRefresh={onRefresh}
         />
       </View>
-
-      {/* <OrderDetailsModal
-        isVisible={isOrderDetailModalVisible}
-        order={selectedOrder!}
-        navigation={navigation}
-        onClose={() => {
-          setIsOrderDetailModalVisible(false)
-          setSelectedOrder(undefined)
-        }}
-      /> */}
     </SafeAreaView>
   );
 }

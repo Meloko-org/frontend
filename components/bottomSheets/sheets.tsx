@@ -37,6 +37,7 @@ import CircuitShop from "./CircuitShop";
 import SignInRequired from "./SignInRequired";
 import Note from "./Note";
 import OrderDetails from "./OrderDetails";
+import QRCode from "./QRCode";
 
 registerSheet("alert", CustomAlert);
 registerSheet("product-details", ProductDetails);
@@ -57,6 +58,7 @@ registerSheet("circuit-shop", CircuitShop);
 registerSheet("signin-required", SignInRequired);
 registerSheet("note", Note);
 registerSheet("order-details", OrderDetails);
+registerSheet("qr-code", QRCode);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -180,6 +182,11 @@ declare module "react-native-actions-sheet" {
     note: SheetDefinition<{
       payload: {
         note: NoteData;
+      };
+    }>;
+    "qr-code": SheetDefinition<{
+      payload: {
+        orderId: string;
       };
     }>;
   }
