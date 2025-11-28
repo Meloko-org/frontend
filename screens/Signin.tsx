@@ -218,10 +218,13 @@ export default function SignInScreen({ navigation, route }: SignInScreenProps) {
       // Étape 3 : exécution de la navigation
       switch (redirect.type) {
         case "root":
-          navigation.navigate(redirect.screen);
+          navigation.navigate(redirect.screen as never);
           break;
         case "userTab":
-          navigation.navigate("TabNavigatorUser", { screen: redirect.screen });
+          navigation.navigate("TabNavigatorUser", {
+            screen: redirect.screen,
+            params: redirect.params,
+          });
           break;
         case "producerTab":
           navigation.navigate("TabNavigatorProducer", {
@@ -229,7 +232,7 @@ export default function SignInScreen({ navigation, route }: SignInScreenProps) {
           });
           break;
         case "onboarding":
-          navigation.navigate(redirect.screen);
+          navigation.navigate(redirect.screen as never);
           break;
       }
     } catch (error) {

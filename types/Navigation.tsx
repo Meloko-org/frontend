@@ -106,8 +106,8 @@ type ProducerTabParamList = {
     programmedPosts?: string;
   };
   PostType: { from?: string; backLabel?: string; screenTitle?: string };
-  ProgrammedPosts: { from?: string; backLabel?: string; screenTitle?: string };
-  PostParameters: { from?: string; backLabel?: string; screenTitle?: string };
+  ProgrammedPosts?: { from?: string; backLabel?: string; screenTitle?: string };
+  PostParameters?: { from?: string; backLabel?: string; screenTitle?: string };
   ProductPostChoice: {
     from?: string;
     backLabel?: string;
@@ -119,7 +119,7 @@ type ProducerTabParamList = {
     screenTitle?: string;
   };
   NoticePostChoice: { from?: string; backLabel?: string; screenTitle?: string };
-  CreatePost: {
+  CreatePost?: {
     from?: string;
     backLabel?: string;
     screenTitle?: string;
@@ -159,6 +159,12 @@ type ProducerTabParamList = {
     orderId: string;
   };
   ProducerContact: undefined;
+};
+
+/* simplification pour les tab navigators trop complexes comme producerTabParamList */
+type SafeNavigatorParams<T> = {
+  screen: keyof T;
+  params?: any; // on laisse react-navigation faire le contrôle au runtime
 };
 
 type UserTabParamList = {
@@ -213,7 +219,7 @@ type UserTabParamList = {
 // To keep synced with the Native Stack
 type RootStackParamList = {
   TabNavigatorUser: NavigatorScreenParams<UserTabParamList> | undefined;
-  TabNavigatorProducer: NavigatorScreenParams<ProducerTabParamList> | undefined;
+  TabNavigatorProducer: SafeNavigatorParams<ProducerTabParamList> | undefined;
   Home: undefined;
   SignIn: {
     from?: string;
@@ -313,7 +319,7 @@ type RootStackParamList = {
 
 type Redirect =
   | { type: "root"; screen: keyof RootStackParamList }
-  | { type: "userTab"; screen: keyof UserTabParamList }
+  | { type: "userTab"; screen: keyof UserTabParamList; params?: any }
   | { type: "producerTab"; screen: keyof ProducerTabParamList }
   | { type: "onboarding"; screen: keyof RootStackParamList };
 
