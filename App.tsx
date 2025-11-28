@@ -25,6 +25,11 @@ import {
 } from "./types/Navigation";
 
 import _FontAwesome from "react-native-vector-icons/FontAwesome5";
+import { useFonts, Caveat_400Regular } from "@expo-google-fonts/caveat";
+import { Caveat_500Medium } from "@expo-google-fonts/caveat/500Medium";
+import { Caveat_600SemiBold } from "@expo-google-fonts/caveat/600SemiBold";
+import { Caveat_700Bold } from "@expo-google-fonts/caveat/700Bold";
+
 import { useColorScheme } from "nativewind";
 
 /* STACK screens */
@@ -556,16 +561,22 @@ const TabNavigatorProducer: React.FC = () => {
         component={OrderDetailsScreen}
         options={{ tabBarButton: () => null }}
       />
-      {/* <ProducerTab.Screen
-        name="Sales"
-        component={withErrorBoundary(ShopWithdrawModesScreen, "SalesScreen")}
-        options={{ tabBarButton: () => null }}
-      /> */}
     </ProducerTab.Navigator>
   );
 };
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Caveat_400Regular,
+    Caveat_500Medium,
+    Caveat_600SemiBold,
+    Caveat_700Bold,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>

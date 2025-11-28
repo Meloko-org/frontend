@@ -366,6 +366,9 @@ type UserData = {
   clerkPasswordEnabled: boolean | null | undefined;
   producer: ProducerData | null;
   addresses: UserAddressData[] | null;
+  settings: {
+    helpHints: boolean;
+  };
 };
 
 type ProducerData = {

@@ -18,7 +18,7 @@ import { ShopState, setShopData } from "../reducers/shop";
 import { SheetManager } from "react-native-actions-sheet";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList, UserTabParamList } from "../types/Navigation";
+import { RootStackParamList } from "../types/Navigation";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { getRedirectTarget } from "../helpers/navigationHelpers";
 
@@ -377,10 +377,11 @@ export default function SignInScreen({ navigation, route }: SignInScreenProps) {
       }
       setConnectionLoading(false);
     } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2));
+      console.error("test :", JSON.stringify(err, null, 2));
+      // const message = err.errors.map((err: string) => err.message).join("\n")
       SheetManager.show("alert", {
         payload: {
-          message: err.errors.map((err: string) => err).join("\n"),
+          message: "Connexion impossible avec ces identifiants.",
           alertType: "error",
         },
       });

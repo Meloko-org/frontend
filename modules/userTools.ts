@@ -188,10 +188,49 @@ const removeUserAddress = async (token: string | null, id: string) => {
   }
 };
 
+const updateHelpHints = async (
+  token: string | null,
+  value: boolean,
+): Promise<ApiResponse<{ helpHints: boolean }>> => {
+  try {
+    const response = await fetch(`${API_ROOT}/users/toggleHelpHints`, {
+      method: "PUT",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ helpHints: value }),
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Problème réseau.`,
+      };
+    }
+
+    const data = await response.json();
+
+    return data.success
+      ? { success: true, data: data.helpHints }
+      : { success: false, data: null, message: data.message };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      data: null,
+      message: "Une erreur s'est produite.",
+    };
+  }
+};
+
 export default {
   getUserInfos,
   updateUser,
   addUserAddress,
   setDefaultAddress,
   removeUserAddress,
+  updateHelpHints,
 };

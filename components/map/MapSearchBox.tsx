@@ -5,12 +5,14 @@ import React, {
   forwardRef,
 } from "react";
 import * as Location from "expo-location";
+import { useAuth } from "@clerk/clerk-expo";
 
 import { useSelector, useDispatch } from "react-redux";
 import { mapShopResultsState } from "../../reducers/mapShopResults";
 import { mapMarketResultsState } from "../../reducers/mapMarketResults";
 
 import { useCollapsibleSection } from "../../hooks/useCollapsibleSection";
+import { iconLibraries, IconLibraryName } from "../iconLibraries";
 
 import { MarketResultData, ShopResultData } from "../../types/API";
 import { SheetManager } from "react-native-actions-sheet";
@@ -22,6 +24,9 @@ import { Slider } from "@miblanchard/react-native-slider";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import InputButtonGroup from "../utils/inputs/radioGroup";
 import Spinner from "../utils/Spinner";
+import HelpHint from "../utils/HelpHint";
+import { setHelpHints, UserState } from "../../reducers/user";
+import userTools from "../../modules/userTools";
 
 type userPosition = {
   latitude: number;
@@ -50,8 +55,17 @@ const MapSearchBox = forwardRef(function MapSearchBox(
   { refreshResultsFn }: Props,
   ref: React.Ref<{ toggleSearch: () => void; openSearch: () => void }>,
 ) {
+  const { isSignedIn, getToken } = useAuth();
+
+  const userStore = useSelector(
+    (state: { user: UserState }) => state.user.value,
+  );
   const dispatch = useDispatch();
   const searchSection = useCollapsibleSection();
+
+  const HelpIcon = iconLibraries["EntypoIcon"];
+  const [helpVisible, setHelpVisible] = useState<Boolean>(true);
+  const [helpButtonDisabled, setHelpButtonDisabled] = useState<boolean>(false);
 
   useImperativeHandle(ref, () => ({
     toggleSearch: () => {
@@ -268,23 +282,73 @@ const MapSearchBox = forwardRef(function MapSearchBox(
     }
   };
 
+  const handleHelpHints = async () => {
+    try {
+      setHelpButtonDisabled(true);
+      setHelpVisible(!helpVisible);
+
+      if (isSignedIn) {
+        console.log("youpi");
+        const token = await getToken();
+        const value = !helpVisible;
+        const helpResponse = await userTools.updateHelpHints(token, value);
+
+        if (!helpResponse.success && helpResponse.message) {
+          SheetManager.show("alert", {
+            payload: {
+              message: helpResponse.message,
+              alertType: "error",
+            },
+          });
+          return;
+        }
+
+        dispatch(setHelpHints(!helpVisible));
+      }
+    } catch (error) {
+      console.log("catch error :", error);
+      // SheetManager.show("alert", {
+      //   payload: {
+      //     message: error,
+      //     alertType: "error"
+      //   }
+      // })
+    } finally {
+      setHelpButtonDisabled(false);
+    }
+  };
+
   useEffect(() => {
     if (!searchSection.isOpen) {
       searchSection.toggle();
     }
   }, []);
 
-  // console.log("------------ MAPSEARCHBOX -----------------------------");
-  // console.log("               shopSearchActive :", isShopSearchActive);
-  // console.log("               marketsearchActive :", isMarketSearchActive);
-  // console.log("               storedResults length: ", storedShopResults.length)
+  useEffect(() => {
+    if (userStore && userStore.settings && userStore.settings.helpHints) {
+      setHelpVisible(userStore.settings.helpHints);
+    }
+  }, [userStore]);
 
-  // une recherche (shop ou market) est active, ou s'il y a des résultats stockés, on retourne null
-  // if (isShopNavigating || isMarketNavigating) return null;
-  // sinon on retourne le composant
+  console.log("------------ MAPSEARCHBOX -----------------------------");
+  console.log("userStore :", JSON.stringify(userStore.settings, null, 2));
+
   return (
     <>
       <View className={`rounded-lg bg-lightbg p-2 dark:bg-tertiary`}>
+        {/* HelpHint */}
+        <Animated.View style={{ height: helpVisible ? "auto" : 0 }}>
+          <View className="w-full">
+            <HelpHint
+              text="1 - quels produits cherchez-vous ?"
+              visible={true}
+              iconName="reply"
+              rotate={-90}
+              arrowPosition="start"
+            />
+          </View>
+        </Animated.View>
+
         <View>
           <InputText
             value={searchOptions.query}
@@ -306,6 +370,20 @@ const MapSearchBox = forwardRef(function MapSearchBox(
           />
         </View>
 
+        {/* HelpHint */}
+        <Animated.View style={{ height: helpVisible ? "auto" : 0 }}>
+          <View className="w-full flex items-end pr-4">
+            <HelpHint
+              text="5 - appuyez sur la loupe pour lancer la recherche"
+              visible={true}
+              iconName="reply"
+              rotate={90}
+              arrowPosition="end"
+              extraClasses="w-64"
+            />
+          </View>
+        </Animated.View>
+
         <Animated.View
           style={[searchSection.animatedStyle]}
           className="overflow-hidden"
@@ -322,9 +400,38 @@ const MapSearchBox = forwardRef(function MapSearchBox(
               />
             </View>
 
+            {/* HelpHint */}
+            <Animated.View style={{ height: helpVisible ? "auto" : 0 }}>
+              <View className="w-full flex items-center">
+                <HelpHint
+                  text="2 - vous cherchez des producteurs ou leurs points de vente ?"
+                  visible={true}
+                  iconName="share"
+                  rotate={-45}
+                  arrowPosition="start"
+                  extraClasses="w-80"
+                />
+              </View>
+            </Animated.View>
+
             <TextHeading3 extraClasses="mt-5" centered>
               Localisation
             </TextHeading3>
+
+            {/* HelpHint */}
+            <Animated.View style={{ height: helpVisible ? "auto" : 0 }}>
+              <View className="w-full flex items-center pr-4">
+                <HelpHint
+                  text="3 - saisissez une adresse ou cliquez sur le bouton"
+                  visible={true}
+                  iconName="share"
+                  rotate={90}
+                  arrowPosition="end"
+                  extraClasses="w-64"
+                />
+              </View>
+            </Animated.View>
+
             <View className="w-full flex flex-row justify-between">
               <View className="w-3/4 relative">
                 <InputText
@@ -363,6 +470,21 @@ const MapSearchBox = forwardRef(function MapSearchBox(
             <TextHeading3 extraClasses="mt-5" centered>
               Distance
             </TextHeading3>
+
+            {/* HelpHint */}
+            <Animated.View style={{ height: helpVisible ? "auto" : 0 }}>
+              <View className="w-full">
+                <HelpHint
+                  text="4 - dans quel rayon recherchez-vous ?"
+                  visible={true}
+                  iconName="reply"
+                  rotate={-90}
+                  arrowPosition="start"
+                  extraClasses=""
+                />
+              </View>
+            </Animated.View>
+
             <View style={{ width: "100%" }} className="px-3 flex-row mb-2">
               <Slider
                 containerStyle={{ width: "80%" }}
@@ -390,15 +512,25 @@ const MapSearchBox = forwardRef(function MapSearchBox(
           </View>
         </Animated.View>
 
-        <Pressable onPress={searchSection.toggle}>
-          <View className="h-7 mt-2">
-            <Text
-              className={` text-sm w-full text-center font-bold text-secondary/40 my-1 dark:text-lightbg`}
-            >
-              {`Appuyez pour ${searchSection.isOpen ? "moins" : "plus"} d'options !`}
-            </Text>
+        <View className="flex flex-row w-full">
+          <View className="w-1/6"></View>
+          <View className="w-4/6">
+            <Pressable onPress={searchSection.toggle}>
+              <View className="h-7 mt-2">
+                <Text
+                  className={` text-sm w-full text-center font-bold text-secondary/40 my-1 dark:text-lightbg`}
+                >
+                  {`Appuyez pour ${searchSection.isOpen ? "moins" : "plus"} d'options !`}
+                </Text>
+              </View>
+            </Pressable>
           </View>
-        </Pressable>
+          <View className="w-1/6 flex items-end justify-end">
+            <Pressable onPress={handleHelpHints} disabled={helpButtonDisabled}>
+              <HelpIcon name="help-with-circle" color="#FAA200" size={25} />
+            </Pressable>
+          </View>
+        </View>
       </View>
 
       {isSearchLoading && (

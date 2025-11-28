@@ -18,6 +18,9 @@ const initialState: UserState = {
     clerkPasswordEnabled: null,
     producer: null,
     addresses: [],
+    settings: {
+      helpHints: true,
+    },
   },
 };
 
@@ -43,6 +46,9 @@ export const userSlice = createSlice({
     addOrder: (state: UserState, action: PayloadAction<OrderData>): void => {
       state.value.orders.push(action.payload);
     },
+    setHelpHints: (state: UserState, action: PayloadAction<boolean>): void => {
+      state.value.settings.helpHints = action.payload;
+    },
     resetUser: (state: UserState): void => {
       state.value = {
         _id: null,
@@ -56,6 +62,9 @@ export const userSlice = createSlice({
         clerkPasswordEnabled: null,
         producer: null,
         addresses: null,
+        settings: {
+          helpHints: false,
+        },
       };
 
       console.log("user reset", state);
@@ -69,5 +78,6 @@ export const {
   resetUser,
   updateUserAddresses,
   setDefaultAddress,
+  setHelpHints,
 } = userSlice.actions;
 export default userSlice.reducer;

@@ -13,7 +13,7 @@ type IconButtonProps = {
   extraClasses?: string;
   onPressFn:
     | ((event: GestureResponderEvent) => void)
-    | ((uri: string) => void)
+    // | ((uri: string) => void)
     | undefined;
   animated?: boolean;
   size?: number;

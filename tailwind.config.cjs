@@ -40,6 +40,12 @@ module.exports = {
         partialCanceled: "#BA2D0B",
         canceled: "#EA2B1F",
       },
+      fontFamily: {
+        caveat: ["Caveat_400Regular"],
+        caveatMedium: ["Caveat_500Medium"],
+        caveatSemiBold: ["Caveat_600SemiBold"],
+        caveatBold: ["Caveat_700Bold"],
+      },
     },
   },
   plugins: [],
