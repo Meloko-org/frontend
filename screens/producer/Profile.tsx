@@ -118,7 +118,6 @@ export default function ProducerProfileScreen({ navigation, route }: Props) {
   const [isPremium, setPremium] = useState<boolean>(true); // à modifier
 
   useEffect(() => {
-    console.log("Valeur actuelle de producerStore:", producerStore);
     if (producerStore !== null) {
       setSocialReason(producerStore.socialReason ?? "");
       setSiren(producerStore.siren ?? "");
@@ -149,15 +148,21 @@ export default function ProducerProfileScreen({ navigation, route }: Props) {
   const onSignoutPress = async () => {
     try {
       await signOut();
-      dispatch(resetUser());
-      dispatch(emptyCart());
-      dispatch(resetProducerData());
-      dispatch(resetShopData());
-
-      navigation.navigate("Home");
     } catch (err) {
       console.error(err);
+      SheetManager.show("alert", {
+        payload: {
+          message: `Une erreur est survenue lors de la déconnexion.\nVeuillez ré-essayer.`,
+          alertType: "error",
+        },
+      });
+      return;
     }
+    dispatch(resetUser());
+    dispatch(emptyCart());
+    dispatch(resetProducerData());
+    dispatch(resetShopData());
+    navigation.navigate("Home");
   };
 
   const switchUser = () => {

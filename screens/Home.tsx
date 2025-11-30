@@ -31,6 +31,7 @@ import { ShopState, setShopData, resetShopData } from "../reducers/shop";
 import { emptyCart } from "../reducers/cart";
 import { changeMode, ModeState } from "../reducers/mode";
 import SignInScreen from "./Signin";
+import { SheetManager } from "react-native-actions-sheet";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -82,9 +83,11 @@ export default function HomeScreen({ navigation }: Props) {
       dispatch(setProducerData(producer));
 
       if (producer?.onboardingStep === 5) {
-        navigation.navigate("Onboarding" + producer?.onboardingStep);
-      } else if (producer?.onboardingStep! < 5) {
-        navigation.navigate("Onboarding" + (producer?.onboardingStep + 1));
+        navigation.navigate(("Onboarding" + producer?.onboardingStep) as never);
+      } else if (producer?.onboardingStep && producer?.onboardingStep < 5) {
+        navigation.navigate(
+          ("Onboarding" + (producer?.onboardingStep + 1)) as never,
+        );
       } else {
         const shopResponse = await shopTools.getShopInfos(token, "true");
 
@@ -107,7 +110,6 @@ export default function HomeScreen({ navigation }: Props) {
       (modeStore.mode === "dark" && colorScheme === "light") ||
       (modeStore.mode === "light" && colorScheme === "dark")
     ) {
-      console.log("youpi");
       toggleColorScheme();
     }
     if (isSignedIn) {
@@ -121,13 +123,20 @@ export default function HomeScreen({ navigation }: Props) {
   const onSignoutPress = async () => {
     try {
       await signOut();
-      dispatch(resetUser());
-      dispatch(emptyCart());
-      dispatch(resetProducerData());
-      dispatch(resetShopData());
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
+      SheetManager.show("alert", {
+        payload: {
+          message: `Une erreur est survenue lors de la déconnexion.\nVeuillez ré-essayer.`,
+          alertType: "error",
+        },
+      });
+      return;
     }
+    dispatch(resetUser());
+    dispatch(emptyCart());
+    dispatch(resetProducerData());
+    dispatch(resetShopData());
   };
 
   console.log("HOME modeStore :", modeStore.mode);
@@ -153,7 +162,7 @@ export default function HomeScreen({ navigation }: Props) {
         <View className="flex-[0.2] px-7 justify-center items-center">
           <View className="w-full">
             <ButtonPrimaryEnd
-              label="Recherche"
+              label={`Rechercher\nCommander`}
               iconName="search"
               disabled={false}
               onPressFn={() =>
@@ -161,7 +170,7 @@ export default function HomeScreen({ navigation }: Props) {
                   screen: "MapCustomer",
                 })
               }
-              extraClasses="mb-3 h-14"
+              extraClasses="mb-3 h-20"
             />
             <ButtonPrimaryEnd
               label="Circuit touristique"

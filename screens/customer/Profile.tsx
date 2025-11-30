@@ -45,6 +45,7 @@ import ColorSchemeButton from "../../components/utils/buttons/ColorScheme";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import IconButton from "../../components/utils/buttons/Icon";
 import TextHeading3 from "../../components/utils/texts/Heading3";
+import { SheetManager } from "react-native-actions-sheet";
 const FontAwesome = _Fontawesome as React.ElementType;
 
 type UserProfileNavProp = CompositeNavigationProp<
@@ -89,15 +90,16 @@ export default function UserProfileScreen({ navigation }: Props) {
   const [lastname, setLastname] = useState("");
 
   useEffect(() => {
-    if (isSignedIn) {
-      fetchData();
-      setFirstname(userStore.firstname!);
-      setLastname(userStore.lastname!);
-      setEmail(userStore.email!);
-    }
+    if (!isSignedIn) return;
+
+    fetchData();
+    setFirstname(userStore.firstname!);
+    setLastname(userStore.lastname!);
+    setEmail(userStore.email!);
   }, [userStore, isSignedIn]);
 
   const fetchData = async () => {
+    console.log("youpiiiii");
     try {
       const token = await getToken();
       // store producer info in the store
@@ -128,14 +130,25 @@ export default function UserProfileScreen({ navigation }: Props) {
   const onSignoutPress = async () => {
     try {
       await signOut();
-      dispatch(resetUser());
-      dispatch(emptyCart());
-      dispatch(resetProducerData());
-      dispatch(resetShopData());
-      navigation.navigate("Home");
     } catch (err) {
       console.error(err);
+      console.error(
+        "signOut error (stringified):",
+        JSON.stringify(err, Object.getOwnPropertyNames(err), 2),
+      );
+      SheetManager.show("alert", {
+        payload: {
+          message: `Une erreur est survenue lors de la déconnexion.\nVeuillez ré-essayer.`,
+          alertType: "error",
+        },
+      });
+      return;
     }
+    dispatch(resetUser());
+    dispatch(emptyCart());
+    dispatch(resetProducerData());
+    dispatch(resetShopData());
+    navigation.navigate("Home");
   };
 
   const switchProducer = () => {
@@ -177,10 +190,6 @@ export default function UserProfileScreen({ navigation }: Props) {
     const displayMode = modeStore.mode === "light" ? "dark" : "light";
     dispatch(changeMode(displayMode));
   };
-
-  console.log("PROFILE modeStore.mode :", modeStore.mode);
-  console.log("PROFILE colorScheme :", colorScheme);
-  console.log("les adresses :", userStore.addresses);
 
   return (
     <SafeAreaView

@@ -8,7 +8,6 @@ import {
 } from "@clerk/clerk-expo";
 import type { SessionResource } from "@clerk/types";
 import * as AuthSession from "expo-auth-session";
-import * as WebBrowser from "expo-web-browser";
 
 import { useDispatch, useSelector } from "react-redux";
 import { UserState, updateUser } from "../reducers/user";
@@ -51,22 +50,7 @@ type SignInScreenProps = {
   route: SignInScreenRouteProp;
 };
 
-// Warm up the android browser to improve UX
-// https://docs.expo.dev/guides/authentication/#improving-user-experience
-export const useWarmUpBrowser = () => {
-  useEffect(() => {
-    void WebBrowser.warmUpAsync();
-    return () => {
-      void WebBrowser.coolDownAsync();
-    };
-  }, []);
-};
-
-WebBrowser.maybeCompleteAuthSession();
-
 export default function SignInScreen({ navigation, route }: SignInScreenProps) {
-  useWarmUpBrowser();
-
   const { from, backLabel, screenTitle, next } = route.params || {}; // route.params peut être non défini quand on revient SignUpScreen
 
   const userStore = useSelector(

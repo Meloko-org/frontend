@@ -114,8 +114,23 @@ import mapShopResults from "./reducers/mapShopResults";
 import mapMarketResults from "./reducers/mapMarketResults";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { AuthProvider, useAuthContext } from "./hooks/useAuthContext";
+
+import * as WebBrowser from "expo-web-browser";
+
+// Warm up the android browser to improve UX
+// https://docs.expo.dev/guides/authentication/#improving-user-experience
+export const useWarmUpBrowser = () => {
+  useEffect(() => {
+    void WebBrowser.warmUpAsync();
+    return () => {
+      void WebBrowser.coolDownAsync();
+    };
+  }, []);
+};
+
+WebBrowser.maybeCompleteAuthSession();
 
 const reducers = combineReducers({
   user,
@@ -566,6 +581,8 @@ const TabNavigatorProducer: React.FC = () => {
 };
 
 export default function App() {
+  useWarmUpBrowser();
+
   const [fontsLoaded] = useFonts({
     Caveat_400Regular,
     Caveat_500Medium,
