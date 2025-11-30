@@ -1,7 +1,6 @@
 {
   "name": "frontend",
   "version": "1.0.0",
-  "type": "module",
   "main": "expo/AppEntry.js",
   "scripts": {
     "start-c": "expo start -c",
