@@ -12,7 +12,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "^2.0.2",
+    "@clerk/clerk-expo": "^2.19.6",
     "@clerk/types": "^4.11.0",
     "@expo-google-fonts/caveat": "^0.4.2",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
