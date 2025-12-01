@@ -12,7 +12,7 @@
     "preexpo-prebuild": "node patches/clerk-expo-disable-esm.js"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "^2.19.6",
+    "@clerk/clerk-expo": "^2.13.0",
     "@clerk/types": "^4.11.0",
     "@expo-google-fonts/caveat": "^0.4.2",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
