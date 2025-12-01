@@ -33,6 +33,7 @@
     "dotenv": "^16.4.5",
     "expo": "53.0.20",
     "expo-auth-session": "~6.2.1",
+    "expo-build-properties": "^1.0.9",
     "expo-camera": "~16.1.11",
     "expo-dev-client": "~5.2.4",
     "expo-file-system": "~18.1.9",
