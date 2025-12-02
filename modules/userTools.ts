@@ -28,13 +28,23 @@ const getUserInfos = async (
     return data.success
       ? { success: true, data: data.user }
       : { success: false, data: null, message: data.message };
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
+
+    // ✔ Si c’est une erreur réseau → on laisse remonter
+    if (
+      error.message?.includes("Network request failed") ||
+      error.message?.includes("Failed to fetch") ||
+      error.name === "TypeError" ||
+      error.name === "AbortError"
+    ) {
+      throw error; // Laisse withTimeout gérer
+    }
+
     return {
       success: false,
       data: null,
-      message:
-        "Une erreur s'est produite lors de la récupération de l'utilisateur.",
+      message: "Une erreur s'est produite lors de la connexion.",
     };
   }
 };

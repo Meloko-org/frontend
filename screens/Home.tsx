@@ -41,7 +41,7 @@ export default function HomeScreen({ navigation }: Props) {
   // Import the Clerk Auth functions
   const { signOut, isSignedIn, getToken } = useAuth();
 
-  const [logger, setLogger] = useState<string | null>(null);
+  const [logged, setLogged] = useState<boolean>(false);
   // Import the public api root address
   const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -71,6 +71,7 @@ export default function HomeScreen({ navigation }: Props) {
       }
 
       dispatch(updateUser(userResponse.data!));
+      setLogged(true);
 
       const producerResponse = await producerTools.getProducerInfos(token);
 
@@ -139,9 +140,7 @@ export default function HomeScreen({ navigation }: Props) {
     dispatch(resetShopData());
   };
 
-  console.log("HOME modeStore :", modeStore.mode);
-  console.log("HOME colorScheme :", colorScheme);
-  // console.log("HOME shopStore products :", shopStore?.products)
+  console.log("HOME logged :", logged);
 
   return (
     <SafeAreaView
@@ -188,7 +187,7 @@ export default function HomeScreen({ navigation }: Props) {
 
         <View className="flex-[0.4] px-7">
           <View className="flex-1 justify-end pb-10 items-center">
-            {isSignedIn ? (
+            {isSignedIn && logged ? (
               <>
                 {producerStore !== null ? (
                   <>

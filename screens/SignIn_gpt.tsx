@@ -4,7 +4,7 @@ import { View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import * as AuthSession from "expo-auth-session";
 import { useDispatch, useSelector } from "react-redux";
-import { useSignIn, useSSO, useUser, useAuth } from "@clerk/clerk-expo";
+import { useSignIn, useSSO, useUser } from "@clerk/clerk-expo";
 import { SheetManager } from "react-native-actions-sheet";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,8 +16,11 @@ import InputText from "../components/utils/inputs/Text";
 import Spinner from "../components/utils/Spinner";
 import ChooseAccountTypeModal from "../components/modals/ChooseAccountType";
 
+// import * as userTools from "../modules/userTools";
+// import * as producerTools from "../modules/producerTools";
 import { updateUser } from "../reducers/user";
 import { getRedirectTarget } from "../helpers/navigationHelpers"; // ta fonction
+import { useAuth } from "@clerk/clerk-expo"; // getToken, isSignedIn, signOut
 import userTools from "../modules/userTools";
 import producerTools from "../modules/producerTools";
 import TextBody1 from "../components/utils/texts/Body1";
@@ -35,7 +38,7 @@ export default function SignInScreen({ navigation, route }: SignInScreenProps) {
   const { signIn, setActive, isLoaded } = useSignIn();
   const { startSSOFlow } = useSSO();
   const { user } = useUser();
-  const { getToken, signOut } = useAuth();
+  const { getToken } = useAuth();
 
   const pendingSessionIdRef = useRef<string | null>(null);
 
@@ -97,13 +100,11 @@ export default function SignInScreen({ navigation, route }: SignInScreenProps) {
         userResponse = await withTimeout(userTools.getUserInfos(token), 8000);
       } catch (err: any) {
         // timeout or network error
-        let confirm;
         if (err?.message === "TIMEOUT") {
-          confirm = await SheetManager.show("confirm", {
+          SheetManager.show("alert", {
             payload: {
               message: "Le serveur met trop de temps à répondre.",
               alertType: "error",
-              buttonLabel: "Ré-essayer",
             },
           });
         } else {
@@ -113,12 +114,6 @@ export default function SignInScreen({ navigation, route }: SignInScreenProps) {
               alertType: "error",
             },
           });
-        }
-
-        if (confirm) {
-          await fetchDataFlow();
-        } else {
-          await signOut();
         }
         return false;
       }
@@ -276,32 +271,26 @@ export default function SignInScreen({ navigation, route }: SignInScreenProps) {
     if (!isLoaded) return;
     setBackendWorking(true);
     try {
-      const redirectUrl = AuthSession.makeRedirectUri({
-        scheme: "meloko",
-        path: "expo-development-client",
-      });
-      console.log("redirectUrl: ", redirectUrl);
+      const redirectUrl = AuthSession.makeRedirectUri({ scheme: "meloko" });
       const result = await startSSOFlow({
         strategy: "oauth_google",
         redirectUrl,
       });
-      // const { createdSessionId, setActive: setActiveFromSSO, signUp } = result as any;
+      const {
+        createdSessionId,
+        setActive: setActiveFromSSO,
+        signUp,
+      } = result as any;
 
-      const { createdSessionId, setActive, signIn, signUp } = result;
-      console.log("result :", result);
       if (createdSessionId) {
-        console.log("youpi2");
         if (signUp?.createdUserId) {
           // new user sign up (store and open modal)
           pendingSessionIdRef.current = createdSessionId;
           setIsChooseAccountTypeModalvisible(true);
         } else {
           // existing user: activate and fetch data
-          // await setActiveFromSSO!({ session: createdSessionId });
-          await setActive!({ session: createdSessionId });
-
+          await setActiveFromSSO!({ session: createdSessionId });
           const ok = await fetchDataFlow();
-
           if (!ok) {
             // backend problem: user still signed in at Clerk side; user can retry or sign out
             return;
@@ -339,10 +328,7 @@ export default function SignInScreen({ navigation, route }: SignInScreenProps) {
         signUp,
       } = (await startSSOFlow({
         strategy: "oauth_facebook",
-        redirectUrl: AuthSession.makeRedirectUri({
-          scheme: "meloko",
-          path: "expo-development-client",
-        }),
+        redirectUrl: AuthSession.makeRedirectUri(),
       })) as any;
 
       if (createdSessionId) {

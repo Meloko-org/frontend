@@ -61,7 +61,9 @@ export default function ConfirmSheet(props: SheetProps<"confirm">) {
             extraClasses="h-12 px-2"
           />
           <PrimaryButton
-            label="OK"
+            label={
+              props.payload?.buttonLabel ? props.payload.buttonLabel : "OK"
+            }
             onPressFn={() => {
               SheetManager.hide(props.sheetId, {
                 payload: true,

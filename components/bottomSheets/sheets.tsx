@@ -146,6 +146,7 @@ declare module "react-native-actions-sheet" {
       payload: {
         message: string;
         alertType: "info" | "success" | "error" | "warning";
+        buttonLabel?: string;
       };
       returnedValue: boolean;
     }>;
