@@ -33,7 +33,14 @@
         "foregroundImage": "./assets/icone_la_charrue.png",
         "backgroundColor": "#98B66E"
       },
-      "package": "com.crawazaky.frontend"
+      "package": "com.crawazaky.frontend",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [{ "scheme": "exp+meloko" }],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

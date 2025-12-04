@@ -5,6 +5,7 @@ node_modules/
 
 # Expo
 .expo/
+./expo-share
 dist/
 web-build/
 
@@ -18,6 +19,7 @@ web-build/
 
 # Metro
 .metro-health-check*
+/.metro-cache
 
 # debug
 npm-debug.*
@@ -35,3 +37,23 @@ yarn.lock
 
 # typescript
 *.tsbuildinfo
+
+# Ignore temporary files
+*.log
+*.tmp
+
+# Ignore build artifacts
+/android/app/build
+/ios/build
+/build
+
+# Ignore Git
+/.git
+/.gitignore
+
+# Ignore Tests
+/__tests__/
+
+# Ignore large asset folders (adjust if needed)
+/assets/raw/*
+/assets/videos/*

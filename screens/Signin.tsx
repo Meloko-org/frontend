@@ -1,25 +1,24 @@
-// SigninScreen.tsx (remplace ton ancien fichier)
 import React, { useCallback, useRef, useState } from "react";
-import { View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import * as AuthSession from "expo-auth-session";
 import { useDispatch, useSelector } from "react-redux";
 import { useSignIn, useSSO, useUser, useAuth } from "@clerk/clerk-expo";
+import * as AuthSession from "expo-auth-session";
 import { SheetManager } from "react-native-actions-sheet";
+
+import { updateUser } from "../reducers/user";
+import { getRedirectTarget } from "../helpers/navigationHelpers";
+import userTools from "../modules/userTools";
+import producerTools from "../modules/producerTools";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 
+import { View } from "react-native";
 import TopBar from "../components/TopBar";
 import ButtonPrimaryEnd from "../components/utils/buttons/PrimaryEnd";
 import InputText from "../components/utils/inputs/Text";
 import Spinner from "../components/utils/Spinner";
 import ChooseAccountTypeModal from "../components/modals/ChooseAccountType";
-
-import { updateUser } from "../reducers/user";
-import { getRedirectTarget } from "../helpers/navigationHelpers"; // ta fonction
-import userTools from "../modules/userTools";
-import producerTools from "../modules/producerTools";
 import TextBody1 from "../components/utils/texts/Body1";
 import OpenScreenButton from "../components/utils/buttons/OpenScreen";
 
@@ -278,16 +277,19 @@ export default function SignInScreen({ navigation, route }: SignInScreenProps) {
     try {
       const redirectUrl = AuthSession.makeRedirectUri({
         scheme: "meloko",
-        path: "expo-development-client",
       });
       console.log("redirectUrl: ", redirectUrl);
       const result = await startSSOFlow({
         strategy: "oauth_google",
         redirectUrl,
       });
-      // const { createdSessionId, setActive: setActiveFromSSO, signUp } = result as any;
+      const {
+        createdSessionId,
+        setActive: setActiveFromSSO,
+        signUp,
+      } = result as any;
 
-      const { createdSessionId, setActive, signIn, signUp } = result;
+      // const { createdSessionId, setActive, signIn, signUp } = result;
       console.log("result :", result);
       if (createdSessionId) {
         console.log("youpi2");
@@ -297,8 +299,8 @@ export default function SignInScreen({ navigation, route }: SignInScreenProps) {
           setIsChooseAccountTypeModalvisible(true);
         } else {
           // existing user: activate and fetch data
-          // await setActiveFromSSO!({ session: createdSessionId });
-          await setActive!({ session: createdSessionId });
+          await setActiveFromSSO!({ session: createdSessionId });
+          // await setActive!({ session: createdSessionId });
 
           const ok = await fetchDataFlow();
 

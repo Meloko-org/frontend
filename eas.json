@@ -1,6 +1,6 @@
 {
   "cli": {
-    "version": ">= 10.2.1"
+    "version": ">= 16.0.0"
   },
   "build": {
     "development": {
@@ -26,6 +26,10 @@
         "EXPO_PUBLIC_API_ROOT": "https://api-five-tan-98.vercel.app"
       }
     },
-    "production": {}
+    "production": {
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
   }
 }
