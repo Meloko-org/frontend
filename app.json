@@ -6,61 +6,44 @@
     "orientation": "portrait",
     "icon": "./assets/icone_la_charrue.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": false,
     "scheme": "meloko",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.jisdev.frontend"
+      "bundleIdentifier": "com.jisdev.frontend",
+      "supportsTablet": true
     },
     "android": {
+      "package": "com.jisdev.frontend",
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyC1RZGSGuf9VZx0q-v-Ik5YF8KB-SoyxxY"
         }
       },
-      "permissions": [
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION",
-        "FOREGROUND_SERVICE"
-      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/icone_la_charrue.png",
         "backgroundColor": "#98B66E"
-      },
-      "package": "com.jisdev.frontend"
+      }
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "plugins": [
+      "expo-secure-store",
+      "expo-web-browser",
+      "expo-video",
+      "expo-font",
+      [
+        "expo-build-properties",
+        {
+          "android": {},
+          "ios": {}
+        }
+      ]
+    ],
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/3d2f7777-279f-49a3-8a15-f6a953419463"
     },
     "extra": {
       "eas": {
         "projectId": "3d2f7777-279f-49a3-8a15-f6a953419463"
       }
-    },
-    "owner": "meloko",
-    "runtimeVersion": "1.0.0",
-    "updates": {
-      "url": "https://u.expo.dev/3d2f7777-279f-49a3-8a15-f6a953419463"
-    },
-    "plugins": [
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "extraMavenRepos": []
-          },
-          "ios": {}
-        }
-      ],
-      "expo-secure-store",
-      "expo-web-browser",
-      "expo-video",
-      "expo-font"
-    ]
+    }
   }
 }
