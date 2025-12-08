@@ -1,49 +1,66 @@
 {
   "expo": {
-    "name": "Meloko",
-    "slug": "meloko",
+    "name": "meloko",
+    "slug": "agri-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icone_la_charrue.png",
     "userInterfaceStyle": "light",
+    "newArchEnabled": false,
     "scheme": "meloko",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "ios": {
-      "bundleIdentifier": "com.jisdev.frontend",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jisdev.frontend"
     },
     "android": {
-      "package": "com.jisdev.frontend",
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyC1RZGSGuf9VZx0q-v-Ik5YF8KB-SoyxxY"
         }
       },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "FOREGROUND_SERVICE"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/icone_la_charrue.png",
         "backgroundColor": "#98B66E"
+      },
+      "package": "com.jisdev.frontend"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "owner": "jisdev",
+    "extra": {
+      "eas": {
+        "projectId": "a54f469f-93f4-485a-b511-6d232cb15c21"
       }
     },
-    "plugins": [
-      "expo-secure-store",
-      "expo-web-browser",
-      "expo-video",
-      "expo-font",
-      [
-        "expo-build-properties",
-        {
-          "android": {},
-          "ios": {}
-        }
-      ]
-    ],
     "runtimeVersion": "1.0.0",
     "updates": {
       "url": "https://u.expo.dev/3d2f7777-279f-49a3-8a15-f6a953419463"
     },
-    "extra": {
-      "eas": {
-        "projectId": "3d2f7777-279f-49a3-8a15-f6a953419463"
-      }
-    }
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "extraMavenRepos": []
+          },
+          "ios": {}
+        }
+      ],
+      "expo-secure-store",
+      "expo-web-browser",
+      "expo-video",
+      "expo-font"
+    ]
   }
 }

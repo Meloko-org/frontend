@@ -275,9 +275,17 @@ export default function SignInScreen({ navigation, route }: SignInScreenProps) {
     if (!isLoaded) return;
     setBackendWorking(true);
     try {
+      /* en prod */
       const redirectUrl = AuthSession.makeRedirectUri({
         scheme: "meloko",
       });
+      console.log(
+        "redirect scheme: ",
+        AuthSession.makeRedirectUri({ scheme: "meloko" }),
+      );
+      /* en dev */
+      // const redirectUrl = "https://giving-sunbeam-78.clerk.accounts.dev/v1/oauth_callback"
+
       console.log("redirectUrl: ", redirectUrl);
       const result = await startSSOFlow({
         strategy: "oauth_google",
@@ -292,7 +300,6 @@ export default function SignInScreen({ navigation, route }: SignInScreenProps) {
       // const { createdSessionId, setActive, signIn, signUp } = result;
       console.log("result :", result);
       if (createdSessionId) {
-        console.log("youpi2");
         if (signUp?.createdUserId) {
           // new user sign up (store and open modal)
           pendingSessionIdRef.current = createdSessionId;
