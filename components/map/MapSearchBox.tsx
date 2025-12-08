@@ -504,7 +504,7 @@ const MapSearchBox = forwardRef(function MapSearchBox(
                 thumbTintColor="#98B66E"
               />
               <View className="flex flex-row items-center justify-center w-20">
-                <Text className=" dark:text-lightbg">
+                <Text className="text-black dark:text-lightbg">
                   {searchOptions.radius.value[0]} km
                 </Text>
               </View>
