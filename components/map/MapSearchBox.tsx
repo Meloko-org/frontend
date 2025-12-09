@@ -3,6 +3,7 @@ import React, {
   useEffect,
   useImperativeHandle,
   forwardRef,
+  useCallback,
 } from "react";
 import * as Location from "expo-location";
 import { useAuth } from "@clerk/clerk-expo";
@@ -27,6 +28,7 @@ import Spinner from "../utils/Spinner";
 import HelpHint from "../utils/HelpHint";
 import { setHelpHints, UserState } from "../../reducers/user";
 import userTools from "../../modules/userTools";
+import { useFocusEffect } from "@react-navigation/native";
 
 type userPosition = {
   latitude: number;
@@ -76,6 +78,7 @@ const MapSearchBox = forwardRef(function MapSearchBox(
       if (!searchSection.isOpen) {
         searchSection.toggle();
       }
+      setHelpVisible(userStore.settings.helpHints);
     },
   }));
 
@@ -288,7 +291,6 @@ const MapSearchBox = forwardRef(function MapSearchBox(
       setHelpVisible(!helpVisible);
 
       if (isSignedIn) {
-        console.log("youpi");
         const token = await getToken();
         const value = !helpVisible;
         const helpResponse = await userTools.updateHelpHints(token, value);
@@ -325,13 +327,15 @@ const MapSearchBox = forwardRef(function MapSearchBox(
   }, []);
 
   useEffect(() => {
-    if (userStore && userStore.settings && userStore.settings.helpHints) {
+    const stored = userStore.settings.helpHints;
+    if (stored !== undefined) {
       setHelpVisible(userStore.settings.helpHints);
     }
-  }, [userStore]);
+  }, [userStore.settings.helpHints]);
 
   console.log("------------ MAPSEARCHBOX -----------------------------");
   console.log("userStore :", JSON.stringify(userStore.settings, null, 2));
+  console.log("helpVisible :", helpVisible);
 
   return (
     <>

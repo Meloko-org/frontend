@@ -7,11 +7,12 @@ import {
   mapMarketResultsState,
 } from "../../reducers/mapMarketResults";
 
-import { FlatList, View } from "react-native";
+import { FlatList as RNFlatList, View } from "react-native";
 import ActionSheet, {
   ActionSheetRef,
   SheetManager,
   SheetProps,
+  FlatList,
   ScrollView,
 } from "react-native-actions-sheet";
 import TextHeading4 from "../utils/texts/Heading4";
@@ -40,7 +41,7 @@ export default function MapMarketResults(
 
   const actionSheetRef = useRef<ActionSheetRef>(null);
   const isNavigatingRef = useRef(false); // pour distinguer d'une fermeture sèche ou suivie d'une navigation
-  const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<RNFlatList>(null);
   const [snapIndex, setSnapIndex] = useState(0);
 
   const isMarketSheetActiveRef = useRef(false);

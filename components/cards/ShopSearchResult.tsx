@@ -31,9 +31,21 @@ export default function ShopSearchResultCard({
   showDirectionButton,
 }: ShopSearchResultCardProps): JSX.Element {
   return (
-    <TouchableOpacity onPress={onPressFn}>
+    <TouchableOpacity
+      onPress={onPressFn}
+      // className={`
+      //     ${extraClasses}
+      //     ${displayMode === "bottomSheet" || displayMode === "order" ? "rounded-lg p-1" : "p-2"}
+      //     ${isHighlighted ? "bg-primary/50" : " bg-white p-2 dark:bg-tertiary"}
+      //     flex flex-row w-full shadow-xl/30`
+      //   }
+    >
       <View
-        className={`${extraClasses} ${displayMode === "bottomSheet" || displayMode === "order" ? "rounded-lg shadow-sm p-1" : "p-2"} ${isHighlighted ? "bg-primary/50" : " bg-white p-2 dark:bg-tertiary"} flex flex-row w-full`}
+        className={`
+          ${extraClasses} 
+          ${displayMode === "bottomSheet" || displayMode === "order" ? "rounded-lg p-1" : "p-2"} 
+          ${isHighlighted ? "bg-primary/50" : " bg-white p-2 dark:bg-tertiary"} 
+          flex flex-row w-full shadow-xl/30`}
       >
         <View className="flex flex-row items-center w-4/5">
           {displayMode !== "order" && (

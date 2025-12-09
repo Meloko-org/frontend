@@ -16,13 +16,14 @@ import {
 import { closeIfOpen } from "../../helpers/sheetHelpers";
 
 import { ShopResultData } from "../../types/API";
-import { FlatList, View } from "react-native";
+import { View, FlatList as RNFlatList } from "react-native";
 
 import ActionSheet, {
   SheetManager,
   SheetProps,
   getSheetStack,
   ActionSheetRef,
+  FlatList,
   useSheetPayload,
 } from "react-native-actions-sheet";
 import TextHeading4 from "../utils/texts/Heading4";
@@ -49,7 +50,7 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
   );
 
   const actionSheetRef = useRef<ActionSheetRef>(null);
-  const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<RNFlatList>(null);
   const isNavigatingRef = useRef(false); // pour distinguer d'une fermeture sèche ou suivie d'une navigation
 
   const shops: ShopResultData[] = props.payload?.resultsList ?? [];
@@ -186,15 +187,6 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
           </View>
         )}
 
-        {/* {props.payload?.onBackFn && (
-          <View className="px-3 mt-2">
-            <BackLabelButton
-              backLabel="Retour aux points de vente"
-              onPressFn={props.payload.onBackFn}
-            />
-          </View>
-        )} */}
-
         <TextHeading4 centered extraClasses="my-3 h-10">
           {`${props.payload?.resultsList.length.toString()} Producteur(s)`}
         </TextHeading4>
@@ -216,7 +208,7 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
                 distance={item.distance}
                 onPressFn={() => onShopPress(item)}
                 isHighlighted={item.shop?._id === selectedShopId}
-                extraClasses="mb-1"
+                extraClasses="mb-5"
                 displayMode="bottomSheet"
               />
             )}
