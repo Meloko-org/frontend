@@ -16,21 +16,27 @@ import {
 import { closeIfOpen } from "../../helpers/sheetHelpers";
 
 import { ShopResultData } from "../../types/API";
-import { View, FlatList as RNFlatList } from "react-native";
-
+import { View, FlatList } from "react-native";
 import ActionSheet, {
   SheetManager,
   SheetProps,
   getSheetStack,
   ActionSheetRef,
-  FlatList,
   useSheetPayload,
 } from "react-native-actions-sheet";
+
 import TextHeading4 from "../utils/texts/Heading4";
 import BackLabelButton from "../utils/buttons/BackLabel";
 import ShopSearchResultCard from "../cards/ShopSearchResult";
 import { withSpring } from "react-native-reanimated";
 import { mapMarketResultsState } from "../../reducers/mapMarketResults";
+
+/**
+ * Impossible de faire fonctionner le scroll et le scrollToIndex en même temps:
+ * FlatList de Actionsheet permet le scroll mais pas le scrollToIndex
+ * FlatList de react-native permet le scrollToIndex mais pas le scroll
+ * Idem dans MapMarketResults
+ */
 
 export default function MapShopResults(props: SheetProps<"map-shop-results">) {
   const dispatch = useDispatch();
@@ -50,7 +56,7 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
   );
 
   const actionSheetRef = useRef<ActionSheetRef>(null);
-  const flatListRef = useRef<RNFlatList>(null);
+  const flatListRef = useRef<FlatList>(null);
   const isNavigatingRef = useRef(false); // pour distinguer d'une fermeture sèche ou suivie d'une navigation
 
   const shops: ShopResultData[] = props.payload?.resultsList ?? [];
