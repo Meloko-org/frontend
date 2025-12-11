@@ -6,6 +6,9 @@ import { UserTabParamList } from "../../types/Navigation";
 
 import { useDispatch, useSelector } from "react-redux";
 
+import { formatCentsToEuros } from "../../modules/globalTools";
+import { getCartTotal } from "../../modules/CartTools";
+
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import StripePaymentButton from "../../components/utils/buttons/StripePayment";
@@ -14,7 +17,6 @@ import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import InputTextarea from "../../components/utils/inputs/Textarea";
 import ButtonSecondaryStart from "../../components/utils/buttons/SecondaryStart";
-import CartTools from "../../modules/CartTools";
 import { CartState } from "../../reducers/cart";
 import { UserState } from "../../reducers/user";
 import TopBar from "../../components/TopBar";
@@ -48,7 +50,7 @@ export default function PaymentCustomerScreen({
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
   );
-  const [cartTotal, setCartTotal] = useState<number | undefined>(0);
+  const [cartTotal, setCartTotal] = useState<number>(0);
   const [firstname, setFirstname] = useState<string>(userStore.firstname || "");
   const [lastname, setLastname] = useState<string>(userStore.lastname || "");
   const [billingAddress, setBillingAddress] = useState<
@@ -70,19 +72,18 @@ export default function PaymentCustomerScreen({
   }, []);
 
   useEffect(() => {
-    let allShopsCost = CartTools.getCartTotal(cartStore);
-    setCartTotal(allShopsCost);
+    setCartTotal(getCartTotal(cartStore));
   }, [cartStore]);
 
   console.log("------------- PAYMENTSCREEN ------------------------------");
-  console.log(
-    "cartStore :",
-    JSON.stringify(
-      cartStore.map((c) => c.products),
-      null,
-      2,
-    ),
-  );
+  // console.log(
+  //   "cartStore :",
+  //   JSON.stringify(
+  //     cartStore.map((c) => c.products),
+  //     null,
+  //     2,
+  //   ),
+  // );
   // console.log("cartStore user :", JSON.stringify(cartStore, null, 2))
   console.log("cartTotal :", cartTotal);
 
@@ -176,7 +177,7 @@ export default function PaymentCustomerScreen({
 
       <View style={{ flex: 1.5 }} className="px-3">
         <StripePaymentButton
-          label={`Payer ${cartTotal!.toFixed(2)} €`}
+          label={`Payer ${formatCentsToEuros(cartTotal)}`}
           iconName="credit-card"
           firstname={firstname}
           lastname={lastname}

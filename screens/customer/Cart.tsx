@@ -4,26 +4,24 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { UserTabParamList } from "../../types/Navigation";
 
-import { View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { CartState } from "../../reducers/cart";
+import { mapShopResultsState } from "../../reducers/mapShopResults";
+
+import { getShopSubtotal, getCartTotal } from "../../modules/CartTools";
+import { formatCentsToEuros } from "../../modules/globalTools";
+
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { View } from "react-native";
 import TextHeading2 from "../../components/utils/texts/Heading2";
 import TextHeading3 from "../../components/utils/texts/Heading3";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addProductToCart,
-  increaseCartQuantity,
-  decreaseCartQuantity,
-  CartState,
-} from "../../reducers/cart";
 import CardProduct from "../../components/cards/Product";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import ButtonPrimaryStart from "../../components/utils/buttons/PrimaryStart";
 import ButtonSecondaryStart from "../../components/utils/buttons/SecondaryStart";
-import CartTools from "../../modules/CartTools";
-import { mapShopResultsState } from "../../reducers/mapShopResults";
 import TextHeading4 from "../../components/utils/texts/Heading4";
-import TextBody2 from "../../components/utils/texts/Body2";
 import TextBody1 from "../../components/utils/texts/Body1";
 
 type CartRouteProp = RouteProp<UserTabParamList, "Cart">;
@@ -55,15 +53,11 @@ export default function CartScreen({ navigation }: Props) {
   const cartStore = useSelector(
     (state: { cart: CartState }) => state.cart.value,
   );
-  const [cartTotal, setCartTotal] = useState<number | undefined>(0);
+  const [cartTotal, setCartTotal] = useState<number>(0);
 
   useEffect(() => {
     if (cartStore.length > 0) {
-      // let allShopsCost = CartTools.getTotalCost(cartStore);
-      // setCartTotal(allShopsCost);
-
-      const total = CartTools.getCartTotal(cartStore);
-      setCartTotal(total);
+      setCartTotal(getCartTotal(cartStore));
     }
   }, [cartStore]);
 
@@ -83,18 +77,7 @@ export default function CartScreen({ navigation }: Props) {
       );
     });
 
-    // let subTotal = 0;
-    // const productsCost = cart.products.reduce((accumulator, currentValue) => {
-    //   const quantity =
-    //     currentValue.stockData.product.weight.unit === "gr"
-    //       ? currentValue.quantity / 1000
-    //       : currentValue.quantity;
-
-    //   return quantity * Number(currentValue.stockData.price) + accumulator;
-    // }, 0);
-    // subTotal += productsCost / 100;
-
-    const subTotal = CartTools.getShopSubtotal(cart);
+    const subTotal = getShopSubtotal(cart);
 
     return (
       <View className="mb-5" key={cart.shop?._id}>
@@ -107,7 +90,7 @@ export default function CartScreen({ navigation }: Props) {
         {productsByShop}
         <View className="flex flex-row justify-center items-center">
           <TextBody1 extraClasses="mr-5">Sous-total:</TextBody1>
-          <TextHeading4>{subTotal.toFixed(2)} €</TextHeading4>
+          <TextHeading4>{formatCentsToEuros(subTotal)}</TextHeading4>
         </View>
       </View>
     );
@@ -122,28 +105,6 @@ export default function CartScreen({ navigation }: Props) {
   };
 
   console.log("------------- CARTSCREEN ----------------------------");
-  // console.log(
-  //   "cartStore: ",
-  //   JSON.stringify(
-  //     cartStore.map((elt) => ({
-  //       key: elt.shop?._id,
-  //       shop: elt.shop,
-  //       products: elt.products.map((pdt) => ({
-  //         name: pdt.stockData.productCustomName
-  //           ? pdt.stockData.productCustomName
-  //           : pdt.stockData.product.name,
-  //         quantity: pdt.quantity,
-  //       })),
-  //     })),
-  //     null,
-  //     2,
-  //   ),
-  // );
-
-  // console.log("    SHOP:");
-  // console.log("         shopSearchActive :", isShopSearchActive);
-  // console.log("         results stored: ", storedShopResults.length);
-  // console.log("         isNavigating: ", isShopNavigating);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -155,11 +116,11 @@ export default function CartScreen({ navigation }: Props) {
             </TextHeading2>
             <ScrollView>
               {products}
-              <View className="px-3 bg-night rounded-lg my-5">
+              <View className="px-3 bg-night/20 dark:bg-night rounded-lg my-5">
                 <TextHeading3
                   centered
                   extraClasses="py-3 text-right"
-                >{`TOTAL: ${cartTotal?.toFixed(2)}€`}</TextHeading3>
+                >{`TOTAL: ${formatCentsToEuros(cartTotal)}`}</TextHeading3>
               </View>
 
               <ButtonPrimaryEnd

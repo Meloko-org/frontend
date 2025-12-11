@@ -5,7 +5,7 @@ import {
 } from "../types/API";
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
-const formatDateToFr = (isoDate: Date | string | undefined) => {
+export const formatDateToFr = (isoDate: Date | string | undefined) => {
   if (!isoDate) return;
 
   const date = typeof isoDate === "string" ? new Date(isoDate) : isoDate;
@@ -19,7 +19,7 @@ const formatDateToFr = (isoDate: Date | string | undefined) => {
   }).format(date);
 };
 
-const formatQuantity = (quantity: number, unit: string) => {
+export const formatQuantity = (quantity: number, unit: string) => {
   if (unit === "gr") {
     if (quantity < 1000) {
       return `${quantity} gr`;
@@ -69,6 +69,16 @@ const formatDuration = (seconds: number): string => {
   }
 };
 
+/* retourne un montant en euros sous la forme d'une string */
+export const formatCentsToEuros = (cents: number): string => {
+  return (cents / 100).toFixed(2) + " €";
+};
+
+/* convertit un montant en euros en centimes sous la forme d'un number */
+export const formatEurosToCents = (euros: string): number => {
+  return Math.round(parseFloat(euros) * 100);
+};
+
 export default {
   formatDateToFr,
   formatQuantity,
@@ -76,4 +86,6 @@ export default {
   arraysEqualById,
   formatDistance,
   formatDuration,
+  formatCentsToEuros,
+  formatEurosToCents,
 };

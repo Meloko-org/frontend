@@ -19,9 +19,9 @@ export default function PriceBadge({
   return (
     <View className={`${extraClasses} ${colour} rounded-lg`}>
       <Text
-        className={`${textClasses} text-darkbg dark:text-lightbg text-center`}
+        className={`${textClasses} text-lightbg dark:text-lightbg text-center`}
       >
-        {children} €
+        {children}
       </Text>
     </View>
   );

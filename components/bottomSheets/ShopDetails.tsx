@@ -7,7 +7,7 @@ import { updateUser, UserState } from "../../reducers/user";
 // import ImageView from "react-native-image-viewing"
 import { useVideoPlayer, VideoView } from "expo-video";
 
-import { View, Image, Dimensions } from "react-native";
+import { View, Image, Dimensions, Text } from "react-native";
 import ActionSheet, {
   SheetProps,
   ScrollView,
@@ -87,8 +87,6 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
 
   const shop = props.payload?.shop;
   const isPremium = props.payload?.shop?.isPremium;
-  // const clickCollect = props.payload?.shop?.clickCollect;
-  // const markets = props.payload?.shop?.markets;
 
   const [isViewerVisible, setViewerVisible] = useState<boolean>(false);
   const [initialIndex, setInitialIndex] = useState(0);
@@ -419,15 +417,21 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
                           {d.periods.map((p) => {
                             if (p.open) {
                               return (
-                                <TextBody1 key={p.key} centered>
+                                <Text
+                                  key={p.key}
+                                  className="text-center text-lighbg"
+                                >
                                   {p.open} - {p.close}
-                                </TextBody1>
+                                </Text>
                               );
                             } else {
                               return (
-                                <TextBody1 key={p.key} centered>
+                                <Text
+                                  key={p.key}
+                                  className="text-center text-lighbg"
+                                >
                                   Fermé
-                                </TextBody1>
+                                </Text>
                               );
                             }
                           })}
@@ -473,15 +477,21 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
                                 {d.periods.map((p) => {
                                   if (p.open) {
                                     return (
-                                      <TextBody1 key={p.key} centered>
+                                      <Text
+                                        key={p.key}
+                                        className="text-center text-lighbg"
+                                      >
                                         {p.open} - {p.close}
-                                      </TextBody1>
+                                      </Text>
                                     );
                                   } else {
                                     return (
-                                      <TextBody1 key={p.key} centered>
+                                      <Text
+                                        key={p.key}
+                                        className="text-center text-lighbg"
+                                      >
                                         Absent
-                                      </TextBody1>
+                                      </Text>
                                     );
                                   }
                                 })}
@@ -496,7 +506,7 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
             )}
           </View>
 
-          {isPremium && members!.length > 0 && (
+          {isPremium && members !== undefined && members!.length > 0 && (
             <View className="px-3 my-5">
               <TextHeading3 centered extraClasses="text-bold mb-3">
                 Notre équipe

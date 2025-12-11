@@ -40,7 +40,7 @@ export default function BadgeWithdraw(
     <View
       className={`${props.extraClasses} flex flex-row justify-center items-center rounded-lg py-1 px-2 ${backgroundColor()}`}
     >
-      <TextBody2 extraClasses="text-lightbg font-bold uppercase">
+      <Text className="text-lightbg font-bold text-[12px] uppercase">
         {props.type === "pending" && `attende de\nvalidation`}
         {props.type === "partialValidated" && `validation\npartielle`}
         {props.type === "validated" && `à retirer`}
@@ -48,7 +48,7 @@ export default function BadgeWithdraw(
         {props.type === "withdrawn" && `retirée`}
         {props.type === "canceled" && `annulée`}
         {props.type === "partialCanceled" && `annulation\npartielle`}
-      </TextBody2>
+      </Text>
     </View>
   );
 }

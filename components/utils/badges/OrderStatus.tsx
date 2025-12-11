@@ -1,5 +1,5 @@
 import React, { JSX } from "react";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import TextBody2 from "../texts/Body2";
 
 type OrderStatusBadgeProps = {
@@ -32,7 +32,7 @@ export default function OrderStatusBadge(
     <View
       className={`${props.extraClasses} flex flex-row justify-center items-center rounded-lg ${backgroundColor()}`}
     >
-      <TextBody2 extraClasses="text-lightbg font-bold uppercase">
+      <Text className="text-lightbg font-bold text-[12px] uppercase">
         {props.status === "pending" && `en attente`}
 
         {props.status === "validated" && `à retirer`}
@@ -40,7 +40,7 @@ export default function OrderStatusBadge(
         {props.status === "withdrawn" && `retirée`}
 
         {props.status === "canceled" && `annulée`}
-      </TextBody2>
+      </Text>
     </View>
   );
 }

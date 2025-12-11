@@ -263,7 +263,6 @@ export default function StripePaymentButton({
 
   console.log(" ----------- STRIPE PAYMENT -------------------- ");
   console.log("cart amount :", totalCartAmount);
-  // console.log("userStore Orders :", userStore.orders);
 
   return (
     <StripeProvider

@@ -24,7 +24,8 @@ import { useColorScheme } from "nativewind";
 import orderTools from "../../modules/orderTools";
 import { SheetManager } from "react-native-actions-sheet";
 import CartControlButton from "../utils/buttons/CartControlButton";
-import CartTools from "../../modules/CartTools";
+import { getProductTotal } from "../../modules/CartTools";
+import { formatCentsToEuros } from "../../modules/globalTools";
 
 type CardProductProps = {
   stockData?: StockData;
@@ -47,6 +48,10 @@ export default function CardProduct({
   quantityControllable,
   showImage,
 }: CardProductProps): JSX.Element {
+  console.log("----- PRODUCT CARD -----");
+  console.log("is stockData :", stockData !== undefined);
+  console.log(" is shopData :", shopData !== undefined);
+
   const dispatch = useDispatch();
   const cartStore = useSelector(
     (state: { cart: CartState }) => state.cart.value,
@@ -117,20 +122,11 @@ export default function CardProduct({
                   textClasses="font-bold"
                 >
                   {stockData && quantity
-                    ? CartTools.getProductTotal(stockData, quantity).toFixed(2)
+                    ? formatCentsToEuros(getProductTotal(stockData, quantity))
                     : "0.00"}
-                  {/* {stockData && quantity
-                    ? orderTools
-                        .getProductCost(
-                          stockData!.price,
-                          quantity,
-                          stockData?.product.weight.unit,
-                        )
-                        .toFixed(2)
-                    : "0.00"} */}
                 </PriceBadge>
               ) : (
-                <PricePer>{`${(stockData?.price! / 100).toFixed(2)} € / ${unitLabel}`}</PricePer>
+                <PricePer>{`${formatCentsToEuros(stockData!.price)} / ${unitLabel}`}</PricePer>
               )}
             </View>
           </View>

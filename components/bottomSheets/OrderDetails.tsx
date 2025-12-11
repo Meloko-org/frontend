@@ -1,4 +1,10 @@
-import globalTools from "../../modules/globalTools";
+import { useRef } from "react";
+
+import globalTools, {
+  formatCentsToEuros,
+  formatQuantity,
+} from "../../modules/globalTools";
+import { getProductTotal } from "../../modules/CartTools";
 import orderTools from "../../modules/orderTools";
 
 import ActionSheet, {
@@ -23,7 +29,6 @@ import BadgeWithdrawStatus from "../../components/utils/badges/WithdrawStatus";
 import ButtonPrimaryEnd from "../utils/buttons/PrimaryEnd";
 import Spinner from "../utils/Spinner";
 import CloseSheetButton from "../utils/buttons/CloseSheet";
-import { useRef } from "react";
 import IconButton from "../utils/buttons/Icon";
 
 export default function OrderDetails(props: SheetProps<"order-details">) {
@@ -41,16 +46,16 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
     "Dimanche",
   ];
 
+  let clickCollectOrders = null;
+  let marketOrders = null;
   let clickCollectOrdersDisplay: React.ReactNode = null;
   let marketOrdersDisplay: React.ReactNode = null;
 
   if (order) {
-    const clickCollectOrders = order.details.filter(
+    clickCollectOrders = order.details.filter(
       (d) => d.withdrawMode === "clickCollect",
     );
-    const marketOrders = order.details.filter(
-      (d) => d.withdrawMode === "market",
-    );
+    marketOrders = order.details.filter((d) => d.withdrawMode === "market");
 
     clickCollectOrdersDisplay = clickCollectOrders.map((cco) => {
       const productList = cco.products.map((p) => {
@@ -66,22 +71,12 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
             </View>
             <View className="w-1/6">
               <TextBody2 centered>
-                {globalTools.formatQuantity(
-                  p.quantity,
-                  p.product.product.weight.unit,
-                )}
+                {formatQuantity(p.quantity, p.product.product.weight.unit)}
               </TextBody2>
             </View>
             <View className="w-1/6">
               <TextBody1 centered>
-                {orderTools
-                  .getProductCost(
-                    p.product.price,
-                    p.quantity,
-                    p.product.product.weight.unit,
-                  )
-                  .toFixed(2)}{" "}
-                €
+                {formatCentsToEuros(getProductTotal(p.product, p.quantity))}
               </TextBody1>
             </View>
           </View>
@@ -113,9 +108,9 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
               <View>
                 <TextHeading4>Total :</TextHeading4>
               </View>
-              <View className="pr-1">
+              <View className="pr-2">
                 <TextHeading3>
-                  {orderTools.getPriceInEuros(cco.shopTotalTTC).toFixed(2)} €
+                  {formatCentsToEuros(cco.shopTotalTTC)}
                 </TextHeading3>
               </View>
             </View>
@@ -123,7 +118,7 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
 
           <View className="flex flex-row w-full justify-between mt-2">
             <View className="flex flex-row items-center rounded-lg bg-white dark:bg-tertiary py-2 px-5 mb-2">
-              <Text className="text-dark dark:text-white">Status : </Text>
+              <Text className="text-black dark:text-white">Status : </Text>
               <OrderStatusBadge
                 status={cco.status}
                 extraClasses="ml-2 px-2 py-1"
@@ -164,22 +159,12 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
             </View>
             <View className="w-1/6">
               <TextBody2 centered>
-                {globalTools.formatQuantity(
-                  p.quantity,
-                  p.product.product.weight.unit,
-                )}
+                {formatQuantity(p.quantity, p.product.product.weight.unit)}
               </TextBody2>
             </View>
             <View className="w-1/6">
               <TextBody1 centered>
-                {orderTools
-                  .getProductCost(
-                    p.product.price,
-                    p.quantity,
-                    p.product.product.weight.unit,
-                  )
-                  .toFixed(2)}{" "}
-                €
+                {formatCentsToEuros(getProductTotal(p.product, p.quantity))}
               </TextBody1>
             </View>
           </View>
@@ -207,22 +192,26 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
             <View className="w-5/6">
               <View className="flex flex-row items-center">
                 <View className="">
-                  <TextBody2>Point de vente : </TextBody2>
+                  <Text className="text-[12px] text-lightbt">
+                    Point de vente :{" "}
+                  </Text>
                 </View>
                 <View className="w-auto">
-                  <TextBody1 extraClasses="font-bold">
+                  <Text className="font-bold text-[14px] text-white">
                     {mo.withdrawMarket}
-                  </TextBody1>
+                  </Text>
                 </View>
               </View>
               <View className="flex flex-row items-center">
                 <View className="">
-                  <TextBody2>Jour de retrait : </TextBody2>
+                  <Text className="text-[12px] text-lightbt">
+                    Jour de retrait :{" "}
+                  </Text>
                 </View>
                 <View className="">
-                  <TextBody1 extraClasses="font-bold">
+                  <Text className="font-bold text-[14px] text-white">
                     {dayLabels[mo.withdrawDay - 1]}
-                  </TextBody1>
+                  </Text>
                 </View>
               </View>
             </View>
@@ -243,7 +232,7 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
               </View>
               <View className="pr-1">
                 <TextHeading3>
-                  {orderTools.getPriceInEuros(mo.shopTotalTTC).toFixed(2)} €
+                  {formatCentsToEuros(mo.shopTotalTTC)}
                 </TextHeading3>
               </View>
             </View>
@@ -251,7 +240,7 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
 
           <View className="flex flex-row w-full justify-between mb-2">
             <View className="flex flex-row items-center rounded-lg bg-white dark:bg-tertiary py-2 px-5 mb-2">
-              <Text className="text-dark dark:text-white">Status : </Text>
+              <Text className="text-black dark:text-white">Status : </Text>
               <OrderStatusBadge
                 status={mo.status}
                 extraClasses="ml-2 px-2 py-1"
@@ -364,7 +353,7 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
                     extraClasses="px-3 py-1"
                     textClasses="font-bold text-lg"
                   >
-                    {orderTools.getPriceInEuros(order.totalTTC).toFixed(2)}
+                    {formatCentsToEuros(order.totalTTC)}
                   </PriceBadge>
                 </View>
               </View>
@@ -377,23 +366,27 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
               </View>
 
               <View className="items-center">
-                {clickCollectOrdersDisplay && (
-                  <>
-                    <TextHeading4 centered extraClasses="mb-2">
-                      Retrait en Click & Collect
-                    </TextHeading4>
-                    {clickCollectOrdersDisplay}
-                  </>
-                )}
+                {clickCollectOrders &&
+                  clickCollectOrders.length > 0 &&
+                  clickCollectOrdersDisplay && (
+                    <>
+                      <TextHeading4 centered extraClasses="mb-2">
+                        Retrait en Click & Collect
+                      </TextHeading4>
+                      {clickCollectOrdersDisplay}
+                    </>
+                  )}
 
-                {marketOrdersDisplay && (
-                  <>
-                    <TextHeading4 centered extraClasses="mb-2">
-                      Retrait en Points de vente
-                    </TextHeading4>
-                    {marketOrdersDisplay}
-                  </>
-                )}
+                {marketOrders &&
+                  marketOrders.length > 0 &&
+                  marketOrdersDisplay && (
+                    <>
+                      <TextHeading4 centered extraClasses="mb-2">
+                        Retrait en Points de vente
+                      </TextHeading4>
+                      {marketOrdersDisplay}
+                    </>
+                  )}
               </View>
               <View>
                 {order.details.length > 1 && (

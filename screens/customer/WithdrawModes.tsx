@@ -13,6 +13,9 @@ import { RootStackParamList, UserTabParamList } from "../../types/Navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { CartState, updateWithdrawMode } from "../../reducers/cart";
 
+import { getCartTotal } from "../../modules/CartTools";
+import { formatCentsToEuros } from "../../modules/globalTools";
+
 import {
   LightShopData,
   MarketData,
@@ -24,7 +27,7 @@ import {
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { View, Image, Modal } from "react-native";
+import { View, Image, Text } from "react-native";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import CardProduct from "../../components/cards/Product";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
@@ -37,7 +40,6 @@ import ButtonSecondaryStart from "../../components/utils/buttons/SecondaryStart"
 import SelectMarketModal from "../../components/modals/user/SelectMarket";
 import TextBody1 from "../../components/utils/texts/Body1";
 import TopBar from "../../components/TopBar";
-import CartTools from "../../modules/CartTools";
 
 type SelectedMarkets = {};
 
@@ -76,7 +78,7 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
   const cartStore = useSelector(
     (state: { cart: CartState }) => state.cart.value,
   );
-  const [cartTotal, setCartTotal] = useState<number | undefined>(0);
+  const [cartTotal, setCartTotal] = useState<number>(0);
 
   const [isSelectMarketModalVisible, setSelectMarketModalVisible] =
     useState<boolean>(false);
@@ -152,8 +154,7 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
 
   useEffect(() => {
     if (cartStore.length > 0) {
-      const allShopsCost = CartTools.getCartTotal(cartStore);
-      setCartTotal(allShopsCost);
+      setCartTotal(getCartTotal(cartStore));
       setIsPaymentDisabledButton(cartStore.some((c) => !c.withdrawMode));
     }
   }, [cartStore]);
@@ -196,89 +197,87 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
     }
   };
 
-  const products = cartStore.map((cart) => {
-    if (cart) {
-      const shopData = cart.shop;
-      const productsByShop = cart.products.map((p) => {
-        return (
-          <CardProduct
-            stockData={p.stockData}
-            shopData={shopData}
-            key={p.stockData._id}
-            extraClasses="mb-1"
-            displayMode="withdraw"
-            showImage={true}
-          />
-        );
-      });
+  // const products = cartStore.map((cart) => {
+  //   if (cart) {
+  //     const shopData = cart.shop;
+  //     const productsByShop = cart.products.map((p) => {
+  //       return (
+  //         <CardProduct
+  //           stockData={p.stockData}
+  //           shopData={shopData}
+  //           key={p.stockData._id}
+  //           extraClasses="mb-1"
+  //           displayMode="withdraw"
+  //           showImage={true}
+  //         />
+  //       );
+  //     });
 
-      const withdrawModeButtonData = [];
+  //     const withdrawModeButtonData = [];
 
-      cart.shop?.markets &&
-        cart.shop?.markets.length > 0 &&
-        withdrawModeButtonData.push({
-          label: "Points de vente",
-          value: "market",
-          selected: cart.withdrawMode === "market" ? true : false,
-        });
+  //     cart.shop?.markets &&
+  //       cart.shop?.markets.length > 0 &&
+  //       withdrawModeButtonData.push({
+  //         label: "Points de vente",
+  //         value: "market",
+  //         selected: cart.withdrawMode === "market" ? true : false,
+  //       });
 
-      cart.shop?.clickCollect &&
-        withdrawModeButtonData.push({
-          label: "Click & Collect",
-          value: "clickCollect",
-          selected: cart.withdrawMode === "clickCollect" ? true : false,
-        });
+  //     cart.shop?.clickCollect &&
+  //       withdrawModeButtonData.push({
+  //         label: "Click & Collect",
+  //         value: "clickCollect",
+  //         selected: cart.withdrawMode === "clickCollect" ? true : false,
+  //       });
 
-      return (
-        <View className="mb-3" key={cart.shop?._id}>
-          <TextHeading4
-            centered
-            extraClasses="mb-2 pb-1 bg-night/20 dark:bg-night rounded-lg"
-          >
-            {cart.shop?.name}
-          </TextHeading4>
+  //     return (
+  //       <View className="mb-3" key={cart.shop?._id}>
+  //         <TextHeading4
+  //           centered
+  //           extraClasses="mb-2 pb-1 bg-night/20 dark:bg-night rounded-lg"
+  //         >
+  //           {cart.shop?.name}
+  //         </TextHeading4>
 
-          <View className="flex">
-            <InputRadioGroup
-              data={withdrawModeButtonData}
-              size="base"
-              onPressFn={(value) =>
-                handleSelectedModePress(cart.shop?.name, value)
-              }
-            />
-            {cart.withdrawMode === "market" && cart.market && (
-              <Market
-                key={cart.market._id}
-                marketData={cart.market}
-                extraClasses="mt-3"
-              />
-            )}
-          </View>
-          <View className="mt-3">{productsByShop}</View>
-        </View>
-      );
-    }
-  });
+  //         <View className="flex">
+  //           <InputRadioGroup
+  //             data={withdrawModeButtonData}
+  //             size="base"
+  //             onPressFn={(value) =>
+  //               handleSelectedModePress(cart.shop?.name, value)
+  //             }
+  //           />
+  //           {cart.withdrawMode === "market" && cart.market && (
+  //             <Market
+  //               key={cart.market._id}
+  //               marketData={cart.market}
+  //               extraClasses="mt-3"
+  //             />
+  //           )}
+  //         </View>
+  //         <View className="mt-3">{productsByShop}</View>
+  //       </View>
+  //     );
+  //   }
+  // });
 
-  console.log(
-    "------------------------------- WITHDRAWMODES --------------------------------------------------------------------",
-  );
-  console.log("cartStore:");
-  console.log(
-    "withdrawMode: ",
-    cartStore.find((cart) => cart.shop?._id === selectedShop?._id)
-      ?.withdrawMode,
-  );
-  console.log(
-    "withdrawMarket: ",
-    cartStore.find((cart) => cart.shop?._id === selectedShop?._id)
-      ?.withdrawMarket,
-  );
-  console.log(
-    "withdrawDay: ",
-    cartStore.find((cart) => cart.shop?._id === selectedShop?._id)?.withdrawDay,
-  );
-  console.log("cartStore complet :", JSON.stringify(cartStore[0], null, 2));
+  console.log("----------------- WITHDRAWMODES -----------------");
+  // console.log("cartStore:");
+  // console.log(
+  //   "withdrawMode: ",
+  //   cartStore.find((cart) => cart.shop?._id === selectedShop?._id)
+  //     ?.withdrawMode,
+  // );
+  // console.log(
+  //   "withdrawMarket: ",
+  //   cartStore.find((cart) => cart.shop?._id === selectedShop?._id)
+  //     ?.withdrawMarket,
+  // );
+  // console.log(
+  //   "withdrawDay: ",
+  //   cartStore.find((cart) => cart.shop?._id === selectedShop?._id)?.withdrawDay,
+  // );
+  // console.log("cartStore complet :", JSON.stringify(cartStore[0], null, 2));
 
   return (
     <SafeAreaView
@@ -324,11 +323,13 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
               {s.withdrawMarket && s.withdrawDay && (
                 <View className="px-1 mb-3">
                   <View className="flex flex-row bg-success rounded-lg px-2 py-1">
-                    <TextBody1 extraClasses="font-bold">Retrait: </TextBody1>
-                    <TextBody1>{s.withdrawMarket}, </TextBody1>
-                    <TextBody1>
+                    <Text className="text-lightbg">Retrait: </Text>
+                    <Text className="font-bold text-lightbg">
+                      {s.withdrawMarket},{" "}
+                    </Text>
+                    <Text className="font-bold text-lightbg">
                       {weekDays[s.withdrawDay - 1]} prochain
-                    </TextBody1>
+                    </Text>
                   </View>
                 </View>
               )}
@@ -355,13 +356,12 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
               </View>
             </View>
           ))}
-          {/* <TextHeading3 extraClasses="py-3 text-right">{`TOTAL : ${cartTotal.toFixed(2)}€`}</TextHeading3> */}
 
-          <View className="px-3 bg-night rounded-lg my-5">
+          <View className="px-3 bg-night/20 dark:bg-night rounded-lg my-5">
             <TextHeading3
               centered
               extraClasses="py-2"
-            >{`TOTAL: ${cartTotal?.toFixed(2)}€`}</TextHeading3>
+            >{`TOTAL: ${formatCentsToEuros(cartTotal)}`}</TextHeading3>
           </View>
         </ScrollView>
       </View>

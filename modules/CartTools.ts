@@ -1,54 +1,36 @@
 import { CartData, StockData } from "../types/API";
 
-const getProductTotal = (stockData: StockData, quantity: number) => {
+/* retourne le prix d'un produit en centimes en fonction de la quantité */
+export const getProductTotal = (
+  stockData: StockData,
+  quantity: number,
+): number => {
   const unit = stockData.product.weight.unit;
-  const priceInCents = Number(stockData.price);
-
   const qty = unit === "gr" ? quantity / 1000 : quantity;
 
-  return (priceInCents * qty) / 100;
+  return Math.round(stockData.price * qty);
 };
 
-const getShopSubtotal = (cartShop: CartData) => {
-  return cartShop.products.reduce((acc, item) => {
-    return acc + getProductTotal(item.stockData, item.quantity);
-  }, 0);
+/* retourne le total d'un shop en centimes */
+export const getShopSubtotal = (cartShop: CartData): number => {
+  return Math.round(
+    cartShop.products.reduce((acc, item) => {
+      return acc + getProductTotal(item.stockData, item.quantity);
+    }, 0),
+  );
 };
 
-/* return price in cents */
-const getCartTotal = (cartStore: CartData[]) => {
-  return cartStore.reduce((acc, shopCart) => {
-    return acc + getShopSubtotal(shopCart);
-  }, 0);
+/* retourne le montant total du panier en centimes */
+export const getCartTotal = (cartStore: CartData[]): number => {
+  return Math.round(
+    cartStore.reduce((acc, shopCart) => {
+      return acc + getShopSubtotal(shopCart);
+    }, 0),
+  );
 };
-
-const getCartTotalInCents = (cartStore: CartData[]) => {
-  return getCartTotal(cartStore) * 100;
-};
-
-// const getTotalCost = (cartStore: CartData[]) => {
-//   if (cartStore.length > 0) {
-//     let allShopCost = 0;
-//     cartStore.forEach((c) => {
-//       const cartTotalCost = c.products.reduce((accumulator, currentValue) => {
-//         // définit la quantité selon que le produit est vendu au kilo ou à la pièce
-//         const quantity =
-//           currentValue.stockData.product.weight.unit === "gr"
-//             ? currentValue.quantity / 1000
-//             : currentValue.quantity;
-
-//         return quantity * Number(currentValue.stockData.price) + accumulator;
-//       }, 0);
-//       allShopCost += cartTotalCost / 100;
-//     });
-//     return allShopCost;
-//   }
-// };
 
 export default {
   getProductTotal,
   getShopSubtotal,
   getCartTotal,
-  getCartTotalInCents,
-  // getTotalCost,
 };

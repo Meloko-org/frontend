@@ -539,7 +539,7 @@ const getMarketById = async (marketId: string): Promise<MarketData | null> => {
   donc les informations qui seront stockées dans le cartStore pour ne pas y stocker trop d'infos.
  */
 const getLightShop = (shop: ShopData): LightShopData => {
-  console.log("getShopLight :", shop);
+  // console.log("getShopLight :", shop);
   return {
     _id: shop!._id,
     name: shop!.name,

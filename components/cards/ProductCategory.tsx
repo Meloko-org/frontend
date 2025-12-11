@@ -25,7 +25,7 @@ export default function ProductCategory({
         className="w-full h-20 rounded-t-lg"
       />
       <View className="rounded-b-lg p-2">
-        <Text className="text-base font-bold dark:text-lightbg">
+        <Text className="text-base font-bold text-black dark:text-lightbg">
           {object.category.name}
         </Text>
         <Text className="text-xs uppercase dark:text-lightbg">

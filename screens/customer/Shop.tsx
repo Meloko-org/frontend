@@ -88,7 +88,7 @@ export default function ShopUserScreen({ navigation, route }: Props) {
     }
 
     (async () => {
-      const fullShopResponse = await shopTools.getFullShopById(shopId);
+      const fullShopResponse = await shopTools.getFullShopById(shopId!);
 
       if (fullShopResponse.success && fullShopResponse.data) {
         console.log("shop recovered");

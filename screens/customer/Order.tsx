@@ -1,6 +1,8 @@
 import React, { JSX, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import { useAuth } from "@clerk/clerk-expo";
+
 // import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 // import { RootStackParamList } from "../../types/Navigation";
 
@@ -23,6 +25,7 @@ import { OrderData } from "../../types/API";
 import shopTools from "../../modules/shopTools";
 import orderTools from "../../modules/orderTools";
 import Spinner from "../../components/utils/Spinner";
+import { SheetManager } from "react-native-actions-sheet";
 
 type OrderCustomerRouteProp = RouteProp<UserTabParamList, "OrderCustomer">;
 
@@ -42,10 +45,12 @@ export default function OrderCustomerScreen({
 }: Props): JSX.Element {
   const { orderId } = route.params;
 
+  const { getToken } = useAuth();
+
   const userStore = useSelector(
     (state: { user: UserState }) => state.user.value,
   );
-  const [newOrder, setNewOrder] = useState<OrderData | undefined>(undefined);
+  const [newOrder, setNewOrder] = useState<OrderData | null>(null);
 
   const weekDays = [
     "Lundi",
@@ -57,10 +62,33 @@ export default function OrderCustomerScreen({
     "Dimanche",
   ];
 
+  /* version 1 basée sur le userStore */
+  // useEffect(() => {
+  //   const newOrder = userStore.orders.find((o) => o._id === orderId);
+  //   setNewOrder(newOrder);
+  // }, [route.params, userStore.orders]);
+
+  /* version 2 basée sur le backend */
   useEffect(() => {
-    const newOrder = userStore.orders.find((o) => o._id === orderId);
-    setNewOrder(newOrder);
-  }, [route.params, userStore.orders]);
+    fetchOrder();
+  }, [route.params]);
+
+  const fetchOrder = async () => {
+    const token = await getToken();
+    const orderResponse = await orderTools.getUserOrderById(token, orderId);
+
+    if (!orderResponse.success && orderResponse.message) {
+      SheetManager.show("alert", {
+        payload: {
+          message: orderResponse.message,
+          alertType: "error",
+        },
+      });
+      return;
+    }
+
+    setNewOrder(orderResponse.data);
+  };
 
   let clickCollectOrdersDisplay: React.ReactNode = null;
   let marketOrdersDisplay: React.ReactNode = null;
@@ -199,6 +227,8 @@ export default function OrderCustomerScreen({
       </SafeAreaView>
     );
   }
+
+  console.log("------- ORDER ----------");
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
