@@ -240,7 +240,7 @@ function getOrderStatus(order: OrderData): GlobalOrderStatus {
   }
 
   if (uniqueStatuses.has("validated")) {
-    return "partialPending"; // Combinaison de validé et en attente
+    return "partialValidated"; // Combinaison de validé et en attente
   }
 
   if (uniqueStatuses.has("canceled")) {

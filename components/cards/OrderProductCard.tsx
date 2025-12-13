@@ -7,6 +7,8 @@ import PricePer from "../utils/badges/Dark";
 import TextHeading4 from "../utils/texts/Heading4";
 import TextBody2 from "../utils/texts/Body2";
 import { OrderData } from "../../types/API";
+import { formatCentsToEuros } from "../../modules/globalTools";
+import { getProductTotal } from "../../modules/CartTools";
 
 type OrderProductCardProps = {
   orderProductData?: OrderData["details"][0]["products"][0];
@@ -82,6 +84,12 @@ export default function OrderProductCard({
       );
     });
 
+  const productName = orderProductData?.product.productCustomName
+    ? orderProductData.product.productCustomName
+    : orderProductData?.product.product.family.name +
+      " " +
+      orderProductData?.product.product.name;
+
   const unit =
     orderProductData?.product.product.weight.unit === "gr" ? "kg" : "pièce";
 
@@ -102,7 +110,10 @@ export default function OrderProductCard({
       }}
     >
       <View className={`${extraClasses} relative`}>
-        <View className="rounded-lg border shadow-sm bg-white p-2 dark:bg-tertiary w-full">
+        <View
+          style={{ shadowColor: "#000" }}
+          className="rounded-lg shadow-lg bg-white p-2 dark:bg-tertiary w-full"
+        >
           <View className="flex flex-row items-center w-full">
             <View className="flex flex-row items-center rounded-lg w-1/5">
               <Image
@@ -123,14 +134,13 @@ export default function OrderProductCard({
 
             <View className="w-4/5 px-5 items-start">
               <View className="">
-                <TextHeading4
-                  centered
-                  extraClasses="mb-1"
-                >{`${orderProductData?.product.product.family.name + " " + orderProductData?.product.product.name}`}</TextHeading4>
+                <TextHeading4 centered extraClasses="mb-1">
+                  {productName}
+                </TextHeading4>
               </View>
               <View className="flex flex-row">
-                <PricePer extraClasses="h-7 mr-2">{`${orderProductData?.product.price + " € / " + unit}`}</PricePer>
-                <View className="flex-row flex-wrap">{tags}</View>
+                <PricePer extraClasses="h-7 mr-2">{`${formatCentsToEuros(orderProductData!.product.price) + "/" + unit}`}</PricePer>
+                <View className="flex-row flex-wrap flex-1">{tags}</View>
               </View>
               <View className="flex flex-row w-full justify-between mt-2">
                 <View className="flex flex-row items-center">
@@ -152,12 +162,12 @@ export default function OrderProductCard({
                   </View>
                   <View>
                     <TextBody1>
-                      {getPrice(
-                        orderProductData?.product.price!,
-                        orderProductData?.quantity!,
-                        orderProductData?.product.product.weight.unit!,
-                      )}{" "}
-                      €
+                      {formatCentsToEuros(
+                        getProductTotal(
+                          orderProductData!.product,
+                          orderProductData!.quantity,
+                        ),
+                      )}
                     </TextBody1>
                   </View>
                 </View>

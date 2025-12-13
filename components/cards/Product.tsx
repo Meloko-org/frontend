@@ -49,8 +49,8 @@ export default function CardProduct({
   showImage,
 }: CardProductProps): JSX.Element {
   console.log("----- PRODUCT CARD -----");
-  console.log("is stockData :", stockData !== undefined);
-  console.log(" is shopData :", shopData !== undefined);
+  // console.log("is stockData :", stockData !== undefined);
+  // console.log(" is shopData :", shopData !== undefined);
 
   const dispatch = useDispatch();
   const cartStore = useSelector(
@@ -68,8 +68,7 @@ export default function CardProduct({
     });
   };
 
-  const isBulk =
-    stockData?.product.family.productsTypes.includes("bulk") ?? false;
+  const isBulk = !!stockData?.product.family.productsTypes.includes("bulk");
 
   const productName = !isBulk
     ? stockData?.productCustomName
@@ -87,7 +86,8 @@ export default function CardProduct({
       <TouchableOpacity
         onPress={showProductDetailsBottomSheet}
         activeOpacity={0.8}
-        className={`${extraClasses} rounded-lg shadow-sm bg-white px-2 py-1 dark:bg-tertiary flex flex-row w-full`}
+        style={{ shadowColor: "#000" }}
+        className={`${extraClasses} rounded-lg shadow-md bg-white px-2 py-1 dark:bg-tertiary flex flex-row w-full`}
       >
         <View className="flex flex-row items-center w-full">
           <View className="flex flex-row w-4/5 items-center">

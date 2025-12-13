@@ -31,20 +31,21 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import stocksTools from "../../modules/stocksTools";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import { ProducerState } from "../../reducers/producer";
+import { getWithdrawModes, WithdrawMode } from "../../modules/shopTools";
 
-type ShopProducteurRouteProp = RouteProp<ProducerTabParamList, "ShopProducer">;
+type ShopProducerRouteProp = RouteProp<ProducerTabParamList, "ShopProducer">;
 
-type ShopProducteurNavProp = BottomTabNavigationProp<
+type ShopProducerNavProp = BottomTabNavigationProp<
   ProducerTabParamList,
   "ShopProducer"
 >;
 
 type Props = {
-  navigation: ShopProducteurNavProp;
-  route: ShopProducteurRouteProp;
+  navigation: ShopProducerNavProp;
+  route: ShopProducerRouteProp;
 };
 
-export default function ShopProducteurScreen({ navigation, route }: Props) {
+export default function ShopProducerScreen({ navigation, route }: Props) {
   const [description, setDescription] = useState<string>("");
 
   const { getToken } = useAuth();
@@ -62,6 +63,7 @@ export default function ShopProducteurScreen({ navigation, route }: Props) {
 
   const [shopData, setShopData] = useState(shopStore);
   const [hasZeroStock, setHasZeroStock] = useState<boolean | undefined>(false);
+  const [withdrawModes, setWithdrawModes] = useState<WithdrawMode[]>([]);
   const [isOnline, setIsOnline] = useState<boolean>(false);
 
   const fetchStocks = async (shopId: string) => {
@@ -80,6 +82,9 @@ export default function ShopProducteurScreen({ navigation, route }: Props) {
         setDescription(shopStore.shortDesc);
       }
       fetchStocks(shopStore._id);
+
+      // détermine les modes de retrait
+      setWithdrawModes(getWithdrawModes(shopStore));
     }
   }, []);
 
@@ -162,8 +167,14 @@ export default function ShopProducteurScreen({ navigation, route }: Props) {
           </View>
         </View>
 
-        <View className="flex flex-row items-center justify-center w-full mb-3">
-          <BadgeSecondary
+        <View className="flex flex-row items-center justify-around w-full mb-3">
+          {withdrawModes &&
+            withdrawModes.map((mode) => (
+              <BadgeSecondary key={mode.key} uppercase textClasses="text-xs">
+                {mode.label}
+              </BadgeSecondary>
+            ))}
+          {/* <BadgeSecondary
             uppercase
             textClasses="text-xs"
             extraClasses="px-1 mr-1"
@@ -183,7 +194,7 @@ export default function ShopProducteurScreen({ navigation, route }: Props) {
             extraClasses="px-1 mr-1"
           >
             livraison
-          </BadgeSecondary>
+          </BadgeSecondary> */}
         </View>
 
         <View className="flex flex-row mb-3">

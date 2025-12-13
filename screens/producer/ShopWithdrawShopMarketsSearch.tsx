@@ -88,7 +88,14 @@ export default function ShopWithdrawShopMarketsSearchScreen({
           return;
         }
 
-        setMarketsList(marketResponse.data);
+        if (marketResponse.data) {
+          const availableMarkets =
+            marketResponse.data?.filter(
+              (market) => !shopStore?.markets.some((m) => m._id === market._id),
+            ) ?? [];
+
+          setMarketsList(availableMarkets);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -140,6 +147,11 @@ export default function ShopWithdrawShopMarketsSearchScreen({
       console.log(error);
     }
   };
+
+  console.log(
+    "markets :",
+    shopStore?.markets.map((market) => market.market._id),
+  );
 
   return (
     <SafeAreaView

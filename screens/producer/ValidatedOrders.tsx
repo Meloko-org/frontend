@@ -102,38 +102,45 @@ export default function ValidatedOrdersScreen({ navigation, route }: Props) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <TopBar
-        backLabel={backLabel || "Retour au tableau"}
-        screen={from || "BusinessCenter"}
-        label={screenTitle || "COMMANDES\nVALIDEES"}
-        extraClasses="mt-2 mb-5"
-      />
-
-      <View className="px-3">
-        <FlatList
-          data={validatedOrders}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <OrderStatus
-              orderData={item}
-              extraClasses="mb-2"
-              onPressFn={() => {
-                console.log("clicked order: ", item?._id);
-                handlePressCard(item);
-              }}
-            />
-          )}
-          onEndReached={() => {
-            if (currentPage < totalPages) {
-              loadMoreOrders(); // fonction pour fetch page suivante
-            }
-          }}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={isLoading ? <Spinner /> : null}
-          refreshing={isRefreshing}
-          onRefresh={onRefresh}
+    <SafeAreaView
+      className="flex-1 bg-lightbg dark:bg-darkbg"
+      edges={["right", "left", "top"]}
+    >
+      <View style={{ flex: 1 }}>
+        <TopBar
+          backLabel={backLabel || "Retour au tableau"}
+          screen={from || "BusinessCenter"}
+          label={screenTitle || "COMMANDES\nVALIDEES"}
+          extraClasses="mt-2 mb-5"
         />
+      </View>
+
+      <View style={{ flex: 10 }}>
+        <View className="px-3 mb-5">
+          <FlatList
+            data={validatedOrders}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <OrderStatus
+                orderData={item}
+                extraClasses="mb-2"
+                onPressFn={() => {
+                  console.log("clicked order: ", item?._id);
+                  handlePressCard(item);
+                }}
+              />
+            )}
+            onEndReached={() => {
+              if (currentPage < totalPages) {
+                loadMoreOrders(); // fonction pour fetch page suivante
+              }
+            }}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={isLoading ? <Spinner /> : null}
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );

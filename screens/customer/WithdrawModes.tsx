@@ -336,7 +336,10 @@ export default function WithdrawModesScreen({ navigation, route }: Props) {
 
               <View className="mt-3 flex flex-row flex-wrap justify-center gap-x-2 gap-y-2 mb-3">
                 {s.products.map((p) => (
-                  <View className="flex flex-row items-center rounded-sm">
+                  <View
+                    key={p.stockData._id}
+                    className="flex flex-row items-center rounded-sm"
+                  >
                     <Image
                       source={
                         p.stockData.productCustomName

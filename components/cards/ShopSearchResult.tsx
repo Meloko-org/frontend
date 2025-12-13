@@ -41,11 +41,12 @@ export default function ShopSearchResultCard({
       //   }
     >
       <View
+        style={{ shadowColor: "#000" }}
         className={`
           ${extraClasses} 
           ${displayMode === "bottomSheet" || displayMode === "order" ? "rounded-lg p-1" : "p-2"} 
           ${isHighlighted ? "bg-primary/50" : " bg-white p-2 dark:bg-tertiary"} 
-          flex flex-row w-full shadow-xl/30`}
+          flex flex-row w-full shadow-md`}
       >
         <View className="flex flex-row items-center w-4/5">
           {displayMode !== "order" && (

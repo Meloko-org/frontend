@@ -74,6 +74,7 @@ export default function SelectMarketModal({
   }, [shop, isVisible]);
 
   console.log("---------------- SELECTMARKETMODAL ------------------------");
+  console.log("highlighted market ", highlightedMarket);
 
   return (
     <Modal

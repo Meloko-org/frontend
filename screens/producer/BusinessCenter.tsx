@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { OrdersState, setOrders } from "../../reducers/orders";
 import { ShopState } from "../../reducers/shop";
 
-import globalTools from "../../modules/globalTools";
+import globalTools, { formatCentsToEuros } from "../../modules/globalTools";
 import businessTools from "../../modules/businessTools";
 
 import { OrderSummary } from "../../types/API";
@@ -82,15 +82,17 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
   const [orderCount, setOrederCount] = useState(0);
 
   type Financials = {
-    revenus: number;
+    totalTTC: number;
+    totalHT: number;
+    totalVAT: number;
     commission: number;
-    tva: number;
   };
 
   const [financials, setFinancials] = useState<Financials>({
-    revenus: 0,
+    totalTTC: 0,
+    totalHT: 0,
+    totalVAT: 0,
     commission: 0,
-    tva: 0,
   });
 
   const getStartDate = (period: string) => {
@@ -187,7 +189,9 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
     const now = new Date();
 
     let count = 0;
-    let revenus = 0;
+    let totalTTC = 0;
+    let totalHT = 0;
+    let totalVAT = 0;
 
     ordersStore.forEach((order) => {
       const orderDate = new Date(order.createdAt);
@@ -198,18 +202,18 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
           end: now,
         })
       ) {
-        const price = order.detail.shopTotalPrice || 0;
+        totalTTC += order.detail.shopTotalTTC;
+        totalHT += order.detail.shopTotalHT;
+        totalVAT += order.detail.shopTotalVAT;
 
-        revenus += price;
         count++;
       }
       setOrederCount(count);
     });
 
-    const commission = revenus * 0.15;
-    const tva = revenus * 0.055; // ou adapte selon ta règle TVA
+    const commission = totalHT * 0.15;
 
-    setFinancials({ revenus, commission, tva });
+    setFinancials({ totalTTC, totalHT, totalVAT, commission });
   }, [ordersStore, selectedPeriod]);
 
   const handleScan = (orderId: string) => {
@@ -227,7 +231,7 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <TextHeading3
         centered
-        extraClasses="mb-5 mt-2"
+        extraClasses="mb-4 mt-2"
       >{`Tableau de bord`}</TextHeading3>
 
       <ScrollView
@@ -238,30 +242,35 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
           <Spinner />
         ) : (
           <>
-            <View className="mb-3">
-              <TextBody1 centered extraClasses="mb-1">
-                Dernière commande :
-              </TextBody1>
-              <View className="flex-row items-center rounded-lg bg-white dark:bg-tertiary py-1 px-2 space-around w-full mb-3">
-                <View className="flex-none">
-                  <TextBody1>
-                    {lastOrder?.user.firstname + " " + lastOrder?.user.lastname}
-                  </TextBody1>
-                </View>
-                <View className="grow">
-                  <TextBody1 centered>
-                    {globalTools.formatDateToFr(lastOrder?.createdAt!)}
-                  </TextBody1>
-                </View>
-                <View className="flex-none">
-                  <TextBody1>
-                    {lastOrder?.detail.shopTotalPrice + " €"}
-                  </TextBody1>
+            {lastOrder && (
+              <View className="mb-2">
+                <TextBody1 centered extraClasses="mb-1">
+                  Dernière commande :
+                </TextBody1>
+                <View
+                  style={{ shadowColor: "#000" }}
+                  className="flex-row items-center rounded-lg shadow-sm bg-white dark:bg-tertiary py-1 px-2 space-around w-full mb-3"
+                >
+                  <View className="flex-none">
+                    <TextBody1>
+                      {lastOrder.user.firstname + " " + lastOrder.user.lastname}
+                    </TextBody1>
+                  </View>
+                  <View className="grow">
+                    <TextBody1 centered>
+                      {globalTools.formatDateToFr(lastOrder.createdAt!)}
+                    </TextBody1>
+                  </View>
+                  <View className="flex-none">
+                    <TextBody1>
+                      {formatCentsToEuros(lastOrder.detail.shopTotalTTC)}
+                    </TextBody1>
+                  </View>
                 </View>
               </View>
-            </View>
+            )}
 
-            <View className="mb-5">
+            <View className="mb-4">
               <OpenScreenButton
                 label="Commandes en attente"
                 notice={pendingOrders.length.toString()}
@@ -328,17 +337,17 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
               /> */}
             </View>
 
-            <View className="px-3">
+            <View className="px-3 mb-4">
               <ButtonPrimaryEnd
                 label="Scanner QR Code"
                 iconName="qrcode"
                 onPressFn={() => setScannerVisible(true)}
-                extraClasses="mb-3 h-14"
+                extraClasses="h-14"
               />
             </View>
 
-            <View className="mt-5">
-              <View className="flex flex-row items-center mb-3">
+            <View className="">
+              <View className="flex flex-row items-center mb-2">
                 <View className="w-[40%]">
                   <TextHeading3 centered extraClasses="my-1">
                     Finances
@@ -363,12 +372,25 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
 
               <View className="flex flex-row items-center px-4">
                 <View className="w-[70%]">
-                  <TextBody1 extraClasses="my-1">Nombre de commandes</TextBody1>
+                  <TextBody1 extraClasses="">Nombre de commandes</TextBody1>
                 </View>
                 <View className="w-[30%]">
                   <View className="flex items-end">
                     <TextHeading4 extraClasses="text-right">
                       {orderCount}
+                    </TextHeading4>
+                  </View>
+                </View>
+              </View>
+
+              <View className="flex flex-row items-center px-4">
+                <View className="w-[50%]">
+                  <TextBody1 extraClasses="">Chiffre d'affaire TTC</TextBody1>
+                </View>
+                <View className="w-[50%]">
+                  <View className="flex items-end">
+                    <TextHeading4 extraClasses="text-right">
+                      {formatCentsToEuros(financials.totalTTC)}
                     </TextHeading4>
                   </View>
                 </View>
@@ -383,20 +405,7 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
                 <View className="w-[50%]">
                   <View className="flex items-end">
                     <TextHeading4 extraClasses="text-right">
-                      {financials.revenus.toFixed(2)} €
-                    </TextHeading4>
-                  </View>
-                </View>
-              </View>
-
-              <View className="flex flex-row items-center px-4">
-                <View className="w-[50%]">
-                  <TextBody1 extraClasses="my-1">Commission Meloko</TextBody1>
-                </View>
-                <View className="w-[50%]">
-                  <View className="flex items-end">
-                    <TextHeading4 extraClasses="text-right">
-                      {financials.commission.toFixed(2)} €
+                      {formatCentsToEuros(financials.totalHT)}
                     </TextHeading4>
                   </View>
                 </View>
@@ -409,7 +418,35 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
                 <View className="w-[50%]">
                   <View className="flex items-end">
                     <TextHeading4 extraClasses="text-right">
-                      {financials.tva.toFixed(2)} €
+                      {formatCentsToEuros(financials.totalVAT)}
+                    </TextHeading4>
+                  </View>
+                </View>
+              </View>
+
+              <View className="flex flex-row items-center px-4">
+                <View className="w-[50%]">
+                  <TextBody1 extraClasses="my-1">Commission Meloko</TextBody1>
+                </View>
+                <View className="w-[50%]">
+                  <View className="flex items-end">
+                    <TextHeading4 extraClasses="text-right">
+                      {formatCentsToEuros(financials.commission)}
+                    </TextHeading4>
+                  </View>
+                </View>
+              </View>
+
+              <View className="flex flex-row items-center px-4">
+                <View className="w-[50%]">
+                  <TextBody1 extraClasses="my-1">CA - Commission</TextBody1>
+                </View>
+                <View className="w-[50%]">
+                  <View className="flex items-end">
+                    <TextHeading4 extraClasses="text-right">
+                      {formatCentsToEuros(
+                        financials.totalHT - financials.commission,
+                      )}
                     </TextHeading4>
                   </View>
                 </View>

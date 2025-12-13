@@ -17,6 +17,7 @@ import { SheetManager } from "react-native-actions-sheet";
 
 import { Alert } from "react-native";
 import ButtonPrimaryEnd from "./PrimaryEnd";
+import { formatCentsToEuros } from "../../../modules/globalTools";
 
 type StripPaymentButtonProps = {
   label: string;
@@ -25,7 +26,7 @@ type StripPaymentButtonProps = {
   lastname: string;
   billingAddress: UserAddressData;
   shippingAddress: UserAddressData;
-  totalCartAmount: number | undefined;
+  totalCartAmount: number;
   navigation: BottomTabNavigationProp<UserTabParamList>;
   disabled: boolean;
   extraClasses?: string;
@@ -116,8 +117,8 @@ export default function StripePaymentButton({
         return;
       } else {
         dispatch(emptyCart());
-        await fetchData();
-        navigation.navigate("OrderCustomer", {
+        // await fetchData();
+        navigation.jumpTo("OrderCustomer", {
           orderId: order._id,
         });
       }
@@ -272,7 +273,7 @@ export default function StripePaymentButton({
     >
       <ButtonPrimaryEnd
         disabled={disabled || isPaymentScreenLoading}
-        label={label}
+        label={`Payer ${formatCentsToEuros(totalCartAmount)}`}
         iconName={iconName}
         onPressFn={() => openPaymentSheet()}
         isLoading={isPaymentScreenLoading}

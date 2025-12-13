@@ -21,11 +21,12 @@ import CardProducer from "../../components/cards/ProducerSearchResult";
 import ButtonPrimaryEnd from "../../components/utils/buttons/PrimaryEnd";
 import CardProduct from "../../components/cards/Product";
 import { UserState } from "../../reducers/user";
-import { OrderData } from "../../types/API";
+import { OrderData, ShopData } from "../../types/API";
 import shopTools from "../../modules/shopTools";
 import orderTools from "../../modules/orderTools";
 import Spinner from "../../components/utils/Spinner";
 import { SheetManager } from "react-native-actions-sheet";
+import { formatCentsToEuros } from "../../modules/globalTools";
 
 type OrderCustomerRouteProp = RouteProp<UserTabParamList, "OrderCustomer">;
 
@@ -44,6 +45,9 @@ export default function OrderCustomerScreen({
   navigation,
 }: Props): JSX.Element {
   const { orderId } = route.params;
+
+  console.log("------- ORDER ----------");
+  console.log("order id :", orderId);
 
   const { getToken } = useAuth();
 
@@ -125,32 +129,38 @@ export default function OrderCustomerScreen({
             extraClasses="mb-1"
             displayMode="order"
             showDirectionButton
-            onPressFn={() => {
-              navigation.navigate("ShopUser", {
-                shopId: cco.shop!._id,
-                distance: undefined,
-                relevantProducts: [],
-                sheetId: undefined,
-              });
-            }}
+            onPressFn={() => handleProducerPress(cco.shop)}
+            // onPressFn={() => {
+            //   navigation.navigate("ShopUser", {
+            //     shopId: cco.shop!._id,
+            //     distance: undefined,
+            //     relevantProducts: [],
+            //     sheetId: undefined,
+            //   });
+            // }}
           />
           {productList}
-          <View className="flex flex-row items-center rounded-lg py-1 px-4 bg-white dark:bg-tertiary w-full mb-2">
+
+          <View
+            style={{ shadowColor: "#000" }}
+            className="flex flex-row items-center rounded-lg py-1 px-4 bg-white dark:bg-tertiary w-full mb-5 shadow-md"
+          >
             <View>
               <TextBody1>Retrait:</TextBody1>
             </View>
             <View className="pl-3">
-              <TextHeading4>ClickAndCollect</TextHeading4>
+              <TextHeading4>Click And Collect</TextHeading4>
             </View>
           </View>
-          <View className="flex flex-row justify-around rounded-lg p-1 bg-succes dark:bg-success  w-full">
+
+          <View className="flex flex-row justify-around items-center rounded-lg p-1 bg-withdrawn dark:bg-success w-full mb-5">
             <View className="px-2">
-              <TextBody1>Montant:</TextBody1>
+              <Text className="text-white text-md">Montant:</Text>
             </View>
             <View>
-              <TextHeading4>
-                {orderTools.getPriceInEuros(cco.shopTotalTTC).toFixed(2)} €
-              </TextHeading4>
+              <Text className="text-white text-xl font-bold">
+                {formatCentsToEuros(cco.shopTotalTTC)}
+              </Text>
             </View>
           </View>
         </View>
@@ -180,17 +190,22 @@ export default function OrderCustomerScreen({
             extraClasses="mb-1"
             displayMode="order"
             showDirectionButton
-            onPressFn={() => {
-              navigation.navigate("ShopUser", {
-                shopId: mo.shop!._id,
-                distance: undefined,
-                relevantProducts: [],
-                sheetId: undefined,
-              });
-            }}
+            onPressFn={() => handleProducerPress(mo.shop)}
+            // onPressFn={() => {
+            //   navigation.navigate("ShopUser", {
+            //     shopId: mo.shop!._id,
+            //     distance: undefined,
+            //     relevantProducts: [],
+            //     sheetId: undefined,
+            //   });
+            // }}
           />
           {productList}
-          <View className="flex flex-row mb-2 rounded-lg p-1 bg-white dark:bg-tertiary  w-full">
+
+          <View
+            style={{ shadowColor: "#000" }}
+            className="flex flex-row mb-5 rounded-lg p-1 bg-white dark:bg-tertiary w-full shadow-md"
+          >
             <View className="px-4">
               <TextBody1>Retrait:</TextBody1>
             </View>
@@ -203,14 +218,15 @@ export default function OrderCustomerScreen({
               </View>
             </View>
           </View>
-          <View className="flex flex-row justify-around rounded-lg p-1 bg-succes dark:bg-success w-full">
+
+          <View className="flex flex-row justify-around items-center rounded-lg p-1 bg-success dark:bg-success w-full">
             <View className="px-2">
-              <TextBody1>Montant:</TextBody1>
+              <Text className="text-white text-md">Montant:</Text>
             </View>
             <View>
-              <TextHeading4>
-                {orderTools.getPriceInEuros(mo.shopTotalTTC).toFixed(2)} €
-              </TextHeading4>
+              <Text className="text-white text-xl font-bold">
+                {formatCentsToEuros(mo.shopTotalTTC)}
+              </Text>
             </View>
           </View>
         </View>
@@ -228,7 +244,16 @@ export default function OrderCustomerScreen({
     );
   }
 
-  console.log("------- ORDER ----------");
+  const handleProducerPress = (shop: ShopData) => {
+    SheetManager.show("shop-details", {
+      payload: {
+        shop,
+        showButtons: true,
+      },
+    });
+  };
+
+  console.log("DATA ORDER :", JSON.stringify(newOrder, null, 2));
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -244,8 +269,13 @@ export default function OrderCustomerScreen({
           centered
           extraClasses="mb-4"
         >{`Commande n° ${newOrder?.invoiceNumber}`}</TextHeading4>
-        <View className="rounded-lg bg-danger p-3 mb-3">
-          <Text className="font-bold text-white text-center text-[20px]">{`Montant total: ${orderTools.getPriceInEuros(newOrder!.totalTTC).toFixed(2)} €`}</Text>
+        <View
+          style={{ shadowColor: "#000" }}
+          className="rounded-lg bg-danger p-3 mb-3"
+        >
+          <Text className="font-bold text-white text-center text-[20px]">
+            {`Montant total: ${formatCentsToEuros(newOrder.totalTTC)}`}
+          </Text>
         </View>
 
         <ScrollView

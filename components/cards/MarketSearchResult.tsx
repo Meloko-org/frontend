@@ -31,7 +31,11 @@ export default function MarketSearchResultCard({
   return (
     <TouchableOpacity onPress={onPressFn}>
       <View
-        className={`${extraClasses} rounded-lg ${isHighlighted ? "bg-primary/50" : " bg-white dark:bg-tertiary"} p-1 flex flex-row w-full`}
+        style={{ shadowColor: "#000" }}
+        className={`
+          ${extraClasses} 
+          ${isHighlighted ? "bg-primary/50" : " bg-white dark:bg-tertiary"} 
+          p-1 rounded-lg flex flex-row w-full shadow-md`}
       >
         <View className="flex flex-row items-center">
           <View className="flex flex-row items-center rounded-sm w-1/4">

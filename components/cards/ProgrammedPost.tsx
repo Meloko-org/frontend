@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ValidatePostData } from "../../types/API";
 import globalTools from "../../modules/globalTools";
 
-import { TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
 import TextBody2 from "../utils/texts/Body2";
 import TextBody1 from "../utils/texts/Body1";
@@ -42,11 +42,12 @@ export default function ProgrammedPostCard({
 
   return (
     <TouchableOpacity
-      className={`${extraClasses} border rounded-lg bg-lightbg dark:bg-tertiary border-lightbg dark:border-darkbg`}
+      style={{ shadowColor: "#000" }}
+      className={`${extraClasses} border rounded-lg shadow-lg bg-white dark:bg-tertiary border-lightbg dark:border-darkbg`}
       onPress={onPressFn}
     >
       <View className={`bg-${postColor} h-8 flex justify-center rounded-t-lg`}>
-        <TextBody2 extraClasses="font-bold ml-2">{postLabel}</TextBody2>
+        <Text className="font-bold text-white ml-2">{postLabel}</Text>
       </View>
 
       <View className="flex flex-row">

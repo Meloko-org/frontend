@@ -101,15 +101,21 @@ export default function PendingOrdersScreen({ navigation, route }: Props) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <TopBar
-        backLabel={backLabel || "Retour au tableau"}
-        screen={from || "BusinessCenter"}
-        label={screenTitle || "COMMANDES\nEN ATTENTE"}
-        extraClasses="mt-2 mb-5"
-      />
+    <SafeAreaView
+      className="flex-1 bg-lightbg dark:bg-darkbg"
+      edges={["right", "left", "top"]}
+    >
+      <View style={{ flex: 1 }}>
+        <TopBar
+          backLabel={backLabel || "Retour au tableau"}
+          screen={from || "BusinessCenter"}
+          label={screenTitle || "COMMANDES\nEN ATTENTE"}
+          extraClasses="mt-2 mb-5"
+        />
+      </View>
 
-      <View className="px-3">
+      <View style={{ flex: 10 }} className="">
+        {/* <View className="w-full"> */}
         <FlatList
           data={pendingOrders}
           keyExtractor={(item) => item._id}
@@ -129,10 +135,12 @@ export default function PendingOrdersScreen({ navigation, route }: Props) {
             }
           }}
           onEndReachedThreshold={0.5}
+          contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12 }}
           ListFooterComponent={isLoading ? <Spinner /> : null}
           refreshing={isRefreshing}
           onRefresh={onRefresh}
         />
+        {/* </View> */}
       </View>
     </SafeAreaView>
   );

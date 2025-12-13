@@ -117,7 +117,10 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
           </View>
 
           <View className="flex flex-row w-full justify-between mt-2">
-            <View className="flex flex-row items-center rounded-lg bg-white dark:bg-tertiary py-2 px-5 mb-2">
+            <View
+              style={{ shadowColor: "#000" }}
+              className="flex flex-row shadow-md items-center rounded-lg bg-white dark:bg-tertiary py-2 px-5 mb-2"
+            >
               <Text className="text-black dark:text-white">Status : </Text>
               <OrderStatusBadge
                 status={cco.status}
@@ -175,7 +178,7 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
           <CardProducer
             shopData={mo.shop}
             withdrawData={mo.products}
-            extraClasses="mb-1"
+            extraClasses="mb-3"
             displayMode="order"
             showDirectionButton={false}
             onPressFn={() => {
@@ -188,7 +191,7 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
             }}
           />
 
-          <View className="flex flex-row items-center rounded-lg px-3 py-1 bg-premiumbg mb-1">
+          <View className="flex flex-row items-center rounded-lg px-3 py-1 bg-premiumbg mb-3">
             <View className="w-5/6">
               <View className="flex flex-row items-center">
                 <View className="">
@@ -224,7 +227,7 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
             </View>
           </View>
 
-          <View className="w-full divide-y divide-dashed divide-black dark:divide-white mt-1">
+          <View className="w-full divide-y divide-dashed divide-black dark:divide-white mb-2">
             <View className="mb-1">{productList}</View>
             <View className="flex flex-row justify-between w-full px-1 pt-1">
               <View>
@@ -238,8 +241,11 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
             </View>
           </View>
 
-          <View className="flex flex-row w-full justify-between mb-2">
-            <View className="flex flex-row items-center rounded-lg bg-white dark:bg-tertiary py-2 px-5 mb-2">
+          <View className="flex flex-row w-full justify-between mb-3">
+            <View
+              style={{ shadowColor: "#000" }}
+              className="flex flex-row shadow-md items-center rounded-lg bg-white dark:bg-tertiary py-2 px-5 mb-2"
+            >
               <Text className="text-black dark:text-white">Status : </Text>
               <OrderStatusBadge
                 status={mo.status}

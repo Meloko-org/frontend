@@ -2,10 +2,12 @@ import React, { useCallback } from "react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/Navigation";
-import { useFocusEffect, useRoute } from "@react-navigation/native";
-import { RouteProp } from "@react-navigation/native";
+import {
+  ProducerTabParamList,
+  RootStackParamList,
+} from "../../types/Navigation";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 
 import { View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,12 +21,12 @@ import { SheetManager } from "react-native-actions-sheet";
 import Spinner from "../../components/utils/Spinner";
 
 type ProgrammedPostsScreenRouteProp = RouteProp<
-  RootStackParamList,
+  ProducerTabParamList,
   "ProgrammedPosts"
 >;
 
-type ProgrammedPostsScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+type ProgrammedPostsScreenNavigationProp = BottomTabNavigationProp<
+  ProducerTabParamList,
   "ProgrammedPosts"
 >;
 

@@ -17,7 +17,6 @@ const FontAwesome = _Fontawesome as unknown as React.ElementType;
 
 type CardMarketProps = {
   marketData: MarketData;
-  // openingHoursData?: OpeningHoursData;
   openingHoursData?: OpeningHourData[];
   isActiveData?: boolean;
   onPressFn?: ((arg0: MarketData) => void) | undefined;
@@ -53,7 +52,6 @@ type CardMarketProps = {
 
 export default function Market(props: CardMarketProps): JSX.Element {
   const [isHighlighted, setHighlighted] = useState(false);
-  // const [isRadioHighlighted, setRadioHighlighted] = useState<boolean>(false)
 
   const [marketInfos, setMarketInfos] = useState<{
     market: MarketData;
@@ -65,8 +63,17 @@ export default function Market(props: CardMarketProps): JSX.Element {
     openingHours: props.openingHoursData?.length ? props.openingHoursData : [],
   });
 
-  // console.log()
-  // console.log("------------------------------- MARKETS --------------------------------------------------------------------");
+  const highlightClassForOuter = props.radioButtonMode
+    ? isHighlighted || props.isRadioButtonActive
+      ? "bg-primary"
+      : ""
+    : "";
+
+  const highlightClassForInner = !props.radioButtonMode
+    ? isHighlighted || props.isRadioButtonActive
+      ? "bg-primary"
+      : ""
+    : "";
 
   useEffect(() => {
     if (props.isActiveData) {
@@ -103,6 +110,7 @@ export default function Market(props: CardMarketProps): JSX.Element {
   const handleHighlight = () => {
     /* si Market est utilisé en mode withdraw */
     if (props.radioButtonMode) {
+      console.log("radio Mode");
       props.onRadioButtonPress && props.onRadioButtonPress();
     } else {
       /* si Market est utilisé pour paramétrer le shop */
@@ -137,7 +145,8 @@ export default function Market(props: CardMarketProps): JSX.Element {
   // console.log("marketInfos.open :", JSON.stringify(marketInfos.openingHours, null, 2))
   // console.log("marketInfos :", JSON.stringify(marketInfos, null, 2))
   // console.log("marketInfos :",marketInfos)
-  // console.log("isHighlighted:", isHighlighted)
+  console.log("radioButtonMode :", props.radioButtonMode);
+  console.log("isHighlighted:", isHighlighted);
 
   return (
     <TouchableOpacity
@@ -146,12 +155,21 @@ export default function Market(props: CardMarketProps): JSX.Element {
           ? handleHighlight()
           : props.onPressFn && props.onPressFn(props.marketData)
       }
+      style={{ shadowColor: "#000" }}
+      className={`
+          ${props.extraClasses}
+          rounded-lg shadow-md bg-white dark:bg-tertiary
+        `}
     >
       <View
-        className={`${props.extraClasses} flex rounded-lg p-2 shadow-lg w-full bg-white dark:bg-tertiary  `}
+        className={`
+          ${props.radioButtonMode && (isHighlighted || props.isRadioButtonActive) ? "bg-primary" : ""} 
+          flex rounded-lg p-2 w-full`}
       >
         <View
-          className={`${isHighlighted || props.isRadioButtonActive ? "bg-primary" : ""} flex flex-row w-full p-1 rounded-lg mb-2 items-center`}
+          className={`
+            ${!props.radioButtonMode && (isHighlighted || props.isRadioButtonActive) ? "bg-primary" : ""} 
+            flex flex-row w-full p-1 rounded-lg mb-2 items-center`}
         >
           <View className="flex-none justify-center rounded-lg mr-1">
             <Image

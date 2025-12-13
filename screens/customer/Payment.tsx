@@ -69,22 +69,13 @@ export default function PaymentCustomerScreen({
       userStore.addresses.find((adr) => adr.isDefault === true);
 
     if (defaultAddress) setBillingAddress(defaultAddress);
-  }, []);
+  }, [userStore]);
 
   useEffect(() => {
     setCartTotal(getCartTotal(cartStore));
   }, [cartStore]);
 
   console.log("------------- PAYMENTSCREEN ------------------------------");
-  // console.log(
-  //   "cartStore :",
-  //   JSON.stringify(
-  //     cartStore.map((c) => c.products),
-  //     null,
-  //     2,
-  //   ),
-  // );
-  // console.log("cartStore user :", JSON.stringify(cartStore, null, 2))
   console.log("cartTotal :", cartTotal);
 
   return (

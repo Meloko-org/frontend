@@ -552,6 +552,41 @@ const getLightShop = (shop: ShopData): LightShopData => {
   };
 };
 
+export type WithdrawMode = {
+  key: "clickCollect" | "market" | "shipping";
+  label: string;
+};
+
+export const getWithdrawModes = (shop: ShopData): Array<WithdrawMode> => {
+  const withdrawModes: WithdrawMode[] = [];
+
+  // teste le mode de retrait "click & collect"
+  if (shop?.clickCollect && Object.keys(shop?.clickCollect).length > 0) {
+    withdrawModes.push({
+      key: "clickCollect",
+      label: "Click & collect",
+    });
+  }
+
+  // teste le mode de retrait "market"
+  if (shop?.markets && shop.markets.length > 0) {
+    withdrawModes.push({
+      key: "market",
+      label: "Points de vente",
+    });
+  }
+
+  // teste le mode de retrait "shipping"
+  if (shop?.shipping && shop?.shipping === true) {
+    withdrawModes.push({
+      key: "shipping",
+      label: "Livraison",
+    });
+  }
+
+  return withdrawModes;
+};
+
 export default {
   updateShop,
   createOrUpdateShop,
@@ -567,4 +602,5 @@ export default {
   updateShopMarkets,
   getMarketById,
   getLightShop,
+  getWithdrawModes,
 };

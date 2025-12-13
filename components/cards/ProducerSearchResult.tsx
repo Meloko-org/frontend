@@ -44,10 +44,11 @@ export default function ShopSearchResultCard({
   return (
     <TouchableOpacity onPress={onPressFn}>
       <View
+        style={{ shadowColor: "#000" }}
         className={`
           ${extraClasses} 
-          ${displayMode === "bottomSheet" || displayMode === "order" ? "rounded-lg shadow-sm bg-white p-2 dark:bg-tertiary" : "p-2"} 
-          flex flex-row w-full`}
+          ${displayMode === "bottomSheet" || displayMode === "order" ? "rounded-lg bg-white p-2 dark:bg-tertiary" : "p-2"} 
+          flex flex-row w-full shadow-md`}
       >
         <View className="flex flex-row items-center w-4/5">
           {displayMode !== "order" && (

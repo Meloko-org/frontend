@@ -45,6 +45,7 @@ type OrderData = {
       shopTotalHT: number;
       shopTotalVAT: number;
       shopTotalTTC: number;
+      shopInvoiceNumber: number;
       status: string;
     },
   ];
@@ -409,7 +410,9 @@ type OrderSummary = {
   };
   detail: {
     status: string;
-    shopTotalPrice: number;
+    shopTotalTTC: number;
+    shopTotalHT: number;
+    shopTotalVAT: number;
   };
 };
 

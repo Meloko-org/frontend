@@ -4,9 +4,9 @@ import { ShopState } from "../../reducers/shop";
 import { OrderData } from "../../types/API";
 import { useColorScheme } from "nativewind";
 
-import globalTools from "../../modules/globalTools";
+import globalTools, { formatCentsToEuros } from "../../modules/globalTools";
 
-import { TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View, Text } from "react-native";
 import TextHeading4 from "../utils/texts/Heading4";
 import TextBody1 from "../utils/texts/Body1";
 import OrderStatusBadge from "../utils/badges/OrderStatus";
@@ -27,8 +27,6 @@ export default function OrderStatus({
   onPressFn,
   extraClasses,
 }: OrderStatusProps): JSX.Element {
-  const { colorScheme, toggleColorScheme } = useColorScheme();
-
   const shopStore = useSelector(
     (state: { shop: ShopState }) => state.shop.value,
   );
@@ -37,12 +35,11 @@ export default function OrderStatus({
     (detail) => detail?.shop?.toString() === shopStore?._id.toString(),
   );
 
-  // console.log("orderData :", JSON.stringify(orderData, null, 2));
-
   return (
     <TouchableOpacity onPress={() => onPressFn && onPressFn()}>
       <View
-        className={`${extraClasses} rounded-lg border bg-white dark:bg-tertiary p-2`}
+        style={{ shadowColor: "#000" }}
+        className={`${extraClasses} rounded-lg shadow-lg bg-white dark:bg-tertiary p-2`}
       >
         <View className="mb-1 bg-lightbg dark:bg-darkbg rounded-lg pb-1">
           <TextHeading4 centered>
@@ -52,12 +49,12 @@ export default function OrderStatus({
 
         <View className="flex flex-row items-center justify-between w-full mb-1">
           <View>
-            <BlackBadge extraClasses="py-1 px-2">{`N°${orderData?._id.slice(0, 7)}`}</BlackBadge>
+            <BlackBadge extraClasses="py-1 px-2">{`N°${orderData?.invoiceNumber}`}</BlackBadge>
           </View>
           <View className="">
-            <TextBody1 extraClasses="" textClasses="text-right">
+            <Text className="text-black dark:text-lightbg text-right">
               {globalTools.formatDateToFr(orderData?.createdAt)}
-            </TextBody1>
+            </Text>
           </View>
         </View>
 
@@ -86,7 +83,7 @@ export default function OrderStatus({
               <BadgeSecondary
                 extraClasses="px-2"
                 textClasses="font-bold"
-              >{`${shopDetails?.shopTotalPrice} €`}</BadgeSecondary>
+              >{`${formatCentsToEuros(shopDetails!.shopTotalTTC)}`}</BadgeSecondary>
             </View>
             <OrderStatusBadge
               extraClasses="py-1 px-1"

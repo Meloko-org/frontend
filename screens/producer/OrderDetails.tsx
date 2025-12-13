@@ -108,12 +108,12 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
   const getProductsFromOrder = (order: OrderData) => {
     const orderDetail = order.details[0];
 
-    if (orderDetail.withdrawMode === "market") {
-      setWithdrawMarket(orderDetail.withdrawMarket);
-      setWithdrawDay(
-        globalTools.getWeekDayLabel(Number(orderDetail.withdrawDay)),
-      );
-    }
+    // if (orderDetail.withdrawMode === "market") {
+    //   setWithdrawMarket(orderDetail.withdrawMarket);
+    //   setWithdrawDay(
+    //     globalTools.getWeekDayLabel(Number(orderDetail.withdrawDay)),
+    //   );
+    // }
 
     const orderProductsCards = orderDetail.products.map((product) => (
       <OrderProductCard
@@ -283,7 +283,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
             <View className="px-3">
               <OrderStatus orderData={order} status={status} />
 
-              {withdrawMarket && withdrawDay && (
+              {/* {withdrawMarket && withdrawDay && (
                 <View className="rounded-lg border bg-white dark:bg-tertiary p-2">
                   <View className="flex flex-row w-full items-center">
                     <View className="w-2/6">
@@ -302,7 +302,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                     </View>
                   </View>
                 </View>
-              )}
+              )} */}
 
               <View className="mt-5 mb-2">
                 <TextBody1 centered>Détail</TextBody1>
