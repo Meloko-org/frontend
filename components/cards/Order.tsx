@@ -40,7 +40,8 @@ export default function CardOrder(props: CardOrderProps): JSX.Element {
       onPress={(value) => props.onPressFn && props.onPressFn(value)}
     >
       <View
-        className={`${props.extraClasses} rounded-lg shadow-sm bg-white p-2 w-full dark:bg-tertiary`}
+        style={{ shadowColor: "#000" }}
+        className={`${props.extraClasses} shadow-lg rounded-lg bg-white p-2 dark:bg-tertiary`}
       >
         <View className="mb-2">
           <TextHeading4>{`Commande n° ${props.orderData.invoiceNumber}`}</TextHeading4>

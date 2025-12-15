@@ -92,7 +92,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
           },
         });
 
-        navigation.navigate(from);
+        navigation.navigate(from as never);
       } else {
         setOrder(orderResponse.data!);
         // mise à jour du status

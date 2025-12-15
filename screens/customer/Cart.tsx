@@ -68,7 +68,7 @@ export default function CartScreen({ navigation }: Props) {
           stockData={p.stockData}
           shopData={cart.shop}
           key={p.stockData._id}
-          extraClasses="mb-2"
+          extraClasses="mb-2 mx-3"
           displayMode="cart"
           quantity={p.quantity}
           quantityControllable
@@ -83,7 +83,7 @@ export default function CartScreen({ navigation }: Props) {
       <View className="mb-5" key={cart.shop?._id}>
         <TextHeading4
           centered
-          extraClasses="mb-2 pb-1 bg-night/20 dark:bg-night rounded-lg"
+          extraClasses="mb-2 mx-3 pb-1 bg-night/20 dark:bg-night rounded-lg"
         >
           {cart.shop?.name}
         </TextHeading4>
@@ -108,13 +108,14 @@ export default function CartScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <View className="p-3 flex flex-column h-full">
+      <View className="flex flex-column h-full">
         {products.length > 0 ? (
           <>
-            <TextHeading2 extraClasses="mb-5" centered>
-              Mon panier
-            </TextHeading2>
-            <ScrollView>
+            <ScrollView className="px-3 mb-5">
+              <TextHeading2 extraClasses="mb-5" centered>
+                Mon panier
+              </TextHeading2>
+
               {products}
               <View className="px-3 bg-night/20 dark:bg-night rounded-lg my-5">
                 <TextHeading3

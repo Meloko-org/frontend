@@ -216,13 +216,10 @@ export default function ProducerProfileScreen({ navigation, route }: Props) {
     dispatch(changeMode(displayMode));
   };
 
-  console.log(
-    "---------------------------------- PRODUCER --------------------------------------------------------------------",
-  );
-  console.log("USERSTORE -> ", userStore);
-  console.log("PRODUCERSTORE -> ", producerStore);
-  console.log("SHOPSTORE -> ", shopStore?.isPremium);
-  console.log("");
+  console.log("------------ PRODUCER PROFILE -------------");
+  console.log("userStore :", Object.keys(userStore).length > 0);
+  console.log("producerStore :", Object.keys(userStore).length > 0);
+  console.log("shopStore :", Object.keys(userStore).length > 0);
 
   return (
     <SafeAreaView

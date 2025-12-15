@@ -140,7 +140,13 @@ export default function HomeScreen({ navigation }: Props) {
     dispatch(resetShopData());
   };
 
-  console.log("HOME logged :", logged);
+  console.log("------------ HOME -------------");
+  console.log("userStore :", userStore && Object.keys(userStore).length > 0);
+  console.log(
+    "producerStore :",
+    producerStore && Object.keys(producerStore).length > 0,
+  );
+  console.log("shopStore :", shopStore && Object.keys(shopStore).length > 0);
 
   return (
     <SafeAreaView

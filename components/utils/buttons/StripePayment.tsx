@@ -102,7 +102,7 @@ export default function StripePaymentButton({
       }
 
       /* envoi des données au backend */
-      const order = await initializePaymentSheet();
+      const orderId = await initializePaymentSheet();
 
       /* ouverture de l'UI Stripe */
       const { error } = await presentPaymentSheet();
@@ -119,7 +119,7 @@ export default function StripePaymentButton({
         dispatch(emptyCart());
         // await fetchData();
         navigation.jumpTo("OrderCustomer", {
-          orderId: order._id,
+          orderId,
         });
       }
     } catch (error: unknown) {
@@ -152,7 +152,7 @@ export default function StripePaymentButton({
         paymentIntent,
         ephemeralKey,
         customer,
-        order,
+        orderId,
       } = await fetchPaymentSheetParams();
 
       /* appel initPaymentSheet du skd Stripe */
@@ -172,7 +172,7 @@ export default function StripePaymentButton({
         setLoading(true);
       }
 
-      return order;
+      return orderId;
     } catch (error) {
       console.error(error);
 
@@ -216,7 +216,6 @@ export default function StripePaymentButton({
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        amount: totalCartAmount,
         billingAddress,
         shippingAddress,
         cart: cartStore,
@@ -235,7 +234,7 @@ export default function StripePaymentButton({
 
     console.log("fetchPaymentSheetParams ok");
 
-    const { paymentIntent, ephemeralKey, customer, order } =
+    const { paymentIntent, ephemeralKey, customer, orderId } =
       await paymentResponse.json();
 
     return {
@@ -243,7 +242,7 @@ export default function StripePaymentButton({
       paymentIntent,
       ephemeralKey,
       customer,
-      order,
+      orderId,
     };
   };
 

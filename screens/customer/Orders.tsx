@@ -180,7 +180,7 @@ export default function OrdersCustomerScreen({
         />
       </View>
 
-      <View style={{ flex: 8 }} className="px-3">
+      <View style={{ flex: 8 }} className="">
         <FlatList
           data={fetchedOrders}
           keyExtractor={(item) => item._id}
@@ -188,7 +188,7 @@ export default function OrdersCustomerScreen({
             <CardOrder
               key={item._id}
               orderData={item}
-              extraClasses="mb-2"
+              extraClasses="mb-2 mx-3"
               onPressFn={() => handleOrderDetailPress(item)}
             />
           )}
@@ -197,6 +197,7 @@ export default function OrdersCustomerScreen({
               loadMoreOrders();
             }
           }}
+          contentContainerStyle={{ marginTop: 5 }}
           onEndReachedThreshold={0.5}
           ListFooterComponent={isLoading ? <Spinner /> : null}
           refreshing={isRefreshing}

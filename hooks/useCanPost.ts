@@ -6,6 +6,10 @@ export function useCanPost(): boolean {
     (state: { shop: ShopData }) => state.shop?.value,
   );
 
+  if (!shopStore) {
+    console.log("shopStore not defined");
+  }
+
   const socials: NetworksData = shopStore.socials;
 
   if (!socials) return false;

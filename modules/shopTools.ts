@@ -557,6 +557,7 @@ export type WithdrawMode = {
   label: string;
 };
 
+/* Récupération des modes de retrait d'un shop */
 export const getWithdrawModes = (shop: ShopData): Array<WithdrawMode> => {
   const withdrawModes: WithdrawMode[] = [];
 

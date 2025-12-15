@@ -46,6 +46,7 @@ type OrderData = {
       shopTotalVAT: number;
       shopTotalTTC: number;
       shopInvoiceNumber: number;
+      invoicePdfUrl: string;
       status: string;
     },
   ];

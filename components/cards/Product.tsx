@@ -87,7 +87,7 @@ export default function CardProduct({
         onPress={showProductDetailsBottomSheet}
         activeOpacity={0.8}
         style={{ shadowColor: "#000" }}
-        className={`${extraClasses} rounded-lg shadow-md bg-white px-2 py-1 dark:bg-tertiary flex flex-row w-full`}
+        className={`${extraClasses} rounded-lg shadow-md bg-white px-2 py-1 dark:bg-tertiary flex flex-row`}
       >
         <View className="flex flex-row items-center w-full">
           <View className="flex flex-row w-4/5 items-center">
