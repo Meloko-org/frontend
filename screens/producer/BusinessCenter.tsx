@@ -231,7 +231,7 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
       <TextHeading3
         centered
-        extraClasses="mb-4 mt-2"
+        extraClasses="mb-2 mt-2"
       >{`Tableau de bord`}</TextHeading3>
 
       <ScrollView
@@ -287,7 +287,7 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
               <OpenScreenButton
                 label="Commandes validées"
                 notice={validatedOrders.length.toString()}
-                noticeColor="bg-emerald-800"
+                noticeColor="bg-validated"
                 onPressFn={() =>
                   navigation.navigate("ValidatedOrders", {
                     from: "BusinessCenter",
@@ -300,7 +300,7 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
               <OpenScreenButton
                 label="Commandes retirées"
                 notice={withdrawnOrders.length.toString()}
-                noticeColor="bg-primary"
+                noticeColor="bg-withdrawn"
                 onPressFn={() =>
                   navigation.navigate("WithdrawnOrders", {
                     from: "BusinessCenter",
@@ -313,7 +313,7 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
               <OpenScreenButton
                 label="Commandes annulées"
                 notice={canceledOrders.length.toString()}
-                noticeColor="bg-danger"
+                noticeColor="bg-canceled"
                 onPressFn={() =>
                   navigation.navigate("CanceledOrders", {
                     from: "BusinessCenter",
@@ -372,12 +372,31 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
 
               <View className="flex flex-row items-center px-4">
                 <View className="w-[70%]">
-                  <TextBody1 extraClasses="">Nombre de commandes</TextBody1>
+                  <TextBody1 extraClasses="font-bold">
+                    Nombre de commandes
+                  </TextBody1>
                 </View>
                 <View className="w-[30%]">
                   <View className="flex items-end">
                     <TextHeading4 extraClasses="text-right">
                       {orderCount}
+                    </TextHeading4>
+                  </View>
+                </View>
+              </View>
+
+              <View className="flex flex-row items-center px-4 mb-2">
+                <View className="w-[50%]">
+                  <TextBody1 extraClasses="my-1 font-bold">
+                    CA - Commission
+                  </TextBody1>
+                </View>
+                <View className="w-[50%]">
+                  <View className="flex items-end">
+                    <TextHeading4 extraClasses="text-right">
+                      {formatCentsToEuros(
+                        financials.totalHT - financials.commission,
+                      )}
                     </TextHeading4>
                   </View>
                 </View>
@@ -432,21 +451,6 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
                   <View className="flex items-end">
                     <TextHeading4 extraClasses="text-right">
                       {formatCentsToEuros(financials.commission)}
-                    </TextHeading4>
-                  </View>
-                </View>
-              </View>
-
-              <View className="flex flex-row items-center px-4">
-                <View className="w-[50%]">
-                  <TextBody1 extraClasses="my-1">CA - Commission</TextBody1>
-                </View>
-                <View className="w-[50%]">
-                  <View className="flex items-end">
-                    <TextHeading4 extraClasses="text-right">
-                      {formatCentsToEuros(
-                        financials.totalHT - financials.commission,
-                      )}
                     </TextHeading4>
                   </View>
                 </View>
