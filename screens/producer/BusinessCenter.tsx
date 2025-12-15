@@ -274,7 +274,7 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
               <OpenScreenButton
                 label="Commandes en attente"
                 notice={pendingOrders.length.toString()}
-                noticeColor="bg-warning"
+                noticeColor="bg-pending"
                 onPressFn={() =>
                   navigation.navigate("PendingOrders", {
                     from: "BusinessCenter",

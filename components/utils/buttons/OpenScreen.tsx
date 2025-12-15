@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../types/Navigation";
 
-import { TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View, Text } from "react-native";
 import TextBody1 from "../texts/Body1";
 import FontAwesome6Icon from "@expo/vector-icons/FontAwesome6";
 import FontAwesome5Icon from "@expo/vector-icons/FontAwesome5";
@@ -76,7 +76,7 @@ export default function OpenScreenButton({
             ${noticeColor ? noticeColor : "bg-primary"}
           `}
           >
-            <TextHeading4 centered>{notice}</TextHeading4>
+            <Text className="font-bold text-white text-lg">{notice}</Text>
           </View>
         )}
         <View className="pr-4 ml-5">
