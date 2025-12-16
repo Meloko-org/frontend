@@ -57,17 +57,12 @@ export default function TopBar({
               (navigation as any).navigate(screen as never);
             }
           }}
-          // onPressFn={() =>
-          //   screenParams
-          //     ? navigation.navigate(screen as any, screenParams)
-          //     : navigation.navigate(screen as any)
-          // }
           extraClasses="ml-1 px-2"
         />
       </View>
 
       <View className="mr-1">
-        <Text className="text-sm text-dark text-right leading-4 font-bold dark:text-white">
+        <Text className="text-sm text-night dark:text-white text-right leading-4 font-bold">
           {label.toLocaleUpperCase()}
         </Text>
       </View>

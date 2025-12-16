@@ -1,8 +1,10 @@
 import {
   ApiResponse,
   OrderData,
+  OrderDataForShop,
+  OrderProduct,
   OrderSummary,
-  ProductDetail,
+  // ProductDetail,
   StockData,
 } from "../types/API";
 
@@ -62,10 +64,11 @@ const getOrdersByUser = async (
   }
 };
 
+/* retourne un order avec un seul élément dans details, celui qui correspond au shop */
 const getOrderDetailsById = async (
   token: string | null,
   id: string,
-): Promise<ApiResponse<OrderData>> => {
+): Promise<ApiResponse<OrderDataForShop>> => {
   try {
     const response = await fetch(`${API_ROOT}/orders/${id}`, {
       method: "GET",
@@ -163,35 +166,30 @@ const validateOrder = async (
 };
 
 // construit le nouvel order pour valider, annuler ou restaurer
-
 const buildUpdatedOrder = ({
   order,
-  shopId,
   newStatus,
   updateProductCallback,
 }: {
-  order: OrderData | undefined;
-  shopId: string | undefined;
-  newStatus: string;
-  updateProductCallback?: (product: ProductDetail) => ProductDetail;
-}): OrderData => {
-  const updatedDetails = order?.details.map((detail) => {
-    if (detail.shop === shopId) {
-      const updatedProducts = updateProductCallback
-        ? detail.products.map(updateProductCallback)
-        : [...detail.products];
+  order: OrderDataForShop;
+  newStatus: "pending" | "validated" | "withdrawn" | "canceled";
+  updateProductCallback?: (product: OrderProduct) => OrderProduct;
+}): OrderDataForShop => {
+  const detail = order.details[0];
 
-      return {
+  const updatedProducts = updateProductCallback
+    ? detail.products.map(updateProductCallback)
+    : detail.products;
+
+  return {
+    ...order,
+    details: [
+      {
         ...detail,
         products: updatedProducts,
         status: newStatus,
-      };
-    }
-    return detail;
-  });
-  return {
-    ...order,
-    details: updatedDetails,
+      },
+    ],
   };
 };
 

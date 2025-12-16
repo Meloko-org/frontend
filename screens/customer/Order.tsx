@@ -46,9 +46,6 @@ export default function OrderCustomerScreen({
 }: Props): JSX.Element {
   const { orderId } = route.params;
 
-  console.log("------- ORDER ----------");
-  console.log("order id :", orderId);
-
   const { getToken } = useAuth();
 
   const userStore = useSelector(
@@ -66,13 +63,6 @@ export default function OrderCustomerScreen({
     "Dimanche",
   ];
 
-  /* version 1 basée sur le userStore */
-  // useEffect(() => {
-  //   const newOrder = userStore.orders.find((o) => o._id === orderId);
-  //   setNewOrder(newOrder);
-  // }, [route.params, userStore.orders]);
-
-  /* version 2 basée sur le backend */
   useEffect(() => {
     fetchOrder();
   }, [route.params]);
@@ -130,14 +120,6 @@ export default function OrderCustomerScreen({
             displayMode="order"
             showDirectionButton
             onPressFn={() => handleProducerPress(cco.shop)}
-            // onPressFn={() => {
-            //   navigation.navigate("ShopUser", {
-            //     shopId: cco.shop!._id,
-            //     distance: undefined,
-            //     relevantProducts: [],
-            //     sheetId: undefined,
-            //   });
-            // }}
           />
           {productList}
 
@@ -168,12 +150,12 @@ export default function OrderCustomerScreen({
     });
 
     marketOrdersDisplay = marketOrders.map((mo) => {
-      console.log("marketOrder: ", JSON.stringify(mo, null, 2));
       const productList = mo.products.map((p) => {
         return (
           <CardProduct
             stockData={p.product}
             shopData={shopTools.getLightShop(mo.shop)}
+            quantity={p.quantity}
             key={p.product._id}
             extraClasses="mb-1"
             displayMode="detail"
@@ -191,14 +173,6 @@ export default function OrderCustomerScreen({
             displayMode="order"
             showDirectionButton
             onPressFn={() => handleProducerPress(mo.shop)}
-            // onPressFn={() => {
-            //   navigation.navigate("ShopUser", {
-            //     shopId: mo.shop!._id,
-            //     distance: undefined,
-            //     relevantProducts: [],
-            //     sheetId: undefined,
-            //   });
-            // }}
           />
           {productList}
 
@@ -252,8 +226,6 @@ export default function OrderCustomerScreen({
       },
     });
   };
-
-  console.log("DATA ORDER :", JSON.stringify(newOrder, null, 2));
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

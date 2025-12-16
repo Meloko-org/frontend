@@ -8,7 +8,12 @@ import { ProducerTabParamList } from "../../types/Navigation";
 import { useSelector, UseSelector } from "react-redux";
 import { ShopState } from "../../reducers/shop";
 
-import { OrderData, ProductData, ProductDetail } from "../../types/API";
+import {
+  OrderData,
+  OrderDataForShop,
+  OrderProduct,
+  ProductData,
+} from "../../types/API";
 
 import orderTools from "../../modules/orderTools";
 import globalTools from "../../modules/globalTools";
@@ -26,6 +31,7 @@ import CustomButton from "../../components/utils/buttons/Custom";
 import TextBody2 from "../../components/utils/texts/Body2";
 import Spinner from "../../components/utils/Spinner";
 import TopBar from "../../components/TopBar";
+import TextHeading4 from "../../components/utils/texts/Heading4";
 
 type OrderDetailsRouteProp = RouteProp<ProducerTabParamList, "OrderDetails">;
 
@@ -49,11 +55,11 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
 
   const { getToken } = useAuth();
 
-  const [order, setOrder] = useState<OrderData | undefined>();
+  const [order, setOrder] = useState<OrderDataForShop | undefined>();
   const [products, setProducts] = useState<JSX.Element[]>([]);
   const [subOrderId, setSubOrderId] = useState<string | undefined>();
-  const [withdrawMarket, setWithdrawMarket] = useState<string>();
-  const [withdrawDay, setWithdrawDay] = useState<string>();
+  // const [withdrawMarket, setWithdrawMarket] = useState<string>();
+  // const [withdrawDay, setWithdrawDay] = useState<string>();
 
   const [status, setStatus] = useState<
     string | "pending" | "validated" | "withdrawn" | "canceled"
@@ -79,10 +85,10 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
         orderId,
       );
 
-      console.log(
-        "ORDERDETAILS :",
-        JSON.stringify(orderResponse.data, null, 2),
-      );
+      // console.log(
+      //   "ORDERDETAILS :",
+      //   JSON.stringify(orderResponse.data, null, 2),
+      // );
 
       if (!orderResponse.success) {
         SheetManager.show("alert", {
@@ -93,10 +99,10 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
         });
 
         navigation.navigate(from as never);
-      } else {
-        setOrder(orderResponse.data!);
+      } else if (orderResponse.success && orderResponse.data) {
+        setOrder(orderResponse.data);
         // mise à jour du status
-        setStatus(orderResponse.data?.details[0].status!);
+        setStatus(orderResponse.data?.details[0].status);
       }
     } catch (error) {
       console.error("Failed to fetch order", error);
@@ -107,13 +113,6 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
 
   const getProductsFromOrder = (order: OrderData) => {
     const orderDetail = order.details[0];
-
-    // if (orderDetail.withdrawMode === "market") {
-    //   setWithdrawMarket(orderDetail.withdrawMarket);
-    //   setWithdrawDay(
-    //     globalTools.getWeekDayLabel(Number(orderDetail.withdrawDay)),
-    //   );
-    // }
 
     const orderProductsCards = orderDetail.products.map((product) => (
       <OrderProductCard
@@ -144,13 +143,14 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
 
   const handleUpdateOrder = async (
     newStatus: "canceled" | "pending" | "validated" | "withdrawn",
-    callback?: (product: ProductDetail) => ProductDetail,
+    callback?: (product: OrderProduct) => OrderProduct,
   ) => {
     try {
+      if (!order || !shopStore) return;
+
       setIsLoading(true);
       const updatedOrder = orderTools.buildUpdatedOrder({
         order,
-        shopId: shopStore?._id,
         newStatus: newStatus,
         updateProductCallback: callback,
       });
@@ -188,67 +188,73 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
     switch (status) {
       case "canceled":
         return (
-          <CustomButton
-            label={`REMETTRE LA COMMANDE\nEN ATTENTE`}
-            extraClasses="border border-primary bg-lightbg/90 dark:bg-transparent flex-1 mt-5 mx-1 rounded-lg px-2 h-[60px]"
-            textClasses="text-lightbg font-bold text-sm"
-            onPressFn={() =>
-              handleUpdateOrder("pending", (product) => ({
-                ...product,
-                isConfirmed: false,
-              }))
-            }
-            isLoading={isLoading}
-          />
-        );
-      case "pending":
-        return (
-          <>
+          <View className="flex flex-row mx-3">
             <CustomButton
-              label={`VALIDER`}
-              extraClasses="bg-primary flex-1 mb-5 mx-1 rounded-lg px-2 h-[80px]"
-              textClasses="text-lightbg font-bold text-lg"
+              label={`REMETTRE LA COMMANDE\nEN ATTENTE`}
+              extraClasses="border border-primary bg-lightbg/90 dark:bg-transparent flex-1 mx-1 rounded-lg px-2 h-[60px]"
+              textClasses="text-night dark:text-lightbg font-bold text-sm"
               onPressFn={() =>
-                handleUpdateOrder("validated", (product) => {
-                  if (!canceledProducts.includes(product.product._id)) {
-                    return { ...product, isConfirmed: true };
-                  }
-                  return product;
-                })
-              }
-              isLoading={isLoading}
-            />
-            <CustomButton
-              label={`ANNULER LA COMMANDE`}
-              extraClasses="bg-danger flex-1 mt-5 mx-1 rounded-lg px-2 h-[60px]"
-              textClasses="text-lightbg font-bold text-sm"
-              onPressFn={() =>
-                handleUpdateOrder("canceled", (product) => ({
+                handleUpdateOrder("pending", (product) => ({
                   ...product,
                   isConfirmed: false,
                 }))
               }
               isLoading={isLoading}
             />
+          </View>
+        );
+      case "pending":
+        return (
+          <>
+            <View className="flex flex-row mx-3">
+              <CustomButton
+                label={`ANNULER LA COMMANDE`}
+                extraClasses="bg-danger flex-1 mx-1 rounded-lg px-2 h-[80px]"
+                textClasses="text-lightbg font-bold text-sm"
+                onPressFn={() =>
+                  handleUpdateOrder("canceled", (product) => ({
+                    ...product,
+                    isConfirmed: false,
+                  }))
+                }
+                isLoading={isLoading}
+              />
+              <CustomButton
+                label={`VALIDER`}
+                extraClasses="bg-primary flex-1 mx-1 rounded-lg px-2 h-[80px]"
+                textClasses="text-lightbg font-bold text-lg"
+                onPressFn={() =>
+                  handleUpdateOrder("validated", (product) => {
+                    if (!canceledProducts.includes(product.product._id)) {
+                      return { ...product, isConfirmed: true };
+                    }
+                    return product;
+                  })
+                }
+                isLoading={isLoading}
+              />
+            </View>
           </>
         );
       case "validated":
         return (
           <>
-            <CustomButton
-              label={`VALIDER LE RETRAIT`}
-              extraClasses="bg-primary flex-1 mx-1 mb-5 rounded-lg px-2 h-[80px]"
-              textClasses="text-lightbg font-bold text-lg"
-              onPressFn={() => handleUpdateOrder("withdrawn")}
-              isLoading={isLoading}
-            />
-            {/* <Custom
-              label={`REMETTRE LA COMMANDE\nEN ATTENTE`}
-              extraClasses="border border-primary bg-lightbg/90 dark:bg-transparent flex-1 mt-5 mx-1 rounded-lg px-2 h-[60px]"
-              textClasses="text-lightbg font-bold text-sm"
-              onPressFn={() => handleUpdateOrder("pending", (product) => ({...product,isConfirmed: false}))}
-              isLoading={isLoading}
-            /> */}
+            <View className="flex flex-row mx-3">
+              <CustomButton
+                label={`VALIDER LE RETRAIT`}
+                extraClasses="bg-primary flex-1 mx-1 rounded-lg px-2 h-[80px]"
+                textClasses="text-lightbg font-bold text-lg"
+                onPressFn={() => handleUpdateOrder("withdrawn")}
+                isLoading={isLoading}
+              />
+              {/* <Custom
+                label={`REMETTRE LA COMMANDE\nEN ATTENTE`}
+                extraClasses="border border-primary bg-lightbg/90 dark:bg-transparent flex-1 mt-5 mx-1 rounded-lg px-2 h-[60px]"
+                textClasses="text-lightbg font-bold text-sm"
+                onPressFn={() => handleUpdateOrder("pending", (product) => ({...product,isConfirmed: false}))}
+                isLoading={isLoading}
+              /> */}
+            </View>
           </>
         );
       case "withdrawn":
@@ -261,62 +267,47 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <TopBar
-        backLabel={backLabel || "Retour au tableau"}
-        screen={from || "businessCenter"}
-        label={screenTitle || "COMMANDES\nEN ATTENTE"}
-        extraClasses="mt-2 mb-5"
-      />
+      <View style={{ flex: 1 }}>
+        <TopBar
+          backLabel={backLabel || "Retour au tableau"}
+          screen={from || "businessCenter"}
+          label={screenTitle || "COMMANDES\nEN ATTENTE"}
+          extraClasses="mt-2 mb-5"
+        />
+      </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        className="w-full flex-1 pb-5"
-      >
-        <View className="mb-3">
-          <TextHeading3 centered>Détail commande</TextHeading3>
-        </View>
-
+      <View style={{ flex: 9 }}>
         {isLoading ? (
-          <Spinner />
+          <View className="w-full h-full flex items-center justify-center">
+            <Spinner />
+          </View>
         ) : (
           order && (
-            <View className="px-3">
-              <OrderStatus orderData={order} status={status} />
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              className="w-full flex-1 pb-5"
+            >
+              <View className="p-3">
+                <OrderStatus orderData={order} status={status} />
 
-              {/* {withdrawMarket && withdrawDay && (
-                <View className="rounded-lg border bg-white dark:bg-tertiary p-2">
-                  <View className="flex flex-row w-full items-center">
-                    <View className="w-2/6">
-                      <TextBody2>Point de vente :</TextBody2>
-                    </View>
-                    <View className="w-4/6">
-                      <TextBody1>{withdrawMarket}</TextBody1>
-                    </View>
-                  </View>
-                  <View className="flex flex-row w-full items-center">
-                    <View className="w-2/6">
-                      <TextBody2>Jour de retrait :</TextBody2>
-                    </View>
-                    <View className="w-4/6">
-                      <TextBody1>{withdrawDay}</TextBody1>
-                    </View>
-                  </View>
+                <View className="mt-5 mb-2">
+                  <TextHeading4 centered>Détail</TextHeading4>
+                  <TextBody2 centered>
+                    (Cliquez sur un produit pour l'annuler avant de valider)
+                  </TextBody2>
                 </View>
-              )} */}
-
-              <View className="mt-5 mb-2">
-                <TextBody1 centered>Détail</TextBody1>
-                <TextBody2 centered>
-                  (Cliquez sur un produit pour l'annuler avant de valider)
-                </TextBody2>
+                {products}
               </View>
-              {products}
-
-              <View className="mt-5 mb-4">{renderButtons()}</View>
-            </View>
+            </ScrollView>
           )
         )}
-      </ScrollView>
+      </View>
+
+      {status !== "withdrawn" && (
+        <View style={{ flex: 1.5 }} className="pt-2">
+          {renderButtons()}
+        </View>
+      )}
     </SafeAreaView>
   );
 }

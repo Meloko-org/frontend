@@ -86,93 +86,103 @@ export default function SelectMarketModal({
       }}
     >
       <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-        <View className="h-10 flex flex-row justify-start items-center pl-3 mt-2 mb-5">
-          <BackLabelButton
-            backLabel="Retour"
-            onPressFn={() => {
-              const cartShop = cartStore.find((c) => c.shop?._id === shop?._id);
+        <View style={{ flex: 1 }}>
+          <View className="h-10 flex flex-row justify-start items-center pl-3 mt-2 mb-5">
+            <BackLabelButton
+              backLabel="Retour"
+              onPressFn={() => {
+                const cartShop = cartStore.find(
+                  (c) => c.shop?._id === shop?._id,
+                );
 
-              if (!cartShop?.withdrawMarket && !cartShop?.withdrawDay) {
-                if (cartShop?.withdrawMode === "clickCollect") {
-                  dispatch(
-                    updateWithdrawMode({
-                      shopId: shop!._id,
-                      withdrawMode: "clickCollect",
-                      withdrawMarket: null,
-                      withdrawDay: null,
-                    }),
-                  );
-                } else {
-                  dispatch(
-                    updateWithdrawMode({
-                      shopId: shop!._id,
-                      withdrawMode: null,
-                      withdrawMarket: null,
-                      withdrawDay: null,
-                    }),
-                  );
-                }
-              }
-              onCloseFn(false);
-            }}
-            extraClasses="pr-2"
-          />
-        </View>
-
-        <ScrollView>
-          <View className="px-3">
-            <TextHeading3 centered>Sélection du point de vente</TextHeading3>
-            <TextBody1 centered>Cliquez pour sélectionner</TextBody1>
-
-            {markets.map((data) => (
-              <View key={data._id}>
-                <Market
-                  key={data.market._id}
-                  marketData={data.market}
-                  highlightEnable
-                  radioButtonMode
-                  showAddress={true}
-                  displayMode="withdrawMode"
-                  extraClasses="mb-2 mt-3"
-                  isRadioButtonActive={highlightedMarket === data.market._id}
-                  onRadioButtonPress={() =>
-                    setHighlightedMarket(data.market._id)
-                  }
-                />
-                <WithdrawDays
-                  openingHours={data.openingHours}
-                  onDaySelect={(selectedDay) => {
-                    console.log(
-                      `Jour sélectionné pour le marché ${data.market.name} : ${selectedDay}`,
-                    );
+                if (!cartShop?.withdrawMarket && !cartShop?.withdrawDay) {
+                  if (cartShop?.withdrawMode === "clickCollect") {
                     dispatch(
                       updateWithdrawMode({
                         shopId: shop!._id,
-                        withdrawMode: "market",
+                        withdrawMode: "clickCollect",
+                        withdrawMarket: null,
+                        withdrawDay: null,
                       }),
                     );
+                  } else {
                     dispatch(
-                      setWithdrawMarket({
+                      updateWithdrawMode({
                         shopId: shop!._id,
-                        withdrawMarket: data.market.name,
-                        withdrawDay: selectedDay,
+                        withdrawMode: null,
+                        withdrawMarket: null,
+                        withdrawDay: null,
                       }),
                     );
-                    console.log("dispatch done");
-                  }}
-                  isEnabled={highlightedMarket === data.market._id}
-                  highlightedDay={
-                    highlightedMarket === data.market._id
-                      ? cartStore.find((c) => c.shop?._id === shop?._id)
-                          ?.withdrawDay || null
-                      : null
                   }
-                  extraClasses="mb-5 ml-2"
-                />
-              </View>
-            ))}
+                }
+                onCloseFn(false);
+              }}
+              extraClasses="pr-2"
+            />
+            <View className="text-right flex-grow mr-2">
+              <Text className="text-sm text-night dark:text-white text-right leading-4 font-bold">
+                {`SELECTION DU\nPOINT DE VENTE`}
+              </Text>
+            </View>
           </View>
-        </ScrollView>
+        </View>
+
+        <View style={{ flex: 10 }}>
+          <ScrollView>
+            <View className="px-3">
+              <TextBody1 centered>Cliquez pour sélectionner</TextBody1>
+
+              {markets.map((data) => (
+                <View key={data._id}>
+                  <Market
+                    key={data.market._id}
+                    marketData={data.market}
+                    highlightEnable
+                    radioButtonMode
+                    showAddress={true}
+                    displayMode="withdrawMode"
+                    extraClasses="mb-2 mt-3"
+                    isRadioButtonActive={highlightedMarket === data.market._id}
+                    onRadioButtonPress={() =>
+                      setHighlightedMarket(data.market._id)
+                    }
+                  />
+                  <WithdrawDays
+                    openingHours={data.openingHours}
+                    onDaySelect={(selectedDay) => {
+                      console.log(
+                        `Jour sélectionné pour le marché ${data.market.name} : ${selectedDay}`,
+                      );
+                      dispatch(
+                        updateWithdrawMode({
+                          shopId: shop!._id,
+                          withdrawMode: "market",
+                        }),
+                      );
+                      dispatch(
+                        setWithdrawMarket({
+                          shopId: shop!._id,
+                          withdrawMarket: data.market.name,
+                          withdrawDay: selectedDay,
+                        }),
+                      );
+                      console.log("dispatch done");
+                    }}
+                    isEnabled={highlightedMarket === data.market._id}
+                    highlightedDay={
+                      highlightedMarket === data.market._id
+                        ? cartStore.find((c) => c.shop?._id === shop?._id)
+                            ?.withdrawDay || null
+                        : null
+                    }
+                    extraClasses="mb-5 ml-2"
+                  />
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
       </SafeAreaView>
     </Modal>
   );

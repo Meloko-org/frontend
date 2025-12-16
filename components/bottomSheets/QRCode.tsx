@@ -13,7 +13,7 @@ export default function QRCodeSheet(props: SheetProps<"qr-code">) {
   return (
     <ActionSheet
       ref={qrSheetRef}
-      snapPoints={[100]}
+      // snapPoints={[80]}
       indicatorStyle={{ backgroundColor: "#000000" }}
       gestureEnabled={true}
       id={props.sheetId}

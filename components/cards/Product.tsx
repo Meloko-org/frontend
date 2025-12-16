@@ -48,10 +48,6 @@ export default function CardProduct({
   quantityControllable,
   showImage,
 }: CardProductProps): JSX.Element {
-  console.log("----- PRODUCT CARD -----");
-  // console.log("is stockData :", stockData !== undefined);
-  // console.log(" is shopData :", shopData !== undefined);
-
   const dispatch = useDispatch();
   const cartStore = useSelector(
     (state: { cart: CartState }) => state.cart.value,

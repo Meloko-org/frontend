@@ -1,3 +1,32 @@
+/* types concernant les order */
+type OrderProduct = {
+  _id: string;
+  product: StockData;
+  quantity: number;
+  unitPriceTTC: number;
+  unitPriceHT: number;
+  vatRate: number;
+  vatAMount: number;
+  totalPriceTTC: number;
+  isConfirmed: boolean;
+};
+
+type OrderDetail = {
+  _id: string;
+  products: OrderProduct[];
+  withdrawMode: string;
+  withdrawMarket: string;
+  withdrawDay: number;
+  market: MarketData;
+  shop: ShopData;
+  shopTotalHT: number;
+  shopTotalVAT: number;
+  shopTotalTTC: number;
+  shopInvoiceNumber: number;
+  invoicePdfUrl?: string;
+  status: string;
+};
+
 type OrderData = {
   _id: string;
   user: UserData;
@@ -21,35 +50,7 @@ type OrderData = {
     latitude: number;
     longitude: number;
   };
-  details: [
-    {
-      _id: string;
-      products: [
-        {
-          _id: string;
-          product: StockData;
-          quantity: number;
-          unitPriceTTC: number;
-          unitPriceHT: number;
-          vatRate: number;
-          vatAMount: number;
-          totalPriceTTC: number;
-          isConfirmed: boolean;
-        },
-      ];
-      withdrawMode: string;
-      withdrawMarket: string;
-      withdrawDay: number;
-      market: MarketData;
-      shop: ShopData;
-      shopTotalHT: number;
-      shopTotalVAT: number;
-      shopTotalTTC: number;
-      shopInvoiceNumber: number;
-      invoicePdfUrl: string;
-      status: string;
-    },
-  ];
+  details: OrderDetail[];
   isWithdraw: boolean;
   isPaid: boolean;
   paymentMethod: string;
@@ -60,6 +61,115 @@ type OrderData = {
   invoiceNumber: string;
   createdAt: Date;
 };
+
+type OrderDataForShop = Omit<OrderData, "details"> & {
+  details: [OrderDetail];
+};
+
+type ShopOrderStatus = {
+  status: "pending" | "validated" | "withdrawn" | "canceled";
+};
+
+// type OrderData = {
+//   _id: string;
+//   user: UserData;
+//   billingAddress: {
+//     name: string;
+//     address1: string;
+//     address2: string;
+//     postalCode: string;
+//     city: string;
+//     country: string;
+//     latitude: number;
+//     longitude: number;
+//   };
+//   shippingAddress: {
+//     name: string;
+//     address1: string;
+//     address2: string;
+//     postalCode: string;
+//     city: string;
+//     country: string;
+//     latitude: number;
+//     longitude: number;
+//   };
+//   details: [
+//     {
+//       _id: string;
+//       products: [
+//         {
+//           _id: string;
+//           product: StockData;
+//           quantity: number;
+//           unitPriceTTC: number;
+//           unitPriceHT: number;
+//           vatRate: number;
+//           vatAMount: number;
+//           totalPriceTTC: number;
+//           isConfirmed: boolean;
+//         },
+//       ];
+//       withdrawMode: string;
+//       withdrawMarket: string;
+//       withdrawDay: number;
+//       market: MarketData;
+//       shop: ShopData;
+//       shopTotalHT: number;
+//       shopTotalVAT: number;
+//       shopTotalTTC: number;
+//       shopInvoiceNumber: number;
+//       invoicePdfUrl: string | undefined;
+//       status: string;
+//     },
+//   ];
+//   isWithdraw: boolean;
+//   isPaid: boolean;
+//   paymentMethod: string;
+//   stripePIId: string;
+//   totalHT: number;
+//   totalVAT: number;
+//   totalTTC: number;
+//   invoiceNumber: string;
+//   createdAt: Date;
+// };
+
+// type OrderDataForShop = Omit<OrderData, "details"> & {
+//   details: [
+//     {
+//       _id: string;
+//       products: [
+//         {
+//           _id: string;
+//           product: StockData;
+//           quantity: number;
+//           unitPriceTTC: number;
+//           unitPriceHT: number;
+//           vatRate: number;
+//           vatAMount: number;
+//           totalPriceTTC: number;
+//           isConfirmed: boolean;
+//         },
+//       ];
+//       withdrawMode: string;
+//       withdrawMarket: string;
+//       withdrawDay: number;
+//       market: MarketData;
+//       shop: ShopData;
+//       shopTotalHT: number;
+//       shopTotalVAT: number;
+//       shopTotalTTC: number;
+//       shopInvoiceNumber: number;
+//       invoicePdfUrl: string | undefined;
+//       status: string;
+//     }
+//   ]; // ✅ tuple volontaire
+// };
+
+// type ProductDetail = {
+//   product: StockData;
+//   quantity: number;
+//   isConfirmed: boolean | null;
+// };
 
 type ProductData = {
   _id: string;
@@ -384,12 +494,6 @@ type ProducerData = {
   onboardingStep: number;
 } | null;
 
-type ProductDetail = {
-  product: StockData;
-  quantity: number;
-  isConfirmed: boolean | null;
-};
-
 type WeightData = {
   unit: string;
   measurement: number;
@@ -603,6 +707,10 @@ export type {
   MarketsData,
   MarketResultData,
   OrderData,
+  OrderDetail,
+  OrderProduct,
+  OrderDataForShop,
+  ShopOrderStatus,
   ProducerData,
   ProductFamilyData,
   ProductCategoryData,
@@ -612,7 +720,7 @@ export type {
   ClickCollectData,
   OpeningHourData,
   PeriodData,
-  ProductDetail,
+  // ProductDetail,
   WeightData,
   ApiResponse,
   NoteData,

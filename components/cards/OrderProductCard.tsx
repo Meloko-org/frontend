@@ -108,13 +108,12 @@ export default function OrderProductCard({
           toggleCancel();
         }
       }}
+      style={{ shadowColor: "#000" }}
+      className={`${extraClasses} rounded-lg shadow-lg p-1 bg-white dark:bg-tertiary`}
     >
-      <View className={`${extraClasses} relative`}>
-        <View
-          style={{ shadowColor: "#000" }}
-          className="rounded-lg shadow-lg bg-white p-2 dark:bg-tertiary w-full"
-        >
-          <View className="flex flex-row items-center w-full">
+      <View className={`relative`}>
+        <View className="">
+          <View className="flex flex-row items-center">
             <View className="flex flex-row items-center rounded-lg w-1/5">
               <Image
                 source={

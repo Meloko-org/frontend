@@ -1,7 +1,7 @@
 import React, { JSX } from "react";
 import { useSelector } from "react-redux";
 import { ShopState } from "../../reducers/shop";
-import { OrderData } from "../../types/API";
+import { OrderData, OrderDataForShop } from "../../types/API";
 import { useColorScheme } from "nativewind";
 
 import globalTools, { formatCentsToEuros } from "../../modules/globalTools";
@@ -13,9 +13,10 @@ import OrderStatusBadge from "../utils/badges/OrderStatus";
 import BadgeSecondary from "../utils/badges/Secondary";
 import BlackBadge from "../utils/badges/Black";
 import TextBody2 from "../utils/texts/Body2";
+import Spinner from "../utils/Spinner";
 
 type OrderStatusProps = {
-  orderData: OrderData | undefined;
+  orderData: OrderData | OrderDataForShop | undefined;
   status?: string | "pending" | "validated" | "withdrawn" | "canceled";
   onPressFn?: () => void;
   extraClasses?: string;
@@ -26,14 +27,12 @@ export default function OrderStatus({
   status,
   onPressFn,
   extraClasses,
-}: OrderStatusProps): JSX.Element {
-  const shopStore = useSelector(
-    (state: { shop: ShopState }) => state.shop.value,
-  );
+}: OrderStatusProps) {
+  const shopDetails = orderData?.details[0];
 
-  const shopDetails = orderData?.details.find(
-    (detail) => detail?.shop?.toString() === shopStore?._id.toString(),
-  );
+  if (!orderData || !shopDetails) {
+    return null;
+  }
 
   return (
     <TouchableOpacity onPress={() => onPressFn && onPressFn()}>
@@ -41,19 +40,19 @@ export default function OrderStatus({
         style={{ shadowColor: "#000" }}
         className={`${extraClasses} rounded-lg shadow-lg bg-white dark:bg-tertiary p-2`}
       >
-        <View className="mb-1 bg-lightbg dark:bg-darkbg rounded-lg pb-1">
-          <TextHeading4 centered>
-            {orderData?.user.lastname} {orderData?.user.firstname}
+        <View className="mb-1 rounded-lg pb-1">
+          <TextHeading4>
+            {orderData.user.lastname} {orderData.user.firstname}
           </TextHeading4>
         </View>
 
         <View className="flex flex-row items-center justify-between w-full mb-1">
           <View>
-            <BlackBadge extraClasses="py-1 px-2">{`N°${orderData?.invoiceNumber}`}</BlackBadge>
+            <BlackBadge extraClasses="py-1 px-2">{`N°${orderData.invoiceNumber}`}</BlackBadge>
           </View>
           <View className="">
             <Text className="text-black dark:text-lightbg text-right">
-              {globalTools.formatDateToFr(orderData?.createdAt)}
+              {globalTools.formatDateToFr(orderData.createdAt)}
             </Text>
           </View>
         </View>
@@ -62,7 +61,7 @@ export default function OrderStatus({
           <View className="h-full items-start w-4/6">
             <View>
               <BadgeSecondary extraClasses="px-2 mr-3" textClasses="font-bold">
-                {shopDetails?.withdrawMode}
+                {shopDetails.withdrawMode}
               </BadgeSecondary>
             </View>
 
@@ -83,11 +82,11 @@ export default function OrderStatus({
               <BadgeSecondary
                 extraClasses="px-2"
                 textClasses="font-bold"
-              >{`${formatCentsToEuros(shopDetails!.shopTotalTTC)}`}</BadgeSecondary>
+              >{`${formatCentsToEuros(shopDetails.shopTotalTTC)}`}</BadgeSecondary>
             </View>
             <OrderStatusBadge
               extraClasses="py-1 px-1"
-              status={status ? status : shopDetails?.status}
+              status={status ? status : shopDetails.status}
             />
           </View>
         </View>
