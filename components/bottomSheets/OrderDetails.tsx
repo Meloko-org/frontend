@@ -127,14 +127,35 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
                 extraClasses="ml-2 px-2 py-1"
               />
             </View>
-            <View>
+
+            <View className="flex flex-row justify-around flex-grow ml-5">
               {cco.status === "validated" && (
-                <CustomButton
-                  extraClasses="rounded-lg p-2 h-[40px] bg-success"
-                  textClasses="text-white"
-                  label="Afficher QR code"
-                  onPressFn={() => handleQRCodePress(order._id)}
-                />
+                <>
+                  <IconButton
+                    iconName="file-pdf"
+                    iconColor="white"
+                    iconFamily="FontAwesome6Icon"
+                    buttonColor="bg-partialValidated"
+                    size={30}
+                    extraClasses="p-2 w-12"
+                    onPressFn={() => handleQRCodePress(order._id)}
+                  />
+                  <IconButton
+                    iconName="qrcode"
+                    iconColor="white"
+                    iconFamily="FontAwesomeIcon"
+                    buttonColor="bg-success"
+                    size={30}
+                    extraClasses="p-2 w-12"
+                    onPressFn={() => handleQRCodePress(order._id)}
+                  />
+                </>
+                // <CustomButton
+                //   extraClasses="rounded-lg p-2 h-[40px] bg-success"
+                //   textClasses="text-white"
+                //   label="Afficher QR code"
+                //   onPressFn={() => handleQRCodePress(order._id)}
+                // />
               )}
             </View>
           </View>

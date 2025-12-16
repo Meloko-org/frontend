@@ -13,12 +13,12 @@ export default function QRCodeSheet(props: SheetProps<"qr-code">) {
   return (
     <ActionSheet
       ref={qrSheetRef}
-      // snapPoints={[80]}
+      snapPoints={[80]}
       indicatorStyle={{ backgroundColor: "#000000" }}
       gestureEnabled={true}
       id={props.sheetId}
     >
-      <View className="bg-lightbg dark:bg-darkbg">
+      <View className="bg-lightbg dark:bg-darkbg w-full h-full p-5">
         <View style={{ flex: 1 }} className="w-full flex items-end">
           <CloseSheetButton
             onPressFn={() => {
@@ -26,7 +26,7 @@ export default function QRCodeSheet(props: SheetProps<"qr-code">) {
             }}
           />
         </View>
-        <View style={{ flex: 9 }} className="flex items-center justify-center">
+        <View style={{ flex: 9 }} className="flex items-center justify-start">
           <QRCode value={props.payload?.orderId} size={300} />
         </View>
       </View>
