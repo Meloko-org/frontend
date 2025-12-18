@@ -129,16 +129,16 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
             </View>
 
             <View className="flex flex-row justify-around flex-grow ml-5">
-              {cco.status === "validated" && (
+              {(cco.status === "validated" || cco.status === "withdrawn") && (
                 <>
                   <IconButton
                     iconName="file-pdf"
                     iconColor="white"
                     iconFamily="FontAwesome6Icon"
-                    buttonColor="bg-partialValidated"
+                    buttonColor="bg-greener"
                     size={30}
                     extraClasses="p-2 w-12"
-                    onPressFn={() => handleQRCodePress(order._id)}
+                    onPressFn={() => handleInvoicePDF(order._id)}
                   />
                   <IconButton
                     iconName="qrcode"
@@ -150,12 +150,6 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
                     onPressFn={() => handleQRCodePress(order._id)}
                   />
                 </>
-                // <CustomButton
-                //   extraClasses="rounded-lg p-2 h-[40px] bg-success"
-                //   textClasses="text-white"
-                //   label="Afficher QR code"
-                //   onPressFn={() => handleQRCodePress(order._id)}
-                // />
               )}
             </View>
           </View>
@@ -273,14 +267,28 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
                 extraClasses="ml-2 px-2 py-1"
               />
             </View>
-            <View>
+            <View className="flex flex-row justify-around flex-grow ml-5">
               {mo.status === "validated" && (
-                <CustomButton
-                  extraClasses="rounded-lg p-2 h-[40px] bg-success"
-                  textClasses="text-white"
-                  label="Afficher QR code"
-                  onPressFn={() => handleQRCodePress(order._id)}
-                />
+                <>
+                  <IconButton
+                    iconName="file-pdf"
+                    iconColor="white"
+                    iconFamily="FontAwesome6Icon"
+                    buttonColor="bg-partialValidated"
+                    size={30}
+                    extraClasses="p-2 w-12"
+                    onPressFn={() => handleInvoicePDF(order._id)}
+                  />
+                  <IconButton
+                    iconName="qrcode"
+                    iconColor="white"
+                    iconFamily="FontAwesomeIcon"
+                    buttonColor="bg-success"
+                    size={30}
+                    extraClasses="p-2 w-12"
+                    onPressFn={() => handleQRCodePress(order._id)}
+                  />
+                </>
               )}
             </View>
           </View>
@@ -288,6 +296,8 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
       );
     });
   }
+
+  const handleInvoicePDF = (id: string) => {};
 
   const handleQRCodePress = (id: string) => {
     SheetManager.show("qr-code", {

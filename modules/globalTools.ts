@@ -3,7 +3,17 @@ import {
   ProductCategoryData,
   ShopFeaturesData,
 } from "../types/API";
-const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
+// const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
+
+export const WEEK_DAYS = [
+  "Lundi",
+  "Mardi",
+  "Mercredi",
+  "Jeudi",
+  "Vendredi",
+  "Samedi",
+  "Dimanche",
+];
 
 export const formatDateToFr = (isoDate: Date | string | undefined) => {
   if (!isoDate) return;

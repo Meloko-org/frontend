@@ -388,7 +388,7 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
               <View className="flex flex-row items-center px-4 mb-2">
                 <View className="w-[50%]">
                   <TextBody1 extraClasses="my-1 font-bold">
-                    CA - Commission
+                    CA HT - Commission
                   </TextBody1>
                 </View>
                 <View className="w-[50%]">

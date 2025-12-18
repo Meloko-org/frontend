@@ -67,6 +67,7 @@ declare module "react-native-actions-sheet" {
     alert: SheetDefinition<{
       payload: {
         message: string;
+        error?: string;
         alertType: "info" | "success" | "error" | "warning";
       };
     }>;

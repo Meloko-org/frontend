@@ -139,17 +139,18 @@ const getUserOrderById = async (
   }
 };
 
-const validateOrder = async (
+const updateSubOrder = async (
   token: string | null,
-  values: {
-    order: OrderData;
-    status: "pending" | "withdrawn" | "canceled" | "validated";
-  },
   id: string,
+  values: {
+    subOrderId: string;
+    status: "pending" | "withdrawn" | "canceled" | "validated";
+    canceledProducts?: string[];
+  },
 ) => {
   try {
-    const response = await fetch(`${API_ROOT}/orders/${id}`, {
-      method: "PUT",
+    const response = await fetch(`${API_ROOT}/orders/${id}/update-sub-order`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -159,9 +160,13 @@ const validateOrder = async (
     });
 
     const data = await response.json();
-    return data;
+
+    return data.success
+      ? { success: true, message: data.message }
+      : { success: false, message: data.message, error: data.error };
   } catch (error) {
     console.log(error);
+    return { success: false, message: error };
   }
 };
 
@@ -271,7 +276,7 @@ const getPriceInEuros = (price: number) => {
 
 export default {
   getOrderDetailsById,
-  validateOrder,
+  updateSubOrder,
   getOrdersByUser,
   getOrderStatus,
   getUserOrderById,

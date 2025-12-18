@@ -6,12 +6,13 @@ import TextBody1 from "../utils/texts/Body1";
 import PricePer from "../utils/badges/Dark";
 import TextHeading4 from "../utils/texts/Heading4";
 import TextBody2 from "../utils/texts/Body2";
-import { OrderData } from "../../types/API";
+import { OrderData, OrderDataForShop, OrderProduct } from "../../types/API";
 import { formatCentsToEuros } from "../../modules/globalTools";
 import { getProductTotal } from "../../modules/CartTools";
 
 type OrderProductCardProps = {
-  orderProductData?: OrderData["details"][0]["products"][0];
+  orderProductData?: OrderProduct;
+  productStatus: "confirmed" | "canceled" | "deleted";
   onPressFn?: (id: string) => void;
   extraClasses?: string;
   showImage?: boolean;
@@ -20,39 +21,13 @@ type OrderProductCardProps = {
 
 export default function OrderProductCard({
   orderProductData,
+  productStatus,
   onPressFn,
   extraClasses,
   showImage,
   status,
-}: OrderProductCardProps): JSX.Element {
-  const [isCanceled, setIsCanceled] = useState<boolean>(false);
-  // const [ isDeleted, setIsDeleted ] = useState<boolean>(false)
-
-  useEffect(() => {
-    if (status === "validated" || status === "withdrawn") {
-      if (orderProductData?.isConfirmed === false) {
-        setIsCanceled(true);
-      }
-    }
-    if (status === "canceled") {
-      setIsCanceled(true);
-    }
-
-    // if (orderProductData?.product.isDeleted) {
-    //   setIsDeleted(true)
-    // }
-  }, [status]);
-
-  // const isCanceled =
-  //   status === "canceled" ||
-  //   ((status === "validated" || status === "withdrawn") &&
-  //     orderProductData?.isConfirmed === false);
-
-  const isDeleted = !!orderProductData?.product.isDeleted;
-
-  const toggleCancel = () => {
-    setIsCanceled((prev) => !prev);
-  };
+}: OrderProductCardProps) {
+  if (!orderProductData) return;
 
   const formatQuantity = (quantity: number, unit: string) => {
     if (unit === "gr") {
@@ -65,17 +40,10 @@ export default function OrderProductCard({
     return `${quantity}`;
   };
 
-  const getPrice = (price: number, quantity: number, unit: string) => {
-    return unit === "gr"
-      ? ((quantity / 1000) * price).toFixed(2)
-      : (quantity * price).toFixed(2);
-  };
-
   const tags =
     orderProductData?.product.tags &&
     orderProductData?.product.tags.length > 0 &&
     orderProductData?.product.tags.map((tag) => {
-      // console.log("s", s)
       return (
         <BadgeSecondary
           key={tag._id}
@@ -93,19 +61,11 @@ export default function OrderProductCard({
   const unit =
     orderProductData?.product.product.weight.unit === "gr" ? "kg" : "pièce";
 
-  // console.log(
-  //   "ORDERPRODUCTCARDS orderProductData: ",
-  //   JSON.stringify(orderProductData, null, 2),
-  // );
-
-  console.log("ORDERPRODUCTCARD isDeleted :", isDeleted);
-
   return (
     <TouchableOpacity
       onPress={() => {
         if (onPressFn && status === "pending") {
-          onPressFn(orderProductData?.product._id!);
-          toggleCancel();
+          onPressFn(orderProductData?._id);
         }
       }}
       style={{ shadowColor: "#000" }}
@@ -175,18 +135,18 @@ export default function OrderProductCard({
           </View>
         </View>
 
-        {(isCanceled || isDeleted) && (
+        {(productStatus === "canceled" || productStatus === "deleted") && (
           <View className="absolute w-full h-full inset-0">
             <View className="absolute inset-0 opacity-70 w-full h-full bg-black rounded-lg" />
             {status !== "canceled" && (
               <View className="absolute inset-0 flex items-center justify-center h-full w-full">
                 <View>
-                  {isCanceled && (
+                  {productStatus === "canceled" && (
                     <Text className="text-danger text-center font-bold text-lg rounded-lg bg-lightbg p-1">
                       Produit annulé
                     </Text>
                   )}
-                  {isDeleted && (
+                  {productStatus === "deleted" && (
                     <Text className="text-warning font-bold text-lg rounded-lg bg-lightbg p-1">
                       Ce produit n'est plus en vente
                     </Text>

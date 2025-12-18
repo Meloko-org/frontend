@@ -52,30 +52,29 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
     (state: { shop: ShopState }) => state.shop.value,
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isCanceling, setIsCanceling] = useState<boolean>(false);
 
   const { getToken } = useAuth();
 
   const [order, setOrder] = useState<OrderDataForShop | undefined>();
-  const [products, setProducts] = useState<JSX.Element[]>([]);
+  // const [products, setProducts] = useState<JSX.Element[]>([]);
   const [subOrderId, setSubOrderId] = useState<string | undefined>();
-  // const [withdrawMarket, setWithdrawMarket] = useState<string>();
-  // const [withdrawDay, setWithdrawDay] = useState<string>();
-
+  const [canceledProducts, setCanceledProducts] = useState<string[]>([]);
   const [status, setStatus] = useState<
     string | "pending" | "validated" | "withdrawn" | "canceled"
   >("pending");
-  const [canceledProducts, setCanceledProducts] = useState<string[]>([]);
 
-  const weekDays = [
-    "Lundi",
-    "Mardi",
-    "Mercredi",
-    "Jeudi",
-    "Vendredi",
-    "Samedi",
-    "Dimanche",
-  ];
+  // const weekDays = [
+  //   "Lundi",
+  //   "Mardi",
+  //   "Mercredi",
+  //   "Jeudi",
+  //   "Vendredi",
+  //   "Samedi",
+  //   "Dimanche",
+  // ];
 
+  // récupère un order avec un seul élément dans détails
   const fetchOrder = async () => {
     try {
       setIsLoading(true);
@@ -84,11 +83,6 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
         token,
         orderId,
       );
-
-      // console.log(
-      //   "ORDERDETAILS :",
-      //   JSON.stringify(orderResponse.data, null, 2),
-      // );
 
       if (!orderResponse.success) {
         SheetManager.show("alert", {
@@ -101,6 +95,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
         navigation.navigate(from as never);
       } else if (orderResponse.success && orderResponse.data) {
         setOrder(orderResponse.data);
+        setSubOrderId(orderResponse.data?.details[0]._id);
         // mise à jour du status
         setStatus(orderResponse.data?.details[0].status);
       }
@@ -111,44 +106,51 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
     }
   };
 
-  const getProductsFromOrder = (order: OrderData) => {
-    const orderDetail = order.details[0];
+  // const getProductsFromOrder = (order: OrderDataForShop) => {
+  //   const orderDetail = order.details[0];
 
-    const orderProductsCards = orderDetail.products.map((product) => (
-      <OrderProductCard
-        key={product._id}
-        orderProductData={product}
-        extraClasses="mb-3"
-        onPressFn={handleCanceledProducts}
-        status={orderDetail.status}
-      />
-    ));
+  //   const orderProductsCards = orderDetail.products.map((product) => (
+  //     <OrderProductCard
+  //       key={product._id}
+  //       orderProductData={product}
+  //       extraClasses="mb-3"
+  //       onPressFn={handleCanceledProducts}
+  //       status={orderDetail.status}
+  //     />
+  //   ));
 
-    setProducts(orderProductsCards);
-
-    setSubOrderId(orderDetail._id);
-  };
+  //   setProducts(orderProductsCards);
+  //   setSubOrderId(orderDetail._id);
+  // };
 
   useEffect(() => {
     setOrder(undefined);
-    setProducts([]);
+    setCanceledProducts([]);
+    // setProducts([]);
     fetchOrder();
   }, [orderId]);
 
-  useEffect(() => {
-    if (order && shopStore) {
-      getProductsFromOrder(order);
-    }
-  }, [order, shopStore]);
+  // useEffect(() => {
+  //   if (order && shopStore) {
+  //     getProductsFromOrder(order);
+  //   }
+  // }, [order, shopStore]);
 
-  const handleUpdateOrder = async (
+  console.log("subOrderId :", subOrderId);
+
+  const handleUpdateSubOrder = async (
     newStatus: "canceled" | "pending" | "validated" | "withdrawn",
     callback?: (product: OrderProduct) => OrderProduct,
   ) => {
     try {
-      if (!order || !shopStore) return;
+      if (!order || !shopStore || !subOrderId) return;
 
-      setIsLoading(true);
+      if (newStatus !== "canceled") {
+        setIsLoading(true);
+      } else {
+        setIsCanceling(true);
+      }
+
       const updatedOrder = orderTools.buildUpdatedOrder({
         order,
         newStatus: newStatus,
@@ -158,18 +160,37 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
       setOrder(updatedOrder);
 
       const token = await getToken();
-      const values = { order: updatedOrder, status: newStatus };
-      const response = await orderTools.validateOrder(token, values, orderId);
+      const values = {
+        subOrderId,
+        status: newStatus,
+        canceledProducts,
+      };
 
-      Alert.alert("Status de la commande", response.message);
+      console.log("values :", values);
 
-      if (response.result) {
+      const response = await orderTools.updateSubOrder(token, orderId, values);
+
+      // Alert.alert("Status de la commande", response?.message);
+
+      SheetManager.show("alert", {
+        payload: {
+          message: response.message,
+          error: response.error ? response.error : undefined,
+          alertType: response.success ? "success" : "error",
+        },
+      });
+
+      if (response?.success) {
         setStatus(newStatus);
       }
     } catch (error) {
       console.log(error);
     } finally {
-      setIsLoading(false);
+      if (newStatus !== "canceled") {
+        setIsLoading(false);
+      } else {
+        setIsCanceling(false);
+      }
     }
   };
 
@@ -179,7 +200,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
       if (existingProduct) {
         return prevState?.filter((p) => p !== id);
       } else {
-        return [...prevState, id];
+        return prevState ? [...prevState, id] : [id];
       }
     });
   };
@@ -194,12 +215,12 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
               extraClasses="border border-primary bg-lightbg/90 dark:bg-transparent flex-1 mx-1 rounded-lg px-2 h-[60px]"
               textClasses="text-night dark:text-lightbg font-bold text-sm"
               onPressFn={() =>
-                handleUpdateOrder("pending", (product) => ({
+                handleUpdateSubOrder("pending", (product) => ({
                   ...product,
                   isConfirmed: false,
                 }))
               }
-              isLoading={isLoading}
+              isLoading={isCanceling}
             />
           </View>
         );
@@ -212,7 +233,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                 extraClasses="bg-danger flex-1 mx-1 rounded-lg px-2 h-[80px]"
                 textClasses="text-lightbg font-bold text-sm"
                 onPressFn={() =>
-                  handleUpdateOrder("canceled", (product) => ({
+                  handleUpdateSubOrder("canceled", (product) => ({
                     ...product,
                     isConfirmed: false,
                   }))
@@ -224,7 +245,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                 extraClasses="bg-primary flex-1 mx-1 rounded-lg px-2 h-[80px]"
                 textClasses="text-lightbg font-bold text-lg"
                 onPressFn={() =>
-                  handleUpdateOrder("validated", (product) => {
+                  handleUpdateSubOrder("validated", (product) => {
                     if (!canceledProducts.includes(product.product._id)) {
                       return { ...product, isConfirmed: true };
                     }
@@ -244,7 +265,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                 label={`VALIDER LE RETRAIT`}
                 extraClasses="bg-primary flex-1 mx-1 rounded-lg px-2 h-[80px]"
                 textClasses="text-lightbg font-bold text-lg"
-                onPressFn={() => handleUpdateOrder("withdrawn")}
+                onPressFn={() => handleUpdateSubOrder("withdrawn")}
                 isLoading={isLoading}
               />
               {/* <Custom
@@ -264,6 +285,8 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
         return null;
     }
   };
+
+  console.log("canceledProducts :", canceledProducts);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -296,7 +319,25 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                     (Cliquez sur un produit pour l'annuler avant de valider)
                   </TextBody2>
                 </View>
-                {products}
+                {/* {products} */}
+                {order.details[0].products.map((p) => {
+                  const productStatus = p.product.isDeleted
+                    ? "deleted"
+                    : !p.isConfirmed || canceledProducts.includes(p._id)
+                      ? "canceled"
+                      : "confirmed";
+
+                  return (
+                    <OrderProductCard
+                      key={p._id}
+                      orderProductData={p}
+                      productStatus={productStatus}
+                      extraClasses="mb-3"
+                      onPressFn={handleCanceledProducts}
+                      status={status}
+                    />
+                  );
+                })}
               </View>
             </ScrollView>
           )
