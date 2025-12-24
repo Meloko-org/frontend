@@ -1,12 +1,15 @@
 import {
   ApiResponse,
+  FileResponse,
   OrderData,
   OrderDataForShop,
   OrderProduct,
   OrderSummary,
+  PdfResult,
   // ProductDetail,
   StockData,
 } from "../types/API";
+import * as FileSystem from "expo-file-system";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
@@ -198,8 +201,68 @@ const buildUpdatedOrder = ({
   };
 };
 
-// gestion des status
+// récupère la facture pour la partager
+const getInvoice = async (
+  token: string | null,
+  invoiceId: string,
+): Promise<FileResponse> => {
+  try {
+    const response = await fetch(`${API_ROOT}/invoices/${invoiceId}/pdf`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        mode: "cors",
+      },
+    });
 
+    if (!response.ok) {
+      return {
+        success: false,
+        message: `Erreur ${response.status}: Impossible de télécharger la facture.`,
+      };
+    }
+
+    const blob = await response.blob();
+
+    return { success: true, blob };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      message: "Une erreur s'est produite lors de la récupération des données.",
+    };
+  }
+};
+
+// récupère la facture pour l'afficher
+const getInvoicePdf = async (
+  token: string | null,
+  invoiceId: string,
+): Promise<PdfResult> => {
+  try {
+    const fileUri = FileSystem.cacheDirectory + `invoice-${invoiceId}.pdf`;
+
+    const result = await FileSystem.downloadAsync(
+      `${API_ROOT}/invoices/${invoiceId}/pdf`,
+      fileUri,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    return { success: true, uri: result.uri };
+  } catch (e) {
+    return {
+      success: false,
+      message: "Impossible d’afficher la facture.",
+    };
+  }
+};
+
+// gestion des status
 type GlobalOrderStatus =
   | "pending"
   | "partialValidated"
@@ -283,4 +346,6 @@ export default {
   buildUpdatedOrder,
   getProductCost,
   getPriceInEuros,
+  getInvoice,
+  getInvoicePdf,
 };

@@ -315,6 +315,11 @@ type RootStackParamList = {
     productData?: ProductData;
     onboarding: true;
   };
+  DisplayPdf: {
+    id: string;
+    type: "invoice" | "creditNote";
+    title?: string;
+  };
 };
 
 type Redirect =

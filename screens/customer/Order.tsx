@@ -240,7 +240,7 @@ export default function OrderCustomerScreen({
         <TextHeading4
           centered
           extraClasses="mb-4"
-        >{`Commande n° ${newOrder?.invoiceNumber}`}</TextHeading4>
+        >{`Commande n° ${newOrder?.orderNumber}`}</TextHeading4>
         <View
           style={{ shadowColor: "#000" }}
           className="rounded-lg bg-danger p-3 mb-3"

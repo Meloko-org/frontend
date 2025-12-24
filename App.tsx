@@ -42,6 +42,7 @@ import Onboarding2Screen from "./screens/Onboarding2";
 import Onboarding3Screen from "./screens/Onboarding3";
 import Onboarding4Screen from "./screens/Onboarding4";
 import Onboarding5Screen from "./screens/Onboarding5";
+import DisplayPdfScreen from "./screens/DisplayPdf";
 import StocksOldScreen from "./screens/Stocks";
 import ComponentsScreen from "./screens/Components";
 /* Tab USER screens */
@@ -678,6 +679,10 @@ export default function App() {
                         <Stack.Screen
                           name="OnboardingStockFamilies"
                           component={StockFamiliesScreen}
+                        />
+                        <Stack.Screen
+                          name="DisplayPdf"
+                          component={DisplayPdfScreen}
                         />
                         <Stack.Screen
                           name="TabNavigatorUser"

@@ -48,7 +48,7 @@ export default function OrderStatus({
 
         <View className="flex flex-row items-center justify-between w-full mb-1">
           <View>
-            <BlackBadge extraClasses="py-1 px-2">{`N°${orderData.invoiceNumber}`}</BlackBadge>
+            <BlackBadge extraClasses="py-1 px-2">{`N°${orderData.orderNumber}`}</BlackBadge>
           </View>
           <View className="">
             <Text className="text-black dark:text-lightbg text-right">

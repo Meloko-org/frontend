@@ -116,31 +116,32 @@ export default function ValidatedOrdersScreen({ navigation, route }: Props) {
       </View>
 
       <View style={{ flex: 10 }}>
-        <View className="px-3 mb-5">
-          <FlatList
-            data={validatedOrders}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
-              <OrderStatus
-                orderData={item}
-                extraClasses="mb-2"
-                onPressFn={() => {
-                  console.log("clicked order: ", item?._id);
-                  handlePressCard(item);
-                }}
-              />
-            )}
-            onEndReached={() => {
-              if (currentPage < totalPages) {
-                loadMoreOrders(); // fonction pour fetch page suivante
-              }
-            }}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={isLoading ? <Spinner /> : null}
-            refreshing={isRefreshing}
-            onRefresh={onRefresh}
-          />
-        </View>
+        {/* <View className="px-3 mb-5"> */}
+        <FlatList
+          data={validatedOrders}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <OrderStatus
+              orderData={item}
+              extraClasses="mb-2"
+              onPressFn={() => {
+                console.log("clicked order: ", item?._id);
+                handlePressCard(item);
+              }}
+            />
+          )}
+          onEndReached={() => {
+            if (currentPage < totalPages) {
+              loadMoreOrders(); // fonction pour fetch page suivante
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12 }}
+          ListFooterComponent={isLoading ? <Spinner /> : null}
+          refreshing={isRefreshing}
+          onRefresh={onRefresh}
+        />
+        {/* </View> */}
       </View>
     </SafeAreaView>
   );

@@ -21,6 +21,7 @@ type MainButtonProps = {
   iconName?: string;
   iconFamily?: IconLibraryName;
   iconColor?: string;
+  bgColor?: string;
   extraClasses?: string;
   onPressFn: ((event: GestureResponderEvent) => void) | undefined;
   animated?: boolean;
@@ -37,6 +38,7 @@ export default function MainButton({
   iconFamily,
   iconColor,
   iconSize,
+  bgColor,
   extraClasses,
   onPressFn,
   animated,
@@ -61,41 +63,6 @@ export default function MainButton({
     inputRange: [0, 1],
     outputRange: ["0deg", "180deg"],
   });
-
-  const handlePress = (event: GestureResponderEvent) => {
-    // Si l'animation est activée via la prop, démarre l'animation
-    if (animated) {
-      startAnimation();
-    }
-
-    // Appelle la fonction onPressFn si elle est passée
-    if (onPressFn) {
-      onPressFn(event);
-    }
-  };
-
-  const IconComponent = iconFamily
-    ? iconLibraries[iconFamily]
-    : iconLibraries["FontAwesome5Icon"];
-
-  const labelIconTop = (
-    <TouchableOpacity
-      className={`${extraClasses} flex rounded-lg justify-center items-center bg-primary/90 mb-2`}
-      onPress={handlePress}
-    >
-      {/* Applique la rotation à l'icône via transform */}
-      <Animated.View style={{ transform: [{ rotate: rotation }] }}>
-        {IconComponent && (
-          <IconComponent
-            name={iconName}
-            size={iconSize ? iconSize : 25}
-            color={iconColor}
-          />
-        )}
-      </Animated.View>
-      <Text className="text-white text-lg/5 text-center">{label}</Text>
-    </TouchableOpacity>
-  );
 
   const ball1 = useRef(new Animated.Value(0)).current;
   const ball2 = useRef(new Animated.Value(0)).current;
@@ -142,12 +109,69 @@ export default function MainButton({
     ]),
   ).start();
 
+  const handlePress = (event: GestureResponderEvent) => {
+    // Si l'animation est activée via la prop, démarre l'animation
+    if (animated) {
+      startAnimation();
+    }
+
+    // Appelle la fonction onPressFn si elle est passée
+    if (onPressFn) {
+      onPressFn(event);
+    }
+  };
+
+  const IconComponent = iconFamily
+    ? iconLibraries[iconFamily]
+    : iconLibraries["FontAwesome5Icon"];
+
+  // const bgColorDisabled = bgColor && bgColor+"/60"
+
+  const labelIconTop = (
+    <TouchableOpacity
+      className={`
+        ${extraClasses} 
+        ${
+          disabled
+            ? bgColor
+              ? bgColor
+              : "bg-primary/60"
+            : bgColor
+              ? bgColor
+              : "bg-primary"
+        }
+        flex rounded-lg justify-center items-center
+        `}
+      onPress={handlePress}
+    >
+      {/* Applique la rotation à l'icône via transform */}
+      <Animated.View style={{ transform: [{ rotate: rotation }] }}>
+        {IconComponent && (
+          <IconComponent
+            name={iconName}
+            size={iconSize ? iconSize : 25}
+            color={iconColor}
+          />
+        )}
+      </Animated.View>
+      <Text className="text-white text-lg/5 text-center">{label}</Text>
+    </TouchableOpacity>
+  );
+
   const labelIconEnd = (
     <TouchableOpacity
       className={`
         ${extraClasses} 
-        ${disabled ? "bg-primary/60" : "bg-primary/90"}
-        relative flex flex-row rounded-lg shadow-sm py-1 justify-center items-center px-2 w-min
+        ${
+          disabled
+            ? bgColor
+              ? bgColor
+              : "bg-primary/60"
+            : bgColor
+              ? bgColor
+              : "bg-primary/90"
+        }
+        relative flex flex-row rounded-lg py-1 justify-center items-center px-2
       `}
       onPress={handlePress}
       disabled={disabled}
@@ -188,7 +212,19 @@ export default function MainButton({
 
   const icon = (
     <TouchableOpacity
-      className={`${extraClasses} p-1 w-fit`}
+      className={`
+        ${extraClasses}
+        ${
+          disabled
+            ? bgColor
+              ? bgColor
+              : "bg-primary/60"
+            : bgColor
+              ? bgColor
+              : "bg-primary"
+        }
+        p-1 w-fit
+      `}
       onPress={handlePress}
     >
       {/* Applique la rotation à l'icône via transform */}
@@ -203,6 +239,7 @@ export default function MainButton({
       </Animated.View>
     </TouchableOpacity>
   );
+
   const selectedButton = () => {
     switch (buttonType) {
       case "label-icon-top":

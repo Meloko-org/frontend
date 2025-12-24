@@ -23,8 +23,9 @@ type OrderDetail = {
   shopTotalVAT: number;
   shopTotalTTC: number;
   shopInvoiceNumber: number;
-  invoicePdfUrl?: string;
   status: string;
+  invoice: string;
+  creditNote: string;
 };
 
 type OrderData = {
@@ -58,7 +59,7 @@ type OrderData = {
   totalHT: number;
   totalVAT: number;
   totalTTC: number;
-  invoiceNumber: string;
+  orderNumber: string;
   createdAt: Date;
 };
 
@@ -506,6 +507,14 @@ type ApiResponse<T> = {
   message?: string;
 };
 
+type FileResponse =
+  | { success: true; blob: Blob }
+  | { success: false; message: string };
+
+type PdfResult =
+  | { success: true; uri: string }
+  | { success: false; message: string };
+
 type OrderSummary = {
   _id: string;
   createdAt: string;
@@ -723,6 +732,8 @@ export type {
   // ProductDetail,
   WeightData,
   ApiResponse,
+  FileResponse,
+  PdfResult,
   NoteData,
   OrderSummary,
   ShopCategoriesWithFamiliesData,

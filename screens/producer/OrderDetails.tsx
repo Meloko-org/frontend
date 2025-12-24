@@ -1,9 +1,21 @@
 import React, { JSX, useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 
-import { RouteProp, useRoute } from "@react-navigation/native";
+// import { RouteProp, useRoute } from "@react-navigation/native";
+// import { BottomTabNavigationProp, BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+// import { ProducerTabParamList, RootStackParamList } from "../../types/Navigation";
+// import { NativeStackScreenProps } from "@react-navigation/native-stack";
+
+import { RouteProp } from "@react-navigation/native";
+import { CompositeNavigationProp } from "@react-navigation/native";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
-import { ProducerTabParamList } from "../../types/Navigation";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+// ✅ Import de tes types centralisés
+import {
+  RootStackParamList,
+  ProducerTabParamList,
+} from "../../types/Navigation";
 
 import { useSelector, UseSelector } from "react-redux";
 import { ShopState } from "../../reducers/shop";
@@ -16,13 +28,15 @@ import {
 } from "../../types/API";
 
 import orderTools from "../../modules/orderTools";
-import globalTools from "../../modules/globalTools";
+
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
 
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SheetManager } from "react-native-actions-sheet";
 
-import { Alert, View } from "react-native";
+import { Alert, View, Text } from "react-native";
 import TextHeading3 from "../../components/utils/texts/Heading3";
 import OrderStatus from "../../components/cards/OrderStatus";
 import TextBody1 from "../../components/utils/texts/Body1";
@@ -32,17 +46,31 @@ import TextBody2 from "../../components/utils/texts/Body2";
 import Spinner from "../../components/utils/Spinner";
 import TopBar from "../../components/TopBar";
 import TextHeading4 from "../../components/utils/texts/Heading4";
+import IconButton from "../../components/utils/buttons/Icon";
+import MainButton from "../../components/utils/buttons/MainButton";
 
-type OrderDetailsRouteProp = RouteProp<ProducerTabParamList, "OrderDetails">;
+// type OrderDetailsRouteProp = RouteProp<ProducerTabParamList, "OrderDetails">;
 
-type OrderDetailsNavProp = BottomTabNavigationProp<
-  ProducerTabParamList,
-  "OrderDetails"
+// type OrderDetailsNavProp = BottomTabNavigationProp<
+//   ProducerTabParamList,
+//   "OrderDetails"
+// >;
+
+// type Props = {
+//   navigation: OrderDetailsNavProp;
+//   route: OrderDetailsRouteProp;
+// };
+
+type ProducerProfileNavProp = CompositeNavigationProp<
+  BottomTabNavigationProp<ProducerTabParamList, "OrderDetails">,
+  NativeStackNavigationProp<RootStackParamList>
 >;
 
+type ProducerProfileRouteProp = RouteProp<ProducerTabParamList, "OrderDetails">;
+
 type Props = {
-  navigation: OrderDetailsNavProp;
-  route: OrderDetailsRouteProp;
+  navigation: ProducerProfileNavProp;
+  route: ProducerProfileRouteProp;
 };
 
 export default function OrderDetailsScreen({ navigation, route }: Props) {
@@ -63,16 +91,6 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
   const [status, setStatus] = useState<
     string | "pending" | "validated" | "withdrawn" | "canceled"
   >("pending");
-
-  // const weekDays = [
-  //   "Lundi",
-  //   "Mardi",
-  //   "Mercredi",
-  //   "Jeudi",
-  //   "Vendredi",
-  //   "Samedi",
-  //   "Dimanche",
-  // ];
 
   // récupère un order avec un seul élément dans détails
   const fetchOrder = async () => {
@@ -96,7 +114,6 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
       } else if (orderResponse.success && orderResponse.data) {
         setOrder(orderResponse.data);
         setSubOrderId(orderResponse.data?.details[0]._id);
-        // mise à jour du status
         setStatus(orderResponse.data?.details[0].status);
       }
     } catch (error) {
@@ -106,23 +123,6 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
     }
   };
 
-  // const getProductsFromOrder = (order: OrderDataForShop) => {
-  //   const orderDetail = order.details[0];
-
-  //   const orderProductsCards = orderDetail.products.map((product) => (
-  //     <OrderProductCard
-  //       key={product._id}
-  //       orderProductData={product}
-  //       extraClasses="mb-3"
-  //       onPressFn={handleCanceledProducts}
-  //       status={orderDetail.status}
-  //     />
-  //   ));
-
-  //   setProducts(orderProductsCards);
-  //   setSubOrderId(orderDetail._id);
-  // };
-
   useEffect(() => {
     setOrder(undefined);
     setCanceledProducts([]);
@@ -130,25 +130,29 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
     fetchOrder();
   }, [orderId]);
 
-  // useEffect(() => {
-  //   if (order && shopStore) {
-  //     getProductsFromOrder(order);
-  //   }
-  // }, [order, shopStore]);
+  const hasInvoice = order && !!order.details[0].invoice;
+  const hasCreditNote = order && !!order.details[0].creditNote;
 
   console.log("subOrderId :", subOrderId);
+  console.log("order :", order);
+  console.log("shopStore :", shopStore);
 
   const handleUpdateSubOrder = async (
     newStatus: "canceled" | "pending" | "validated" | "withdrawn",
     callback?: (product: OrderProduct) => OrderProduct,
   ) => {
-    try {
-      if (!order || !shopStore || !subOrderId) return;
+    console.log("youpi");
 
-      if (newStatus !== "canceled") {
-        setIsLoading(true);
-      } else {
+    try {
+      if (!order || !subOrderId) {
+        // console.log("order :", Object.keys(order).length > 0)
+        return;
+      }
+
+      if (newStatus === "canceled") {
         setIsCanceling(true);
+      } else {
+        setIsLoading(true);
       }
 
       const updatedOrder = orderTools.buildUpdatedOrder({
@@ -286,7 +290,62 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
     }
   };
 
+  const downloadCreditNote = async (creditNote) => {};
+
+  const downloadInvoice = async (invoiceId: string) => {
+    console.log("invoiceId :", invoiceId);
+    const token = await getToken();
+    const invoiceResponse = await orderTools.getInvoice(token, invoiceId);
+
+    if (!invoiceResponse.success) {
+      SheetManager.show("alert", {
+        payload: {
+          message: invoiceResponse.message,
+          alertType: "error",
+        },
+      });
+      return;
+    }
+
+    try {
+      const fileUri = FileSystem.documentDirectory + `facture-${invoiceId}.pdf`;
+
+      const reader = new FileReader();
+
+      reader.onloadend = async () => {
+        const base64Data = reader.result?.toString().split(",")[1];
+
+        if (!base64Data) return;
+
+        await FileSystem.writeAsStringAsync(fileUri, base64Data, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+
+        await Sharing.shareAsync(fileUri);
+      };
+
+      reader.readAsDataURL(invoiceResponse.blob);
+    } catch (error) {
+      console.error(error);
+      SheetManager.show("alert", {
+        payload: {
+          message: "Impossible d’ouvrir la facture.",
+          alertType: "error",
+        },
+      });
+    }
+  };
+
+  const displayInvoice = (invoiceId: string) => {
+    navigation.navigate("DisplayPdf", {
+      id: invoiceId,
+      type: "invoice",
+      title: "Facture",
+    });
+  };
+
   console.log("canceledProducts :", canceledProducts);
+  console.log("hasInvoice :", hasInvoice);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -311,7 +370,88 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
               className="w-full flex-1 pb-5"
             >
               <View className="p-3">
-                <OrderStatus orderData={order} status={status} />
+                <OrderStatus
+                  orderData={order}
+                  status={status}
+                  extraClasses="mb-3"
+                />
+
+                <View className="flex flex-row justify-center">
+                  {hasCreditNote && (
+                    <View className="flex flex-row flex-shrink justify-center mr-2">
+                      <View className="rounded-lg bg-tertiary/30 dark:bg-tertiary p-2 mb-3">
+                        <Text className="text-white font-bold text-sm text-center mb-2">
+                          AVOIR
+                        </Text>
+                        <View className="flex flex-row justify-around">
+                          <MainButton
+                            label="Partager"
+                            buttonType="label-icon-top"
+                            iconName="file-pdf"
+                            iconColor="white"
+                            iconFamily="FontAwesome6Icon"
+                            bgColor="bg-withdrawn"
+                            iconSize={25}
+                            extraClasses="p-2 w-18 mr-2"
+                            onPressFn={() =>
+                              downloadCreditNote(order.details[0].invoice)
+                            }
+                          />
+                          <MainButton
+                            label="Afficher"
+                            buttonType="label-icon-top"
+                            iconName="file-pdf"
+                            iconColor="white"
+                            iconFamily="FontAwesome6Icon"
+                            bgColor="bg-partialWithdrawn"
+                            iconSize={25}
+                            extraClasses="p-2 w-18"
+                            onPressFn={() =>
+                              displayCreditNote(order.details[0].creditNote)
+                            }
+                          />
+                        </View>
+                      </View>
+                    </View>
+                  )}
+                  {hasInvoice && (
+                    <View className="flex flex-row flex-shrink justify-center">
+                      <View className="rounded-lg bg-tertiary/30 dark:bg-tertiary p-2 mb-3">
+                        <Text className="text-white font-bold text-sm text-center mb-2">
+                          FACTURE
+                        </Text>
+                        <View className="flex flex-row justify-around">
+                          <MainButton
+                            label="Partager"
+                            buttonType="label-icon-top"
+                            iconName="file-pdf"
+                            iconColor="white"
+                            iconFamily="FontAwesome6Icon"
+                            bgColor="bg-validated"
+                            iconSize={25}
+                            extraClasses="p-2 w-18 mr-2"
+                            onPressFn={() =>
+                              downloadInvoice(order.details[0].invoice)
+                            }
+                          />
+                          <MainButton
+                            label="Afficher"
+                            buttonType="label-icon-top"
+                            iconName="file-pdf"
+                            iconColor="white"
+                            iconFamily="FontAwesome6Icon"
+                            bgColor="bg-partialValidated"
+                            iconSize={25}
+                            extraClasses="p-2 w-18"
+                            onPressFn={() =>
+                              displayInvoice(order.details[0].invoice)
+                            }
+                          />
+                        </View>
+                      </View>
+                    </View>
+                  )}
+                </View>
 
                 <View className="mt-5 mb-2">
                   <TextHeading4 centered>Détail</TextHeading4>
@@ -319,7 +459,6 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                     (Cliquez sur un produit pour l'annuler avant de valider)
                   </TextBody2>
                 </View>
-                {/* {products} */}
                 {order.details[0].products.map((p) => {
                   const productStatus = p.product.isDeleted
                     ? "deleted"

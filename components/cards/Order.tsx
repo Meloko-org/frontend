@@ -44,7 +44,7 @@ export default function CardOrder(props: CardOrderProps): JSX.Element {
         className={`${props.extraClasses} shadow-lg rounded-lg bg-white p-2 dark:bg-tertiary`}
       >
         <View className="mb-2">
-          <TextHeading4>{`Commande n° ${props.orderData.invoiceNumber}`}</TextHeading4>
+          <TextHeading4>{`Commande n° ${props.orderData.orderNumber}`}</TextHeading4>
         </View>
 
         <View className="flex flex-row items-center gap-x-2">

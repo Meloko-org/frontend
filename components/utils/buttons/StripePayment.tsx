@@ -246,7 +246,7 @@ export default function StripePaymentButton({
     };
   };
 
-  // pour mettre à jour les orders du client dans le userStore
+  // pour mettre à jour les orders du client dans le userStore // à supprimer
   const fetchData = async () => {
     try {
       // store user's info in the store

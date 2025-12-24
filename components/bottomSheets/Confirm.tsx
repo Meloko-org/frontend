@@ -50,7 +50,7 @@ export default function ConfirmSheet(props: SheetProps<"confirm">) {
         <TextHeading3 centered extraClasses="font-extrabold text-xl">
           {props.payload?.message}
         </TextHeading3>
-        <View className="flex flex-row w-[50%] justify-around mt-5">
+        <View className="flex flex-row w-[50%] justify-around mt-5 w-full">
           <SecondaryButton
             label="Annuler"
             onPressFn={() => {

@@ -366,7 +366,7 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
                 <TextHeading3
                   extraClasses="mb-3"
                   centered
-                >{`Commande\nn° ${order.invoiceNumber}`}</TextHeading3>
+                >{`Commande\nn° ${order.orderNumber}`}</TextHeading3>
               </View>
               <View className="w-1/6">
                 <CloseSheetButton
