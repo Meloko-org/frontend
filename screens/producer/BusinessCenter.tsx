@@ -226,7 +226,7 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
   };
 
   console.log("------------------ BUSINESS CENTER ------------------");
-  console.log("shopStore :", shopStore);
+  // console.log("shopStore :", shopStore);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

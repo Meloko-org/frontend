@@ -14,20 +14,14 @@ import orderTools from "../modules/orderTools";
 import Spinner from "../components/utils/Spinner";
 import { View } from "react-native";
 import PrimaryButton from "../components/utils/buttons/Primary";
-
-// type DisplayPdfRouteProp = RouteProp<
-//   RootStackParamList,
-//   "DisplayPdf"
-// >;
-
-// type Props = {
-//   route: DisplayPdfRouteProp;
-// };
+import { SafeAreaView } from "react-native-safe-area-context";
+import TopBar from "../components/TopBar";
+import MainButton from "../components/utils/buttons/MainButton";
 
 type Props = NativeStackScreenProps<RootStackParamList, "DisplayPdf">;
 
-export default function DisplayPdfScreen({ route }: Props) {
-  const { id, type, title } = route.params;
+export default function DisplayPdfScreen({ navigation, route }: Props) {
+  const { from, backLabel, screenTitle, id } = route.params;
   const { getToken } = useAuth();
 
   const [pdfUri, setPdfUri] = useState<string | null>(null);
@@ -47,16 +41,66 @@ export default function DisplayPdfScreen({ route }: Props) {
     }
   };
 
-  if (!pdfUri) return <Spinner />;
+  if (!pdfUri)
+    return (
+      <View className="flex-1 w-full h-full items-center justify-center">
+        <Spinner />
+      </View>
+    );
+
+  console.log(pdfUri);
 
   return (
-    <View style={{ flex: 1 }}>
-      <Pdf source={{ uri: pdfUri }} style={{ flex: 1 }} />
+    <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
+      <View style={{ flex: 1 }}>
+        <TopBar
+          onBackPress={() => navigation.goBack()}
+          backLabel={backLabel || "Retour au tableau"}
+          screen={from || "businessCenter"}
+          label={screenTitle || "COMMANDES\nEN ATTENTE"}
+          extraClasses="mt-2 mb-5"
+        />
+      </View>
 
-      <PrimaryButton
-        label="Partager"
-        onPressFn={() => Sharing.shareAsync(pdfUri)}
-      />
-    </View>
+      <View style={{ flex: 9 }}>
+        <View className="flex-1 my-2">
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "#FCFFF0",
+              borderRadius: 8,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.25,
+              shadowRadius: 6,
+              elevation: 6,
+            }}
+          >
+            <Pdf
+              source={{ uri: pdfUri }}
+              style={{ flex: 1, backgroundColor: "#fff" }}
+              trustAllCerts={false}
+              onError={(error) => console.log("PDF error", error)}
+            />
+          </View>
+        </View>
+      </View>
+
+      <View style={{ flex: 1 }} className="flex flex-row justify-center px-5">
+        <View className="">
+          <MainButton
+            label="Partager"
+            buttonType="label-icon-top"
+            iconName="file-pdf"
+            iconColor="white"
+            iconFamily="FontAwesome6Icon"
+            bgColor="bg-withdrawn"
+            iconSize={25}
+            extraClasses="p-2 w-18 mr-2"
+            onPressFn={() => Sharing.shareAsync(pdfUri)}
+          />
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }

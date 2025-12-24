@@ -49,28 +49,16 @@ import TextHeading4 from "../../components/utils/texts/Heading4";
 import IconButton from "../../components/utils/buttons/Icon";
 import MainButton from "../../components/utils/buttons/MainButton";
 
-// type OrderDetailsRouteProp = RouteProp<ProducerTabParamList, "OrderDetails">;
-
-// type OrderDetailsNavProp = BottomTabNavigationProp<
-//   ProducerTabParamList,
-//   "OrderDetails"
-// >;
-
-// type Props = {
-//   navigation: OrderDetailsNavProp;
-//   route: OrderDetailsRouteProp;
-// };
-
-type ProducerProfileNavProp = CompositeNavigationProp<
+type OrderDetailsNavProp = CompositeNavigationProp<
   BottomTabNavigationProp<ProducerTabParamList, "OrderDetails">,
   NativeStackNavigationProp<RootStackParamList>
 >;
 
-type ProducerProfileRouteProp = RouteProp<ProducerTabParamList, "OrderDetails">;
+type OrderDetailsRouteProp = RouteProp<ProducerTabParamList, "OrderDetails">;
 
 type Props = {
-  navigation: ProducerProfileNavProp;
-  route: ProducerProfileRouteProp;
+  navigation: OrderDetailsNavProp;
+  route: OrderDetailsRouteProp;
 };
 
 export default function OrderDetailsScreen({ navigation, route }: Props) {
@@ -135,7 +123,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
 
   console.log("subOrderId :", subOrderId);
   console.log("order :", order);
-  console.log("shopStore :", shopStore);
+  // console.log("shopStore :", shopStore);
 
   const handleUpdateSubOrder = async (
     newStatus: "canceled" | "pending" | "validated" | "withdrawn",
@@ -338,9 +326,10 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
 
   const displayInvoice = (invoiceId: string) => {
     navigation.navigate("DisplayPdf", {
+      from: "OrderDetails",
+      backLabel: "Retour facture",
+      screenTitle: "FACTURE",
       id: invoiceId,
-      type: "invoice",
-      title: "Facture",
     });
   };
 

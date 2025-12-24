@@ -316,9 +316,10 @@ type RootStackParamList = {
     onboarding: true;
   };
   DisplayPdf: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
     id: string;
-    type: "invoice" | "creditNote";
-    title?: string;
   };
 };
 

@@ -17,6 +17,7 @@ type TopBarProps = {
   onLayout?: (event: LayoutChangeEvent) => void;
   backLabel: string;
   label: string;
+  onBackPress?: () => void;
   screen: keyof RootStackParamList | string;
   screenParams?: object;
   extraClasses?: string;
@@ -30,6 +31,7 @@ export default function TopBar({
   onLayout,
   backLabel,
   label,
+  onBackPress,
   screen,
   screenParams,
   extraClasses,
@@ -48,6 +50,10 @@ export default function TopBar({
         <BackLabelButton
           backLabel={backLabel}
           onPressFn={() => {
+            if (onBackPress) {
+              onBackPress();
+              return;
+            }
             if (screenParams) {
               (navigation as any).navigate(
                 screen as never,
