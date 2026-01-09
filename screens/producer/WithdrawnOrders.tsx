@@ -53,16 +53,27 @@ export default function WithdrawnOrdersScreen({ navigation, route }: Props) {
   const fetchWithdrawnOrders = async (page = 1) => {
     setIsLoading(true);
     const token = await getToken();
-    const pendingResponse = await businessTools.getOrders(
+    const withdrawnResponse = await businessTools.getOrders(
       token,
-      "withdrawn",
+      "picked_up",
       page,
     );
 
-    if (!pendingResponse.success) {
+    if (!withdrawnResponse.success) {
       SheetManager.show("alert", {
         payload: {
-          message: "Aucune commande en attente.",
+          message: withdrawnResponse.message,
+          alertType: "warning",
+        },
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    if (withdrawnResponse.orders.length === 0) {
+      SheetManager.show("alert", {
+        payload: {
+          message: "Aucune commande retirée.",
           alertType: "warning",
         },
       });
@@ -71,19 +82,20 @@ export default function WithdrawnOrdersScreen({ navigation, route }: Props) {
     }
 
     if (page === 1) {
-      setWithdrawnOrders(pendingResponse.orders);
+      setWithdrawnOrders(withdrawnResponse.orders);
     } else {
-      setWithdrawnOrders((prev) => [...prev, ...pendingResponse.orders]);
+      setWithdrawnOrders((prev) => [...prev, ...withdrawnResponse.orders]);
     }
 
-    setCurrentPage(pendingResponse.page);
-    setTotalPages(pendingResponse.totalPages);
+    setCurrentPage(withdrawnResponse.page);
+    setTotalPages(withdrawnResponse.totalPages);
 
     setIsLoading(false);
   };
 
   useFocusEffect(
     React.useCallback(() => {
+      setWithdrawnOrders([]);
       fetchWithdrawnOrders(1);
     }, []),
   );
@@ -113,6 +125,7 @@ export default function WithdrawnOrdersScreen({ navigation, route }: Props) {
       <View className="px-3">
         <FlatList
           data={withdrawnOrders}
+          extraData={withdrawnOrders.map((o) => o._id).join(",")}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <OrderStatus

@@ -3,12 +3,14 @@ type OrderProduct = {
   _id: string;
   product: StockData;
   quantity: number;
+  unit: string;
   unitPriceTTC: number;
   unitPriceHT: number;
   vatRate: number;
   vatAMount: number;
   totalPriceTTC: number;
-  isConfirmed: boolean;
+  productStatus: ProductStatus;
+  pickedUp: boolean;
 };
 
 type OrderDetail = {
@@ -22,10 +24,11 @@ type OrderDetail = {
   shopTotalHT: number;
   shopTotalVAT: number;
   shopTotalTTC: number;
-  shopInvoiceNumber: number;
-  status: string;
+  status: SubOrderStatus;
   invoice: string;
-  creditNote: string;
+  creditNotes: string[];
+  stockIssue: boolean;
+  stockIssueProduct: string;
 };
 
 type OrderData = {
@@ -54,6 +57,7 @@ type OrderData = {
   details: OrderDetail[];
   isWithdraw: boolean;
   isPaid: boolean;
+  paidAt: Date;
   paymentMethod: string;
   stripePIId: string;
   totalHT: number;
@@ -71,106 +75,58 @@ type ShopOrderStatus = {
   status: "pending" | "validated" | "withdrawn" | "canceled";
 };
 
-// type OrderData = {
-//   _id: string;
-//   user: UserData;
-//   billingAddress: {
-//     name: string;
-//     address1: string;
-//     address2: string;
-//     postalCode: string;
-//     city: string;
-//     country: string;
-//     latitude: number;
-//     longitude: number;
-//   };
-//   shippingAddress: {
-//     name: string;
-//     address1: string;
-//     address2: string;
-//     postalCode: string;
-//     city: string;
-//     country: string;
-//     latitude: number;
-//     longitude: number;
-//   };
-//   details: [
-//     {
-//       _id: string;
-//       products: [
-//         {
-//           _id: string;
-//           product: StockData;
-//           quantity: number;
-//           unitPriceTTC: number;
-//           unitPriceHT: number;
-//           vatRate: number;
-//           vatAMount: number;
-//           totalPriceTTC: number;
-//           isConfirmed: boolean;
-//         },
-//       ];
-//       withdrawMode: string;
-//       withdrawMarket: string;
-//       withdrawDay: number;
-//       market: MarketData;
-//       shop: ShopData;
-//       shopTotalHT: number;
-//       shopTotalVAT: number;
-//       shopTotalTTC: number;
-//       shopInvoiceNumber: number;
-//       invoicePdfUrl: string | undefined;
-//       status: string;
-//     },
-//   ];
-//   isWithdraw: boolean;
-//   isPaid: boolean;
-//   paymentMethod: string;
-//   stripePIId: string;
-//   totalHT: number;
-//   totalVAT: number;
-//   totalTTC: number;
-//   invoiceNumber: string;
-//   createdAt: Date;
-// };
+type OrderStatus =
+  | "pending"
+  | "paid"
+  | "stock_conflict"
+  | "completed"
+  | "cancelled";
 
-// type OrderDataForShop = Omit<OrderData, "details"> & {
-//   details: [
-//     {
-//       _id: string;
-//       products: [
-//         {
-//           _id: string;
-//           product: StockData;
-//           quantity: number;
-//           unitPriceTTC: number;
-//           unitPriceHT: number;
-//           vatRate: number;
-//           vatAMount: number;
-//           totalPriceTTC: number;
-//           isConfirmed: boolean;
-//         },
-//       ];
-//       withdrawMode: string;
-//       withdrawMarket: string;
-//       withdrawDay: number;
-//       market: MarketData;
-//       shop: ShopData;
-//       shopTotalHT: number;
-//       shopTotalVAT: number;
-//       shopTotalTTC: number;
-//       shopInvoiceNumber: number;
-//       invoicePdfUrl: string | undefined;
-//       status: string;
-//     }
-//   ]; // ✅ tuple volontaire
-// };
+type SubOrderStatus =
+  | "pending"
+  | "prepared"
+  | "partially_prepared"
+  | "picked_up"
+  | "partially_picked_up"
+  | "cancelled";
 
-// type ProductDetail = {
-//   product: StockData;
-//   quantity: number;
-//   isConfirmed: boolean | null;
-// };
+type SubOrderStatusGroups = "pending" | "prepared" | "picked_up" | "cancelled";
+
+type ProductStatus = "pending" | "confirmed" | "cancelled" | "deleted";
+
+type SubOrderIntent = "cancel" | "prepare" | "pick_up";
+
+type OrderProductAction =
+  | "toggle_not_picked_up"
+  | "toggle_cancel"
+  | "open_sav"
+  | null;
+
+type GetOrderProductOverlayParams = {
+  product: OrderProduct; // le produit dans le subOrder
+  subOrderStatus: SubOrderStatus;
+  stockIssue?: boolean;
+  cancelledProducts?: string[];
+  notPickedUpProducts?: string[];
+};
+
+type ProductOverlay = {
+  label: string;
+  type: "error" | "warning" | "info";
+} | null;
+
+type SavContextData =
+  | {
+      type: "order";
+      orderId: string;
+      subOrderId: string;
+    }
+  | {
+      type: "product";
+      orderId: string;
+      subOrderId: string;
+      productId: string;
+    };
 
 type ProductData = {
   _id: string;
@@ -258,12 +214,13 @@ type MarketResultData = {
 
 type StockData = {
   _id: string;
+  product: ProductData;
+  shop: ShopData;
   productCustomName: string;
+  stockTotal: number;
+  stockReserved: number;
   price: number;
   pricePerKilo: number;
-  stock: number;
-  shop: ShopData;
-  product: ProductData;
   weightPerUnit: string;
   origin: string;
   format: string;
@@ -720,6 +677,15 @@ export type {
   OrderProduct,
   OrderDataForShop,
   ShopOrderStatus,
+  OrderStatus,
+  SubOrderStatus,
+  SubOrderStatusGroups,
+  ProductStatus,
+  SubOrderIntent,
+  OrderProductAction,
+  GetOrderProductOverlayParams,
+  ProductOverlay,
+  SavContextData,
   ProducerData,
   ProductFamilyData,
   ProductCategoryData,

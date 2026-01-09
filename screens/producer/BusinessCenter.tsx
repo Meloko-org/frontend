@@ -146,9 +146,9 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
 
     const grouped = {
       pending: [] as OrderSummary[],
-      validated: [] as OrderSummary[],
-      withdrawn: [] as OrderSummary[],
-      canceled: [] as OrderSummary[],
+      prepared: [] as OrderSummary[],
+      pickedUp: [] as OrderSummary[],
+      cancelled: [] as OrderSummary[],
     };
 
     ordersStore.forEach((order) => {
@@ -156,19 +156,18 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
 
       switch (status) {
         case "pending":
-        case "partialPending":
           grouped.pending.push(order);
           break;
-        case "validated":
-          grouped.validated.push(order);
+        case "prepared":
+        case "partially_prepared":
+          grouped.prepared.push(order);
           break;
-        case "withdrawn":
-        case "partialWithdrawn":
-          grouped.withdrawn.push(order);
+        case "picked_up":
+        case "partially_picked_up":
+          grouped.pickedUp.push(order);
           break;
-        case "canceled":
-        case "partialCanceled":
-          grouped.canceled.push(order);
+        case "cancelled":
+          grouped.cancelled.push(order);
           break;
         default:
           console.warn(`Status inconnu: ${status}`);
@@ -177,9 +176,9 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
     });
 
     setPendingOrders(grouped.pending);
-    setValidatedOrders(grouped.validated);
-    setWithdrawnOrders(grouped.withdrawn);
-    setCanceledOrders(grouped.canceled);
+    setValidatedOrders(grouped.prepared);
+    setWithdrawnOrders(grouped.pickedUp);
+    setCanceledOrders(grouped.cancelled);
   }, [ordersStore]);
 
   useEffect(() => {
@@ -316,7 +315,7 @@ export default function BusinessCenterScreen({ navigation, route }: Props) {
                 notice={canceledOrders.length.toString()}
                 noticeColor="bg-canceled"
                 onPressFn={() =>
-                  navigation.navigate("CanceledOrders", {
+                  navigation.navigate("CancelledOrders", {
                     from: "BusinessCenter",
                     backLabel: "Retour au tableau",
                     screenTitle: "COMMANDES\nANNULÉES",

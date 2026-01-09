@@ -2,8 +2,8 @@ import {
   ApiResponse,
   OrderData,
   OrderSummary,
-  ProductDetail,
-  StockData,
+  SubOrderStatus,
+  SubOrderStatusGroups,
 } from "../types/API";
 
 const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
@@ -47,7 +47,7 @@ const getOrderSummary = async (
 /* récupère les orders d'un producer */
 const getOrders = async (
   token: string | null,
-  type: "pending" | "validated" | "withdrawn" | "canceled" | "all",
+  type: SubOrderStatusGroups,
   page = 1,
   limit = 10,
 ) => {

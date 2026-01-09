@@ -148,7 +148,7 @@ type ProducerTabParamList = {
   PendingOrders: { from?: string; backLabel?: string; screenTitle?: string };
   ValidatedOrders: { from?: string; backLabel?: string; screenTitle?: string };
   WithdrawnOrders: { from?: string; backLabel?: string; screenTitle?: string };
-  CanceledOrders: { from?: string; backLabel?: string; screenTitle?: string };
+  CancelledOrders: { from?: string; backLabel?: string; screenTitle?: string };
   AllOrders: { from?: string; backLabel?: string; screenTitle?: string };
   ProducerProfile: undefined;
   StocksOld: undefined;
@@ -320,6 +320,8 @@ type RootStackParamList = {
     backLabel?: string;
     screenTitle?: string;
     id: string;
+    type: "invoice" | "creditNote";
+    path: "invoices" | "creditNotes";
   };
 };
 

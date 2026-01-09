@@ -61,6 +61,17 @@ export default function PendingOrdersScreen({ navigation, route }: Props) {
     if (!pendingResponse.success) {
       SheetManager.show("alert", {
         payload: {
+          message: pendingResponse.message,
+          alertType: "warning",
+        },
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    if (pendingResponse.orders.length === 0) {
+      SheetManager.show("alert", {
+        payload: {
           message: "Aucune commande en attente.",
           alertType: "warning",
         },
@@ -83,6 +94,7 @@ export default function PendingOrdersScreen({ navigation, route }: Props) {
 
   useFocusEffect(
     React.useCallback(() => {
+      setPendingOrders([]);
       fetchPendingOrders(1);
     }, []),
   );
@@ -99,6 +111,9 @@ export default function PendingOrdersScreen({ navigation, route }: Props) {
       orderId: order._id,
     });
   };
+
+  console.log("---------- PENDING ORDERS -------------");
+  console.log("nbr pendingOreders :", pendingOrders.length);
 
   return (
     <SafeAreaView
@@ -118,13 +133,13 @@ export default function PendingOrdersScreen({ navigation, route }: Props) {
         {/* <View className="w-full"> */}
         <FlatList
           data={pendingOrders}
+          extraData={pendingOrders.map((o) => o._id).join(",")}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <OrderStatus
               orderData={item}
               extraClasses="mb-2"
               onPressFn={() => {
-                console.log("clicked order: ", item?._id);
                 handlePressCard(item);
               }}
             />

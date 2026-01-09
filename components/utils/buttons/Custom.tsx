@@ -12,6 +12,7 @@ type CustomProps = {
   textClasses?: string;
   onPressFn: ((event: GestureResponderEvent) => void) | undefined;
   isLoading?: boolean;
+  disabled?: boolean;
 };
 
 export default function CustomButton({
@@ -22,6 +23,7 @@ export default function CustomButton({
   textClasses,
   onPressFn,
   isLoading,
+  disabled = false,
 }: CustomProps): JSX.Element {
   const ball1 = useRef(new Animated.Value(0)).current;
   const ball2 = useRef(new Animated.Value(0)).current;
@@ -78,6 +80,7 @@ export default function CustomButton({
 					${extraClasses} 
 					 flex justify-center items-center w-min
 				`}
+      disabled={disabled}
       onPress={onPressFn}
     >
       {isLoading ? (

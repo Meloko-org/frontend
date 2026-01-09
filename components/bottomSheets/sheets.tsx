@@ -19,6 +19,7 @@ import {
   NoteData,
   OrderData,
   ProductData,
+  SavContextData,
   ShopData,
   ShopResultData,
   StockData,
@@ -38,6 +39,7 @@ import SignInRequired from "./SignInRequired";
 import Note from "./Note";
 import OrderDetails from "./OrderDetails";
 import QRCode from "./QRCode";
+import SAV from "./SAV";
 
 registerSheet("alert", CustomAlert);
 registerSheet("product-details", ProductDetails);
@@ -59,6 +61,7 @@ registerSheet("signin-required", SignInRequired);
 registerSheet("note", Note);
 registerSheet("order-details", OrderDetails);
 registerSheet("qr-code", QRCode);
+registerSheet("sav", SAV);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -189,6 +192,11 @@ declare module "react-native-actions-sheet" {
     "qr-code": SheetDefinition<{
       payload: {
         orderId: string;
+      };
+    }>;
+    sav: SheetDefinition<{
+      payload: {
+        savContext: SavContextData;
       };
     }>;
   }

@@ -1,4 +1,9 @@
-import React, { JSX, useEffect, useState } from "react";
+import React from "react";
+import { OrderProduct, SubOrderStatus } from "../../types/API";
+import { formatCentsToEuros } from "../../modules/globalTools";
+import { getProductTotal } from "../../modules/CartTools";
+import { useOrderProductOverlay } from "../../hooks/useOrderProductOverlay";
+
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import BadgeSecondary from "../utils/badges/Secondary";
 import _Fontawesome from "react-native-vector-icons/FontAwesome6";
@@ -6,28 +11,31 @@ import TextBody1 from "../utils/texts/Body1";
 import PricePer from "../utils/badges/Dark";
 import TextHeading4 from "../utils/texts/Heading4";
 import TextBody2 from "../utils/texts/Body2";
-import { OrderData, OrderDataForShop, OrderProduct } from "../../types/API";
-import { formatCentsToEuros } from "../../modules/globalTools";
-import { getProductTotal } from "../../modules/CartTools";
 
 type OrderProductCardProps = {
-  orderProductData?: OrderProduct;
-  productStatus: "confirmed" | "canceled" | "deleted";
-  onPressFn?: (id: string) => void;
+  product: OrderProduct;
+  subOrderStatus: SubOrderStatus;
+  stockIssue?: boolean;
+  cancelledProducts: string[];
+  notPickedUpProducts: string[];
+  onToggleNotPickUp?: (productId: string) => void;
+  onToggleCancel?: (productId: string) => void;
+  onOpenSav?: (product: OrderProduct) => void;
   extraClasses?: string;
-  showImage?: boolean;
-  status?: string;
 };
 
 export default function OrderProductCard({
-  orderProductData,
-  productStatus,
-  onPressFn,
+  product,
+  subOrderStatus,
+  stockIssue,
+  cancelledProducts = [],
+  notPickedUpProducts = [],
+  onToggleNotPickUp,
+  onToggleCancel,
+  onOpenSav,
   extraClasses,
-  showImage,
-  status,
 }: OrderProductCardProps) {
-  if (!orderProductData) return;
+  if (!product) return;
 
   const formatQuantity = (quantity: number, unit: string) => {
     if (unit === "gr") {
@@ -41,9 +49,9 @@ export default function OrderProductCard({
   };
 
   const tags =
-    orderProductData?.product.tags &&
-    orderProductData?.product.tags.length > 0 &&
-    orderProductData?.product.tags.map((tag) => {
+    product?.product.tags &&
+    product?.product.tags.length > 0 &&
+    product?.product.tags.map((tag) => {
       return (
         <BadgeSecondary
           key={tag._id}
@@ -52,22 +60,32 @@ export default function OrderProductCard({
       );
     });
 
-  const productName = orderProductData?.product.productCustomName
-    ? orderProductData.product.productCustomName
-    : orderProductData?.product.product.family.name +
+  const productName = product?.product.productCustomName
+    ? product.product.productCustomName
+    : product?.product.product.family.name +
       " " +
-      orderProductData?.product.product.name;
+      product?.product.product.name;
 
-  const unit =
-    orderProductData?.product.product.weight.unit === "gr" ? "kg" : "pièce";
+  const unit = product?.product.product.weight.unit === "gr" ? "kg" : "pièce";
+
+  const { overlay, onPress, isInteractive } = useOrderProductOverlay({
+    product,
+    subOrderStatus,
+    stockIssue,
+    cancelledProducts,
+    notPickedUpProducts,
+    onToggleCancel,
+    onToggleNotPickUp,
+    onOpenSav,
+  });
+
+  // console.log("---------- ORDERPRODUCTCARD -------------")
+  // console.log("product :", product)
 
   return (
     <TouchableOpacity
-      onPress={() => {
-        if (onPressFn && status === "pending") {
-          onPressFn(orderProductData?._id);
-        }
-      }}
+      disabled={!isInteractive}
+      onPress={onPress}
       style={{ shadowColor: "#000" }}
       className={`${extraClasses} rounded-lg shadow-lg p-1 bg-white dark:bg-tertiary`}
     >
@@ -77,14 +95,14 @@ export default function OrderProductCard({
             <View className="flex flex-row items-center rounded-lg w-1/5">
               <Image
                 source={
-                  orderProductData?.product.product.image
+                  product?.product.product.image
                     ? {
-                        uri: orderProductData?.product.product.image,
+                        uri: product?.product.product.image,
                       }
                     : require("../../assets/icon.png")
                 }
                 className="rounded-lg w-20 h-20"
-                alt={`Illustration du produit ${orderProductData?.product.product.name}`}
+                alt={`Illustration du produit ${product?.product.product.name}`}
                 resizeMode="cover"
                 width={96}
                 height={64}
@@ -98,7 +116,7 @@ export default function OrderProductCard({
                 </TextHeading4>
               </View>
               <View className="flex flex-row">
-                <PricePer extraClasses="h-7 mr-2">{`${formatCentsToEuros(orderProductData!.product.price) + "/" + unit}`}</PricePer>
+                <PricePer extraClasses="h-7 mr-2">{`${formatCentsToEuros(product!.product.price) + "/" + unit}`}</PricePer>
                 <View className="flex-row flex-wrap flex-1">{tags}</View>
               </View>
               <View className="flex flex-row w-full justify-between mt-2">
@@ -109,8 +127,8 @@ export default function OrderProductCard({
                   <View>
                     <TextBody1>
                       {formatQuantity(
-                        orderProductData?.quantity!,
-                        orderProductData?.product.product.weight.unit!,
+                        product?.quantity!,
+                        product?.product.product.weight.unit!,
                       )}
                     </TextBody1>
                   </View>
@@ -122,10 +140,7 @@ export default function OrderProductCard({
                   <View>
                     <TextBody1>
                       {formatCentsToEuros(
-                        getProductTotal(
-                          orderProductData!.product,
-                          orderProductData!.quantity,
-                        ),
+                        getProductTotal(product!.product, product!.quantity),
                       )}
                     </TextBody1>
                   </View>
@@ -135,25 +150,28 @@ export default function OrderProductCard({
           </View>
         </View>
 
-        {(productStatus === "canceled" || productStatus === "deleted") && (
+        {overlay && (
           <View className="absolute w-full h-full inset-0">
-            <View className="absolute inset-0 opacity-70 w-full h-full bg-black rounded-lg" />
-            {status !== "canceled" && (
-              <View className="absolute inset-0 flex items-center justify-center h-full w-full">
-                <View>
-                  {productStatus === "canceled" && (
-                    <Text className="text-danger text-center font-bold text-lg rounded-lg bg-lightbg p-1">
-                      Produit annulé
-                    </Text>
-                  )}
-                  {productStatus === "deleted" && (
-                    <Text className="text-warning font-bold text-lg rounded-lg bg-lightbg p-1">
-                      Ce produit n'est plus en vente
-                    </Text>
-                  )}
-                </View>
-              </View>
-            )}
+            <View className="absolute inset-0 opacity-50 w-full h-full bg-black rounded-lg" />
+
+            <View className="absolute inset-0 flex items-center justify-center px-4 h-full w-full">
+              <Text
+                className={`
+                    font-bold text-lg text-center px-2 py-1 rounded-lg
+                    ${
+                      overlay.type === "error"
+                        ? "bg-danger text-white"
+                        : overlay.type === "warning"
+                          ? "bg-warning text-white"
+                          : overlay.type === "info"
+                            ? "bg-lightbg text-black"
+                            : ""
+                    }
+                  `}
+              >
+                {overlay.label}
+              </Text>
+            </View>
           </View>
         )}
       </View>

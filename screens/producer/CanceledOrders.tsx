@@ -16,19 +16,19 @@ import TopBar from "../../components/TopBar";
 import OrderStatus from "../../components/cards/OrderStatus";
 import Spinner from "../../components/utils/Spinner";
 
-type CanceledOrdersRouteProp = RouteProp<
+type CancelledOrdersRouteProp = RouteProp<
   ProducerTabParamList,
-  "CanceledOrders"
+  "CancelledOrders"
 >;
 
-type CanceledOrdersNavProp = BottomTabNavigationProp<
+type CancelledOrdersNavProp = BottomTabNavigationProp<
   ProducerTabParamList,
-  "CanceledOrders"
+  "CancelledOrders"
 >;
 
 type Props = {
-  navigation: CanceledOrdersNavProp;
-  route: CanceledOrdersRouteProp;
+  navigation: CancelledOrdersNavProp;
+  route: CancelledOrdersRouteProp;
 };
 
 export default function CanceledOrdersScreen({ navigation, route }: Props) {
@@ -36,7 +36,7 @@ export default function CanceledOrdersScreen({ navigation, route }: Props) {
 
   const { getToken } = useAuth();
 
-  const [canceledOrders, setCanceledOrders] = useState<OrderData[]>([]);
+  const [cancelledOrders, setCancelledOrders] = useState<OrderData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -52,16 +52,27 @@ export default function CanceledOrdersScreen({ navigation, route }: Props) {
   const fetchCanceledOrders = async (page = 1) => {
     setIsLoading(true);
     const token = await getToken();
-    const pendingResponse = await businessTools.getOrders(
+    const cancelledResponse = await businessTools.getOrders(
       token,
-      "canceled",
+      "cancelled",
       page,
     );
 
-    if (!pendingResponse.success) {
+    if (!cancelledResponse.success) {
       SheetManager.show("alert", {
         payload: {
-          message: "Aucune commande en attente.",
+          message: cancelledResponse.message,
+          alertType: "warning",
+        },
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    if (cancelledResponse.orders.length === 0) {
+      SheetManager.show("alert", {
+        payload: {
+          message: "Aucune commande annulée.",
           alertType: "warning",
         },
       });
@@ -70,19 +81,20 @@ export default function CanceledOrdersScreen({ navigation, route }: Props) {
     }
 
     if (page === 1) {
-      setCanceledOrders(pendingResponse.orders);
+      setCancelledOrders(cancelledResponse.orders);
     } else {
-      setCanceledOrders((prev) => [...prev, ...pendingResponse.orders]);
+      setCancelledOrders((prev) => [...prev, ...cancelledResponse.orders]);
     }
 
-    setCurrentPage(pendingResponse.page);
-    setTotalPages(pendingResponse.totalPages);
+    setCurrentPage(cancelledResponse.page);
+    setTotalPages(cancelledResponse.totalPages);
 
     setIsLoading(false);
   };
 
   useFocusEffect(
     React.useCallback(() => {
+      setCancelledOrders([]);
       fetchCanceledOrders(1);
     }, []),
   );
@@ -93,7 +105,7 @@ export default function CanceledOrdersScreen({ navigation, route }: Props) {
 
   const handlePressCard = (order: OrderData) => {
     navigation.navigate("OrderDetails", {
-      from: "CanceledOrders",
+      from: "CancelledOrders",
       backLabel: "Retour annulées",
       screenTitle: "DETAIL\nCOMMANDE",
       orderId: order._id,
@@ -111,7 +123,8 @@ export default function CanceledOrdersScreen({ navigation, route }: Props) {
 
       <View className="px-3">
         <FlatList
-          data={canceledOrders}
+          data={cancelledOrders}
+          extraData={cancelledOrders.map((o) => o._id).join(",")}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <OrderStatus

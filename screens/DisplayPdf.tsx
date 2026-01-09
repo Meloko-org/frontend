@@ -21,7 +21,7 @@ import MainButton from "../components/utils/buttons/MainButton";
 type Props = NativeStackScreenProps<RootStackParamList, "DisplayPdf">;
 
 export default function DisplayPdfScreen({ navigation, route }: Props) {
-  const { from, backLabel, screenTitle, id } = route.params;
+  const { from, backLabel, screenTitle, id, type, path } = route.params;
   const { getToken } = useAuth();
 
   const [pdfUri, setPdfUri] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export default function DisplayPdfScreen({ navigation, route }: Props) {
 
   const loadPdf = async () => {
     const token = await getToken();
-    const result = await orderTools.getInvoicePdf(token, id);
+    const result = await orderTools.getPdfToDisplay(token, id, type, path);
 
     if (result.success) {
       setPdfUri(result.uri);

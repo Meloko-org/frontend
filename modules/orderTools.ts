@@ -8,6 +8,8 @@ import {
   PdfResult,
   // ProductDetail,
   StockData,
+  SubOrderIntent,
+  SubOrderStatus,
 } from "../types/API";
 import * as FileSystem from "expo-file-system";
 
@@ -147,8 +149,9 @@ const updateSubOrder = async (
   id: string,
   values: {
     subOrderId: string;
-    status: "pending" | "withdrawn" | "canceled" | "validated";
-    canceledProducts?: string[];
+    intent: SubOrderIntent;
+    canceledProductIds?: string[];
+    notPickedUpProductIds: string[];
   },
 ) => {
   try {
@@ -165,7 +168,12 @@ const updateSubOrder = async (
     const data = await response.json();
 
     return data.success
-      ? { success: true, message: data.message }
+      ? {
+          success: true,
+          order: data.order,
+          refundsPending: data.refundsPending,
+          message: data.message,
+        }
       : { success: false, message: data.message, error: data.error };
   } catch (error) {
     console.log(error);
@@ -262,6 +270,71 @@ const getInvoicePdf = async (
   }
 };
 
+// récupère le pdf pour la partager
+const getPdfToShare = async (
+  token: string | null,
+  id: string,
+  path: "invoices" | "creditNotes",
+): Promise<FileResponse> => {
+  try {
+    const response = await fetch(`${API_ROOT}/${path}/${id}/pdf`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        mode: "cors",
+      },
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: `Erreur ${response.status}: Impossible de télécharger la facture.`,
+      };
+    }
+
+    const blob = await response.blob();
+
+    return { success: true, blob };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      message: "Une erreur s'est produite lors de la récupération des données.",
+    };
+  }
+};
+
+// récupère le pdf pour l'afficher
+const getPdfToDisplay = async (
+  token: string | null,
+  id: string,
+  type: "invoice" | "creditNote",
+  path: "invoices" | "creditNotes",
+): Promise<PdfResult> => {
+  try {
+    const fileUri = FileSystem.cacheDirectory + `${type}-${id}.pdf`;
+    console.log("fileuri :", fileUri);
+
+    const result = await FileSystem.downloadAsync(
+      `${API_ROOT}/${path}/${id}/pdf`,
+      fileUri,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    return { success: true, uri: result.uri };
+  } catch (e) {
+    return {
+      success: false,
+      message: "Impossible d’afficher le document.",
+    };
+  }
+};
+
 // gestion des status
 type GlobalOrderStatus =
   | "pending"
@@ -348,4 +421,6 @@ export default {
   getPriceInEuros,
   getInvoice,
   getInvoicePdf,
+  getPdfToShare,
+  getPdfToDisplay,
 };

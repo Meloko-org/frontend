@@ -1,7 +1,7 @@
 import React, { JSX } from "react";
 import { useSelector } from "react-redux";
 import { ShopState } from "../../reducers/shop";
-import { OrderData, OrderDataForShop } from "../../types/API";
+import { OrderData, OrderDataForShop, SubOrderStatus } from "../../types/API";
 import { useColorScheme } from "nativewind";
 
 import globalTools, { formatCentsToEuros } from "../../modules/globalTools";
@@ -17,7 +17,7 @@ import Spinner from "../utils/Spinner";
 
 type OrderStatusProps = {
   orderData: OrderData | OrderDataForShop | undefined;
-  status?: string | "pending" | "validated" | "withdrawn" | "canceled";
+  status?: SubOrderStatus;
   onPressFn?: () => void;
   extraClasses?: string;
 };
@@ -85,7 +85,7 @@ export default function OrderStatus({
               >{`${formatCentsToEuros(shopDetails.shopTotalTTC)}`}</BadgeSecondary>
             </View>
             <OrderStatusBadge
-              extraClasses="py-1 px-1"
+              extraClasses="py-1 px-2"
               status={status ? status : shopDetails.status}
             />
           </View>

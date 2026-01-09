@@ -53,13 +53,24 @@ export default function ValidatedOrdersScreen({ navigation, route }: Props) {
   const fetchValidatedOrders = async (page = 1) => {
     setIsLoading(true);
     const token = await getToken();
-    const pendingResponse = await businessTools.getOrders(
+    const validatedResponse = await businessTools.getOrders(
       token,
-      "validated",
+      "prepared",
       page,
     );
 
-    if (!pendingResponse.success) {
+    if (!validatedResponse.success) {
+      SheetManager.show("alert", {
+        payload: {
+          message: validatedResponse.message,
+          alertType: "warning",
+        },
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    if (validatedResponse.orders.length === 0) {
       SheetManager.show("alert", {
         payload: {
           message: "Aucune commande en attente.",
@@ -71,19 +82,20 @@ export default function ValidatedOrdersScreen({ navigation, route }: Props) {
     }
 
     if (page === 1) {
-      setValidatedOrders(pendingResponse.orders);
+      setValidatedOrders(validatedResponse.orders);
     } else {
-      setValidatedOrders((prev) => [...prev, ...pendingResponse.orders]);
+      setValidatedOrders((prev) => [...prev, ...validatedResponse.orders]);
     }
 
-    setCurrentPage(pendingResponse.page);
-    setTotalPages(pendingResponse.totalPages);
+    setCurrentPage(validatedResponse.page);
+    setTotalPages(validatedResponse.totalPages);
 
     setIsLoading(false);
   };
 
   useFocusEffect(
     React.useCallback(() => {
+      setValidatedOrders([]);
       fetchValidatedOrders(1);
     }, []),
   );
@@ -119,6 +131,7 @@ export default function ValidatedOrdersScreen({ navigation, route }: Props) {
         {/* <View className="px-3 mb-5"> */}
         <FlatList
           data={validatedOrders}
+          extraData={validatedOrders.map((o) => o._id).join(",")}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <OrderStatus

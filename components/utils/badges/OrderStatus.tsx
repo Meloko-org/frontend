@@ -1,45 +1,32 @@
 import React, { JSX } from "react";
 import { Text, View } from "react-native";
 import TextBody2 from "../texts/Body2";
+import { SubOrderStatus } from "../../../types/API";
+import {
+  getSubOrderStatusGroup,
+  SUB_ORDER_GROUP_COLORS,
+  SUB_ORDER_GROUP_LABELS,
+} from "../../../helpers/orderHelpers";
 
 type OrderStatusBadgeProps = {
-  status:
-    | "pending"
-    | "validated"
-    | "withdrawn"
-    | "canceled"
-    | string
-    | undefined;
+  status: SubOrderStatus;
   extraClasses?: string;
 };
 
-export default function OrderStatusBadge(
-  props: OrderStatusBadgeProps,
-): JSX.Element {
-  const backgroundColor = () => {
-    switch (true) {
-      case props.status === "pending":
-        return "bg-pending";
-      case props.status === "validated":
-        return "bg-validated";
-      case props.status === "withdrawn":
-        return "bg-withdrawn";
-      case props.status === "canceled":
-        return "bg-canceled";
-    }
-  };
+export default function OrderStatusBadge({
+  status,
+  extraClasses,
+}: OrderStatusBadgeProps): JSX.Element {
+  const group = getSubOrderStatusGroup(status);
+  const label = SUB_ORDER_GROUP_LABELS[group];
+  const color = SUB_ORDER_GROUP_COLORS[group];
+
   return (
     <View
-      className={`${props.extraClasses} flex flex-row justify-center items-center rounded-lg ${backgroundColor()}`}
+      className={`${extraClasses} flex flex-row justify-center items-center rounded-lg ${color}`}
     >
       <Text className="text-lightbg font-bold text-[12px] uppercase">
-        {props.status === "pending" && `en attente`}
-
-        {props.status === "validated" && `à retirer`}
-
-        {props.status === "withdrawn" && `retirée`}
-
-        {props.status === "canceled" && `annulée`}
+        {label}
       </Text>
     </View>
   );

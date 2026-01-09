@@ -1,10 +1,5 @@
-import React, { JSX, useEffect, useState } from "react";
+import React, { JSX, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
-
-// import { RouteProp, useRoute } from "@react-navigation/native";
-// import { BottomTabNavigationProp, BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-// import { ProducerTabParamList, RootStackParamList } from "../../types/Navigation";
-// import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { RouteProp } from "@react-navigation/native";
 import { CompositeNavigationProp } from "@react-navigation/native";
@@ -25,9 +20,17 @@ import {
   OrderDataForShop,
   OrderProduct,
   ProductData,
+  SavContextData,
+  SubOrderIntent,
+  SubOrderStatus,
+  SubOrderStatusGroups,
 } from "../../types/API";
 
 import orderTools from "../../modules/orderTools";
+import {
+  getSubOrderStatusGroup,
+  SUB_ORDER_GROUP_LABELS,
+} from "../../helpers/orderHelpers";
 
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
@@ -68,17 +71,17 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
     (state: { shop: ShopState }) => state.shop.value,
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isCanceling, setIsCanceling] = useState<boolean>(false);
+  const [isCancelling, setIsCancelling] = useState<boolean>(false);
 
   const { getToken } = useAuth();
 
   const [order, setOrder] = useState<OrderDataForShop | undefined>();
-  // const [products, setProducts] = useState<JSX.Element[]>([]);
   const [subOrderId, setSubOrderId] = useState<string | undefined>();
-  const [canceledProducts, setCanceledProducts] = useState<string[]>([]);
-  const [status, setStatus] = useState<
-    string | "pending" | "validated" | "withdrawn" | "canceled"
-  >("pending");
+  const [cancelledProducts, setCancelledProducts] = useState<string[]>([]);
+  const [notPickedUpProducts, setNotPickedUpProducts] = useState<string[]>([]);
+  // const [status, setStatus] = useState<SubOrderStatus>("pending");
+  const subOrder = order?.details[0];
+  const status = subOrder?.status;
 
   // récupère un order avec un seul élément dans détails
   const fetchOrder = async () => {
@@ -102,7 +105,6 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
       } else if (orderResponse.success && orderResponse.data) {
         setOrder(orderResponse.data);
         setSubOrderId(orderResponse.data?.details[0]._id);
-        setStatus(orderResponse.data?.details[0].status);
       }
     } catch (error) {
       console.error("Failed to fetch order", error);
@@ -113,21 +115,37 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
 
   useEffect(() => {
     setOrder(undefined);
-    setCanceledProducts([]);
-    // setProducts([]);
+    setCancelledProducts([]);
     fetchOrder();
   }, [orderId]);
 
   const hasInvoice = order && !!order.details[0].invoice;
-  const hasCreditNote = order && !!order.details[0].creditNote;
+  const hasCreditNote = order && !!order.details[0].creditNotes.length;
 
-  console.log("subOrderId :", subOrderId);
-  console.log("order :", order);
+  // permet de désactiver le bouton "valider" en cas de stockIssue
+  const hasBlockingStockIssue = useMemo(() => {
+    if (!order) return false;
+    if (!order.details[0].stockIssue) return false;
+
+    return order.details[0].products.some((product) => {
+      const available =
+        product.product.stockTotal - product.product.stockReserved;
+
+      const isOutOfStock = product.quantity > available;
+      const isCancelled = cancelledProducts.includes(product._id);
+
+      return isOutOfStock && !isCancelled;
+    });
+  }, [order, cancelledProducts]);
+
+  // console.log("subOrderId :", subOrderId);
+  // console.log("order :", JSON.stringify(order, null, 2));
   // console.log("shopStore :", shopStore);
+  console.log("blocking :", hasBlockingStockIssue);
 
   const handleUpdateSubOrder = async (
-    newStatus: "canceled" | "pending" | "validated" | "withdrawn",
-    callback?: (product: OrderProduct) => OrderProduct,
+    intent: SubOrderIntent,
+    productIds?: string[],
   ) => {
     console.log("youpi");
 
@@ -137,57 +155,54 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
         return;
       }
 
-      if (newStatus === "canceled") {
-        setIsCanceling(true);
+      if (intent === "cancel") {
+        setIsCancelling(true);
       } else {
         setIsLoading(true);
       }
 
-      const updatedOrder = orderTools.buildUpdatedOrder({
-        order,
-        newStatus: newStatus,
-        updateProductCallback: callback,
-      });
-
-      setOrder(updatedOrder);
-
       const token = await getToken();
       const values = {
         subOrderId,
-        status: newStatus,
-        canceledProducts,
+        intent,
+        cancelledProductIds: productIds ?? cancelledProducts,
+        notPickedUpProductIds: notPickedUpProducts,
       };
 
       console.log("values :", values);
 
       const response = await orderTools.updateSubOrder(token, orderId, values);
 
-      // Alert.alert("Status de la commande", response?.message);
+      const sheetMessage =
+        response.refundsPending.length > 0
+          ? response.message + `\nUn remboursement est en cours.`
+          : response.message;
 
       SheetManager.show("alert", {
         payload: {
-          message: response.message,
+          message: sheetMessage,
           error: response.error ? response.error : undefined,
           alertType: response.success ? "success" : "error",
         },
       });
 
       if (response?.success) {
-        setStatus(newStatus);
+        console.log("updated status :", response.order.details[0].status);
+        setOrder(response.order);
       }
     } catch (error) {
       console.log(error);
     } finally {
-      if (newStatus !== "canceled") {
+      if (intent !== "cancel") {
         setIsLoading(false);
       } else {
-        setIsCanceling(false);
+        setIsCancelling(false);
       }
     }
   };
 
-  const handleCanceledProducts = (id: string) => {
-    setCanceledProducts((prevState) => {
+  const handleCancelledProducts = (id: string) => {
+    setCancelledProducts((prevState) => {
       const existingProduct = prevState?.find((product) => product === id);
       if (existingProduct) {
         return prevState?.filter((p) => p !== id);
@@ -197,25 +212,54 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
     });
   };
 
+  const handleNotPickUp = (id: string) => {
+    setNotPickedUpProducts((prevState) => {
+      const existingProducts = prevState.find((p) => p === id);
+      if (existingProducts) {
+        return prevState?.filter((p) => p !== id);
+      } else {
+        return prevState ? [...prevState, id] : [id];
+      }
+    });
+  };
+
+  const handleOpenSav = (context: SavContextData) => {
+    console.log("context :", context);
+    SheetManager.show("sav", {
+      payload: {
+        savContext: context,
+      },
+    });
+  };
+
+  const handleCancelSubOrder = async () => {
+    const canCancel = await SheetManager.show("confirm", {
+      payload: {
+        message: "Etes vous sûr de vouloir annuler cette commande ?",
+        alertType: "warning",
+        buttonLabel: "Oui",
+      },
+    });
+
+    if (canCancel) {
+      console.log("youpi");
+      if (!order) return;
+
+      const subOrder = order.details[0];
+      if (!subOrder) return;
+
+      const allProductIds = subOrder.products.map((p) => p.product._id);
+
+      const nextCancelledProducts = Array.from(
+        new Set([...cancelledProducts, ...allProductIds]),
+      );
+      setCancelledProducts(nextCancelledProducts);
+      handleUpdateSubOrder("cancel", nextCancelledProducts);
+    }
+  };
+
   const renderButtons = () => {
     switch (status) {
-      case "canceled":
-        return (
-          <View className="flex flex-row mx-3">
-            <CustomButton
-              label={`REMETTRE LA COMMANDE\nEN ATTENTE`}
-              extraClasses="border border-primary bg-lightbg/90 dark:bg-transparent flex-1 mx-1 rounded-lg px-2 h-[60px]"
-              textClasses="text-night dark:text-lightbg font-bold text-sm"
-              onPressFn={() =>
-                handleUpdateSubOrder("pending", (product) => ({
-                  ...product,
-                  isConfirmed: false,
-                }))
-              }
-              isLoading={isCanceling}
-            />
-          </View>
-        );
       case "pending":
         return (
           <>
@@ -224,32 +268,25 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                 label={`ANNULER LA COMMANDE`}
                 extraClasses="bg-danger flex-1 mx-1 rounded-lg px-2 h-[80px]"
                 textClasses="text-lightbg font-bold text-sm"
-                onPressFn={() =>
-                  handleUpdateSubOrder("canceled", (product) => ({
-                    ...product,
-                    isConfirmed: false,
-                  }))
-                }
-                isLoading={isLoading}
+                onPressFn={handleCancelSubOrder}
+                isLoading={isCancelling}
               />
               <CustomButton
+                disabled={hasBlockingStockIssue}
                 label={`VALIDER`}
-                extraClasses="bg-primary flex-1 mx-1 rounded-lg px-2 h-[80px]"
+                extraClasses={`
+                  ${hasBlockingStockIssue ? "bg-primary/50" : "bg-primary"}
+                  flex-1 mx-1 rounded-lg px-2 h-[80px]
+                `}
                 textClasses="text-lightbg font-bold text-lg"
-                onPressFn={() =>
-                  handleUpdateSubOrder("validated", (product) => {
-                    if (!canceledProducts.includes(product.product._id)) {
-                      return { ...product, isConfirmed: true };
-                    }
-                    return product;
-                  })
-                }
+                onPressFn={() => handleUpdateSubOrder("prepare")}
                 isLoading={isLoading}
               />
             </View>
           </>
         );
-      case "validated":
+      case "prepared":
+      case "partially_prepared":
         return (
           <>
             <View className="flex flex-row mx-3">
@@ -257,38 +294,51 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                 label={`VALIDER LE RETRAIT`}
                 extraClasses="bg-primary flex-1 mx-1 rounded-lg px-2 h-[80px]"
                 textClasses="text-lightbg font-bold text-lg"
-                onPressFn={() => handleUpdateSubOrder("withdrawn")}
+                onPressFn={() => handleUpdateSubOrder("pick_up")}
                 isLoading={isLoading}
               />
-              {/* <Custom
-                label={`REMETTRE LA COMMANDE\nEN ATTENTE`}
-                extraClasses="border border-primary bg-lightbg/90 dark:bg-transparent flex-1 mt-5 mx-1 rounded-lg px-2 h-[60px]"
-                textClasses="text-lightbg font-bold text-sm"
-                onPressFn={() => handleUpdateOrder("pending", (product) => ({...product,isConfirmed: false}))}
-                isLoading={isLoading}
-              /> */}
             </View>
           </>
         );
-      case "withdrawn":
-        return null;
+      case "picked_up":
+      case "partially_picked_up":
+        return (
+          <>
+            <View className="flex flex-row mx-3">
+              <CustomButton
+                label={`REMBOURSER LA COMMANDE`}
+                extraClasses="bg-primary flex-1 mx-1 rounded-lg px-2 h-[80px]"
+                textClasses="text-lightbg font-bold text-lg"
+                onPressFn={() => {
+                  if (order && subOrderId) {
+                    handleOpenSav({
+                      type: "order",
+                      orderId: order._id,
+                      subOrderId: subOrderId,
+                    });
+                  }
+                }}
+                isLoading={isLoading}
+              />
+            </View>
+          </>
+        );
 
       default:
         return null;
     }
   };
 
-  const downloadCreditNote = async (creditNote) => {};
-
-  const downloadInvoice = async (invoiceId: string) => {
-    console.log("invoiceId :", invoiceId);
+  const downloadPdf = async (id: string, path: "invoices" | "creditNotes") => {
+    console.log("id :", id);
+    console.log("path :", path);
     const token = await getToken();
-    const invoiceResponse = await orderTools.getInvoice(token, invoiceId);
+    const pdfResponse = await orderTools.getPdfToShare(token, id, path);
 
-    if (!invoiceResponse.success) {
+    if (!pdfResponse.success) {
       SheetManager.show("alert", {
         payload: {
-          message: invoiceResponse.message,
+          message: pdfResponse.message,
           alertType: "error",
         },
       });
@@ -296,7 +346,9 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
     }
 
     try {
-      const fileUri = FileSystem.documentDirectory + `facture-${invoiceId}.pdf`;
+      const filename =
+        path === "invoices" ? `facture-${id}.pdf` : `avoir-${id}.pdf`;
+      const fileUri = FileSystem.documentDirectory + filename;
 
       const reader = new FileReader();
 
@@ -312,28 +364,39 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
         await Sharing.shareAsync(fileUri);
       };
 
-      reader.readAsDataURL(invoiceResponse.blob);
+      reader.readAsDataURL(pdfResponse.blob);
     } catch (error) {
       console.error(error);
       SheetManager.show("alert", {
         payload: {
-          message: "Impossible d’ouvrir la facture.",
+          message: "Impossible d’ouvrir le document.",
           alertType: "error",
         },
       });
     }
   };
 
-  const displayInvoice = (invoiceId: string) => {
+  const displayPdf = (
+    id: string,
+    type: "invoice" | "creditNote",
+    path: "invoices" | "creditNotes",
+  ) => {
+    console.log("id :", id);
+    console.log("type :", type);
+    console.log("path :", path);
+
     navigation.navigate("DisplayPdf", {
       from: "OrderDetails",
       backLabel: "Retour facture",
       screenTitle: "FACTURE",
-      id: invoiceId,
+      id: id,
+      type,
+      path,
     });
   };
 
-  console.log("canceledProducts :", canceledProducts);
+  console.log("cancelledProducts :", cancelledProducts);
+  console.log("notPickedUpProducts :", notPickedUpProducts);
   console.log("hasInvoice :", hasInvoice);
 
   return (
@@ -383,7 +446,10 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                             iconSize={25}
                             extraClasses="p-2 w-18 mr-2"
                             onPressFn={() =>
-                              downloadCreditNote(order.details[0].invoice)
+                              downloadPdf(
+                                order.details[0].creditNotes[0],
+                                "creditNotes",
+                              )
                             }
                           />
                           <MainButton
@@ -396,7 +462,11 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                             iconSize={25}
                             extraClasses="p-2 w-18"
                             onPressFn={() =>
-                              displayCreditNote(order.details[0].creditNote)
+                              displayPdf(
+                                order.details[0].creditNotes[0],
+                                "creditNote",
+                                "creditNotes",
+                              )
                             }
                           />
                         </View>
@@ -420,7 +490,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                             iconSize={25}
                             extraClasses="p-2 w-18 mr-2"
                             onPressFn={() =>
-                              downloadInvoice(order.details[0].invoice)
+                              downloadPdf(order.details[0].invoice, "invoices")
                             }
                           />
                           <MainButton
@@ -433,7 +503,11 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                             iconSize={25}
                             extraClasses="p-2 w-18"
                             onPressFn={() =>
-                              displayInvoice(order.details[0].invoice)
+                              displayPdf(
+                                order.details[0].invoice,
+                                "invoice",
+                                "invoices",
+                              )
                             }
                           />
                         </View>
@@ -448,32 +522,44 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                     (Cliquez sur un produit pour l'annuler avant de valider)
                   </TextBody2>
                 </View>
-                {order.details[0].products.map((p) => {
-                  const productStatus = p.product.isDeleted
-                    ? "deleted"
-                    : !p.isConfirmed || canceledProducts.includes(p._id)
-                      ? "canceled"
-                      : "confirmed";
-
-                  return (
-                    <OrderProductCard
-                      key={p._id}
-                      orderProductData={p}
-                      productStatus={productStatus}
-                      extraClasses="mb-3"
-                      onPressFn={handleCanceledProducts}
-                      status={status}
-                    />
-                  );
-                })}
+                {order &&
+                  status &&
+                  order.details[0].products.map((p) => {
+                    return (
+                      <OrderProductCard
+                        key={p._id}
+                        product={p}
+                        subOrderStatus={status}
+                        stockIssue={order.details[0].stockIssue}
+                        cancelledProducts={cancelledProducts}
+                        notPickedUpProducts={notPickedUpProducts}
+                        extraClasses="mb-3"
+                        onToggleNotPickUp={handleNotPickUp}
+                        onToggleCancel={handleCancelledProducts}
+                        onOpenSav={() => {
+                          if (order && subOrderId) {
+                            handleOpenSav({
+                              type: "product",
+                              orderId: order._id,
+                              subOrderId: subOrderId,
+                              productId: p._id,
+                            });
+                          }
+                        }}
+                      />
+                    );
+                  })}
               </View>
             </ScrollView>
           )
         )}
       </View>
 
-      {status !== "withdrawn" && (
-        <View style={{ flex: 1.5 }} className="pt-2">
+      {renderButtons() !== null && (
+        <View
+          style={{ flex: 1.5 }}
+          className="flex justify-center bg-darkbg dark:bg-lightbg"
+        >
           {renderButtons()}
         </View>
       )}

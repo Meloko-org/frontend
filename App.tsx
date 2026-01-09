@@ -563,7 +563,7 @@ const TabNavigatorProducer: React.FC = () => {
         options={{ tabBarButton: () => null }}
       />
       <ProducerTab.Screen
-        name="CanceledOrders"
+        name="CancelledOrders"
         component={CanceledOrdersScreen}
         options={{ tabBarButton: () => null }}
       />

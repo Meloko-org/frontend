@@ -129,7 +129,7 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
             </View>
 
             <View className="flex flex-row justify-around flex-grow ml-5">
-              {(cco.status === "validated" || cco.status === "withdrawn") && (
+              {(cco.status === "prepared" || cco.status === "picked_up") && (
                 <>
                   <IconButton
                     iconName="file-pdf"
@@ -268,7 +268,8 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
               />
             </View>
             <View className="flex flex-row justify-around flex-grow ml-5">
-              {mo.status === "validated" && (
+              {(mo.status === "prepared" ||
+                mo.status === "partially_prepared") && (
                 <>
                   <IconButton
                     iconName="file-pdf"
@@ -368,7 +369,7 @@ export default function OrderDetails(props: SheetProps<"order-details">) {
                   centered
                 >{`Commande\nn° ${order.orderNumber}`}</TextHeading3>
               </View>
-              <View className="w-1/6">
+              <View className="w-1/6 flex content-start h-full">
                 <CloseSheetButton
                   onPressFn={() => {
                     sheetRef.current?.hide();
