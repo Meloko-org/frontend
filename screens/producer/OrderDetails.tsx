@@ -51,6 +51,7 @@ import TopBar from "../../components/TopBar";
 import TextHeading4 from "../../components/utils/texts/Heading4";
 import IconButton from "../../components/utils/buttons/Icon";
 import MainButton from "../../components/utils/buttons/MainButton";
+import globalTools from "../../modules/globalTools";
 
 type OrderDetailsNavProp = CompositeNavigationProp<
   BottomTabNavigationProp<ProducerTabParamList, "OrderDetails">,
@@ -103,6 +104,10 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
 
         navigation.navigate(from as never);
       } else if (orderResponse.success && orderResponse.data) {
+        console.log(
+          "ORDERRRRR :",
+          JSON.stringify(orderResponse.data.details[0], null, 2),
+        );
         setOrder(orderResponse.data);
         setSubOrderId(orderResponse.data?.details[0]._id);
       }
@@ -428,58 +433,21 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                   extraClasses="mb-3"
                 />
 
-                <View className="flex flex-row justify-center">
-                  {hasCreditNote && (
-                    <View className="flex flex-row flex-shrink justify-center mr-2">
-                      <View className="rounded-lg bg-tertiary/30 dark:bg-tertiary p-2 mb-3">
-                        <Text className="text-white font-bold text-sm text-center mb-2">
-                          AVOIR
-                        </Text>
-                        <View className="flex flex-row justify-around">
-                          <MainButton
-                            label="Partager"
-                            buttonType="label-icon-top"
-                            iconName="file-pdf"
-                            iconColor="white"
-                            iconFamily="FontAwesome6Icon"
-                            bgColor="bg-withdrawn"
-                            iconSize={25}
-                            extraClasses="p-2 w-18 mr-2"
-                            onPressFn={() =>
-                              downloadPdf(
-                                order.details[0].creditNotes[0],
-                                "creditNotes",
-                              )
-                            }
-                          />
-                          <MainButton
-                            label="Afficher"
-                            buttonType="label-icon-top"
-                            iconName="file-pdf"
-                            iconColor="white"
-                            iconFamily="FontAwesome6Icon"
-                            bgColor="bg-partialWithdrawn"
-                            iconSize={25}
-                            extraClasses="p-2 w-18"
-                            onPressFn={() =>
-                              displayPdf(
-                                order.details[0].creditNotes[0],
-                                "creditNote",
-                                "creditNotes",
-                              )
-                            }
-                          />
-                        </View>
-                      </View>
-                    </View>
-                  )}
+                <View className="">
                   {hasInvoice && (
-                    <View className="flex flex-row flex-shrink justify-center">
-                      <View className="rounded-lg bg-tertiary/30 dark:bg-tertiary p-2 mb-3">
-                        <Text className="text-white font-bold text-sm text-center mb-2">
-                          FACTURE
-                        </Text>
-                        <View className="flex flex-row justify-around">
+                    <View className="rounded-lg bg-tertiary/30 dark:bg-tertiary p-2 mb-3">
+                      <Text className="text-white font-bold text-sm ml-5 mb-2">
+                        FACTURE
+                      </Text>
+                      <View className="flex flex-row">
+                        <View className="flex-grow justify-center items-center">
+                          <Text className="text-black dark:text-white text-xl">
+                            {globalTools.formatDateToFr(
+                              order.details[0].invoice.createdAt,
+                            )}
+                          </Text>
+                        </View>
+                        <View className="flex flex-row justify-around px-5">
                           <MainButton
                             label="Partager"
                             buttonType="label-icon-top"
@@ -488,9 +456,12 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                             iconFamily="FontAwesome6Icon"
                             bgColor="bg-validated"
                             iconSize={25}
-                            extraClasses="p-2 w-18 mr-2"
+                            extraClasses="p-2 w-18 mr-5"
                             onPressFn={() =>
-                              downloadPdf(order.details[0].invoice, "invoices")
+                              downloadPdf(
+                                order.details[0].invoice._id,
+                                "invoices",
+                              )
                             }
                           />
                           <MainButton
@@ -504,7 +475,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                             extraClasses="p-2 w-18"
                             onPressFn={() =>
                               displayPdf(
-                                order.details[0].invoice,
+                                order.details[0].invoice._id,
                                 "invoice",
                                 "invoices",
                               )
@@ -512,6 +483,55 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                           />
                         </View>
                       </View>
+                    </View>
+                  )}
+
+                  {hasCreditNote && (
+                    <View className="rounded-lg bg-tertiary/30 dark:bg-tertiary p-2 mb-3">
+                      <Text className="text-white font-bold text-sm ml-5 mb-2">
+                        AVOIRS
+                      </Text>
+                      {order.details[0].creditNotes.map((cn) => (
+                        <View className="flex flex-row mb-2">
+                          <View className="flex-grow justify-center items-center">
+                            <Text className="text-black dark:text-white text-xl">
+                              {globalTools.formatDateToFr(cn.createdAt)}
+                            </Text>
+                          </View>
+                          <View className="flex flex-row justify-around px-5">
+                            <MainButton
+                              label="Partager"
+                              buttonType="label-icon-top"
+                              iconName="file-pdf"
+                              iconColor="white"
+                              iconFamily="FontAwesome6Icon"
+                              bgColor="bg-withdrawn"
+                              iconSize={25}
+                              extraClasses="p-2 w-18 mr-5"
+                              onPressFn={() =>
+                                downloadPdf(cn._id, "creditNotes")
+                              }
+                            />
+                            <MainButton
+                              label="Afficher"
+                              buttonType="label-icon-top"
+                              iconName="file-pdf"
+                              iconColor="white"
+                              iconFamily="FontAwesome6Icon"
+                              bgColor="bg-partialWithdrawn"
+                              iconSize={25}
+                              extraClasses="p-2 w-18"
+                              onPressFn={() =>
+                                displayPdf(
+                                  order.details[0].creditNotes[0]._id,
+                                  "creditNote",
+                                  "creditNotes",
+                                )
+                              }
+                            />
+                          </View>
+                        </View>
+                      ))}
                     </View>
                   )}
                 </View>

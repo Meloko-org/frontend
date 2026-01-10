@@ -104,16 +104,16 @@ export const getOrderProductAction = ({
     return "toggle_not_picked_up";
   }
 
-  // 🧾 Après retrait → SAV
-  if (["picked_up", "partially_picked_up"].includes(subOrderStatus)) {
-    return "open_sav";
-  }
-
   if (
     ["picked_up", "partially_picked_up"].includes(subOrderStatus) &&
     product.productStatus === "cancelled"
   ) {
     return null;
+  }
+
+  // 🧾 Après retrait → SAV
+  if (["picked_up", "partially_picked_up"].includes(subOrderStatus)) {
+    return "open_sav";
   }
 
   return null;

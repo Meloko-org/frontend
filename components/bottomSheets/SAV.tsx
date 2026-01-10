@@ -138,9 +138,9 @@ export default function SAV(props: SheetProps<"sav">) {
           <>
             <TextHeading4 centered>Remboursement d'un produit</TextHeading4>
             <View className="p-3 bg-darkbg/20 dark:bg-lightbg/20 rounded-lg my-5">
-              <View className="flex flex-row justify-around">
+              <View className="flex flex-row justify-around mb-5">
                 <Text className="font-bold text-lg text-black dark:text-white">
-                  {`${productName}`}
+                  {`${productName?.toUpperCase()}`}
                 </Text>
                 <Text className="font-bold text-lg text-black dark:text-white">
                   {`${productDetail.quantity} ${productDetail.unit}`}
@@ -202,7 +202,7 @@ export default function SAV(props: SheetProps<"sav">) {
           </View>
         ) : (
           <>
-            <View className="flex flex-row w-full items-center mb-5">
+            <View className="flex flex-row w-full items-center my-2 mb-5">
               <View className="w-1/6"></View>
               <View className="w-4/6">
                 <TextHeading3

@@ -25,10 +25,20 @@ type OrderDetail = {
   shopTotalVAT: number;
   shopTotalTTC: number;
   status: SubOrderStatus;
-  invoice: string;
-  creditNotes: string[];
+  invoice: InvoiceData;
+  creditNotes: CreditNoteData[];
   stockIssue: boolean;
   stockIssueProduct: string;
+};
+
+type InvoiceData = {
+  _id: string;
+  createdAt: string;
+};
+
+type CreditNoteData = {
+  _id: string;
+  createdAt: string;
 };
 
 type OrderData = {
@@ -674,6 +684,8 @@ export type {
   MarketResultData,
   OrderData,
   OrderDetail,
+  InvoiceData,
+  CreditNoteData,
   OrderProduct,
   OrderDataForShop,
   ShopOrderStatus,
