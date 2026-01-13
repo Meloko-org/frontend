@@ -11,6 +11,10 @@ type OrderProduct = {
   totalPriceTTC: number;
   productStatus: ProductStatus;
   pickedUp: boolean;
+  refunded: boolean;
+  refundReason: string;
+  refundedAt: Date;
+  refundCreditNote: string;
 };
 
 type OrderDetail = {
@@ -136,6 +140,7 @@ type SavContextData =
       orderId: string;
       subOrderId: string;
       productId: string;
+      pickedUp: boolean;
     };
 
 type ProductData = {

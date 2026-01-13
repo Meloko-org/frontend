@@ -80,9 +80,17 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
   const [subOrderId, setSubOrderId] = useState<string | undefined>();
   const [cancelledProducts, setCancelledProducts] = useState<string[]>([]);
   const [notPickedUpProducts, setNotPickedUpProducts] = useState<string[]>([]);
-  // const [status, setStatus] = useState<SubOrderStatus>("pending");
-  const subOrder = order?.details[0];
+  const subOrder = useMemo(() => order?.details?.[0], [order]);
   const status = subOrder?.status;
+  const isSAV = useMemo(() => {
+    return status === "picked_up" || status === "partially_picked_up";
+  }, [status]);
+  const hasFooterActions =
+    status === "pending" ||
+    status === "prepared" ||
+    status === "partially_prepared";
+
+  const layoutHeight = hasFooterActions ? 9 : 10;
 
   // récupère un order avec un seul élément dans détails
   const fetchOrder = async () => {
@@ -104,10 +112,13 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
 
         navigation.navigate(from as never);
       } else if (orderResponse.success && orderResponse.data) {
-        console.log(
-          "ORDERRRRR :",
-          JSON.stringify(orderResponse.data.details[0], null, 2),
-        );
+        // console.log(
+        //   "ORDERRRRR :",
+        //   JSON.stringify(orderResponse.data.details[0], null, 2),
+        // );
+
+        console.log("invoice :", orderResponse.data.details[0].invoice);
+        console.log("invoice :", orderResponse.data.details[0].creditNotes);
         setOrder(orderResponse.data);
         setSubOrderId(orderResponse.data?.details[0]._id);
       }
@@ -228,13 +239,34 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
     });
   };
 
-  const handleOpenSav = (context: SavContextData) => {
-    console.log("context :", context);
-    SheetManager.show("sav", {
+  const handleOpenSav = async (context: SavContextData) => {
+    const updatedOrder = await SheetManager.show("sav", {
       payload: {
         savContext: context,
       },
     });
+
+    if (updatedOrder && updatedOrder.order) {
+      setOrder(updatedOrder.order);
+
+      if (updatedOrder.order && updatedOrder.message) {
+        SheetManager.show("alert", {
+          payload: {
+            message: updatedOrder.message,
+            alertType: "success",
+          },
+        });
+      }
+    }
+
+    if (updatedOrder && updatedOrder.order === null && updatedOrder.message) {
+      SheetManager.show("alert", {
+        payload: {
+          message: updatedOrder.message,
+          alertType: "error",
+        },
+      });
+    }
   };
 
   const handleCancelSubOrder = async () => {
@@ -261,6 +293,20 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
       setCancelledProducts(nextCancelledProducts);
       handleUpdateSubOrder("cancel", nextCancelledProducts);
     }
+  };
+
+  const renderProductTapHelp = () => {
+    let message;
+    switch (status) {
+      case "pending":
+        message = "(Cliquez sur un produit pour l'annuler avant de valider)";
+        break;
+      case "picked_up":
+      case "partially_picked_up":
+        message = "(Cliquez sur un produit pour ouvrir le menu SAV produit)";
+        break;
+    }
+    return message;
   };
 
   const renderButtons = () => {
@@ -309,10 +355,10 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
       case "partially_picked_up":
         return (
           <>
-            <View className="flex flex-row mx-3">
+            <View className="w-48">
               <CustomButton
-                label={`REMBOURSER LA COMMANDE`}
-                extraClasses="bg-primary flex-1 mx-1 rounded-lg px-2 h-[80px]"
+                label={`SAV`}
+                extraClasses="bg-danger flex-1 mx-1 rounded-lg px-2 h-14"
                 textClasses="text-lightbg font-bold text-lg"
                 onPressFn={() => {
                   if (order && subOrderId) {
@@ -323,7 +369,6 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
                     });
                   }
                 }}
-                isLoading={isLoading}
               />
             </View>
           </>
@@ -332,6 +377,31 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
       default:
         return null;
     }
+  };
+
+  const renderSav = () => {
+    if (!isSAV) return null;
+
+    return (
+      <View className="w-full flex items-center justify-center">
+        <View className="w-48">
+          <CustomButton
+            label={`SAV`}
+            extraClasses="bg-danger flex-1 mx-1 rounded-lg px-2 h-14"
+            textClasses="text-lightbg font-bold text-lg"
+            onPressFn={() => {
+              if (order && subOrderId) {
+                handleOpenSav({
+                  type: "order",
+                  orderId: order._id,
+                  subOrderId: subOrderId,
+                });
+              }
+            }}
+          />
+        </View>
+      </View>
+    );
   };
 
   const downloadPdf = async (id: string, path: "invoices" | "creditNotes") => {
@@ -403,6 +473,17 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
   console.log("cancelledProducts :", cancelledProducts);
   console.log("notPickedUpProducts :", notPickedUpProducts);
   console.log("hasInvoice :", hasInvoice);
+  console.log("isSAV :", isSAV);
+
+  if (!order) {
+    return (
+      <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
+        <View className="w-full h-full flex items-center justify-center">
+          <Spinner />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
@@ -415,167 +496,165 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
         />
       </View>
 
-      <View style={{ flex: 9 }}>
-        {isLoading ? (
+      <View style={{ flex: layoutHeight }} className="bg-primary">
+        {/* {isLoading ? (
           <View className="w-full h-full flex items-center justify-center">
             <Spinner />
           </View>
         ) : (
-          order && (
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              className="w-full flex-1 pb-5"
-            >
-              <View className="p-3">
-                <OrderStatus
-                  orderData={order}
-                  status={status}
-                  extraClasses="mb-3"
-                />
+          order && ( */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          className="w-full flex-1 pb-5"
+        >
+          <View className="p-3">
+            <OrderStatus
+              orderData={order}
+              status={status}
+              extraClasses="mb-3"
+            />
 
-                <View className="">
-                  {hasInvoice && (
-                    <View className="rounded-lg bg-tertiary/30 dark:bg-tertiary p-2 mb-3">
-                      <Text className="text-white font-bold text-sm ml-5 mb-2">
-                        FACTURE
+            <View className="">
+              {hasInvoice && (
+                <View className="rounded-lg bg-tertiary/30 dark:bg-tertiary p-2 mb-3">
+                  <Text className="text-black dark:text-white font-bold text-sm ml-5 mb-2">
+                    FACTURE
+                  </Text>
+                  <View className="flex flex-row">
+                    <View className="flex-grow justify-center items-center">
+                      <Text className="text-black dark:text-white font-bold text-xl">
+                        {globalTools.formatDateToFr(
+                          order.details[0].invoice.createdAt,
+                        )}
                       </Text>
-                      <View className="flex flex-row">
-                        <View className="flex-grow justify-center items-center">
-                          <Text className="text-black dark:text-white text-xl">
-                            {globalTools.formatDateToFr(
-                              order.details[0].invoice.createdAt,
-                            )}
-                          </Text>
-                        </View>
-                        <View className="flex flex-row justify-around px-5">
-                          <MainButton
-                            label="Partager"
-                            buttonType="label-icon-top"
-                            iconName="file-pdf"
-                            iconColor="white"
-                            iconFamily="FontAwesome6Icon"
-                            bgColor="bg-validated"
-                            iconSize={25}
-                            extraClasses="p-2 w-18 mr-5"
-                            onPressFn={() =>
-                              downloadPdf(
-                                order.details[0].invoice._id,
-                                "invoices",
-                              )
-                            }
-                          />
-                          <MainButton
-                            label="Afficher"
-                            buttonType="label-icon-top"
-                            iconName="file-pdf"
-                            iconColor="white"
-                            iconFamily="FontAwesome6Icon"
-                            bgColor="bg-partialValidated"
-                            iconSize={25}
-                            extraClasses="p-2 w-18"
-                            onPressFn={() =>
-                              displayPdf(
-                                order.details[0].invoice._id,
-                                "invoice",
-                                "invoices",
-                              )
-                            }
-                          />
-                        </View>
+                    </View>
+                    <View className="flex flex-row justify-around px-5">
+                      <MainButton
+                        label="Partager"
+                        buttonType="label-icon-top"
+                        iconName="file-pdf"
+                        iconColor="white"
+                        iconFamily="FontAwesome6Icon"
+                        bgColor="bg-validated"
+                        iconSize={25}
+                        extraClasses="p-2 w-18 mr-5"
+                        onPressFn={() =>
+                          downloadPdf(order.details[0].invoice._id, "invoices")
+                        }
+                      />
+                      <MainButton
+                        label="Afficher"
+                        buttonType="label-icon-top"
+                        iconName="file-pdf"
+                        iconColor="white"
+                        iconFamily="FontAwesome6Icon"
+                        bgColor="bg-partialValidated"
+                        iconSize={25}
+                        extraClasses="p-2 w-18"
+                        onPressFn={() =>
+                          displayPdf(
+                            order.details[0].invoice._id,
+                            "invoice",
+                            "invoices",
+                          )
+                        }
+                      />
+                    </View>
+                  </View>
+                </View>
+              )}
+
+              {hasCreditNote && (
+                <View className="rounded-lg bg-tertiary/30 dark:bg-tertiary p-2 mb-3">
+                  <Text className="text-black dark:text-white font-bold text-sm ml-5 mb-2">
+                    AVOIRS
+                  </Text>
+                  {order.details[0].creditNotes.map((cn) => (
+                    <View key={cn._id} className="flex flex-row mb-2">
+                      <View className="flex-grow justify-center items-center">
+                        <Text className="text-black dark:text-white font-bold text-xl">
+                          {globalTools.formatDateToFr(cn.createdAt)}
+                        </Text>
+                      </View>
+                      <View className="flex flex-row justify-around px-5">
+                        <MainButton
+                          label="Partager"
+                          buttonType="label-icon-top"
+                          iconName="file-pdf"
+                          iconColor="white"
+                          iconFamily="FontAwesome6Icon"
+                          bgColor="bg-withdrawn"
+                          iconSize={25}
+                          extraClasses="p-2 w-18 mr-5"
+                          onPressFn={() => downloadPdf(cn._id, "creditNotes")}
+                        />
+                        <MainButton
+                          label="Afficher"
+                          buttonType="label-icon-top"
+                          iconName="file-pdf"
+                          iconColor="white"
+                          iconFamily="FontAwesome6Icon"
+                          bgColor="bg-partialWithdrawn"
+                          iconSize={25}
+                          extraClasses="p-2 w-18"
+                          onPressFn={() =>
+                            displayPdf(
+                              order.details[0].creditNotes[0]._id,
+                              "creditNote",
+                              "creditNotes",
+                            )
+                          }
+                        />
                       </View>
                     </View>
-                  )}
-
-                  {hasCreditNote && (
-                    <View className="rounded-lg bg-tertiary/30 dark:bg-tertiary p-2 mb-3">
-                      <Text className="text-white font-bold text-sm ml-5 mb-2">
-                        AVOIRS
-                      </Text>
-                      {order.details[0].creditNotes.map((cn) => (
-                        <View className="flex flex-row mb-2">
-                          <View className="flex-grow justify-center items-center">
-                            <Text className="text-black dark:text-white text-xl">
-                              {globalTools.formatDateToFr(cn.createdAt)}
-                            </Text>
-                          </View>
-                          <View className="flex flex-row justify-around px-5">
-                            <MainButton
-                              label="Partager"
-                              buttonType="label-icon-top"
-                              iconName="file-pdf"
-                              iconColor="white"
-                              iconFamily="FontAwesome6Icon"
-                              bgColor="bg-withdrawn"
-                              iconSize={25}
-                              extraClasses="p-2 w-18 mr-5"
-                              onPressFn={() =>
-                                downloadPdf(cn._id, "creditNotes")
-                              }
-                            />
-                            <MainButton
-                              label="Afficher"
-                              buttonType="label-icon-top"
-                              iconName="file-pdf"
-                              iconColor="white"
-                              iconFamily="FontAwesome6Icon"
-                              bgColor="bg-partialWithdrawn"
-                              iconSize={25}
-                              extraClasses="p-2 w-18"
-                              onPressFn={() =>
-                                displayPdf(
-                                  order.details[0].creditNotes[0]._id,
-                                  "creditNote",
-                                  "creditNotes",
-                                )
-                              }
-                            />
-                          </View>
-                        </View>
-                      ))}
-                    </View>
-                  )}
+                  ))}
                 </View>
+              )}
+            </View>
 
-                <View className="mt-5 mb-2">
-                  <TextHeading4 centered>Détail</TextHeading4>
-                  <TextBody2 centered>
-                    (Cliquez sur un produit pour l'annuler avant de valider)
-                  </TextBody2>
-                </View>
-                {order &&
-                  status &&
-                  order.details[0].products.map((p) => {
-                    return (
-                      <OrderProductCard
-                        key={p._id}
-                        product={p}
-                        subOrderStatus={status}
-                        stockIssue={order.details[0].stockIssue}
-                        cancelledProducts={cancelledProducts}
-                        notPickedUpProducts={notPickedUpProducts}
-                        extraClasses="mb-3"
-                        onToggleNotPickUp={handleNotPickUp}
-                        onToggleCancel={handleCancelledProducts}
-                        onOpenSav={() => {
-                          if (order && subOrderId) {
-                            handleOpenSav({
-                              type: "product",
-                              orderId: order._id,
-                              subOrderId: subOrderId,
-                              productId: p._id,
-                            });
-                          }
-                        }}
-                      />
-                    );
-                  })}
-              </View>
-            </ScrollView>
-          )
-        )}
+            <View className="w-full flex items-center justify-center">
+              {!hasFooterActions && renderButtons()}
+            </View>
+
+            <View className="mt-5 mb-2">
+              <TextHeading4 centered>Détail</TextHeading4>
+              <TextBody2 centered>{renderProductTapHelp()}</TextBody2>
+            </View>
+            {order &&
+              status &&
+              order.details[0].products.map((p) => {
+                return (
+                  <OrderProductCard
+                    key={p._id}
+                    product={p}
+                    subOrderStatus={status}
+                    stockIssue={order.details[0].stockIssue}
+                    cancelledProducts={cancelledProducts}
+                    notPickedUpProducts={notPickedUpProducts}
+                    extraClasses="mb-3"
+                    onToggleNotPickUp={handleNotPickUp}
+                    onToggleCancel={handleCancelledProducts}
+                    onOpenSav={() => {
+                      if (order && subOrderId) {
+                        handleOpenSav({
+                          type: "product",
+                          orderId: order._id,
+                          subOrderId: subOrderId,
+                          productId: p._id,
+                          pickedUp: p.pickedUp,
+                        });
+                      }
+                    }}
+                  />
+                );
+              })}
+          </View>
+        </ScrollView>
+        {/* )
+        )} */}
       </View>
 
-      {renderButtons() !== null && (
+      {hasFooterActions && (
         <View
           style={{ flex: 1.5 }}
           className="flex justify-center bg-darkbg dark:bg-lightbg"

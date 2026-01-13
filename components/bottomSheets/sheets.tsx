@@ -18,6 +18,7 @@ import {
   MarketResultData,
   NoteData,
   OrderData,
+  OrderDataForShop,
   ProductData,
   SavContextData,
   ShopData,
@@ -198,6 +199,10 @@ declare module "react-native-actions-sheet" {
       payload: {
         savContext: SavContextData;
       };
+      returnValue: {
+        order: OrderDataForShop | null;
+        message?: string;
+      } | null;
     }>;
   }
 }

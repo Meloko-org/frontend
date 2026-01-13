@@ -155,15 +155,26 @@ const updateSubOrder = async (
   },
 ) => {
   try {
-    const response = await fetch(`${API_ROOT}/orders/${id}/update-sub-order`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        mode: "cors",
+    const response = await fetch(
+      `${API_ROOT}/sav/order/${id}/update-sub-order`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          mode: "cors",
+        },
+        body: JSON.stringify(values),
       },
-      body: JSON.stringify(values),
-    });
+    );
+
+    if (!response.ok) {
+      return {
+        success: false,
+        data: null,
+        message: `Erreur ${response.status}: Impossible de récupérer les données.`,
+      };
+    }
 
     const data = await response.json();
 
@@ -179,34 +190,6 @@ const updateSubOrder = async (
     console.log(error);
     return { success: false, message: error };
   }
-};
-
-// construit le nouvel order pour valider, annuler ou restaurer
-const buildUpdatedOrder = ({
-  order,
-  newStatus,
-  updateProductCallback,
-}: {
-  order: OrderDataForShop;
-  newStatus: "pending" | "validated" | "withdrawn" | "canceled";
-  updateProductCallback?: (product: OrderProduct) => OrderProduct;
-}): OrderDataForShop => {
-  const detail = order.details[0];
-
-  const updatedProducts = updateProductCallback
-    ? detail.products.map(updateProductCallback)
-    : detail.products;
-
-  return {
-    ...order,
-    details: [
-      {
-        ...detail,
-        products: updatedProducts,
-        status: newStatus,
-      },
-    ],
-  };
 };
 
 // récupère la facture pour la partager
@@ -416,7 +399,6 @@ export default {
   getOrdersByUser,
   getOrderStatus,
   getUserOrderById,
-  buildUpdatedOrder,
   getProductCost,
   getPriceInEuros,
   getInvoice,
