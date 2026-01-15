@@ -255,7 +255,6 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
     });
 
     if (canCancel) {
-      console.log("youpi");
       if (!order) return;
 
       const subOrder = order.details[0];

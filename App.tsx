@@ -119,6 +119,7 @@ import React, { useEffect } from "react";
 import { AuthProvider, useAuthContext } from "./hooks/useAuthContext";
 
 import * as WebBrowser from "expo-web-browser";
+import { registerForPushNotifications } from "./notifications";
 
 // Warm up the android browser to improve UX
 // https://docs.expo.dev/guides/authentication/#improving-user-experience
@@ -583,6 +584,10 @@ const TabNavigatorProducer: React.FC = () => {
 
 export default function App() {
   useWarmUpBrowser();
+
+  useEffect(() => {
+    registerForPushNotifications();
+  }, []);
 
   const [fontsLoaded] = useFonts({
     Caveat_400Regular,
