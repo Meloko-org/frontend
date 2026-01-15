@@ -52,8 +52,8 @@ export default function SimpleInputText({
   textClasses,
 }: SimpleInputTextProps): JSX.Element {
   const borderClasses = showError
-    ? "border-2 border-danger dark:border-red-500"
-    : "border-white";
+    ? "border-4 border-danger dark:border-red-500"
+    : "border-black dark:border-white";
 
   return (
     <View

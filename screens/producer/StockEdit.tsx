@@ -25,7 +25,7 @@ import {
   UpdateStockPayload,
 } from "../../types/API";
 
-import { handleSheetFlow, showAlert } from "../../helpers/sheetHelpers";
+import { handleSheetFlow } from "../../helpers/sheetHelpers";
 import stocksTools from "../../modules/stocksTools";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -182,7 +182,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
 
       if (bulk) {
         setPrice(stockData.price.toString());
-        setStock(stockData.stock);
+        setStock(stockData.stockTotal);
         setWeightPerUnit(
           stockData.product.weight.measurement +
             " " +
@@ -193,7 +193,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
         setImageAdapted(stockData.product.image);
       } else {
         setPrice(stockData.price.toString());
-        setStock(stockData.stock);
+        setStock(stockData.stockTotal);
         setProductCustomName(stockData.productCustomName);
         setPricePerKilo(stockData.pricePerKilo.toString());
         setOrigin(stockData.origin);
@@ -324,7 +324,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
         createValues = {
           product: productData,
           price: numPrice,
-          stock,
+          stockTotal: stock,
           description,
           tags,
         } as CreateBulkStockPayload;
@@ -334,7 +334,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
           _id: stockData?._id,
           product: stockData?.product,
           price: numPrice,
-          stock,
+          stockTotal: stock,
           description,
           tags,
         } as UpdateBulkStockPayload;
@@ -359,7 +359,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
           product: productData,
           productCustomName,
           price: numPrice,
-          stock,
+          stockTotal: stock,
           pricePerKilo: numPricePerKilo,
           weightPerUnit,
           origin,
@@ -377,7 +377,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
           product: stockData?.product,
           productCustomName,
           price: numPrice,
-          stock,
+          stockTotal: stock,
           pricePerKilo: numPricePerKilo,
           weightPerUnit,
           origin,
@@ -604,8 +604,8 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                     height={64}
                   />
                 </View>
-                <View className="flex flex-row grow">
-                  <TextHeading3>
+                <View className="flex shrink">
+                  <TextHeading3 extraClasses="text-wrap">
                     {familyAdpated + " " + nameAdapted}
                   </TextHeading3>
                 </View>
@@ -619,7 +619,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
             </View>
             {isBulk ? (
               <View className="flex flex-row justify-end w-36 mr-2">
-                <Text className="font-bold text-xl text-secondray dark:text-lightbg">
+                <Text className="font-bold text-xl text-secondary dark:text-lightbg">
                   {weightPerUnit}
                 </Text>
               </View>
@@ -681,11 +681,11 @@ export default function StocksEditScreen({ navigation, route }: Props) {
                 size={30}
                 onPressFn={() => handleQuantityChange(-1)}
               />
-              <View className="flex flex-row justify-center w-16">
+              <View className="flex flex-row justify-center w-32">
                 <SimpleInputText
                   value={stock?.toString() ?? ""}
                   height="h-[50px]"
-                  extraClasses="mx-2 w-12"
+                  extraClasses="mx-2 w-24"
                   textClasses=" text-center pr-1 text-xl"
                   onChangeText={(value: string) => {
                     setStock(Number(value));

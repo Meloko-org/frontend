@@ -5,6 +5,7 @@ import TextBody1 from "../utils/texts/Body1";
 import TextBody2 from "../utils/texts/Body2";
 import BlackBadge from "../utils/badges/Black";
 import BadgeGrey from "../utils/badges/Grey";
+import { formatCentsToEuros } from "../../modules/globalTools";
 
 type StockProductCardProps = {
   stock: StockData;
@@ -26,7 +27,8 @@ export default function StockProductCard({
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`${stock.stock === 0 ? "bg-danger/80" : "bg-white dark:bg-tertiary"} shadow-lg rounded-lg  p-2 mb-2`}
+      style={{ shadowColor: "#000" }}
+      className={`${stock.stockTotal === 0 ? "bg-danger/80" : "bg-white dark:bg-tertiary"} shadow-lg rounded-lg  p-2 mb-2`}
     >
       <View className="flex flex-row items-center w-full">
         <View className="rounded-lg w-1/4">
@@ -56,19 +58,22 @@ export default function StockProductCard({
           <View className="flex flex-row">
             <View className="flex flex-row items-center">
               <TextBody2>Prix: </TextBody2>
-              <TextBody1 extraClasses="font-bold">{stock.price}</TextBody1>
+              <TextBody1 extraClasses="font-bold">
+                {formatCentsToEuros(stock.price)}
+              </TextBody1>
               <TextBody2>
-                {stock.productCustomName !== undefined
+                {/* {stock.productCustomName !== undefined
                   ? " €"
                   : stock.product.weight.unit === "gr"
                     ? " € / kg"
-                    : " € / pièce"}
+                    : " € / pièce"} */}
+                {stock.product.weight.unit === "gr" && " / kg"}
               </TextBody2>
             </View>
 
             <View className="flex flex-row flex-grow items-center justify-end pr-2">
               <TextBody2>Quantité: </TextBody2>
-              <TextBody1 extraClasses="font-bold">{stock.stock}</TextBody1>
+              <TextBody1 extraClasses="font-bold">{stock.stockTotal}</TextBody1>
             </View>
           </View>
 

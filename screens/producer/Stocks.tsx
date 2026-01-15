@@ -185,8 +185,8 @@ export default function StocksScreen({ navigation, route }: Props) {
       </View>
 
       <View style={{ flex: 11 }} className="px-3">
-        <ScrollView>
-          <View className="px-3">{filteredProducts}</View>
+        <ScrollView className="">
+          <View className="px-3 mb-5">{filteredProducts}</View>
         </ScrollView>
       </View>
     </SafeAreaView>

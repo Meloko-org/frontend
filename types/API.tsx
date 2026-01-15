@@ -634,7 +634,7 @@ type StatusData =
 // bulk / création
 type CreateBulkStockPayload = {
   price: number;
-  stock: number;
+  stockTotal: number;
   product: ProductData;
   description: string;
   tags: TagData[];
@@ -648,7 +648,7 @@ type CreateClassicStockPayload = {
   productCustomName: string;
   price: number;
   pricePerKilo: number;
-  stock: number;
+  stockTotal: number;
   product: ProductData;
   weightPerUnit: string;
   origin: string;
