@@ -155,18 +155,15 @@ const updateSubOrder = async (
   },
 ) => {
   try {
-    const response = await fetch(
-      `${API_ROOT}/sav/order/${id}/update-sub-order`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          mode: "cors",
-        },
-        body: JSON.stringify(values),
+    const response = await fetch(`${API_ROOT}/orders/${id}/update-sub-order`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        mode: "cors",
       },
-    );
+      body: JSON.stringify(values),
+    });
 
     if (!response.ok) {
       return {

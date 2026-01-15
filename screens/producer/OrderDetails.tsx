@@ -16,21 +16,12 @@ import { useSelector, UseSelector } from "react-redux";
 import { ShopState } from "../../reducers/shop";
 
 import {
-  OrderData,
   OrderDataForShop,
-  OrderProduct,
-  ProductData,
   SavContextData,
   SubOrderIntent,
-  SubOrderStatus,
-  SubOrderStatusGroups,
 } from "../../types/API";
 
 import orderTools from "../../modules/orderTools";
-import {
-  getSubOrderStatusGroup,
-  SUB_ORDER_GROUP_LABELS,
-} from "../../helpers/orderHelpers";
 
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
@@ -40,16 +31,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { SheetManager } from "react-native-actions-sheet";
 
 import { Alert, View, Text } from "react-native";
-import TextHeading3 from "../../components/utils/texts/Heading3";
 import OrderStatus from "../../components/cards/OrderStatus";
-import TextBody1 from "../../components/utils/texts/Body1";
 import OrderProductCard from "../../components/cards/OrderProductCard";
 import CustomButton from "../../components/utils/buttons/Custom";
 import TextBody2 from "../../components/utils/texts/Body2";
 import Spinner from "../../components/utils/Spinner";
 import TopBar from "../../components/TopBar";
 import TextHeading4 from "../../components/utils/texts/Heading4";
-import IconButton from "../../components/utils/buttons/Icon";
 import MainButton from "../../components/utils/buttons/MainButton";
 import globalTools from "../../modules/globalTools";
 
@@ -82,15 +70,15 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
   const [notPickedUpProducts, setNotPickedUpProducts] = useState<string[]>([]);
   const subOrder = useMemo(() => order?.details?.[0], [order]);
   const status = subOrder?.status;
-  const isSAV = useMemo(() => {
-    return status === "picked_up" || status === "partially_picked_up";
-  }, [status]);
+  // const isSAV = useMemo(() => {
+  //   return status === "picked_up" || status === "partially_picked_up";
+  // }, [status]);
   const hasFooterActions =
     status === "pending" ||
     status === "prepared" ||
-    status === "partially_prepared";
-
-  const layoutHeight = hasFooterActions ? 9 : 10;
+    status === "partially_prepared" ||
+    status === "picked_up" ||
+    status === "partially_picked_up";
 
   // récupère un order avec un seul élément dans détails
   const fetchOrder = async () => {
@@ -112,13 +100,6 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
 
         navigation.navigate(from as never);
       } else if (orderResponse.success && orderResponse.data) {
-        // console.log(
-        //   "ORDERRRRR :",
-        //   JSON.stringify(orderResponse.data.details[0], null, 2),
-        // );
-
-        console.log("invoice :", orderResponse.data.details[0].invoice);
-        console.log("invoice :", orderResponse.data.details[0].creditNotes);
         setOrder(orderResponse.data);
         setSubOrderId(orderResponse.data?.details[0]._id);
       }
@@ -163,11 +144,8 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
     intent: SubOrderIntent,
     productIds?: string[],
   ) => {
-    console.log("youpi");
-
     try {
       if (!order || !subOrderId) {
-        // console.log("order :", Object.keys(order).length > 0)
         return;
       }
 
@@ -184,8 +162,6 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
         cancelledProductIds: productIds ?? cancelledProducts,
         notPickedUpProductIds: notPickedUpProducts,
       };
-
-      console.log("values :", values);
 
       const response = await orderTools.updateSubOrder(token, orderId, values);
 
@@ -355,7 +331,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
       case "partially_picked_up":
         return (
           <>
-            <View className="w-48">
+            <View className="flex flex-row mx-3">
               <CustomButton
                 label={`SAV`}
                 extraClasses="bg-danger flex-1 mx-1 rounded-lg px-2 h-14"
@@ -373,35 +349,10 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
             </View>
           </>
         );
-
+      case "cancelled":
       default:
         return null;
     }
-  };
-
-  const renderSav = () => {
-    if (!isSAV) return null;
-
-    return (
-      <View className="w-full flex items-center justify-center">
-        <View className="w-48">
-          <CustomButton
-            label={`SAV`}
-            extraClasses="bg-danger flex-1 mx-1 rounded-lg px-2 h-14"
-            textClasses="text-lightbg font-bold text-lg"
-            onPressFn={() => {
-              if (order && subOrderId) {
-                handleOpenSav({
-                  type: "order",
-                  orderId: order._id,
-                  subOrderId: subOrderId,
-                });
-              }
-            }}
-          />
-        </View>
-      </View>
-    );
   };
 
   const downloadPdf = async (id: string, path: "invoices" | "creditNotes") => {
@@ -473,7 +424,6 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
   console.log("cancelledProducts :", cancelledProducts);
   console.log("notPickedUpProducts :", notPickedUpProducts);
   console.log("hasInvoice :", hasInvoice);
-  console.log("isSAV :", isSAV);
 
   if (!order) {
     return (
@@ -496,13 +446,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
         />
       </View>
 
-      <View style={{ flex: layoutHeight }} className="bg-primary">
-        {/* {isLoading ? (
-          <View className="w-full h-full flex items-center justify-center">
-            <Spinner />
-          </View>
-        ) : (
-          order && ( */}
+      <View style={{ flex: 9 }} className="">
         <ScrollView
           showsVerticalScrollIndicator={false}
           className="w-full flex-1 pb-5"
@@ -517,7 +461,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
             <View className="">
               {hasInvoice && (
                 <View className="rounded-lg bg-tertiary/30 dark:bg-tertiary p-2 mb-3">
-                  <Text className="text-black dark:text-white font-bold text-sm ml-5 mb-2">
+                  <Text className="text-black dark:text-white font-bold text-sm ml-1 mb-2">
                     FACTURE
                   </Text>
                   <View className="flex flex-row">
@@ -566,7 +510,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
 
               {hasCreditNote && (
                 <View className="rounded-lg bg-tertiary/30 dark:bg-tertiary p-2 mb-3">
-                  <Text className="text-black dark:text-white font-bold text-sm ml-5 mb-2">
+                  <Text className="text-black dark:text-white font-bold text-sm ml-1 mb-2">
                     AVOIRS
                   </Text>
                   {order.details[0].creditNotes.map((cn) => (
@@ -650,8 +594,6 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
               })}
           </View>
         </ScrollView>
-        {/* )
-        )} */}
       </View>
 
       {hasFooterActions && (
