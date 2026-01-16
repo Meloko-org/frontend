@@ -32,6 +32,7 @@ import { emptyCart } from "../reducers/cart";
 import { changeMode, ModeState } from "../reducers/mode";
 import SignInScreen from "./Signin";
 import { SheetManager } from "react-native-actions-sheet";
+import { registerForPushNotifications } from "../notifications";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -116,9 +117,11 @@ export default function HomeScreen({ navigation }: Props) {
     if (isSignedIn) {
       (async () => {
         await fetchData();
+        const authToken = await getToken();
+        await registerForPushNotifications(authToken);
       })();
     }
-  }, []);
+  }, [isSignedIn]);
 
   // Signout the user from Clerk
   const onSignoutPress = async () => {

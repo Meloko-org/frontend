@@ -181,7 +181,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
       // mode modification
 
       if (bulk) {
-        setPrice(stockData.price.toString());
+        setPrice((stockData.price / 100).toString());
         setStock(stockData.stockTotal);
         setWeightPerUnit(
           stockData.product.weight.measurement +
@@ -192,7 +192,7 @@ export default function StocksEditScreen({ navigation, route }: Props) {
         setFamilyAdpated(stockData.product.family.name);
         setImageAdapted(stockData.product.image);
       } else {
-        setPrice(stockData.price.toString());
+        setPrice((stockData.price / 100).toString());
         setStock(stockData.stockTotal);
         setProductCustomName(stockData.productCustomName);
         setPricePerKilo(stockData.pricePerKilo.toString());

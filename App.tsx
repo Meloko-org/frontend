@@ -1,6 +1,8 @@
 import { LogBox } from "react-native";
 LogBox.ignoreAllLogs();
 
+import { Button } from "react-native";
+
 import { ClerkProvider, ClerkLoaded } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -119,7 +121,10 @@ import React, { useEffect } from "react";
 import { AuthProvider, useAuthContext } from "./hooks/useAuthContext";
 
 import * as WebBrowser from "expo-web-browser";
-import { registerForPushNotifications } from "./notifications";
+import {
+  registerForPushNotifications,
+  sendTestNotification,
+} from "./notifications";
 
 // Warm up the android browser to improve UX
 // https://docs.expo.dev/guides/authentication/#improving-user-experience
@@ -585,9 +590,12 @@ const TabNavigatorProducer: React.FC = () => {
 export default function App() {
   useWarmUpBrowser();
 
-  useEffect(() => {
-    registerForPushNotifications();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const token = await registerForPushNotifications();
+  //     console.log("🔥 PUSH TOKEN FINAL :", token);
+  //   })();
+  // }, []);
 
   const [fontsLoaded] = useFonts({
     Caveat_400Regular,
@@ -599,6 +607,13 @@ export default function App() {
   if (!fontsLoaded) {
     return null;
   }
+
+  // return (
+  //   <Button
+  //     title="Tester notification"
+  //     onPress={sendTestNotification}
+  //   />
+  // )
 
   return (
     <Provider store={store}>
