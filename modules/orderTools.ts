@@ -6,6 +6,7 @@ import {
   OrderProduct,
   OrderSummary,
   PdfResult,
+  StatusData,
   // ProductDetail,
   StockData,
   SubOrderIntent,
@@ -17,15 +18,7 @@ const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
 
 const getOrdersByUser = async (
   token: string | null,
-  status:
-    | "pending"
-    | "partialValidated"
-    | "validated"
-    | "partialWithdrawn"
-    | "withdrawn"
-    | "partialCanceled"
-    | "canceled"
-    | "all",
+  status: StatusData,
   page = 1,
   limit = 10,
 ) => {
@@ -315,61 +308,41 @@ const getPdfToDisplay = async (
   }
 };
 
-// gestion des status
-type GlobalOrderStatus =
-  | "pending"
-  | "partialValidated"
-  | "validated"
-  | "partialWithdrawn"
-  | "withdrawn"
-  | "partialCanceled"
-  | "canceled";
+function getOrderStatus(order: OrderData): StatusData {
+  const subOrders = order.details;
 
-function getOrderStatus(order: OrderData): GlobalOrderStatus {
-  const subOrderStatuses = order.details.map((detail) => detail.status);
-
-  // console.log(subOrderStatuses)
-
-  // Utiliser un Set pour obtenir les statuts uniques
-  const uniqueStatuses = new Set(subOrderStatuses);
-
-  // Cas 1 : Tous les suborders ont le même statut
-  if (uniqueStatuses.size === 1) {
-    const singleStatus = uniqueStatuses.values().next().value;
-    switch (singleStatus) {
-      case "pending":
-        return "pending";
-      case "validated":
-        return "validated";
-      case "withdrawn":
-        return "withdrawn";
-      case "canceled":
-        return "canceled";
-    }
+  if (!subOrders || subOrders.length === 0) {
+    return "pending";
   }
 
-  // Cas 2 : Combinaisons de statuts
-  if (uniqueStatuses.has("withdrawn")) {
-    if (uniqueStatuses.size === 2 && uniqueStatuses.has("validated")) {
-      return "partialWithdrawn"; // Validé + Retiré
-    }
-    if (uniqueStatuses.size === 1) {
-      return "withdrawn"; // Tous retirés
-    }
+  const statuses = subOrders.map((d) => d.status);
+
+  const isCancelled = (s: string) => s === "cancelled";
+  const isPickedUp = (s: string) => s === "picked-up";
+  const isPrepared = (s: string) =>
+    s === "prepared" || s === "partially-prepared";
+
+  // 1️⃣ Tout annulé
+  if (statuses.every(isCancelled)) {
+    return "cancelled";
   }
 
-  if (uniqueStatuses.has("validated")) {
-    return "partialValidated"; // Combinaison de validé et en attente
+  // 2️⃣ Tout récupéré OU annulé
+  if (statuses.every((s) => isPickedUp(s) || isCancelled(s))) {
+    return "completed";
   }
 
-  if (uniqueStatuses.has("canceled")) {
-    if (uniqueStatuses.size === 1) {
-      return "canceled"; // Tous annulés
-    }
-    return "partialCanceled"; // Combinaison d'annulés et autres
+  // 3️⃣ Tout prêt OU annulé
+  if (statuses.every((s) => isPrepared(s) || isCancelled(s))) {
+    return "ready";
   }
 
-  // Par défaut, on retourne "pending" si aucune autre logique ne s'applique
+  // 4️⃣ Au moins un prêt
+  if (statuses.some(isPrepared)) {
+    return "partially-ready";
+  }
+
+  // 5️⃣ Sinon
   return "pending";
 }
 

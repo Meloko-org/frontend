@@ -118,7 +118,7 @@ export default function HomeScreen({ navigation }: Props) {
       (async () => {
         await fetchData();
         const authToken = await getToken();
-        await registerForPushNotifications(authToken);
+        // await registerForPushNotifications(authToken);
       })();
     }
   }, [isSignedIn]);

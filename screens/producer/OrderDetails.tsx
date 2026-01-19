@@ -23,9 +23,6 @@ import {
 
 import orderTools from "../../modules/orderTools";
 
-import * as FileSystem from "expo-file-system";
-import * as Sharing from "expo-sharing";
-
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SheetManager } from "react-native-actions-sheet";
@@ -38,8 +35,7 @@ import TextBody2 from "../../components/utils/texts/Body2";
 import Spinner from "../../components/utils/Spinner";
 import TopBar from "../../components/TopBar";
 import TextHeading4 from "../../components/utils/texts/Heading4";
-import MainButton from "../../components/utils/buttons/MainButton";
-import globalTools from "../../modules/globalTools";
+import InvoiceSection from "../../components/InvoiceSection";
 
 type OrderDetailsNavProp = CompositeNavigationProp<
   BottomTabNavigationProp<ProducerTabParamList, "OrderDetails">,
@@ -70,9 +66,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
   const [notPickedUpProducts, setNotPickedUpProducts] = useState<string[]>([]);
   const subOrder = useMemo(() => order?.details?.[0], [order]);
   const status = subOrder?.status;
-  // const isSAV = useMemo(() => {
-  //   return status === "picked_up" || status === "partially_picked_up";
-  // }, [status]);
+
   const hasFooterActions =
     status === "pending" ||
     status === "prepared" ||
@@ -115,9 +109,6 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
     setCancelledProducts([]);
     fetchOrder();
   }, [orderId]);
-
-  const hasInvoice = order && !!order.details[0].invoice;
-  const hasCreditNote = order && !!order.details[0].creditNotes.length;
 
   // permet de désactiver le bouton "valider" en cas de stockIssue
   const hasBlockingStockIssue = useMemo(() => {
@@ -354,75 +345,8 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
     }
   };
 
-  const downloadPdf = async (id: string, path: "invoices" | "creditNotes") => {
-    console.log("id :", id);
-    console.log("path :", path);
-    const token = await getToken();
-    const pdfResponse = await orderTools.getPdfToShare(token, id, path);
-
-    if (!pdfResponse.success) {
-      SheetManager.show("alert", {
-        payload: {
-          message: pdfResponse.message,
-          alertType: "error",
-        },
-      });
-      return;
-    }
-
-    try {
-      const filename =
-        path === "invoices" ? `facture-${id}.pdf` : `avoir-${id}.pdf`;
-      const fileUri = FileSystem.documentDirectory + filename;
-
-      const reader = new FileReader();
-
-      reader.onloadend = async () => {
-        const base64Data = reader.result?.toString().split(",")[1];
-
-        if (!base64Data) return;
-
-        await FileSystem.writeAsStringAsync(fileUri, base64Data, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-
-        await Sharing.shareAsync(fileUri);
-      };
-
-      reader.readAsDataURL(pdfResponse.blob);
-    } catch (error) {
-      console.error(error);
-      SheetManager.show("alert", {
-        payload: {
-          message: "Impossible d’ouvrir le document.",
-          alertType: "error",
-        },
-      });
-    }
-  };
-
-  const displayPdf = (
-    id: string,
-    type: "invoice" | "creditNote",
-    path: "invoices" | "creditNotes",
-  ) => {
-    console.log("id :", id);
-    console.log("type :", type);
-    console.log("path :", path);
-
-    navigation.navigate("DisplayPdf", {
-      from: "OrderDetails",
-      backLabel: "Retour facture",
-      screenTitle: "FACTURE",
-      id: id,
-      type,
-      path,
-    });
-  };
-
   console.log("cancelledProducts :", cancelledProducts);
   console.log("notPickedUpProducts :", notPickedUpProducts);
-  console.log("hasInvoice :", hasInvoice);
 
   if (!order) {
     return (
@@ -457,103 +381,13 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
               extraClasses="mb-3"
             />
 
-            <View className="">
-              {hasInvoice && (
-                <View className="rounded-lg bg-tertiary/30 dark:bg-tertiary p-2 mb-3">
-                  <Text className="text-black dark:text-white font-bold text-sm ml-1 mb-2">
-                    FACTURE
-                  </Text>
-                  <View className="flex flex-row">
-                    <View className="flex-grow justify-center items-center">
-                      <Text className="text-black dark:text-white font-bold text-xl">
-                        {globalTools.formatDateToFr(
-                          order.details[0].invoice.createdAt,
-                        )}
-                      </Text>
-                    </View>
-                    <View className="flex flex-row justify-around px-5">
-                      <MainButton
-                        label="Partager"
-                        buttonType="label-icon-top"
-                        iconName="file-pdf"
-                        iconColor="white"
-                        iconFamily="FontAwesome6Icon"
-                        bgColor="bg-validated"
-                        iconSize={25}
-                        extraClasses="p-2 w-18 mr-5"
-                        onPressFn={() =>
-                          downloadPdf(order.details[0].invoice._id, "invoices")
-                        }
-                      />
-                      <MainButton
-                        label="Afficher"
-                        buttonType="label-icon-top"
-                        iconName="file-pdf"
-                        iconColor="white"
-                        iconFamily="FontAwesome6Icon"
-                        bgColor="bg-partialValidated"
-                        iconSize={25}
-                        extraClasses="p-2 w-18"
-                        onPressFn={() =>
-                          displayPdf(
-                            order.details[0].invoice._id,
-                            "invoice",
-                            "invoices",
-                          )
-                        }
-                      />
-                    </View>
-                  </View>
-                </View>
-              )}
-
-              {hasCreditNote && (
-                <View className="rounded-lg bg-tertiary/30 dark:bg-tertiary p-2 mb-3">
-                  <Text className="text-black dark:text-white font-bold text-sm ml-1 mb-2">
-                    AVOIRS
-                  </Text>
-                  {order.details[0].creditNotes.map((cn) => (
-                    <View key={cn._id} className="flex flex-row mb-2">
-                      <View className="flex-grow justify-center items-center">
-                        <Text className="text-black dark:text-white font-bold text-xl">
-                          {globalTools.formatDateToFr(cn.createdAt)}
-                        </Text>
-                      </View>
-                      <View className="flex flex-row justify-around px-5">
-                        <MainButton
-                          label="Partager"
-                          buttonType="label-icon-top"
-                          iconName="file-pdf"
-                          iconColor="white"
-                          iconFamily="FontAwesome6Icon"
-                          bgColor="bg-withdrawn"
-                          iconSize={25}
-                          extraClasses="p-2 w-18 mr-5"
-                          onPressFn={() => downloadPdf(cn._id, "creditNotes")}
-                        />
-                        <MainButton
-                          label="Afficher"
-                          buttonType="label-icon-top"
-                          iconName="file-pdf"
-                          iconColor="white"
-                          iconFamily="FontAwesome6Icon"
-                          bgColor="bg-partialWithdrawn"
-                          iconSize={25}
-                          extraClasses="p-2 w-18"
-                          onPressFn={() =>
-                            displayPdf(
-                              order.details[0].creditNotes[0]._id,
-                              "creditNote",
-                              "creditNotes",
-                            )
-                          }
-                        />
-                      </View>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </View>
+            {subOrder && (
+              <InvoiceSection
+                subOrder={subOrder}
+                from="OrderDetails"
+                backLabel="Retour à la commande"
+              />
+            )}
 
             <View className="w-full flex items-center justify-center">
               {!hasFooterActions && renderButtons()}

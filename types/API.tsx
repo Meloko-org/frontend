@@ -621,12 +621,10 @@ type CircuitParamsData = {
 
 type StatusData =
   | "pending"
-  | "partialValidated"
-  | "validated"
-  | "partialWithdrawn"
-  | "withdrawn"
-  | "partialCanceled"
-  | "canceled"
+  | "partially-ready"
+  | "ready"
+  | "completed"
+  | "cancelled"
   | "all";
 
 /* types spéciaux pour la création ou l'update des produits en fonction du type bulk ou classic */

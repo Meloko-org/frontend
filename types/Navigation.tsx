@@ -209,7 +209,12 @@ type UserTabParamList = {
     backLabel?: string;
     screenTitle?: string;
   };
-
+  UserOrderDetails: {
+    from?: string;
+    backLabel?: string;
+    screenTitle?: string;
+    orderId: string;
+  };
   CircuitParameters: undefined;
   CircuitMap: {
     circuitOptions: CircuitOptionsData;

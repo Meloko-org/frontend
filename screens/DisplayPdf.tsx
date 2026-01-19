@@ -48,7 +48,8 @@ export default function DisplayPdfScreen({ navigation, route }: Props) {
       </View>
     );
 
-  console.log(pdfUri);
+  console.log("id :", id);
+  console.log("pdfUri :", pdfUri);
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">

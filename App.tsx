@@ -61,6 +61,7 @@ import WithdrawModesScreen from "./screens/customer/WithdrawModes";
 import OrderCustomerScreen from "./screens/customer/Order";
 import PaymentCustomerScreen from "./screens/customer/Payment";
 import OrdersCustomerScreen from "./screens/customer/Orders";
+import UserOrderDetailsScreen from "./screens/customer/OrderDetails";
 /* Tab PRODUCER screens*/
 import ShopProducerScreen from "./screens/producer/Shop";
 import BusinessCenterScreen from "./screens/producer/BusinessCenter";
@@ -121,10 +122,13 @@ import React, { useEffect } from "react";
 import { AuthProvider, useAuthContext } from "./hooks/useAuthContext";
 
 import * as WebBrowser from "expo-web-browser";
-import {
-  registerForPushNotifications,
-  sendTestNotification,
-} from "./notifications";
+import * as Notifications from "expo-notifications";
+import * as Linking from "expo-linking";
+import { LinkingOptions } from "@react-navigation/native";
+// import {
+//   registerForPushNotifications,
+//   sendTestNotification,
+// } from "./notifications";
 
 // Warm up the android browser to improve UX
 // https://docs.expo.dev/guides/authentication/#improving-user-experience
@@ -363,6 +367,11 @@ const TabNavigatorUser: React.FC = () => {
         component={OrdersCustomerScreen}
         options={{ tabBarButton: () => null }}
       />
+      <UserTab.Screen
+        name="UserOrderDetails"
+        component={UserOrderDetailsScreen}
+        options={{ tabBarButton: () => null }}
+      />
     </UserTab.Navigator>
   );
 };
@@ -597,6 +606,34 @@ export default function App() {
   //   })();
   // }, []);
 
+  useEffect(() => {
+    const sub = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        console.log("notification reçue :", response);
+        const data = response.notification.request.content.data;
+
+        if (data?.type === "order") {
+          Linking.openURL(`myapp://orders/${data.orderId}`);
+        }
+      },
+    );
+
+    return () => sub.remove();
+  }, []);
+
+  const linking = {
+    prefixes: ["meloko://"],
+    config: {
+      screens: {
+        TabNavigatorProducer: {
+          screens: {
+            OrderDetails: "orders/:orderId",
+          },
+        },
+      },
+    },
+  } as LinkingOptions<RootStackParamList>;
+
   const [fontsLoaded] = useFonts({
     Caveat_400Regular,
     Caveat_500Medium,
@@ -627,7 +664,7 @@ export default function App() {
               <ClerkLoaded>
                 <SafeAreaProvider>
                   <SheetProvider>
-                    <NavigationContainer ref={navigationRef}>
+                    <NavigationContainer ref={navigationRef} linking={linking}>
                       <Stack.Navigator screenOptions={options}>
                         <Stack.Screen name="Home" component={HomeScreen} />
                         <Stack.Screen name="SignUp" component={SignUpScreen} />

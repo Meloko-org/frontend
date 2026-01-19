@@ -35,7 +35,8 @@ export default function OrdersCustomerScreen({
   navigation,
   route,
 }: Props): JSX.Element {
-  const { backLabel, from, screenTitle } = route.params;
+  console.log("route params: ", route.params);
+  const { backLabel, from, screenTitle } = route.params || {};
 
   const { getToken } = useAuth();
 
@@ -77,22 +78,16 @@ export default function OrdersCustomerScreen({
           case "pending":
             message = "Aucune commande en attende.";
             break;
-          case "partialValidated":
+          case "partially-ready":
             message = "Aucune commande partiellement validée.";
             break;
-          case "validated":
+          case "ready":
             message = "Aucune commande validée.";
             break;
-          case "partialWithdrawn":
-            message = "Aucune commande partiellement retirée.";
-            break;
-          case "withdrawn":
+          case "completed":
             message = "Aucune commande retirée.";
             break;
-          case "partialCanceled":
-            message = "Aucune commande partiellement annulée.";
-            break;
-          case "canceled":
+          case "cancelled":
             message = "Aucune commande annulée.";
             break;
           case "all":
@@ -133,11 +128,12 @@ export default function OrdersCustomerScreen({
     }
   };
 
-  const handleOrderDetailPress = (order: OrderData) => {
-    SheetManager.show("order-details", {
-      payload: {
-        order,
-      },
+  const handleOrderDetailPress = (orderId: string) => {
+    navigation.navigate("UserOrderDetails", {
+      from: "OrdersCustomer",
+      backLabel: "Retour aux commandes",
+      screenTitle: "DETAIL\nCOMMANDE",
+      orderId: orderId,
     });
   };
 
@@ -189,7 +185,7 @@ export default function OrdersCustomerScreen({
               key={item._id}
               orderData={item}
               extraClasses="mb-2 mx-3"
-              onPressFn={() => handleOrderDetailPress(item)}
+              onPressFn={() => handleOrderDetailPress(item._id)}
             />
           )}
           onEndReached={() => {
@@ -197,7 +193,7 @@ export default function OrdersCustomerScreen({
               loadMoreOrders();
             }
           }}
-          contentContainerStyle={{ marginTop: 5 }}
+          contentContainerStyle={{ marginTop: 5, paddingBottom: 30 }}
           onEndReachedThreshold={0.5}
           ListFooterComponent={isLoading ? <Spinner /> : null}
           refreshing={isRefreshing}

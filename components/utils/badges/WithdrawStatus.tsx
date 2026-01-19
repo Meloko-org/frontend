@@ -2,16 +2,10 @@ import React, { JSX } from "react";
 import { Text, View } from "react-native";
 import TextHeading4 from "../texts/Heading4";
 import TextBody2 from "../texts/Body2";
+import { StatusData } from "../../../types/API";
 
 export type BadgeWithdrawStatusProps = {
-  type:
-    | "pending"
-    | "partialValidated"
-    | "validated"
-    | "partialWithdrawn"
-    | "withdrawn"
-    | "canceled"
-    | "partialCanceled";
+  type: StatusData;
   extraClasses?: string;
 };
 
@@ -22,17 +16,13 @@ export default function BadgeWithdraw(
     switch (true) {
       case props.type === "pending":
         return "bg-pending";
-      case props.type === "partialValidated":
+      case props.type === "partially-ready":
         return "bg-partialValidated";
-      case props.type === "validated":
+      case props.type === "ready":
         return "bg-validated";
-      case props.type === "partialWithdrawn":
+      case props.type === "completed":
         return "bg-partialWithdrawn";
-      case props.type === "withdrawn":
-        return "bg-withdrawn";
-      case props.type === "partialCanceled":
-        return "bg-partialCanceled";
-      case props.type === "canceled":
+      case props.type === "cancelled":
         return "bg-canceled";
     }
   };
@@ -40,14 +30,12 @@ export default function BadgeWithdraw(
     <View
       className={`${props.extraClasses} flex flex-row justify-center items-center rounded-lg py-1 px-2 ${backgroundColor()}`}
     >
-      <Text className="text-lightbg font-bold text-[12px] uppercase">
-        {props.type === "pending" && `attende de\nvalidation`}
-        {props.type === "partialValidated" && `validation\npartielle`}
-        {props.type === "validated" && `à retirer`}
-        {props.type === "partialWithdrawn" && `retrait\npartiel`}
-        {props.type === "withdrawn" && `retirée`}
-        {props.type === "canceled" && `annulée`}
-        {props.type === "partialCanceled" && `annulation\npartielle`}
+      <Text className="text-lightbg font-bold text-[12px] text-center uppercase">
+        {props.type === "pending" && `En attende de\nvalidation`}
+        {props.type === "partially-ready" && `Validation\npartielle`}
+        {props.type === "ready" && `Prête à être\nretirée`}
+        {props.type === "completed" && `Commande\nterminée`}
+        {props.type === "cancelled" && `Commande\nannulée`}
       </Text>
     </View>
   );

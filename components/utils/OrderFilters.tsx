@@ -20,32 +20,22 @@ const STATUS_COLORS: Record<
     icon: "hourglass-half",
     family: "FontAwesome5Icon",
   },
-  partialValidated: {
+  "partially-ready": {
     color: "bg-partialValidated",
     icon: "check-double",
     family: "FontAwesome5Icon",
   },
-  validated: {
+  ready: {
     color: "bg-validated",
     icon: "check",
     family: "FontAwesome5Icon",
   },
-  partialWithdrawn: {
+  completed: {
     color: "bg-partialWithdrawn",
     icon: "shopping-basket",
     family: "FontAwesome5Icon",
   },
-  withdrawn: {
-    color: "bg-withdrawn",
-    icon: "shopping-basket",
-    family: "FontAwesome5Icon",
-  },
-  partialCanceled: {
-    color: "bg-partialCanceled",
-    icon: "ban",
-    family: "FontAwesome5Icon",
-  },
-  canceled: {
+  cancelled: {
     color: "bg-canceled",
     icon: "times-circle",
     family: "FontAwesome5Icon",
