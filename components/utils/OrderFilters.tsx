@@ -49,7 +49,7 @@ export default function OrderFilters({
   iconSize,
 }: Props) {
   return (
-    <View className="flex flex-row justify-center gap-x-3">
+    <View className="flex flex-row justify-center gap-x-4">
       {Object.entries(STATUS_COLORS).map(([key, data]) => {
         const isActive = status === key;
 

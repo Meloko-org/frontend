@@ -363,7 +363,7 @@ export default function OrderDetailsScreen({ navigation, route }: Props) {
       <View style={{ flex: 1 }}>
         <TopBar
           backLabel={backLabel || "Retour au tableau"}
-          screen={from || "businessCenter"}
+          screen={from || "PendingOrders"}
           label={screenTitle || "COMMANDES\nEN ATTENTE"}
           extraClasses="mt-2 mb-5"
         />

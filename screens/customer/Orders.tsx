@@ -170,7 +170,7 @@ export default function OrdersCustomerScreen({
       <View style={{ flex: 1 }} className="flex flex-row justify-center px-3">
         <OrderFilters
           status={status}
-          size={30}
+          size={40}
           iconSize={20}
           onChange={(s) => setStatus(s)}
         />

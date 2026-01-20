@@ -609,11 +609,20 @@ export default function App() {
   useEffect(() => {
     const sub = Notifications.addNotificationResponseReceivedListener(
       (response) => {
-        console.log("notification reçue :", response);
+        console.log("notification reçue :", JSON.stringify(response, null, 2));
         const data = response.notification.request.content.data;
 
-        if (data?.type === "order") {
-          Linking.openURL(`myapp://orders/${data.orderId}`);
+        if (!data.type) return;
+
+        switch (data.type) {
+          case "user-order":
+            Linking.openURL(`myapp://orders/user/${data.orderId}`);
+            break;
+          case "producer-order":
+            Linking.openURL(`myapp://orders/${data.orderId}`);
+            break;
+          default:
+            console.warn("Notification type inconnu :", data.type);
         }
       },
     );
@@ -625,6 +634,11 @@ export default function App() {
     prefixes: ["meloko://"],
     config: {
       screens: {
+        TabNavigatorUser: {
+          screens: {
+            UserOrderDetails: "orders/user/:orderId",
+          },
+        },
         TabNavigatorProducer: {
           screens: {
             OrderDetails: "orders/:orderId",
