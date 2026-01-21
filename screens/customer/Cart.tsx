@@ -111,7 +111,7 @@ export default function CartScreen({ navigation }: Props) {
       <View className="flex flex-column h-full">
         {products.length > 0 ? (
           <>
-            <ScrollView className="px-3 mb-5">
+            <ScrollView className="px-3">
               <TextHeading2 extraClasses="mb-5" centered>
                 Mon panier
               </TextHeading2>
@@ -137,7 +137,7 @@ export default function CartScreen({ navigation }: Props) {
                 disabled={false}
                 isLoading={false}
                 onPressFn={() => navigation.navigate("MapCustomer")}
-                extraClasses="h-14"
+                extraClasses="h-14 mb-5"
               />
             </ScrollView>
           </>

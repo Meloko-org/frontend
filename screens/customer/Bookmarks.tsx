@@ -72,13 +72,16 @@ export default function BookmarksScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView className="flex-1 bg-lightbg dark:bg-darkbg">
-      <View className="p-3 flex flex-column h-full mt-2">
+      <View className="pt-3 flex flex-column h-full mt-2">
         {shops.length > 0 ? (
           <>
             <TextHeading3 centered extraClasses="my-5">
               Vos producteurs favoris
             </TextHeading3>
-            <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              className="flex-1 pt-1 px-3"
+            >
               {shops.map((shop) => (
                 <CardProducer
                   key={shop?._id}

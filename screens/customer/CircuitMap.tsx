@@ -49,10 +49,10 @@ export default function CircuitMapScreen({ navigation, route }: Props) {
   const fetchCircuit = async () => {
     const response = await circuitTools.getCircuit(circuitOptions);
 
-    if (response.data?.shops.length === 0) {
+    if (!response.success && response.message) {
       SheetManager.show("alert", {
         payload: {
-          message: "Aucun résultat. Réduisez les paramètres.",
+          message: response.message,
           alertType: "warning",
         },
       });

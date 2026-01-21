@@ -7,7 +7,7 @@ import IconButton from "../utils/buttons/Icon";
 import _Fontawesome from "react-native-vector-icons/FontAwesome6";
 import { GestureResponderEvent } from "react-native";
 import { ShopData, ShopResultData } from "../../types/API";
-import bookmarksTools from "../../modules/bookmarksTools";
+import { googleMapsDrive } from "../../modules/globalTools";
 
 type ShopSearchResultCardProps = {
   shopData: ShopData;
@@ -34,12 +34,12 @@ export default function ShopSearchResultCard({
 }: ShopSearchResultCardProps): JSX.Element {
   // const [isBookmarked, setIsBookmarked] = useState<boolean>(true);
 
-  const handleGoogleMap = () => {
-    const destination = `${shopData?.address.latitude}, ${shopData?.address.longitude}`;
+  // const handleGoogleMap = () => {
+  //   const destination = `${shopData?.address.latitude}, ${shopData?.address.longitude}`;
 
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
-    Linking.openURL(url);
-  };
+  //   const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
+  //   Linking.openURL(url);
+  // };
 
   return (
     <TouchableOpacity onPress={onPressFn}>
@@ -47,7 +47,7 @@ export default function ShopSearchResultCard({
         style={{ shadowColor: "#000" }}
         className={`
           ${extraClasses} 
-          ${displayMode === "bottomSheet" || displayMode === "order" ? "rounded-lg bg-white p-2 dark:bg-tertiary" : "p-2"} 
+          ${displayMode !== "mapCallout" ? "rounded-lg bg-white p-2 dark:bg-tertiary" : "p-2"} 
           flex flex-row w-full shadow-md`}
       >
         <View className="flex flex-row items-center w-4/5">
@@ -98,14 +98,14 @@ export default function ShopSearchResultCard({
               (displayMode === "bottomSheet" && (
                 <BadgeSecondary extraClasses="px-1">{`${shopData?.stocks?.length} produit${shopData?.stocks?.length > 1 ? "s" : ""} chez ce producteur`}</BadgeSecondary>
               ))}
-            {displayMode === "bookmark" && (
+            {displayMode === "bookmark" && shopData && (
               <IconButton
                 iconName={"heart"}
                 iconFamily="FontAwesomeIcon"
                 iconColor="#98B66E"
                 extraClasses="h-10"
                 onPressFn={() => {
-                  onBookmarkPressFn?.(shopData?._id!);
+                  onBookmarkPressFn?.(shopData?._id);
                 }}
               />
             )}
@@ -115,7 +115,7 @@ export default function ShopSearchResultCard({
           <View className="flex flex-row justify-center items-center w-1/5">
             <IconButton
               iconName="location-arrow"
-              onPressFn={handleGoogleMap}
+              onPressFn={() => googleMapsDrive(shopData)}
               extraClasses="w-[50px] h-[50px] bg-primary"
             />
           </View>

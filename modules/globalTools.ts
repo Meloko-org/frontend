@@ -1,6 +1,8 @@
+import { Linking } from "react-native";
 import {
   ApiResponse,
   ProductCategoryData,
+  ShopData,
   ShopFeaturesData,
 } from "../types/API";
 // const API_ROOT: string = process.env.EXPO_PUBLIC_API_ROOT!;
@@ -89,6 +91,14 @@ export const formatEurosToCents = (euros: string): number => {
   return Math.round(parseFloat(euros) * 100);
 };
 
+export const googleMapsDrive = (shop: ShopData | undefined) => {
+  if (!shop) return;
+  const destination = `${shop?.address.latitude}, ${shop?.address.longitude}`;
+
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
+  Linking.openURL(url);
+};
+
 export default {
   formatDateToFr,
   formatQuantity,
@@ -98,4 +108,5 @@ export default {
   formatDuration,
   formatCentsToEuros,
   formatEurosToCents,
+  googleMapsDrive,
 };

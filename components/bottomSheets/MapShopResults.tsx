@@ -204,7 +204,7 @@ export default function MapShopResults(props: SheetProps<"map-shop-results">) {
             showsVerticalScrollIndicator={false}
             scrollEnabled={true}
             style={{ height: getFlatListHeight(), width: "100%" }}
-            contentContainerStyle={{ paddingHorizontal: 12 }}
+            contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 12 }}
             ListFooterComponent={<View style={{ height: 100 }} />}
             ref={flatListRef}
             renderItem={({ item }) => (

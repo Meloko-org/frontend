@@ -32,6 +32,8 @@ import bookmarksTools from "../../modules/bookmarksTools";
 import CloseSheetButton from "../utils/buttons/CloseSheet";
 import BadgeSecondary from "../utils/badges/Secondary";
 import React from "react";
+// import globalTools from "../../modules/globalTools";
+import { googleMapsDrive } from "../../modules/globalTools";
 
 type ClickCollectInfosData = {
   instructions: string | undefined;
@@ -311,7 +313,7 @@ export default function ShopDetails(props: SheetProps<"shop-details">) {
                 iconColor="#ffffff"
                 iconFamily="FontAwesome5Icon"
                 extraClasses="h-24 w-32"
-                onPressFn={() => {}}
+                onPressFn={() => googleMapsDrive(shop)}
               />
             </View>
           )}

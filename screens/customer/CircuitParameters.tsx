@@ -339,7 +339,7 @@ export default function CircuitParametersScreen({ navigation }: Props) {
               thumbTintColor="#98B66E"
             />
             <View className="flex flex-row items-center justify-center w-20">
-              <Text className=" dark:text-lightbg">
+              <Text className="text-black dark:text-lightbg">
                 {circuitOptions.radius.value[0]} km
               </Text>
             </View>

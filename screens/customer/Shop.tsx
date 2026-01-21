@@ -187,6 +187,8 @@ export default function ShopUserScreen({ navigation, route }: Props) {
       );
     });
 
+  console.log("categories :", categoriesObjects);
+
   // console.log(
   //   " un product par cat :",
   //   JSON.stringify(
@@ -422,10 +424,10 @@ export default function ShopUserScreen({ navigation, route }: Props) {
                         </View>
                       </View>
 
-                      <View style={{ flex: 10 }} className="px-3 py-1">
+                      <View style={{ flex: 10 }} className="">
                         <ScrollView
                           showsVerticalScrollIndicator={false}
-                          className="w-full"
+                          className="px-3 pt-1 pb-3"
                         >
                           {searchProduct}
                         </ScrollView>

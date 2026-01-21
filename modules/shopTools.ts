@@ -225,57 +225,6 @@ const getStocksByShopAndCategory = async (
   }
 };
 
-// type Period = {
-//   openingTime: string | null;
-//   closingTime: string | null;
-// };
-// type OpeningHour = {
-//   day: number;
-//   periods: Period[];
-// };
-// type ClickCollectValues = {
-//   instructions: string | undefined;
-//   openingHours: OpeningHour[];
-// } | null;
-
-// const updateClickCollect = async (
-//   token: string | null,
-//   values: ClickCollectValues,
-// ): Promise<ApiResponse<ShopData>> => {
-//   try {
-//     const response = await fetch(`${API_ROOT}/shops/clickCollect`, {
-//       method: "PUT",
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${token}`,
-//         mode: "cors",
-//       },
-//       body: JSON.stringify(values),
-//     });
-
-//     if (!response.ok) {
-//       return {
-//         success: false,
-//         data: null,
-//         message: `Erreur ${response.status}: Impossible de mettre à jour.`,
-//       };
-//     }
-
-//     const data = await response.json();
-
-//     return data.success
-//       ? { success: true, data: data.shop }
-//       : { success: false, data: null, message: data.message };
-//   } catch (error) {
-//     console.log(error);
-//     return {
-//       success: false,
-//       data: null,
-//       message: "Une erreur s'est produite lors de la mise à jour.",
-//     };
-//   }
-// };
-
 const updateClickCollect = async (
   token: string | null,
   values: ClickCollectData,
